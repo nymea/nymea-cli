@@ -169,7 +169,7 @@ def method_list_device_states():
         params = {}
         params['deviceId'] = deviceId
         params['stateTypeId'] = deviceClass['stateTypes'][i]['id']
-        response = send_command("Devices.GetStateValue", params)
+        response = guh.send_command("Devices.GetStateValue", params)
         print "%30s: %s" % (deviceClass['stateTypes'][i]['name'], response['params']['value'])
     print "=== States ==="  
 
@@ -328,7 +328,6 @@ def processmenu(menu, parent=None):
 	    screen.clear()
 	    ###############################
 	    curses.endwin()
-	    os.system('clear')
 	    methodCall = globals()[menu['options'][getin]['command']]
 	    methodCall()
 	    raw_input("\nPress any key...")
@@ -345,7 +344,7 @@ def processmenu(menu, parent=None):
 	    screen.clear() 
 	elif menu['options'][getin]['type'] == EXITMENU:
 	    exitmenu = True
- 
+
 # Main 
 guh.init()
 processmenu(menu_data)
