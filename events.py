@@ -18,13 +18,12 @@ def select_eventType(deviceClassId):
     eventTypes = get_eventTypes(deviceClassId)
     if not eventTypes:
         return None
-    
     eventTypeList = []
     for i in range(len(eventTypes)):
         eventTypeList.append(eventTypes[i]['name'])
-        
     selection = guh.get_selection("Please select an event type:", eventTypeList)
     return eventTypes[selection]
+
 
 def create_eventDescriptors():
     enough = False
@@ -40,12 +39,10 @@ def create_eventDescriptors():
         eventDescriptor['eventTypeId'] = eventType['id']
         if len(params) > 0:
             eventDescriptor['paramDescriptors'] = params
-            
         eventDescriptors.append(eventDescriptor)
         input = raw_input("Do you want to add another EventDescriptor? (y/N): ")
         if not input == "y":
             enough = True
-            
     print "got eventDescriptors:", eventDescriptors
     return eventDescriptors
 
@@ -61,7 +58,6 @@ def create_eventDescriptor():
     eventDescriptor['eventTypeId'] = eventType['id']
     if len(params) > 0:
         eventDescriptor['paramDescriptors'] = params
-
     print "got eventDescriptors:", eventDescriptor
     return eventDescriptor
 

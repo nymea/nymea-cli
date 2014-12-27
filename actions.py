@@ -4,8 +4,13 @@ import devices
 def get_actionType(actionTypeId):
     params = {}
     params['actionTypeId'] = actionTypeId
-    response = guh.send_command("Actions.GetActionType", params)
-    return response['params']['actionType']
+    return guh.send_command("Actions.GetActionType", params)['params']['actionType']
+
+
+def get_actionTypes(deviceClassId):
+    params = {}
+    params['deviceClassId'] = deviceClassId
+    return guh.send_command("Devices.GetActionTypes", params)['params']['actionTypes']
 
 
 def create_actions():
@@ -22,23 +27,22 @@ def create_actions():
         action['actionTypeId'] = actionType['id']
         if len(params) > 0:
             action['params'] = params
-            
         actions.append(action)
         input = raw_input("Do you want to add another action? (y/N): ")
         if not input == "y":
-            enough = True
-            
+            enough = True            
     return actions
 
 
 def execute_action():
     deviceId = devices.select_configured_device()
+    if deviceId == None:
+	return None
     device = devices.get_device(deviceId)
     actionType = select_actionType(device['deviceClassId'])
     if actionType == "":
         print "\n    This device has no actions"
-        return
-    
+        return None
     actionTypeId = actionType['id']
     params = {}
     params['actionTypeId'] = actionTypeId
@@ -51,22 +55,13 @@ def execute_action():
     
     
 def select_actionType(deviceClassId):
-    actions = get_action_types(deviceClassId)
+    actions = get_actionTypes(deviceClassId)
     if not actions:
 	return None
-    
     actionList = []
     print "got actions", actions
     for i in range(len(actions)):
         print "got actiontype", actions[i]
         actionList.append(actions[i]['name'])
-        
     selection = guh.get_selection("Please select an action type:", actionList)
     return actions[selection]
-
-
-def get_action_types(deviceClassId):
-    params = {}
-    params['deviceClassId'] = deviceClassId
-    return guh.send_command("Devices.GetActionTypes", params)['params']['actionTypes']
-

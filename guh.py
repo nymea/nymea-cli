@@ -1,5 +1,6 @@
 import sys
 import telnetlib
+import socket
 import json
 
 import devices
@@ -9,19 +10,24 @@ import rules
 
 commandId=0
 
-def init():
+def init_connection():
     HOST='localhost'
     PORT=1234
+    global tn
     if len(sys.argv) > 1:
 	HOST = sys.argv[1]
-    global tn
-    tn = telnetlib.Telnet(HOST, PORT)
-    packet = tn.read_until("\n}\n")
+    try:
+	tn = telnetlib.Telnet(HOST, PORT)
+	packet = tn.read_until("\n}\n")
+	packet = json.loads(packet)
+	print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
+	return True
+    except socket.error, e:
+	print "Error:", e[1]," -> could not connect to guh."
+	print "       Please check if guh is running on", HOST
+	return False
 
-    packet = json.loads(packet)
-    print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
-
-
+    
 def send_command(method, params = None):
     global commandId
     global tn
@@ -30,7 +36,6 @@ def send_command(method, params = None):
     commandObj['method'] = method
     if not params == None and len(params) > 0:
         commandObj['params'] = params
-
     command = json.dumps(commandObj) + '\n'
     commandId = commandId + 1
     tn.write(command)
@@ -38,7 +43,6 @@ def send_command(method, params = None):
     if response['status'] != "success":
         print "JSON error happened: %s" % response
         return None
-    
     return response
 
 
@@ -46,11 +50,12 @@ def get_selection(title, options):
     print "\n\n", title
     for i in range(0,len(options)):
         print "%5i: %s" % (i, options[i])
-        
     selection = raw_input("Enter selection: ")
     if not selection:
 	print "\n   -> error in selection"
 	return None
+    print ""
+    print "========================================================"
     return int(selection)
 
 
@@ -109,7 +114,6 @@ def read_paramDescriptors(paramTypes):
         param['value'] = paramValue
         param['operator'] = operator
         params.append(param)
-        
     print "got params:", params
     return params
 
@@ -178,12 +182,25 @@ def print_rule_error_code(ruleError):
         print "\nERROR: Unknown error code: ", ruleError,  "Please take a look at the newest API version."
 
 
+def print_server_version():
+    response = send_command("JSONRPC.Version")
+    print "guh version: %5s" % (response['params']['version'])
+    print "API version: %5s" % (response['params']['protocol version'])
+
+
+def print_api():
+    print_json_format(send_command("JSONRPC.Introspect"))
+
+
+def print_json_format(string):
+    print json.dumps(string, sort_keys=True, indent=2, separators=(',', ': '))
+
+
 def select_valueOperator():
     valueOperators = ["ValueOperatorEquals", "ValueOperatorNotEquals", "ValueOperatorLess", "ValueOperatorGreater", "ValueOperatorLessOrEqual", "ValueOperatorGreaterOrEqual"]
     selection = get_selection("Please select an operator to compare this parameter: ", valueOperators)
     if selection != None:
         return valueOperators[selection]
-    
     return None
 
 
@@ -192,7 +209,6 @@ def select_stateOperator():
     selection = get_selection("Please select an operator to compare this state: ", stateOperators)
     if selection != None:
         return stateOperators[selection]
-    
     return None
 
   
