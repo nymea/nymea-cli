@@ -2,17 +2,34 @@ import guh
 import devices
 import events
 import actions
+import states
 
 def add_rule():
-    params = {}
-    params['eventDescriptorList'] = events.create_eventDescriptors()
-    if len(params['eventDescriptorList']) > 1:
-        params['stateEvaluator'] = guh.select_stateOperator()
-    params['actions'] = actions.create_actions()
-    print "adding rule with params:", params
-    response = guh.send_command("Rules.AddRule", params)
-    guh.print_rule_error_code(response['params']['ruleError'])
-
+    ruleTypes = ["Create a reaction (Event based rule)", "Create a behaviour (State based rule)"]
+    boolTypes = ["True","False"]
+    ruleType = guh.get_selection("Please select a rule type:", ruleTypes)
+    if ruleType == 0:	#Create a reaction (Event based rule)
+	params = {}
+	eventDescriptors = events.create_eventDescriptors()
+	print guh.print_json_format(eventDescriptors)
+	if len(eventDescriptors) > 1:
+	    params['eventDescriptorList'] = eventDescriptors
+	else:
+	    params['eventDescriptor'] = eventDescriptors[0]
+	params['actions'] = actions.create_actions()
+	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
+	print "adding rule with params:\n", guh.print_json_format(params)
+	response = guh.send_command("Rules.AddRule", params)
+	guh.print_rule_error_code(response['params']['ruleError'])
+    if ruleType == 1:	#Create a behaviour (State based rule)
+	stateEvaluator = states.create_stateEvaluator()
+	params = {}
+	params['stateEvaluator'] = stateEvaluator
+	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
+	#params['actions'] = actions.create_actions()
+	print "adding rule with params:\n", guh.print_json_format(params)
+	#response = guh.send_command("Rules.AddRule", params)
+	#guh.print_rule_error_code(response['params']['ruleError'])
 
 def select_rule():
     ruleIds = guh.send_command("Rules.GetRules", {})['params']['ruleIds']
@@ -73,9 +90,9 @@ def enable_disable_rule():
 def list_rules():
     response = guh.send_command("Rules.GetRules", {})
     if not response['params']['ruleIds']:
-        print "\n    No rules found."
+        print "\n    No rules found. \n"
         return None
-    print "\nRules found:"
+    print "-> List of configured Rules:"
     for i in range(len(response['params']['ruleIds'])):
 	ruleId = response['params']['ruleIds'][i]
 	params = {}
@@ -92,17 +109,19 @@ def list_rule_details():
     params = {}
     params['ruleId'] = ruleId
     response = guh.send_command("Rules.GetRuleDetails", params)
-    print response
-    print "\nDetails for rule", ruleId, "which currently is", get_rule_status(ruleId) 
-    print "\nEvents ->", guh.get_stateEvaluator_string(response['params']['rule']['stateEvaluator']['operator']), ":"
-    for i in range(len(response['params']['rule']['eventDescriptors'])):
-        eventDescriptor = response['params']['rule']['eventDescriptors'][i]
-        device = devices.get_device(eventDescriptor['deviceId'])
-        eventType = events.get_eventType(eventDescriptor['eventTypeId'])
-        paramDescriptors = eventDescriptor['paramDescriptors']
-        print  "%5s. -> %40s -> eventTypeId: %10s: " %(i, device['name'], eventType['name'])
-        for i in range(len(paramDescriptors)):
-            print "%58s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
+    print guh.print_json_format(response)
+    print "========================================================"
+    print "-> Details for rule %s which currently is %s:" % (ruleId, get_rule_status(ruleId))
+    if len(response['params']['rule']['eventDescriptors']) > 0:
+	print "\nEvents:"
+	for i in range(len(response['params']['rule']['eventDescriptors'])):
+	    eventDescriptor = response['params']['rule']['eventDescriptors'][i]
+	    device = devices.get_device(eventDescriptor['deviceId'])
+	    eventType = events.get_eventType(eventDescriptor['eventTypeId'])
+	    paramDescriptors = eventDescriptor['paramDescriptors']
+	    print  "%5s. -> %40s -> eventTypeId: %10s: " %(i, device['name'], eventType['name'])
+	    for i in range(len(paramDescriptors)):
+		print "%58s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
     print "\nActions:"
     for i in range(len(response['params']['rule']['actions'])):
         action = response['params']['rule']['actions'][i]
@@ -112,7 +131,6 @@ def list_rule_details():
         print  "%5s. ->  %40s -> action: %s" %(i, device['name'], actionType['name'])
         for i in range(len(actionParams)):
             print "%61s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
-
 
 
 def list_rules_containig_deviceId():

@@ -45,6 +45,11 @@ menu_data = {
 		    'command': 'method_remove_device' 
 		},
 		{
+		    'title': "List configured devices", 
+		    'type': COMMAND, 
+		    'command': 'method_list_configured_devices' 
+		},
+		{
 		    'title': "List device parameters", 
 		    'type': COMMAND, 
 		    'command': 'method_list_configured_device_params' 
@@ -63,11 +68,6 @@ menu_data = {
 		    'title': "List supported vendors", 
 		    'type': COMMAND, 
 		    'command': 'method_list_vendors' 
-		},
-		{
-		    'title': "List configured devices", 
-		    'type': COMMAND, 
-		    'command': 'method_list_configured_devices' 
 		},
 		{
 		    'title': "List supported devices", 
@@ -102,7 +102,7 @@ menu_data = {
 		    'command': 'method_enable_disable_rule' 
 		},
 		{ 
-		    'title': "List configured rules", 
+		    'title': "List rules", 
 		    'type': COMMAND, 
 		    'command': 'method_list_rules' 
 		},
@@ -196,8 +196,7 @@ def method_list_deviceClasses(vendorId = None):
     devices.list_deviceClasses()
 
 def method_list_deviceClasses_by_vendor():
-    vendorId = devices.select_vendor()
-    method_list_deviceClasses(vendorId)
+    method_list_deviceClasses(devices.select_vendor())
     
 def method_list_rule_detail():
     rules.list_rule_details()

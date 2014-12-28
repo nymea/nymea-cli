@@ -1,5 +1,6 @@
 import guh
 import devices
+import parameters
 
 def get_actionType(actionTypeId):
     params = {}
@@ -21,7 +22,7 @@ def create_actions():
         deviceId = devices.select_configured_device()
         device = devices.get_device(deviceId)
         actionType = select_actionType(device['deviceClassId'])
-        params = guh.read_params(actionType['paramTypes'])
+        params = parameters.read_params(actionType['paramTypes'])
         action = {}
         action['deviceId'] = deviceId
         action['actionTypeId'] = actionType['id']
@@ -48,7 +49,7 @@ def execute_action():
     params['actionTypeId'] = actionTypeId
     params['deviceId'] = deviceId
     actionType = get_actionType(actionTypeId)
-    actionParams = guh.read_params(actionType['paramTypes'])
+    actionParams = parameters.read_params(actionType['paramTypes'])
     params['params'] = actionParams
     response = guh.send_command("Actions.ExecuteAction", params)
     guh.print_device_error_code(response['params']['deviceError'])

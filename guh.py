@@ -23,10 +23,9 @@ def init_connection():
 	print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
 	return True
     except socket.error, e:
-	print "Error:", e[1]," -> could not connect to guh."
+	print "ERROR:", e[1]," -> could not connect to guh."
 	print "       Please check if guh is running on", HOST
 	return False
-
     
 def send_command(method, params = None):
     global commandId
@@ -83,39 +82,6 @@ def get_stateEvaluator_string(stateEvaluator):
         return "|"
     else:
         return "<unknown state evaluator>"
-
-
-def read_params(paramTypes):
-    params = []
-    for paramType in paramTypes:
-        if any("allowedValues" in item for item in paramType):
-	    selection = get_selection("Please select one of following allowed values:", paramType['allowedValues'])
-	    paramValue = paramType['allowedValues'][selection]
-	    param = {}
-	    param['name'] = paramType['name']
-	    param['value'] = paramValue
-	else:  
-	    paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
-	    param = {}
-	    param['name'] = paramType['name']
-	    param['value'] = paramValue
-	    
-        params.append(param)
-    return params
-
-
-def read_paramDescriptors(paramTypes):
-    params = []
-    for paramType in paramTypes:
-        paramValue = raw_input("Please enter value for parameter <%s> (type: %s): " % (paramType['name'], paramType['type']))
-        operator = select_valueOperator()
-        param = {}
-        param['name'] = paramType['name']
-        param['value'] = paramValue
-        param['operator'] = operator
-        params.append(param)
-    print "got params:", params
-    return params
 
 
 def print_device_error_code(deviceError):
@@ -194,11 +160,15 @@ def print_api():
 
 def print_json_format(string):
     print json.dumps(string, sort_keys=True, indent=2, separators=(',', ': '))
+    print "\n"
 
 
-def select_valueOperator():
+def select_valueOperator(value):
     valueOperators = ["ValueOperatorEquals", "ValueOperatorNotEquals", "ValueOperatorLess", "ValueOperatorGreater", "ValueOperatorLessOrEqual", "ValueOperatorGreaterOrEqual"]
-    selection = get_selection("Please select an operator to compare this parameter: ", valueOperators)
+    valueOperatorsSymbols = []
+    for i in valueOperators:
+	valueOperatorsSymbols.append(get_valueOperator_string(i))
+    selection = get_selection("Please select an operator to compare this value: \n %s" % value, valueOperatorsSymbols)
     if selection != None:
         return valueOperators[selection]
     return None
@@ -206,7 +176,10 @@ def select_valueOperator():
 
 def select_stateOperator():
     stateOperators = ["StateOperatorAnd", "StateOperatorOr"]
-    selection = get_selection("Please select an operator to compare this state: ", stateOperators)
+    stateOperatorsSymbols = []
+    for i in stateOperators:
+	stateOperatorsSymbols.append(get_stateEvaluator_string(i))
+    selection = get_selection("Please select a state operator to compare this states: ", stateOperatorsSymbols)
     if selection != None:
         return stateOperators[selection]
     return None

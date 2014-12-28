@@ -1,5 +1,6 @@
 import guh
 import devices
+import parameters
 
 def get_eventType(eventTypeId):
     params = {}
@@ -11,7 +12,10 @@ def get_eventType(eventTypeId):
 def get_eventTypes(deviceClassId):
     params = {}
     params['deviceClassId'] = deviceClassId
-    return guh.send_command("Devices.GetEventTypes", params)['params']['eventTypes']
+    eventTypes = guh.send_command("Devices.GetEventTypes", params)['params']['eventTypes']
+    if eventTypes:
+	return eventTypes
+    return None
 
 
 def select_eventType(deviceClassId):
@@ -29,35 +33,24 @@ def create_eventDescriptors():
     enough = False
     eventDescriptors = []
     while not enough:
-        print "\nCreating EventDescriptor:"
-        deviceId = devices.select_configured_device()
-        device = devices.get_device(deviceId)
-        eventType = select_eventType(device['deviceClassId']);
-        params = guh.read_paramDescriptors(eventType['paramTypes'])
-        eventDescriptor = {}
-        eventDescriptor['deviceId'] = deviceId
-        eventDescriptor['eventTypeId'] = eventType['id']
-        if len(params) > 0:
-            eventDescriptor['paramDescriptors'] = params
+        eventDescriptor = create_eventDescriptor()
         eventDescriptors.append(eventDescriptor)
         input = raw_input("Do you want to add another EventDescriptor? (y/N): ")
         if not input == "y":
             enough = True
-    print "got eventDescriptors:", eventDescriptors
     return eventDescriptors
 
 
 def create_eventDescriptor():
-    print "\nCreating EventDescriptor:"
+    print " -> Creating EventDescriptor:\n"
     deviceId = devices.select_configured_device()
     device = devices.get_device(deviceId)
     eventType = select_eventType(device['deviceClassId']);
-    params = guh.read_paramDescriptors(eventType['paramTypes'])
+    params = parameters.read_paramDescriptors(eventType['paramTypes'])
     eventDescriptor = {}
     eventDescriptor['deviceId'] = deviceId
     eventDescriptor['eventTypeId'] = eventType['id']
     if len(params) > 0:
         eventDescriptor['paramDescriptors'] = params
-    print "got eventDescriptors:", eventDescriptor
     return eventDescriptor
 

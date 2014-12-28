@@ -78,7 +78,6 @@ def list_logEntries():
                 else:
                     deviceName = entry['deviceId']
                 deviceIdCache[entry['deviceId']] = deviceName
-
         if entry['source'] == "LoggingSourceEvents":
             typeId = entry['typeId']
             sourceType = "Event triggered"
@@ -99,8 +98,6 @@ def list_logEntries():
                 else:
                     deviceName = entry['deviceId']
                 deviceIdCache[entry['deviceId']] = deviceName
-
-
         if entry['source'] == "LoggingSourceRules":
             typeId = entry['typeId']
             if entry['eventType'] == "LoggingEventTypeTrigger":
@@ -116,7 +113,6 @@ def list_logEntries():
                     value = "active"
                 else:
                     value = "inactive"
-
             if typeId in ruleIdCache:
                 deviceName = ruleIdCache[typeId]
             else:
@@ -126,7 +122,6 @@ def list_logEntries():
                 else:
                     deviceName = typeId
                 ruleIdCache[typeId] = deviceName
-
         timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
         sourceType = sourceType.ljust(20)
         deviceName = deviceName.ljust(38)

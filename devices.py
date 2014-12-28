@@ -1,4 +1,5 @@
 import guh
+import parameters
 
 def get_supported_vendors():
     return guh.send_command("Devices.GetSupportedVendors")
@@ -53,7 +54,7 @@ def add_configured_device(deviceClassId):
     deviceClass = get_deviceClass(deviceClassId)
     params = {}
     params['deviceClassId'] = deviceClassId
-    deviceParams = guh.read_params(deviceClass['paramTypes'])
+    deviceParams = parameters.read_params(deviceClass['paramTypes'])
     if len(deviceParams) > 0:
         params['deviceParams'] = deviceParams
     print "add device command params:", params
@@ -63,7 +64,7 @@ def add_configured_device(deviceClassId):
 
 def add_device():
     deviceClassId = select_deviceClass()
-    if deviceClassId == "":
+    if deviceClassId == None:
         print "    Empty deviceClass. Can't continue"
         return None
     deviceClass = get_deviceClass(deviceClassId)
@@ -125,7 +126,7 @@ def discover_device(deviceClassId = None):
     deviceClass = get_deviceClass(deviceClassId)
     params = {}
     params['deviceClassId'] = deviceClassId
-    discoveryParams = guh.read_params(deviceClass['discoveryParamTypes'])
+    discoveryParams = parameters.read_params(deviceClass['discoveryParamTypes'])
     if len(discoveryParams) > 0:
         params['discoveryParams'] = discoveryParams
     print "\ndiscovering..."
@@ -202,18 +203,19 @@ def select_deviceClass():
     selection = guh.get_selection("Please select device class", deviceClassList)
     if selection != None:
 	return deviceClassIdList[selection]
+    return None
 
 
 def list_configured_devices():
     deviceList = get_configured_devices()
-    print "-> List of configured devices:"
+    print "-> List of configured devices:\n"
     for device in deviceList:
         print "%35s, ID: %s, DeviceClassID: %s" % (device['name'], device['id'], device['deviceClassId'])
 
 
 def list_deviceClasses(vendorId = None):
     response = get_deviceClasses(vendorId)
-    print "-> List of device classes:"
+    print "-> List of device classes:\n"
     for deviceClass in response:
         print "%35s  %s" % (deviceClass['name'], deviceClass['id'])
 
@@ -224,7 +226,7 @@ def list_device_states():
 	return None
     device = get_device(deviceId)
     deviceClass = get_deviceClass(device['deviceClassId'])
-    print "-> States of device \"%s\" %s:" % (device['name'], device['id'])
+    print "-> States of device \"%s\" %s:\n" % (device['name'], device['id'])
     for i in range(len(deviceClass['stateTypes'])):
         params = {}
         params['deviceId'] = deviceId
@@ -237,21 +239,21 @@ def list_configured_device_params():
     deviceId = select_configured_device()
     device = get_device(deviceId)
     deviceParams = device['params']
-    print "-> Params of device \"%s\" %s:" %(device['name'], device['id'])
+    print "-> Params of device \"%s\" %s\n:" %(device['name'], device['id'])
     for i in range(len(deviceParams)):
         print "%35s: %s" % (deviceParams[i]['name'], deviceParams[i]['value'])
 
 
 def list_vendors():
     response = get_supported_vendors();
-    print "-> List of supported vendors:"
+    print "-> List of supported vendors:\n"
     for vendor in response['params']['vendors']:
         print "%35s  %s" % (vendor['name'], vendor['id'])
 
 
 def list_plugins():
     plugins = get_plugins();
-    print "-> List of supported plugins:"
+    print "-> List of supported plugins:\n"
     for plugin in plugins:
 	print "%35s %s" % (plugin['name'], plugin['id'])
 
@@ -260,9 +262,9 @@ def list_plugin_configuration():
     plugin = get_plugin(pluginId)
     pluginConfiguration = get_plugin_configuration(pluginId)
     if not pluginConfiguration:
-	print "\n    This plugin %s has no configuration parameters.\n" % (plugin['name'])
+	print "\n    The plugin \"%s\" has no configuration parameters.\n" % (plugin['name'])
 	return None
-    print "-> The plugin \"%s\" %s has following configurations:" % (plugin['name'], plugin['id'])
+    print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['name'], plugin['id'])
     for i in range(len(pluginConfiguration)):
 	print "%35s: %s" % (pluginConfiguration[i]['name'], pluginConfiguration[i]['value'])
     
