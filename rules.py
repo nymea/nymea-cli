@@ -26,10 +26,10 @@ def add_rule():
 	params = {}
 	params['stateEvaluator'] = stateEvaluator
 	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
-	#params['actions'] = actions.create_actions()
+	params['actions'] = actions.create_actions()
 	print "adding rule with params:\n", guh.print_json_format(params)
-	#response = guh.send_command("Rules.AddRule", params)
-	#guh.print_rule_error_code(response['params']['ruleError'])
+	response = guh.send_command("Rules.AddRule", params)
+	guh.print_rule_error_code(response['params']['ruleError'])
 
 def select_rule():
     ruleIds = guh.send_command("Rules.GetRules", {})['params']['ruleIds']

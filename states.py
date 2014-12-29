@@ -14,7 +14,6 @@ def get_stateTypes(deviceClassId):
     params = {}
     params['deviceClassId'] = deviceClassId
     response = guh.send_command("Devices.GetStateTypes", params);
-    #print guh.print_json_format(response)
     if "stateTypes" in response['params']:
         return response['params']['stateTypes']
     else:
@@ -38,6 +37,8 @@ def create_stateDescriptor():
     deviceId = devices.select_configured_device()
     device = devices.get_device(deviceId)
     stateType = select_stateType(device['deviceClassId']);
+    if stateType == None:
+	return None
     valueOperator = guh.select_valueOperator(stateType['name'])
     print "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
     stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
@@ -55,18 +56,19 @@ def create_stateDescriptors():
     stateDescriptors = []
     while not enough:
         stateDescriptor = create_stateDescriptor()
-        stateDescriptors.append(stateDescriptor)
-        input = raw_input("Do you want to add another stateDescriptor? (y/N): ")
-        if not input == "y":
-            enough = True
+        if stateDescriptor != None:
+	    stateDescriptors.append(stateDescriptor)
+	    input = raw_input("Do you want to add another stateDescriptor? (y/N): ")
+	    if not input == "y":
+		enough = True
     return stateDescriptors
 
 
 def create_stateEvaluator(stateDescriptors = None):
-    # check if we allready have created a stateDescriptor
+    # check if we already have created a stateDescriptor
     if stateDescriptors == None:
-	#print "-> Creating a new stateEvaluator:\n"
 	stateDescriptors = create_stateDescriptors()
+	# if we have more than one stateDescriptor created...
 	if len(stateDescriptors) > 1:
 	    # create child operators
 	    childEvaluators = []
@@ -87,7 +89,7 @@ def create_stateEvaluator(stateDescriptors = None):
 	    stateEvaluator['stateDescriptor'] = stateDescriptors[0]
 	    return stateEvaluator
     else:
-	# we got allready a stateDescriptors list
+	# we got already a stateDescriptors list
 	if len(stateDescriptors) > 1:
 	    # create child operators
 	    childEvaluators = []

@@ -40,7 +40,7 @@ def send_command(method, params = None):
     tn.write(command)
     response = json.loads(tn.read_until("\n}\n"))
     if response['status'] != "success":
-        print "JSON error happened: %s" % response
+        print "JSON error happened: \n%s" % print_json_format(response)
         return None
     return response
 
