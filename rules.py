@@ -16,6 +16,10 @@ def add_rule():
 	    params['eventDescriptorList'] = eventDescriptors
 	else:
 	    params['eventDescriptor'] = eventDescriptors[0]
+	
+	print "Do you want to add states for your reaction?"
+	
+	
 	params['actions'] = actions.create_actions()
 	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
 	print "adding rule with params:\n", guh.print_json_format(params)
@@ -25,8 +29,8 @@ def add_rule():
 	stateEvaluator = states.create_stateEvaluator()
 	params = {}
 	params['stateEvaluator'] = stateEvaluator
-	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
 	params['actions'] = actions.create_actions()
+	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
 	print "adding rule with params:\n", guh.print_json_format(params)
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
@@ -113,15 +117,9 @@ def list_rule_details():
     print "========================================================"
     print "-> Details for rule %s which currently is %s:" % (ruleId, get_rule_status(ruleId))
     if len(response['params']['rule']['eventDescriptors']) > 0:
-	print "\nEvents:"
-	for i in range(len(response['params']['rule']['eventDescriptors'])):
-	    eventDescriptor = response['params']['rule']['eventDescriptors'][i]
-	    device = devices.get_device(eventDescriptor['deviceId'])
-	    eventType = events.get_eventType(eventDescriptor['eventTypeId'])
-	    paramDescriptors = eventDescriptor['paramDescriptors']
-	    print  "%5s. -> %40s -> eventTypeId: %10s: " %(i, device['name'], eventType['name'])
-	    for i in range(len(paramDescriptors)):
-		print "%58s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
+	events.print_eventDescriptors(response['params']['rule']['eventDescriptors'])
+    if response['params']['rule']['stateEvaluator'] > 0:
+	states.print_stateEvaluator(response['params']['rule']['stateEvaluator'])
     print "\nActions:"
     for i in range(len(response['params']['rule']['actions'])):
         action = response['params']['rule']['actions'][i]

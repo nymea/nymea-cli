@@ -54,3 +54,15 @@ def create_eventDescriptor():
         eventDescriptor['paramDescriptors'] = params
     return eventDescriptor
 
+
+
+def print_eventDescriptors(eventDescriptors):
+    print "\nEvents:"
+    for i in range(len(eventDescriptors)):
+	eventDescriptor = eventDescriptors[i]
+	device = devices.get_device(eventDescriptor['deviceId'])
+	eventType = get_eventType(eventDescriptor['eventTypeId'])
+	paramDescriptors = eventDescriptor['paramDescriptors']
+	print  "%5s. -> %40s -> eventTypeId: %10s: " %(i, device['name'], eventType['name'])
+	for i in range(len(paramDescriptors)):
+	    print "%58s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])

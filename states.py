@@ -74,11 +74,9 @@ def create_stateEvaluator(stateDescriptors = None):
 	    childEvaluators = []
 	    for i in range(len(stateDescriptors)):
 		# recursive call... create a stateEvaluator for each stateDescriptor
-		stateDescriptor = []				# has to be a list to enable recursive calls
-		stateDescriptor.append(stateDescriptors[i])	# append the single stateDescriptor to list (count =1)
-		childEvaluator = {}				# create a complete new stateEvaluator (like in addRule)
-		childEvaluator['stateEvaluator'] = create_stateEvaluator(stateDescriptor)	# recursive call
-		childEvaluators.append(childEvaluator)		# append the new childEvaluator to the real child
+		stateDescriptor = []							# has to be a list to enable recursive calls
+		stateDescriptor.append(stateDescriptors[i])				# append the single stateDescriptor to list (count =1)
+		childEvaluators.append(create_stateEvaluator(stateDescriptor))		# append the new childEvaluator to the real child... recursive call
 	    stateEvaluator = {}
 	    stateEvaluator['childEvaluators'] = childEvaluators
 	    stateEvaluator['operator'] = guh.select_stateOperator()
@@ -95,11 +93,9 @@ def create_stateEvaluator(stateDescriptors = None):
 	    childEvaluators = []
 	    for i in range(len(stateDescriptors)):
 		# recursive call... create a stateEvaluator for each stateDescriptor
-		stateDescriptor = []				# has to be a list to enable recursive calls
-		stateDescriptor.append(stateDescriptors[i])	# append the single stateDescriptor to list (count =1)
-		childEvaluator = {}				# create a complete new stateEvaluator (like in addRule)
-		childEvaluator['stateEvaluator'] = create_stateEvaluator(stateDescriptor)	# recursive call
-		childEvaluators.append(childEvaluator)		# append the new childEvaluator to the real child
+		stateDescriptor = []							# has to be a list to enable recursive calls
+		stateDescriptor.append(stateDescriptors[i])				# append the single stateDescriptor to list (count =1)
+		childEvaluators.append(create_stateEvaluator(stateDescriptor))		# append the new childEvaluator to the real child... recursive call
 	    stateEvaluator = {}
 	    stateEvaluator['childEvaluators'] = childEvaluators
 	    stateEvaluator['operator'] = guh.select_stateOperator()
@@ -109,3 +105,23 @@ def create_stateEvaluator(stateDescriptors = None):
 	    stateEvaluator = {}
 	    stateEvaluator['stateDescriptor'] = stateDescriptors[0]
 	    return stateEvaluator
+
+
+def print_stateEvaluator(stateEvaluator):
+    print "\nStates:\n     ",
+    if 'stateDescriptor' in stateEvaluator:
+	stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
+	device = devices.get_device(stateEvaluator['stateDescriptor']['deviceId'])
+	print stateType['name'],
+	print guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator'])
+	print stateEvaluator['stateDescriptor']['value']
+    else:
+	for i in range(len(stateEvaluator['childEvaluators'])):
+	    device = devices.get_device(stateEvaluator['childEvaluators'][i]['stateDescriptor']['deviceId'])
+	    stateType = get_stateType(stateEvaluator['childEvaluators'][i]['stateDescriptor']['stateTypeId'])
+	    print "(%s:%s" % (device['name'], stateType['name']),
+	    print guh.get_valueOperator_string(stateEvaluator['childEvaluators'][i]['stateDescriptor']['operator']),
+	    print stateEvaluator['childEvaluators'][i]['stateDescriptor']['value'], ")", 
+	    if i != (len(stateEvaluator['childEvaluators']) - 1):
+		print "%s%s" % (guh.get_stateEvaluator_string(stateEvaluator['operator']), guh.get_stateEvaluator_string(stateEvaluator['operator'])),
+	print ""
