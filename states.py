@@ -8,7 +8,7 @@ def get_stateType(stateTypeId):
     if "stateType" in response['params']:
         return response['params']['stateType']
     return None
-
+    
 
 def get_stateTypes(deviceClassId):
     params = {}
@@ -113,7 +113,7 @@ def print_stateEvaluator(stateEvaluator):
 	stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
 	device = devices.get_device(stateEvaluator['stateDescriptor']['deviceId'])
 	print stateType['name'],
-	print guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator'])
+	print guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']),
 	print stateEvaluator['stateDescriptor']['value']
     else:
 	for i in range(len(stateEvaluator['childEvaluators'])):
@@ -124,4 +124,4 @@ def print_stateEvaluator(stateEvaluator):
 	    print stateEvaluator['childEvaluators'][i]['stateDescriptor']['value'], ")", 
 	    if i != (len(stateEvaluator['childEvaluators']) - 1):
 		print "%s%s" % (guh.get_stateEvaluator_string(stateEvaluator['operator']), guh.get_stateEvaluator_string(stateEvaluator['operator'])),
-	print ""
+	print "\n"

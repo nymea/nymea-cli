@@ -53,8 +53,7 @@ def get_selection(title, options):
     if not selection:
 	print "\n   -> error in selection"
 	return None
-    print ""
-    print "========================================================"
+    print "\n========================================================"
     return int(selection)
 
 
@@ -159,8 +158,42 @@ def print_api():
 
 
 def print_json_format(string):
-    print json.dumps(string, sort_keys=True, indent=2, separators=(',', ': '))
+    print json.dumps(string, sort_keys=True, indent=4, separators=(',', ': '))
     print "\n"
+
+
+def print_api_method():
+    methods = send_command("JSONRPC.Introspect")['params']['methods']
+    #print_json_format(methods)
+    methodList = []
+    for item in methods:
+	methodList.append(item)
+    selection = get_selection("Please select a method:", methodList)
+    method = {}
+    method[methodList[selection]] = methods[methodList[selection]]
+    print print_json_format(method)
+
+
+def print_api_notifications():
+    notifications = send_command("JSONRPC.Introspect")['params']['notifications']
+    notificationList = []
+    for item in notifications:
+	notificationList.append(item)
+    selection = get_selection("Please select a notification:", notificationList)
+    notification = {}
+    notification[notificationList[selection]] = notifications[notificationList[selection]]
+    print print_json_format(notification)
+
+
+def print_api_type():
+    types = send_command("JSONRPC.Introspect")['params']['types']
+    typesList = []
+    for item in types:
+	typesList.append(item)
+    selection = get_selection("Please select a notification:", typesList)
+    type = {}
+    type[typesList[selection]] = types[typesList[selection]]
+    print print_json_format(type)
 
 
 def select_valueOperator(value):

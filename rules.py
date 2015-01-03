@@ -17,11 +17,12 @@ def add_rule():
 	else:
 	    params['eventDescriptor'] = eventDescriptors[0]
 	
-	print "Do you want to add states for your reaction?"
-	
-	
+	input = raw_input("-> Do you want to add state conditions to your reaction? (y/N): ")
+	if input == "y":
+	    	stateEvaluator = states.create_stateEvaluator()
+	    	params['stateEvaluator'] = stateEvaluator
 	params['actions'] = actions.create_actions()
-	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
+	params['enabled'] = boolTypes[guh.get_selection("-> Should the rule initially be enabled?", boolTypes)]
 	print "adding rule with params:\n", guh.print_json_format(params)
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
@@ -30,7 +31,7 @@ def add_rule():
 	params = {}
 	params['stateEvaluator'] = stateEvaluator
 	params['actions'] = actions.create_actions()
-	params['enabled'] = boolTypes[guh.get_selection("Should the rule initially be enabled?", boolTypes)]
+	params['enabled'] = boolTypes[guh.get_selection("-> Should the rule initially be enabled?", boolTypes)]
 	print "adding rule with params:\n", guh.print_json_format(params)
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])

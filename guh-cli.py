@@ -149,6 +149,21 @@ menu_data = {
 		    'title': "Print API", 
 		    'type': COMMAND, 
 		    'command': 'method_print_api' 
+		},
+		{ 
+		    'title': "List API method", 
+		    'type': COMMAND, 
+		    'command': 'method_print_api_method' 
+		},
+		{ 
+		    'title': "List API notification", 
+		    'type': COMMAND, 
+		    'command': 'method_print_api_notification' 
+		},
+		{ 
+		    'title': "List API type", 
+		    'type': COMMAND, 
+		    'command': 'method_print_api_type' 
 		}
 	    ]
 	}
@@ -215,6 +230,15 @@ def method_list_server_info():
 
 def method_print_api():
     guh.print_api()
+
+def method_print_api_method():
+    guh.print_api_method()
+    
+def method_print_api_notification():
+    guh.print_api_notifications()
+
+def method_print_api_type():
+    guh.print_api_type()
 
 def runmenu(menu, parent):
     # work out what text to display as the last menu option
