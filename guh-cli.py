@@ -337,22 +337,27 @@ def processmenu(menu, parent=None):
 	    screen.clear() 
 	elif menu['options'][getin]['type'] == EXITMENU:
 	    exitmenu = True
-
+    
 
 # Main 
 if not guh.init_connection():
     exit()
 else:
+    
     os.system('clear')
     screen = curses.initscr() #initializes a new window for capturing key presses
-    curses.noecho() # Disables automatic echoing of key presses (prevents program from input each key twice)
-    curses.cbreak() # Disables line buffering (runs each key as it is pressed rather than waiting for the return key to pressed)
-    curses.start_color() # Lets you use colors when highlighting selected menu option
-    screen.keypad(1) # Capture input from keypad
- 
-    curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN) # Sets up color pair #1, it does black text with green background
-    h = curses.color_pair(1) #h is the coloring for a highlighted menu option
-    n = curses.A_NORMAL #n is the coloring for a non highlighted menu option
- 
-    processmenu(menu_data)
-    curses.endwin()
+    try:
+	curses.noecho() # Disables automatic echoing of key presses (prevents program from input each key twice)
+	curses.cbreak() # Disables line buffering (runs each key as it is pressed rather than waiting for the return key to pressed)
+	curses.start_color() # Lets you use colors when highlighting selected menu option
+	screen.keypad(1) # Capture input from keypad
+    
+	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN) # Sets up color pair #1, it does black text with green background
+	h = curses.color_pair(1) #h is the coloring for a highlighted menu option
+	n = curses.A_NORMAL #n is the coloring for a non highlighted menu option
+    
+	processmenu(menu_data)
+    finally:
+	curses.endwin()
+
+    
