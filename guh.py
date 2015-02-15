@@ -31,9 +31,9 @@ import rules
 commandId=0
 
 def init_connection():
+    global tn
     HOST='localhost'
     PORT=1234
-    global tn
     if len(sys.argv) > 1:
 	HOST = sys.argv[1]
     try:

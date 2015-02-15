@@ -27,6 +27,8 @@ import rules
 import datetime
 import curses
 import sys
+import socket
+import threading
 
 screen = None
 allLines = []
@@ -39,6 +41,7 @@ highlightLineNum = 0
 def log_window():
     print "Open log window..."
     global screenHeight
+    global allLines
     global topLineNum
     global highlightLineNum
     global up
@@ -53,29 +56,31 @@ def log_window():
     screen.keypad(1)
     screen.clear()
     
-    allLines = []
     allLines = get_log_entry_lines()
-    highlightLineNum = 0# len(allLines)
-    h = curses.color_pair(1) 
-    n = curses.A_NORMAL 
+    highlightLineNum = len(allLines)
+    hilightColors = curses.color_pair(1) 
+    normalColors = curses.A_NORMAL 
     screenHeight = curses.LINES - 2
     x = None
+    moveUpDown(down)
+
     try:
 	while x !=ord('\n'):
 	    #draw screen
+	    screen.erase()
 	    screen.border(0)
 	    curses.curs_set(1)   
 	    curses.curs_set(0)
 	    top = topLineNum
 	    bottom = topLineNum + screenHeight
-		
+	    
 	    for (index,line,) in enumerate(allLines[top:bottom]):
 		linenum = topLineNum + index 
 		# highlight current line            
 		if index != highlightLineNum:
-		    screen.addstr(index + 1, 2, line, n)
+		    screen.addstr(index + 1, 2, line, normalColors)
 		else:
-		    screen.addstr(index + 1, 2, line, h)
+		    screen.addstr(index + 1, 2, line, hilightColors)
 	    # get user input
 	    x = screen.getch()
 	    if x == curses.KEY_UP:
@@ -93,10 +98,12 @@ def moveUpDown(direction):
     global screenHeight
     global topLineNum
     global highlightLineNum
+    global allLines
     global up
     global down
     
     nextLineNum = highlightLineNum + direction
+ 
     # paging
     if direction == up and highlightLineNum == 0 and topLineNum != 0:
         topLineNum += up
@@ -107,8 +114,14 @@ def moveUpDown(direction):
     # scroll highlight line
     if direction == up and (topLineNum != 0 or highlightLineNum != 0):
         highlightLineNum = nextLineNum
-    elif direction == down and (topLineNum + highlightLineNum + 1) != len(allLines)-2 and highlightLineNum != screenHeight +2:
+    elif direction == down and (topLineNum + highlightLineNum + 1) != len(allLines) and highlightLineNum != screenHeight:
         highlightLineNum = nextLineNum
+
+def create_notification_thread():
+    HOST='localhost'
+    PORT=1234
+    if len(sys.argv) > 1:
+	HOST = sys.argv[1]
 
 
 def list_logEntries():
