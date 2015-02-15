@@ -243,7 +243,7 @@ def method_list_rules_containig_deviceId():
     rules.list_rules_containig_deviceId()
 
 def method_list_log_entries():
-    logs.list_logEntries()
+    logs.log_window()
 
 def method_list_server_info():
     guh.print_server_version()
@@ -359,5 +359,6 @@ else:
 	processmenu(menu_data)
     finally:
 	curses.endwin()
+	os.system('clear')
 
     
