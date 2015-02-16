@@ -139,7 +139,7 @@ menu_data = {
 	    'subtitle': "Please select an option...",
 	    'options': [
 		{ 
-		    'title': "List log entries", 
+		    'title': "Log monitor", 
 		    'type': COMMAND, 
 		    'command': 'method_list_log_entries' 
 		}
@@ -243,7 +243,7 @@ def method_list_rules_containig_deviceId():
     rules.list_rules_containig_deviceId()
 
 def method_list_log_entries():
-    logs.list_logEntries()
+    logs.log_window()
 
 def method_list_server_info():
     guh.print_server_version()
@@ -261,41 +261,37 @@ def method_print_api_type():
     guh.print_api_type()
 
 def runmenu(menu, parent):
-    # work out what text to display as the last menu option
     if parent is None:
 	lastoption = "Exit"
     else:
 	lastoption = "Return to %s menu" % parent['title']
     
-    optioncount = len(menu['options']) # how many options in this menu
-    pos=0 #pos is the zero-based index of the hightlighted menu option. Every time runmenu is called, position returns to 0, when runmenu ends the position is returned and tells the program what opt$
-    oldpos=None # used to prevent the screen being redrawn every time
-    x = None #control for while loop, let's you scroll through options until return key is pressed then returns pos to program
+    optioncount = len(menu['options']) 
+    pos=0 
+    oldpos=None 
+    x = None 
     
     # Loop until return key is pressed
     while x !=ord('\n'):
 	if pos != oldpos:
 	    oldpos = pos
 	screen.border(0)
-	screen.addstr(2,2, menu['title'], curses.A_STANDOUT) # Title for this menu
-	screen.addstr(4,2, menu['subtitle'], curses.A_BOLD) #Subtitle for this menu
+	screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
+	screen.addstr(4,2, menu['subtitle'], curses.A_BOLD) 
 	# Display all the menu items, showing the 'pos' item highlighted
 	for index in range(optioncount):
-	    textstyle = n
+	    textstyle = normalColor
 	    if pos==index:
-		textstyle = h
+		textstyle = highlightColor
 	    screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
-	# Now display Exit/Return at bottom of menu
-	textstyle = n
+	textstyle = normalColor
 	if pos==optioncount:
-	    textstyle = h
+	    textstyle = highlightColor
 	screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, lastoption), textstyle)
 	screen.refresh()
-	# finished updating screen
-	x = screen.getch() # Gets user input
-	# What is user input?
+	x = screen.getch()
 	if x >= ord('1') and x <= ord(str(optioncount+1)):
-	    pos = x - ord('0') - 1 # convert keypress back to a number, then subtract 1 to get index
+	    pos = x - ord('0') - 1 
 	elif x == 258: # down arrow
 	    if pos < optioncount:
 		pos += 1
@@ -311,12 +307,11 @@ def runmenu(menu, parent):
 def processmenu(menu, parent=None):
     optioncount = len(menu['options'])
     exitmenu = False
-    while not exitmenu: #Loop until the user exits the menu
+    while not exitmenu:
 	getin = runmenu(menu, parent)
 	if getin == optioncount:
 	    exitmenu = True
 	elif menu['options'][getin]['type'] == COMMAND:
-	    #screen.clear()
 	    ###############################
 	    curses.endwin()
 	    print "========================================================"
@@ -328,8 +323,8 @@ def processmenu(menu, parent=None):
 	    global screen
 	    screen = curses.initscr()
 	    screen.clear()
-	    curses.reset_prog_mode()   # reset to 'current' curses environment
-	    curses.curs_set(1)         # reset doesn't do this right
+	    curses.reset_prog_mode()
+	    curses.curs_set(1)
 	    curses.curs_set(0)
 	elif menu['options'][getin]['type'] == MENU:
 	    screen.clear()
@@ -343,21 +338,19 @@ def processmenu(menu, parent=None):
 if not guh.init_connection():
     exit()
 else:
-    
     os.system('clear')
-    screen = curses.initscr() #initializes a new window for capturing key presses
+    screen = curses.initscr()
     try:
-	curses.noecho() # Disables automatic echoing of key presses (prevents program from input each key twice)
-	curses.cbreak() # Disables line buffering (runs each key as it is pressed rather than waiting for the return key to pressed)
-	curses.start_color() # Lets you use colors when highlighting selected menu option
-	screen.keypad(1) # Capture input from keypad
-    
-	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN) # Sets up color pair #1, it does black text with green background
-	h = curses.color_pair(1) #h is the coloring for a highlighted menu option
-	n = curses.A_NORMAL #n is the coloring for a non highlighted menu option
-    
+	curses.noecho()
+	curses.cbreak() 
+	curses.start_color() 
+	screen.keypad(1)
+	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
+	highlightColor = curses.color_pair(1) 
+	normalColor = curses.A_NORMAL 
 	processmenu(menu_data)
     finally:
 	curses.endwin()
+	os.system('clear')
 
     
