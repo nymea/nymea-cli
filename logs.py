@@ -57,13 +57,19 @@ def log_window():
     screen.clear()
     
     allLines = get_log_entry_lines()
-    highlightLineNum = len(allLines)
     hilightColors = curses.color_pair(1) 
     normalColors = curses.A_NORMAL 
     screenHeight = curses.LINES - 2
     x = None
-    moveUpDown(down)
 
+    # scroll to bottom
+    if len(allLines) <= screenHeight:
+	topLineNum = 0
+	highlightLineNum = len(allLines) - 1 
+    else:
+	topLineNum = len(allLines) - screenHeight
+	highlightLineNum = screenHeight - 1
+	
     try:
 	while x !=ord('\n'):
 	    #draw screen
