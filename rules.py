@@ -28,6 +28,8 @@ def add_rule():
     ruleTypes = ["Create a reaction (Event based rule)", "Create a behaviour (State based rule)"]
     boolTypes = ["True","False"]
     ruleType = guh.get_selection("Please select a rule type:", ruleTypes)
+    if ruleType == None:
+	return None
     if ruleType == 0:	#Create a reaction (Event based rule)
 	params = {}
 	eventDescriptors = events.create_eventDescriptors()
@@ -36,13 +38,15 @@ def add_rule():
 	    params['eventDescriptorList'] = eventDescriptors
 	else:
 	    params['eventDescriptor'] = eventDescriptors[0]
-	
 	input = raw_input("-> Do you want to add state conditions to your reaction? (y/N): ")
 	if input == "y":
 	    	stateEvaluator = states.create_stateEvaluator()
 	    	params['stateEvaluator'] = stateEvaluator
 	params['actions'] = actions.create_actions()
-	params['enabled'] = boolTypes[guh.get_selection("-> Should the rule initially be enabled?", boolTypes)]
+	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
+	if selection == None:
+	    return None
+	params['enabled'] = boolTypes[selection]
 	print "adding rule with params:\n", guh.print_json_format(params)
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
@@ -51,7 +55,10 @@ def add_rule():
 	params = {}
 	params['stateEvaluator'] = stateEvaluator
 	params['actions'] = actions.create_actions()
-	params['enabled'] = boolTypes[guh.get_selection("-> Should the rule initially be enabled?", boolTypes)]
+	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
+	if selection == None:
+	    return None
+	params['enabled'] = boolTypes[selection]
 	print "adding rule with params:\n", guh.print_json_format(params)
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
@@ -63,11 +70,12 @@ def select_rule():
     selection = guh.get_selection("Please select rule:", ruleIds)
     if selection != None:
 	return ruleIds[selection]
+    return None
 
 
 def remove_rule():
     ruleId = select_rule()
-    if ruleId == "":
+    if ruleId == None:
         print "\n    No rule found"
         return None
     params = {}
@@ -95,12 +103,12 @@ def get_rule_detail(ruleId):
 
 def enable_disable_rule():
     ruleId = select_rule()
-    if ruleId == "":
+    if ruleId == None:
         print "\n    No rules found"
         return
     actionTypes = ["enable", "disable"]
     selection = guh.get_selection("What do you want to do with this rule: ", actionTypes)     
-    if selection == 0:
+    if selection == None:
 	params = {}
 	params['ruleId'] = ruleId
 	response = guh.send_command("Rules.EnableRule", params)
@@ -128,7 +136,7 @@ def list_rules():
 
 def list_rule_details():
     ruleId = select_rule()
-    if ruleId == "":
+    if ruleId == None:
         print "\n    No rules found"
         return None
     params = {}
@@ -154,6 +162,8 @@ def list_rule_details():
 
 def list_rules_containig_deviceId():
     deviceId = devices.select_configured_device()
+    if not deviceId:
+	return None
     device = devices.get_device(deviceId)
     params = {}
     params['deviceId'] = deviceId

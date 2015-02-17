@@ -22,6 +22,8 @@ import sys
 import telnetlib
 import socket
 import json
+import curses
+import os
 
 import devices
 import events
@@ -66,15 +68,123 @@ def send_command(method, params = None):
 
 
 def get_selection(title, options):
-    print "\n\n", title
+    global screen
+    global normalColor
+    global highlightColor
+    global menuData
+    
+    # create menu data from options
+    menuData = {}
+    menuData['type'] = "menu" 
+    menuData['title'] = title
+    menuOptions = []
     for i in range(0,len(options)):
-        print "%5i: %s" % (i, options[i])
-    selection = raw_input("Enter selection: ")
-    if not selection:
-	print "\n   -> error in selection"
+	menuItem = {}
+	menuItem['title'] = options[i]
+	menuItem['type'] = "option" 
+	menuItem['id'] = i
+	menuOptions.append(menuItem)
+    menuData['options'] = menuOptions
+    
+    # create screen and get selection    
+    screen = curses.initscr()
+    try:
+	curses.noecho()
+	curses.cbreak() 
+	curses.start_color() 
+	screen.clear()
+	screen.keypad(1)
+	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
+	selection = process_selection_menu(menuData)
+	curses.endwin()
+	if selection != None:
+	    return int(selection)
 	return None
-    print "\n========================================================"
-    return int(selection)
+    finally:
+	curses.endwin()
+
+def process_selection_menu(menu):
+    global screen
+    global menuData
+    optioncount = len(menu['options'])
+
+    i = runmenu(menu)
+    if i != optioncount:
+	curses.endwin()
+	screen = curses.initscr()
+	screen.clear()
+	curses.reset_prog_mode()
+	curses.curs_set(1)
+	curses.curs_set(0)
+	return menuData['options'][i]['id']
+    else:
+	return None
+    
+    
+def runmenu(menu):
+    global screen
+    global normalColor
+    global highlightColor
+
+    highlightColor = curses.color_pair(1) 
+    normalColor = curses.A_NORMAL 
+    optioncount = len(menu['options']) 
+    pos=0 
+    oldpos=None 
+    x = None 
+    
+    # Loop until return key is pressed
+    while x !=ord('\n'):
+	if pos != oldpos:
+	    oldpos = pos
+	screen.border(0)
+	screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
+	# Display all the menu items, showing the 'pos' item highlighted
+	for index in range(optioncount):
+	    textstyle = normalColor
+	    if pos==index:
+		textstyle = highlightColor
+		screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
+	textstyle = normalColor
+	if pos==optioncount:
+	    textstyle = highlightColor
+	    screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, "Cancel"), textstyle)
+	screen.refresh()
+	# get user input
+	x = screen.getch()
+	#if x == curses.KEY_UP:
+	#    moveUpDown(up)
+	#elif x == curses.KEY_DOWN:
+	#    moveUpDown(down)
+	#screen.refresh() 
+	if x == curses.KEY_DOWN:
+	    if pos < optioncount:
+		pos += 1
+	    else: pos = 0
+	elif x == curses.KEY_UP: 
+	    if pos > 0:
+		pos += -1
+	    else: pos = optioncount
+	elif x == curses.KEY_BACKSPACE:
+	    pos = optioncount
+	screen.refresh()
+    # return index of the selected item
+    return pos
+
+def moveUpDown(self, direction):
+    nextLineNum = self.highlightLineNum + direction
+    # paging
+    if direction == self.up and self.highlightLineNum == 0 and self.topLineNum != 0:
+	self.topLineNum += self.up
+	return
+    elif direction == self.down and nextLineNum == self.screenHeight and (self.topLineNum + self.screenHeight) != len(self.allLines):
+	self.topLineNum += self.down
+	return
+    # scroll highlight line
+    if direction == self.up and (self.topLineNum != 0 or self.highlightLineNum != 0):
+	self.highlightLineNum = nextLineNum
+    elif direction == self.down and (self.topLineNum + self.highlightLineNum + 1) != len(self.allLines) and self.highlightLineNum != self.screenHeight:
+	self.highlightLineNum = nextLineNum
 
 
 def get_valueOperator_string(valueOperator):
@@ -189,6 +299,8 @@ def print_api_method():
     for item in methods:
 	methodList.append(item)
     selection = get_selection("Please select a method:", methodList)
+    if selection == None:
+	return None
     method = {}
     method[methodList[selection]] = methods[methodList[selection]]
     print print_json_format(method)
@@ -200,6 +312,8 @@ def print_api_notifications():
     for item in notifications:
 	notificationList.append(item)
     selection = get_selection("Please select a notification:", notificationList)
+    if selection == None:
+	return None
     notification = {}
     notification[notificationList[selection]] = notifications[notificationList[selection]]
     print print_json_format(notification)
@@ -211,6 +325,8 @@ def print_api_type():
     for item in types:
 	typesList.append(item)
     selection = get_selection("Please select a notification:", typesList)
+    if selection == None:
+	return None
     type = {}
     type[typesList[selection]] = types[typesList[selection]]
     print print_json_format(type)

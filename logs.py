@@ -18,117 +18,145 @@
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
+import datetime
+import curses
+import sys
+import socket
+import asyncore    
+import telnetlib
+import json
+
 import guh
 import states
 import devices
 import actions
 import events
 import rules
-import datetime
-import curses
-import sys
-import socket
-import threading
 
-screen = None
-allLines = []
-up = -1
-down = 1
-screenHeight = 0
-topLineNum = 0
-highlightLineNum = 0
+class NotificationHandler(asyncore.dispatcher):
+
+    def __init__(self, host, port):
+	self.screen = None
+	self.allLines = []
+	self.up = -1
+	self.down = 1
+	self.screenHeight = 0
+	self.topLineNum = 0
+	self.highlightLineNum = 0
+	self.commandId=0
+        
+        asyncore.dispatcher.__init__(self)
+        self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connect( (host, port) )
+
+    def handle_connect(self):
+	self.enable_notification()
+	self.create_log_window()
+	
+    def create_log_window(self):
+	print " -> Notification socket connected..."
+	print " -> Open log window...\n"
+	# init
+	self.screen = curses.initscr()
+	curses.noecho()
+	curses.cbreak()
+	curses.start_color() 
+	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN) 
+	self.screen.keypad(1)
+	self.screen.clear()
+	
+	self.allLines = get_log_entry_lines()
+	hilightColors = curses.color_pair(1) 
+	normalColors = curses.A_NORMAL 
+	self.screenHeight = curses.LINES - 2
+	x = None
+
+	# scroll to bottom
+	if len(self.allLines) <= self.screenHeight:
+	    self.topLineNum = 0
+	    self.highlightLineNum = len(self.allLines) - 1 
+	else:
+	    self.topLineNum = len(self.allLines) - self.screenHeight
+	    self.highlightLineNum = self.screenHeight - 1
+	    
+	try:
+	    while x !=ord('\n'):
+		#draw screen
+		self.screen.erase()
+		self.screen.border(0)
+		curses.curs_set(1)   
+		curses.curs_set(0)
+		top = self.topLineNum
+		bottom = self.topLineNum + self.screenHeight
+		
+		for (index,line,) in enumerate(self.allLines[top:bottom]):
+		    linenum = self.topLineNum + index 
+		    # highlight current line            
+		    if index != self.highlightLineNum:
+			self.screen.addstr(index + 1, 2, line, normalColors)
+		    else:
+			self.screen.addstr(index + 1, 2, line, hilightColors)
+		
+		# get user input
+		x = self.screen.getch()
+		if x == curses.KEY_UP:
+		    self.moveUpDown(self.up)
+		elif x == curses.KEY_DOWN:
+		    self.moveUpDown(self.down)
+		self.screen.refresh()    
+	finally:
+	    curses.endwin()
+	    print " -> Log window closed."
+	    self.close()
+	    
+    def moveUpDown(self,direction):
+	nextLineNum = self.highlightLineNum + direction
+	# paging
+	if direction == self.up and self.highlightLineNum == 0 and self.topLineNum != 0:
+	    self.topLineNum += self.up
+	    return
+	elif direction == self.down and nextLineNum == self.screenHeight and (self.topLineNum + self.screenHeight) != len(self.allLines):
+	    self.topLineNum += self.down
+	    return
+	# scroll highlight line
+	if direction == self.up and (self.topLineNum != 0 or self.highlightLineNum != 0):
+	    self.highlightLineNum = nextLineNum
+	elif direction == self.down and (self.topLineNum + self.highlightLineNum + 1) != len(self.allLines) and self.highlightLineNum != self.screenHeight:
+	    self.highlightLineNum = nextLineNum
+
+    def enable_notification(self):
+	params = {}
+	commandObj = {}
+	commandObj['id'] = self.commandId
+	commandObj['method'] = "JSONRPC.SetNotificationStatus"
+	params['enabled'] = "true"
+	commandObj['params'] = params
+	command = json.dumps(commandObj) + '\n'
+	self.commandId = self.commandId + 1
+	self.send(command)
+
+    def handle_close(self):
+        curses.endwin()
+        print " -> Log window closed."
+        self.close()
+        print " -> Notification socket closed."
+
+    def handle_read(self):
+        print self.recv(10000)
+	curses.flash()
+    def writable(self):
+        return None
+
+    def handle_write(self):
+        sent = self.send()
     
 def log_window():
-    print "Open log window..."
-    global screenHeight
-    global allLines
-    global topLineNum
-    global highlightLineNum
-    global up
-    global down
-    
-    # init
-    screen = curses.initscr()
-    curses.noecho()
-    curses.cbreak()
-    curses.start_color() 
-    curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN) 
-    screen.keypad(1)
-    screen.clear()
-    
-    allLines = get_log_entry_lines()
-    hilightColors = curses.color_pair(1) 
-    normalColors = curses.A_NORMAL 
-    screenHeight = curses.LINES - 2
-    x = None
-
-    # scroll to bottom
-    if len(allLines) <= screenHeight:
-	topLineNum = 0
-	highlightLineNum = len(allLines) - 1 
-    else:
-	topLineNum = len(allLines) - screenHeight
-	highlightLineNum = screenHeight - 1
-	
-    try:
-	while x !=ord('\n'):
-	    #draw screen
-	    screen.erase()
-	    screen.border(0)
-	    curses.curs_set(1)   
-	    curses.curs_set(0)
-	    top = topLineNum
-	    bottom = topLineNum + screenHeight
-	    
-	    for (index,line,) in enumerate(allLines[top:bottom]):
-		linenum = topLineNum + index 
-		# highlight current line            
-		if index != highlightLineNum:
-		    screen.addstr(index + 1, 2, line, normalColors)
-		else:
-		    screen.addstr(index + 1, 2, line, hilightColors)
-	    # get user input
-	    x = screen.getch()
-	    if x == curses.KEY_UP:
-                moveUpDown(up)
-            elif x == curses.KEY_DOWN:
-                moveUpDown(down)
-            screen.refresh()
-            
-    finally:
-	curses.endwin()
-	print "Log window closed."
-	
-
-def moveUpDown(direction):
-    global screenHeight
-    global topLineNum
-    global highlightLineNum
-    global allLines
-    global up
-    global down
-    
-    nextLineNum = highlightLineNum + direction
- 
-    # paging
-    if direction == up and highlightLineNum == 0 and topLineNum != 0:
-        topLineNum += up
-        return
-    elif direction == down and nextLineNum == screenHeight and (topLineNum + screenHeight) != len(allLines):
-        topLineNum += down
-        return
-    # scroll highlight line
-    if direction == up and (topLineNum != 0 or highlightLineNum != 0):
-        highlightLineNum = nextLineNum
-    elif direction == down and (topLineNum + highlightLineNum + 1) != len(allLines) and highlightLineNum != screenHeight:
-        highlightLineNum = nextLineNum
-
-def create_notification_thread():
-    HOST='localhost'
-    PORT=1234
+    host='localhost'
+    port=1234
     if len(sys.argv) > 1:
-	HOST = sys.argv[1]
-
+	host = sys.argv[1]
+    client = NotificationHandler(host, port)
+    asyncore.loop()
 
 def list_logEntries():
     params = {}
@@ -146,6 +174,9 @@ def get_log_entry_lines():
         line = get_log_entry_line(response['params']['logEntries'][i])
         lines.append(line)
     return lines
+
+def get_log_line_from_notification(notificationMessage):
+    print notificationMessage
 
 def get_log_entry_line(entry):
     stateTypeIdCache = {}
@@ -259,6 +290,6 @@ def get_log_entry_line(entry):
                 deviceName = typeId
             ruleIdCache[typeId] = deviceName
     timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
-    line = "%s %s : %20s : %38s : %30s %5s %20s : %20s" %(levelString, timestamp, sourceType, deviceName, sourceName, symbolString, value, error)
+    line = "%s %s | %15s | %38s | %30s %5s %10s | %20s" %(levelString, timestamp, sourceType, deviceName, sourceName, symbolString, value, error)
     return line
     

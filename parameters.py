@@ -25,6 +25,8 @@ def read_params(paramTypes):
     for paramType in paramTypes:
         if any("allowedValues" in item for item in paramType):
 	    selection = guh.get_selection("Please select one of following allowed values:", paramType['allowedValues'])
+	    if selection == None:
+		return None
 	    paramValue = paramType['allowedValues'][selection]
 	    param = {}
 	    param['name'] = paramType['name']

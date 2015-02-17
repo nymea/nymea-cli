@@ -38,10 +38,15 @@ def create_actions():
     enough = False
     actions = []
     while not enough:
-        print "\nCreating Action:"
+	print "\n========================================================"
+	raw_input("-> Press \"enter\" to create actions!  ")
         deviceId = devices.select_configured_device()
+        if not deviceId:
+	    return None
         device = devices.get_device(deviceId)
         actionType = select_actionType(device['deviceClassId'])
+        if not actionType:
+	    continue
         params = parameters.read_params(actionType['paramTypes'])
         action = {}
         action['deviceId'] = deviceId
@@ -61,7 +66,7 @@ def execute_action():
 	return None
     device = devices.get_device(deviceId)
     actionType = select_actionType(device['deviceClassId'])
-    if actionType == "":
+    if actionType == None:
         print "\n    This device has no actions"
         return None
     actionTypeId = actionType['id']
@@ -85,4 +90,6 @@ def select_actionType(deviceClassId):
         print "got actiontype", actions[i]
         actionList.append(actions[i]['name'])
     selection = guh.get_selection("Please select an action type:", actionList)
-    return actions[selection]
+    if selection != None:
+	return actions[selection]
+    return None

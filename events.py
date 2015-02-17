@@ -46,8 +46,9 @@ def select_eventType(deviceClassId):
     for i in range(len(eventTypes)):
         eventTypeList.append(eventTypes[i]['name'])
     selection = guh.get_selection("Please select an event type:", eventTypeList)
-    return eventTypes[selection]
-
+    if selection != None:
+	return eventTypes[selection]
+    return None
 
 def create_eventDescriptors():
     enough = False

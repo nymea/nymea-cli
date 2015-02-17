@@ -49,8 +49,9 @@ def select_stateType(deviceClassId):
     for i in range(len(stateTypes)):
         stateTypeList.append(stateTypes[i]['name'])
     selection = guh.get_selection("Please select a state type:", stateTypeList)
-    return stateTypes[selection]
-    
+    if selection != None:
+	return stateTypes[selection]
+    return None
 
 def create_stateDescriptor():
     print "-> Creating a new stateDescriptor:\n"

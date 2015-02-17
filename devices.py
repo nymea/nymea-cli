@@ -85,7 +85,6 @@ def add_configured_device(deviceClassId):
 def add_device():
     deviceClassId = select_deviceClass()
     if deviceClassId == None:
-        print "    Empty deviceClass. Can't continue"
         return None
     deviceClass = get_deviceClass(deviceClassId)
     print "createmethods are", deviceClass['createMethods']
@@ -133,6 +132,8 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
 
 def remove_configured_device():
     deviceId = select_configured_device()
+    if not deviceId:
+	return None
     print "should remove device", deviceId
     params = {}
     params['deviceId'] = deviceId
@@ -162,6 +163,8 @@ def discover_device(deviceClassId = None):
     selection = guh.get_selection("Please select a device descriptor", deviceDescriptorList)
     if selection != None:
         return deviceDescriptorIdList[selection]
+    else:
+	return None
 
 
 def select_configured_device():
@@ -177,6 +180,8 @@ def select_configured_device():
     selection = guh.get_selection("Please select a device", deviceList)
     if selection != None:
         return deviceIdList[selection]
+    else:
+	return None
 
 
 def select_vendor():
@@ -192,6 +197,7 @@ def select_vendor():
     selection = guh.get_selection("Please select a vendor", vendorList)
     if selection != None:
 	return vendorIdList[selection]
+    return None
     
     
 def select_plugin():
@@ -207,12 +213,14 @@ def select_plugin():
     selection = guh.get_selection("Please select a plugin", pluginList)
     if selection != None:
 	return pluginIdList[selection]
-    
+    return None
 
 def select_deviceClass():
     vendorId = select_vendor()
+    if not vendorId:
+	return None
     deviceClasses = get_deviceClasses(vendorId)
-    if len(deviceClasses) == 0:
+    if not deviceClasses:
         print "    No supported devices for this vendor"
         return None
     deviceClassList = []
@@ -258,6 +266,8 @@ def list_device_states():
 def list_configured_device_params():
     deviceId = select_configured_device()
     device = get_device(deviceId)
+    if not device:
+	return None
     deviceParams = device['params']
     print "-> Params of device \"%s\" %s\n:" %(device['name'], device['id'])
     for i in range(len(deviceParams)):
@@ -273,12 +283,17 @@ def list_vendors():
 
 def list_plugins():
     plugins = get_plugins();
+    if not plugins:
+	print "-> no plugins! please check guh configuration"
+	return None
     print "-> List of supported plugins:\n"
     for plugin in plugins:
 	print "%35s %s" % (plugin['name'], plugin['id'])
 
 def list_plugin_configuration():
     pluginId = select_plugin()
+    if not pluginId:
+	return None
     plugin = get_plugin(pluginId)
     pluginConfiguration = get_plugin_configuration(pluginId)
     if not pluginConfiguration:

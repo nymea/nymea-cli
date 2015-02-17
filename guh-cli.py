@@ -292,19 +292,23 @@ def runmenu(menu, parent):
 	x = screen.getch()
 	if x >= ord('1') and x <= ord(str(optioncount+1)):
 	    pos = x - ord('0') - 1 
-	elif x == 258: # down arrow
+	if x == curses.KEY_DOWN:
 	    if pos < optioncount:
 		pos += 1
 	    else: pos = 0
-	elif x == 259: # up arrow
+	elif x == curses.KEY_UP: 
 	    if pos > 0:
 		pos += -1
 	    else: pos = optioncount
+	elif x == curses.KEY_BACKSPACE:
+	    pos = optioncount
+	    
     # return index of the selected item
     return pos
     
 
 def processmenu(menu, parent=None):
+    global screen
     optioncount = len(menu['options'])
     exitmenu = False
     while not exitmenu:
@@ -320,7 +324,6 @@ def processmenu(menu, parent=None):
 	    print "--------------------------------------------------------"
 	    raw_input("\nPress \"enter\" to return to the menu...\n")
 	    ###############################
-	    global screen
 	    screen = curses.initscr()
 	    screen.clear()
 	    curses.reset_prog_mode()
