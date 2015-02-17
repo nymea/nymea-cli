@@ -144,11 +144,11 @@ def runmenu(menu):
 	    textstyle = normalColor
 	    if pos==index:
 		textstyle = highlightColor
-		screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
+	    screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
 	textstyle = normalColor
 	if pos==optioncount:
 	    textstyle = highlightColor
-	    screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, "Cancel"), textstyle)
+	screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, "Cancel"), textstyle)
 	screen.refresh()
 	# get user input
 	x = screen.getch()
