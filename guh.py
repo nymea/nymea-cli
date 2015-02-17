@@ -167,6 +167,8 @@ def runmenu(menu):
 	    else: pos = optioncount
 	elif x == curses.KEY_BACKSPACE:
 	    pos = optioncount
+	elif x == 27:
+	    pos = optioncount    
 	screen.refresh()
     # return index of the selected item
     return pos

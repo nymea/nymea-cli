@@ -302,7 +302,8 @@ def runmenu(menu, parent):
 	    else: pos = optioncount
 	elif x == curses.KEY_BACKSPACE:
 	    pos = optioncount
-	    
+	elif x == 27:
+	    pos = optioncount
     # return index of the selected item
     return pos
     
