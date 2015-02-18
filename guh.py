@@ -34,19 +34,21 @@ commandId=0
 
 def init_connection():
     global tn
-    HOST='localhost'
-    PORT=1234
+    host='localhost'
+    port=1234
     if len(sys.argv) > 1:
 	HOST = sys.argv[1]
+    if len(sys.argv) > 2:
+	port = int(sys.argv[2])
     try:
-	tn = telnetlib.Telnet(HOST, PORT)
+	tn = telnetlib.Telnet(host, port)
 	packet = tn.read_until("\n}\n")
 	packet = json.loads(packet)
 	print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
 	return True
     except socket.error, e:
 	print "ERROR:", e[1]," -> could not connect to guh."
-	print "       Please check if guh is running on", HOST
+	print "       Please check if guh is running on %s:%s" %(host,port)
 	return False
     
 def send_command(method, params = None):
@@ -200,6 +202,7 @@ def moveUpDown(direction, menu):
         highlightLineNum = nextLineNum
     elif direction == down and (topLineNum + highlightLineNum + 1) != len(menu['options']) and highlightLineNum != screenHeight:
         highlightLineNum = nextLineNum
+
 
 def get_valueOperator_string(valueOperator):
     if valueOperator == "ValueOperatorEquals":
