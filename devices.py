@@ -145,6 +145,8 @@ def discover_device(deviceClassId = None):
     if deviceClassId == None:
         deviceClassId = select_deviceClass()
     deviceClass = get_deviceClass(deviceClassId)
+    if not deviceClass:
+	return None
     params = {}
     params['deviceClassId'] = deviceClassId
     discoveryParams = parameters.read_params(deviceClass['discoveryParamTypes'])
@@ -163,8 +165,7 @@ def discover_device(deviceClassId = None):
     selection = guh.get_selection("Please select a device descriptor", deviceDescriptorList)
     if selection != None:
         return deviceDescriptorIdList[selection]
-    else:
-	return None
+    return None
 
 
 def select_configured_device():
@@ -180,8 +181,7 @@ def select_configured_device():
     selection = guh.get_selection("Please select a device", deviceList)
     if selection != None:
         return deviceIdList[selection]
-    else:
-	return None
+    return None
 
 
 def select_vendor():
@@ -221,7 +221,7 @@ def select_deviceClass():
 	return None
     deviceClasses = get_deviceClasses(vendorId)
     if not deviceClasses:
-        print "    No supported devices for this vendor"
+        print "\n    No supported devices for this vendor\n"
         return None
     deviceClassList = []
     deviceClassIdList = []
@@ -236,6 +236,9 @@ def select_deviceClass():
 
 def list_configured_devices():
     deviceList = get_configured_devices()
+    if not deviceList:
+	print "\n    No configured device found.\n"
+	return None
     print "-> List of configured devices:\n"
     for device in deviceList:
         print "%35s, ID: %s, DeviceClassID: %s" % (device['name'], device['id'], device['deviceClassId'])
@@ -284,7 +287,7 @@ def list_vendors():
 def list_plugins():
     plugins = get_plugins();
     if not plugins:
-	print "-> no plugins! please check guh configuration"
+        print "\n    No plugins found. Please install guh-plugins and restart guhd."
 	return None
     print "-> List of supported plugins:\n"
     for plugin in plugins:

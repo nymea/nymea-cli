@@ -50,6 +50,7 @@ def select_eventType(deviceClassId):
 	return eventTypes[selection]
     return None
 
+
 def create_eventDescriptors():
     enough = False
     eventDescriptors = []
@@ -74,7 +75,6 @@ def create_eventDescriptor():
     if len(params) > 0:
         eventDescriptor['paramDescriptors'] = params
     return eventDescriptor
-
 
 
 def print_eventDescriptors(eventDescriptors):

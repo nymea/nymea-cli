@@ -69,9 +69,11 @@ def send_command(method, params = None):
 
 def get_selection(title, options):
     global screen
-    global normalColor
-    global highlightColor
-    global menuData
+    global screenHeight
+    global topLineNum
+    global highlightLineNum
+    global up
+    global down
     
     # create menu data from options
     menuData = {}
@@ -84,6 +86,11 @@ def get_selection(title, options):
 	menuItem['type'] = "option" 
 	menuItem['id'] = i
 	menuOptions.append(menuItem)
+    menuItem = {}
+    menuItem['title'] = "Cancel"
+    menuItem['type'] = "exitmenu" 
+    menuItem['id'] = None
+    menuOptions.append(menuItem)
     menuData['options'] = menuOptions
     
     # create screen and get selection    
@@ -94,7 +101,7 @@ def get_selection(title, options):
 	curses.start_color() 
 	screen.clear()
 	screen.keypad(1)
-	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
+	curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_GREEN)
 	selection = process_selection_menu(menuData)
 	curses.endwin()
 	if selection != None:
@@ -105,89 +112,94 @@ def get_selection(title, options):
 
 def process_selection_menu(menu):
     global screen
-    global menuData
-    optioncount = len(menu['options'])
 
     i = runmenu(menu)
-    if i != optioncount:
+    if i != len(menu['options']) :
 	curses.endwin()
 	screen = curses.initscr()
 	screen.clear()
 	curses.reset_prog_mode()
 	curses.curs_set(1)
 	curses.curs_set(0)
-	return menuData['options'][i]['id']
+	return menu['options'][i]['id']
     else:
 	return None
     
     
 def runmenu(menu):
     global screen
-    global normalColor
-    global highlightColor
-
-    highlightColor = curses.color_pair(1) 
-    normalColor = curses.A_NORMAL 
-    optioncount = len(menu['options']) 
-    pos=0 
-    oldpos=None 
-    x = None 
+    global screenHeight
+    global topLineNum
+    global highlightLineNum
+    global up
+    global down
     
+    up = -1
+    down = 1
+    screenHeight = 0
+    topLineNum = 0
+    highlightLineNum = 0
+    oldHighlightLineNum=None 
+    screenHeight = curses.LINES - 6 # - 1 border - 5 title lines
+    
+    x = None 
     # Loop until return key is pressed
     while x !=ord('\n'):
-	if pos != oldpos:
-	    oldpos = pos
+	# reset screen
+	screen.clear()
 	screen.border(0)
-	screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
-	# Display all the menu items, showing the 'pos' item highlighted
-	for index in range(optioncount):
-	    textstyle = normalColor
-	    if pos==index:
-		textstyle = highlightColor
-	    screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
-	textstyle = normalColor
-	if pos==optioncount:
-	    textstyle = highlightColor
-	screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, "Cancel"), textstyle)
+	
+	# print title
+	screen.addstr(2,2, menu['title'], curses.A_STANDOUT)
+	
+	top = topLineNum
+	bottom = topLineNum + screenHeight
+	# print lines
+	for (index,menuItem,) in enumerate(menu['options'][top:bottom]):
+	    linenum = topLineNum + index 
+	    # print normal            
+	    if index != highlightLineNum:
+		screen.addstr(index + 5, 5, "     " + menuItem['title'], curses.A_NORMAL )
+		# bold Cancel
+		if index == len(menu['options'])  - 1:
+		    screen.addstr(index + 5, 5, "     " + menuItem['title'], curses.A_BOLD)
+	    else:
+		# print highlight current line
+		screen.addstr(index + 5, 5, " ->  " + menuItem['title'], curses.color_pair(1))
+	 
 	screen.refresh()
 	# get user input
 	x = screen.getch()
-	#if x == curses.KEY_UP:
-	#    moveUpDown(up)
-	#elif x == curses.KEY_DOWN:
-	#    moveUpDown(down)
-	#screen.refresh() 
-	if x == curses.KEY_DOWN:
-	    if pos < optioncount:
-		pos += 1
-	    else: pos = 0
-	elif x == curses.KEY_UP: 
-	    if pos > 0:
-		pos += -1
-	    else: pos = optioncount
-	elif x == curses.KEY_BACKSPACE:
-	    pos = optioncount
-	elif x == 27:
-	    pos = optioncount    
+	if x == curses.KEY_UP:
+	    moveUpDown(up, menu)
+	elif x == curses.KEY_DOWN:
+	    moveUpDown(down, menu)
 	screen.refresh()
+    
     # return index of the selected item
-    return pos
+    return topLineNum + highlightLineNum
 
-def moveUpDown(self, direction):
-    nextLineNum = self.highlightLineNum + direction
+def moveUpDown(direction, menu):
+    global screenHeight
+    global topLineNum
+    global highlightLineNum
+    global up
+    global down
+    
+    nextLineNum = highlightLineNum + direction
+
     # paging
-    if direction == self.up and self.highlightLineNum == 0 and self.topLineNum != 0:
-	self.topLineNum += self.up
-	return
-    elif direction == self.down and nextLineNum == self.screenHeight and (self.topLineNum + self.screenHeight) != len(self.allLines):
-	self.topLineNum += self.down
-	return
+    if direction == up and highlightLineNum == 0 and topLineNum != 0:
+        topLineNum += up
+        return
+    elif direction == down and nextLineNum == screenHeight and (topLineNum + screenHeight) != len(menu['options']):
+        topLineNum += down
+        return
     # scroll highlight line
-    if direction == self.up and (self.topLineNum != 0 or self.highlightLineNum != 0):
-	self.highlightLineNum = nextLineNum
-    elif direction == self.down and (self.topLineNum + self.highlightLineNum + 1) != len(self.allLines) and self.highlightLineNum != self.screenHeight:
-	self.highlightLineNum = nextLineNum
-
+    if direction == up and (topLineNum != 0 or highlightLineNum != 0):
+        highlightLineNum = nextLineNum
+    elif direction == down and (topLineNum + highlightLineNum + 1) != len(menu['options']) and highlightLineNum != screenHeight:
+        highlightLineNum = nextLineNum
 
 def get_valueOperator_string(valueOperator):
     if valueOperator == "ValueOperatorEquals":
