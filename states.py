@@ -129,6 +129,8 @@ def create_stateEvaluator(stateDescriptors = None):
 
 
 def print_stateEvaluator(stateEvaluator):
+    if not stateEvaluator:
+	return None
     print "\nStates:\n     ",
     if 'stateDescriptor' in stateEvaluator:
 	stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
@@ -137,6 +139,8 @@ def print_stateEvaluator(stateEvaluator):
 	print guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']),
 	print stateEvaluator['stateDescriptor']['value']
     else:
+	if not 'childEvaluators' in stateEvaluator:
+	    return None
 	for i in range(len(stateEvaluator['childEvaluators'])):
 	    device = devices.get_device(stateEvaluator['childEvaluators'][i]['stateDescriptor']['deviceId'])
 	    stateType = get_stateType(stateEvaluator['childEvaluators'][i]['stateDescriptor']['stateTypeId'])
