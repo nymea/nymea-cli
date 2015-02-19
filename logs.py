@@ -97,6 +97,9 @@ def log_window():
 		    elif x == curses.KEY_DOWN:
 			moveUpDown(down)
 			draw_screen()
+		    elif x == ord(' '):
+			scroll_to_bottom()
+			draw_screen()
     finally:
 	curses.endwin()
 	print "Log window closed."
