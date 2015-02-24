@@ -135,22 +135,15 @@ menu_data = {
 	    ]
 	},
 	{
-	    'title': "Logs", 
-	    'type': MENU,
-	    'subtitle': "Please select an option...",
-	    'options': [
-		{ 
-		    'title': "Log monitor", 
-		    'type': COMMAND, 
-		    'command': 'method_list_log_entries' 
-		},
-		{ 
-		    'title': "Notifications sniffer", 
-		    'type': COMMAND, 
-		    'command': 'method_notification_sniffer' 
-		}   
-	    ]
-	},
+	    'title': "Log monitor", 
+	    'type': COMMAND, 
+	    'command': 'method_list_log_entries' 
+	},  
+	{ 
+	    'title': "Notifications sniffer", 
+	    'type': COMMAND, 
+	    'command': 'method_notification_sniffer' 
+	},     
 	{
 	    'title': "System Info", 
 	    'type': MENU,
@@ -345,7 +338,6 @@ def processmenu(menu, parent=None):
 	    screen.clear() 
 	elif menu['options'][getin]['type'] == EXITMENU:
 	    exitmenu = True
-    
 
 # Main 
 if not guh.init_connection():
