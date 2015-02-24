@@ -34,6 +34,7 @@ import events
 import actions
 import rules
 import logs
+import notifications
 
 from time import sleep
 import curses
@@ -142,7 +143,12 @@ menu_data = {
 		    'title': "Log monitor", 
 		    'type': COMMAND, 
 		    'command': 'method_list_log_entries' 
-		}
+		},
+		{ 
+		    'title': "Notifications sniffer", 
+		    'type': COMMAND, 
+		    'command': 'method_notification_sniffer' 
+		}   
 	    ]
 	},
 	{
@@ -244,7 +250,10 @@ def method_list_rules_containig_deviceId():
 
 def method_list_log_entries():
     logs.log_window()
-
+    
+def method_notification_sniffer():
+    notifications.notification_sniffer()
+    
 def method_list_server_info():
     guh.print_server_version()
 
