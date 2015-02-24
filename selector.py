@@ -37,17 +37,23 @@ def get_selection(title, options):
     global highlightLineNum
     global up
     global down
+        
+    sortedOptions = list(options)
+    sortedOptions.sort(key=lambda x: x.lower())
     
     # create menu data from options
     menuData = {}
     menuData['type'] = "menu" 
     menuData['title'] = title
     menuOptions = []
-    for i in range(0,len(options)):
+    for i in range(0,len(sortedOptions)):
 	menuItem = {}
-	menuItem['title'] = options[i]
-	menuItem['type'] = "option" 
-	menuItem['id'] = i
+	menuItem['title'] = sortedOptions[i]
+	menuItem['type'] = "option"
+	for j in range(0,len(options)):
+	    if menuItem['title'] == options[j]:
+		menuItem['id'] = j
+		continue
 	menuOptions.append(menuItem)
     menuItem = {}
     menuItem['title'] = "Cancel"
@@ -71,7 +77,7 @@ def get_selection(title, options):
 	    return int(selection)
 	return None
     finally:
-	curses.endwin()
+	curses.endwin()    
 
 def process_selection_menu(menu):
     global screen
