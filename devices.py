@@ -154,6 +154,7 @@ def discover_device(deviceClassId = None):
         params['discoveryParams'] = discoveryParams
     print "\ndiscovering..."
     response = guh.send_command("Devices.GetDiscoveredDevices", params)
+    print response
     deviceDescriptorList = [];
     deviceDescriptorIdList = [];
     for deviceDescriptor in response['params']['deviceDescriptors']:
