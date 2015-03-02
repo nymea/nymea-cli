@@ -23,6 +23,7 @@ import guh
 def read_params(paramTypes):
     params = []
     for paramType in paramTypes:
+	print guh.print_json_format(paramType)
         if any("allowedValues" in item for item in paramType):
 	    selection = guh.get_selection("Please select one of following allowed values:", paramType['allowedValues'])
 	    if selection == None:
@@ -36,9 +37,10 @@ def read_params(paramTypes):
 	    if paramType['type'] == "bool":
 		boolTypes = ["true","false"]
 		selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
-		paramValue = guh.get_selection(selectionString, boolTypes)
-		if paramValue == None:
+		selection = guh.get_selection(selectionString, boolTypes)
+		if selection == None:
 		    return None
+		paramValue = boolTypes[selection] 
 	    else:
 		paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
 	    param = {}
@@ -53,11 +55,12 @@ def read_paramDescriptors(paramTypes):
     for paramType in paramTypes:
         operator = guh.select_valueOperator(paramType['name'])
         if paramType['type'] == "bool":
-		boolTypes = ["true","false"]
-		selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
-		paramValue = guh.get_selection(selectionString, boolTypes)
-		if paramValue == None:
-		    return None
+	    boolTypes = ["true","false"]
+	    selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
+	    selection = guh.get_selection(selectionString, boolTypes)
+	    if selection == None:
+		return None
+	    paramValue = boolTypes[selection] 
 	else:
 	    print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
 	    paramValue = raw_input("%s %s " % (paramType['name'], guh.get_valueOperator_string(operator)))

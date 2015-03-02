@@ -26,7 +26,7 @@ import states
 
 def add_rule():
     ruleTypes = ["Create a reaction (Event based rule)", "Create a behaviour (State based rule)"]
-    boolTypes = ["True","False"]
+    boolTypes = ["true","false"]
     ruleType = guh.get_selection("Please select a rule type:", ruleTypes)
     if ruleType == None:
 	return None

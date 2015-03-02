@@ -66,9 +66,10 @@ def create_stateDescriptor():
     if stateType['type'] == "bool":
 	boolTypes = ["true","false"]
 	selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
-	stateValue = guh.get_selection(selectionString, boolTypes)
-	if stateValue == None:
+	selection = guh.get_selection(selectionString, boolTypes)
+	if selection == None:
 	    return None
+	stateValue = boolTypes[selection] 
     else:
 	stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
     stateDescriptor = {}
