@@ -23,6 +23,7 @@ import devices
 import events
 import actions
 import states
+import parameters
 
 def add_rule():
     ruleTypes = ["Create a reaction (Event based rule)", "Create a behaviour (State based rule)"]
@@ -32,6 +33,9 @@ def add_rule():
 	return None
     if ruleType == 0:	#Create a reaction (Event based rule)
 	params = {}
+	params['name'] = raw_input("Please enter the name of the rule: ")
+	print "\n========================================================"
+	raw_input("-> Press \"enter\" to create an event descriptor!  ")
 	eventDescriptors = events.create_eventDescriptors()
 	print guh.print_json_format(eventDescriptors)
 	if len(eventDescriptors) > 1:
@@ -51,9 +55,11 @@ def add_rule():
 	response = guh.send_command("Rules.AddRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
     if ruleType == 1:	#Create a behaviour (State based rule)
-	stateEvaluator = states.create_stateEvaluator()
 	params = {}
-	params['stateEvaluator'] = stateEvaluator
+	params['name'] = raw_input("Please enter the name of the rule: ")
+	print "\n========================================================"
+	raw_input("-> Press \"enter\" to create a state descriptor!  ")
+	params['stateEvaluator'] = states.create_stateEvaluator()
 	params['actions'] = actions.create_actions()
 	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
 	if selection == None:
@@ -90,6 +96,10 @@ def get_rule_status(ruleId):
 	return "enabled"
     else:
 	return "disabled"
+
+def get_rule_name(ruleId):
+    response = get_rule_detail(ruleId)
+    return response['name']
 
 
 def get_rule_detail(ruleId):
@@ -131,7 +141,7 @@ def list_rules():
 	params = {}
 	params['ruleId'] = ruleId
 	ruleDetail = guh.send_command("Rules.GetRuleDetails", params)
-	print response['params']['ruleIds'][i], "(", get_rule_status(ruleId), ")"
+	print "%20s : %s : %s" %(get_rule_name(ruleId), ruleId, get_rule_status(ruleId))
 
 
 def list_rule_details():
@@ -144,7 +154,7 @@ def list_rule_details():
     response = guh.send_command("Rules.GetRuleDetails", params)
     print guh.print_json_format(response)
     print "========================================================"
-    print "-> Details for rule %s which currently is %s:" % (ruleId, get_rule_status(ruleId))
+    print "-> Details for rule \"%s\" (%s) which currently is %s:" % (response['params']['rule']['name'], ruleId, get_rule_status(ruleId))
     if len(response['params']['rule']['eventDescriptors']) > 0:
 	events.print_eventDescriptors(response['params']['rule']['eventDescriptors'])
     if response['params']['rule']['stateEvaluator'] > 0:
@@ -171,6 +181,7 @@ def list_rules_containig_deviceId():
     if not response['params']['ruleIds']:
         print "\nThere is no rule containig this device."
         return None
-    print "\nFollowing rules contain this device"
+    print "\nFollowing rules contain this device %s" %(deviceId)
     for i in range(len(response['params']['ruleIds'])):
-        print "Device ", deviceId, "found in rule", response['params']['ruleIds'][i]
+	ruleId = response['params']['ruleIds'][i]
+	print "%20s : %s : %s" %(get_rule_name(ruleId), ruleId, get_rule_status(ruleId))

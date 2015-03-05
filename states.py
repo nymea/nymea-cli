@@ -44,6 +44,8 @@ def select_stateType(deviceClassId):
     stateTypes = get_stateTypes(deviceClassId)
     if not stateTypes:
 	print "\n    This device has no states.\n"
+	print "\n========================================================"
+	raw_input("-> Press \"enter\" to select an other device!  ")
         return None
     stateTypeList = []
     for i in range(len(stateTypes)):
@@ -57,6 +59,8 @@ def create_stateDescriptor():
     print "-> Creating a new stateDescriptor:\n"
     deviceId = devices.select_configured_device()
     device = devices.get_device(deviceId)
+    if device == None:
+	return None
     stateType = select_stateType(device['deviceClassId']);
     if stateType == None:
 	return None
