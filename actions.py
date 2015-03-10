@@ -93,3 +93,16 @@ def select_actionType(deviceClassId):
     if selection != None:
 	return actions[selection]
     return None
+
+def print_actionList(actionList):
+    for i in range(len(actionList)):
+        action = actionList[i]
+        device = devices.get_device(action['deviceId'])
+        actionType = get_actionType(actionList[i]['actionTypeId'])
+        actionParams = actionList[i]['params']
+        print  "%5s. ->  %40s -> action: \"%s\"" %(i, device['name'], actionType['name'])
+        for i in range(len(actionParams)):
+            print "%50s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
+
+    
+

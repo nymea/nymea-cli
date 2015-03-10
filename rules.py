@@ -60,7 +60,11 @@ def add_rule():
 	print "\n========================================================"
 	raw_input("-> Press \"enter\" to create a state descriptor!  ")
 	params['stateEvaluator'] = states.create_stateEvaluator()
-	params['actions'] = actions.create_actions()
+	params['actions'] = actions.create_actions()	
+	print "\n========================================================"
+	input = raw_input("Do you want to add exitAction? (Y/n): ")
+        if not input == "n":
+            params['exitActions'] = actions.create_actions()
 	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
 	if selection == None:
 	    return None
@@ -156,20 +160,17 @@ def list_rule_details():
     print "========================================================"
     print "-> Details for rule \"%s\" (%s) which currently is %s:" % (response['params']['rule']['name'], ruleId, get_rule_status(ruleId))
     if len(response['params']['rule']['eventDescriptors']) > 0:
+	print "\nEvents:\n"
 	events.print_eventDescriptors(response['params']['rule']['eventDescriptors'])
     if response['params']['rule']['stateEvaluator'] > 0:
+	print "\nStates:\n",
 	states.print_stateEvaluator(response['params']['rule']['stateEvaluator'])
-    print "\nActions:"
-    for i in range(len(response['params']['rule']['actions'])):
-        action = response['params']['rule']['actions'][i]
-        device = devices.get_device(action['deviceId'])
-        actionType = actions.get_actionType(response['params']['rule']['actions'][i]['actionTypeId'])
-        actionParams = response['params']['rule']['actions'][i]['params']
-        print  "%5s. ->  %40s -> action: %s" %(i, device['name'], actionType['name'])
-        for i in range(len(actionParams)):
-            print "%61s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
-
-
+    print "\nActions:\n"
+    actions.print_actionList(response['params']['rule']['actions'])
+    if response['params']['rule']['exitActions'] > 0:
+	print "\nExit actions:\n"
+	actions.print_actionList(response['params']['rule']['exitActions'])
+	
 def list_rules_containig_deviceId():
     deviceId = devices.select_configured_device()
     if not deviceId:
