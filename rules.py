@@ -162,15 +162,16 @@ def list_rule_details():
     if len(response['params']['rule']['eventDescriptors']) > 0:
 	print "\nEvents:\n"
 	events.print_eventDescriptors(response['params']['rule']['eventDescriptors'])
-    if response['params']['rule']['stateEvaluator'] > 0:
+    if response['params']['rule']['stateEvaluator']:
 	print "\nStates:\n",
 	states.print_stateEvaluator(response['params']['rule']['stateEvaluator'])
     print "\nActions:\n"
     actions.print_actionList(response['params']['rule']['actions'])
-    if response['params']['rule']['exitActions'] > 0:
+    if len(response['params']['rule']['exitActions']) > 0:
 	print "\nExit actions:\n"
 	actions.print_actionList(response['params']['rule']['exitActions'])
-	
+
+
 def list_rules_containig_deviceId():
     deviceId = devices.select_configured_device()
     if not deviceId:
