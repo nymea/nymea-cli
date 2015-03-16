@@ -56,6 +56,8 @@ def create_eventDescriptors():
     eventDescriptors = []
     while not enough:
         eventDescriptor = create_eventDescriptor()
+        if not eventDescriptor:
+	    continue
         eventDescriptors.append(eventDescriptor)
         input = raw_input("Do you want to add another EventDescriptor? (y/N): ")
         if not input == "y":
@@ -67,7 +69,11 @@ def create_eventDescriptor():
     print " -> Creating EventDescriptor:\n"
     deviceId = devices.select_configured_device()
     device = devices.get_device(deviceId)
-    eventType = select_eventType(device['deviceClassId']);
+    if not device:
+	return None
+    eventType = select_eventType(device['deviceClassId']); 
+    if not eventType:
+	return None
     params = parameters.read_paramDescriptors(eventType['paramTypes'])
     eventDescriptor = {}
     eventDescriptor['deviceId'] = deviceId

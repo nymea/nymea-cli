@@ -22,6 +22,7 @@ import guh
 import devices
 import events
 import actions
+import ruleactions
 import states
 import parameters
 
@@ -46,7 +47,9 @@ def add_rule():
 	if input == "y":
 	    	stateEvaluator = states.create_stateEvaluator()
 	    	params['stateEvaluator'] = stateEvaluator
-	params['actions'] = actions.create_actions()
+	
+	params['actions'] = ruleactions.create_rule_actions(eventDescriptors)
+	
 	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
 	if selection == None:
 	    return None
@@ -60,11 +63,11 @@ def add_rule():
 	print "\n========================================================"
 	raw_input("-> Press \"enter\" to create a state descriptor!  ")
 	params['stateEvaluator'] = states.create_stateEvaluator()
-	params['actions'] = actions.create_actions()	
+	params['actions'] = ruleactions.create_rule_actions()
 	print "\n========================================================"
 	input = raw_input("Do you want to add exitAction? (Y/n): ")
         if not input == "n":
-            params['exitActions'] = actions.create_actions()
+            params['exitActions'] = ruleactions.create_rule_actions()
 	selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
 	if selection == None:
 	    return None
@@ -166,10 +169,10 @@ def list_rule_details():
 	print "\nStates:\n",
 	states.print_stateEvaluator(response['params']['rule']['stateEvaluator'])
     print "\nActions:\n"
-    actions.print_actionList(response['params']['rule']['actions'])
+    ruleactions.print_ruleActionList(response['params']['rule']['actions'])
     if len(response['params']['rule']['exitActions']) > 0:
 	print "\nExit actions:\n"
-	actions.print_actionList(response['params']['rule']['exitActions'])
+	ruleactions.print_ruleActionList(response['params']['rule']['exitActions'])
 
 
 def list_rules_containig_deviceId():

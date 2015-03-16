@@ -53,6 +53,11 @@ def read_params(paramTypes):
 def read_paramDescriptors(paramTypes):
     params = []
     for paramType in paramTypes:
+	selectionTypes = ["yes","no"]
+	selectionText = "-> Do you want to create a descriptor for the param \"%s\"?" %(paramType['name'])
+	selection = guh.get_selection(selectionText, selectionTypes)
+	if selectionTypes[selection] == "no":
+	    continue
         operator = guh.select_valueOperator(paramType['name'])
         if paramType['type'] == "bool":
 	    boolTypes = ["true","false"]
