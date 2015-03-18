@@ -38,7 +38,7 @@ def init_connection():
     host='localhost'
     port=1234
     if len(sys.argv) > 1:
-	HOST = sys.argv[1]
+	host = sys.argv[1]
     if len(sys.argv) > 2:
 	port = int(sys.argv[2])
     try:
