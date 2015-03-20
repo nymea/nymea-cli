@@ -94,6 +94,7 @@ def select_actionType(deviceClassId):
 	return actions[selection]
     return None
 
+
 def print_actionList(actionList):
     for i in range(len(actionList)):
         action = actionList[i]

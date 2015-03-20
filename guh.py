@@ -160,6 +160,12 @@ def print_rule_error_code(ruleError):
         print "\nERROR: invalid parameter in this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorMissingParameter":
         print "\nERROR: missing parameter in this rule. (", ruleError, ")"
+    elif ruleError == "RuleErrorInvalidRuleActionParameter":
+	print "\nERROR: one of the actions parameters in this rule is not valid. (", ruleError, ")"
+    elif ruleError == "RuleErrorInvalidRuleFormat":
+        print "\nERROR: this rule has not the correct format. (", ruleError, ")"
+    elif ruleError == "RuleErrorTypesNotMatching":
+        print "\nERROR: the event and the action params have not the same type. (", ruleError, ")"    
     else:
         print "\nERROR: Unknown error code: ", ruleError,  "Please take a look at the newest API version."
 
