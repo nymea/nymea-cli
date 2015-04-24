@@ -66,6 +66,7 @@ def execute_action():
 	return None
     device = devices.get_device(deviceId)
     actionType = select_actionType(device['deviceClassId'])
+    #print guh.print_json_format(actionType)
     if actionType == None:
         print "\n    This device has no actions"
         return None
