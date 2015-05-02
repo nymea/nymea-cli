@@ -13,6 +13,9 @@ if [ -d ./dist ]; then
         rm -rf dist
 fi
 
+rm guh-cli-1.0.0.tar.gz
+rm MANIFEST
+
 #rm guh-cli-*
 
 # build package

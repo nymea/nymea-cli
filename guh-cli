@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 # -*- coding: UTF-8 -*-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -339,22 +340,26 @@ def processmenu(menu, parent=None):
 	    exitmenu = True
 
 # Main 
-if not guh.init_connection():
-    exit()
-else:
-    os.system('clear')
-    screen = curses.initscr()
-    try:
-	curses.noecho()
-	curses.cbreak() 
-	curses.start_color() 
-	screen.keypad(1)
-	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
-	highlightColor = curses.color_pair(1) 
-	normalColor = curses.A_NORMAL 
-	processmenu(menu_data)
-    finally:
-	curses.endwin()
-	os.system('clear')
+
+if __name__ == "__main__":
+	if not guh.init_connection():
+		exit()
+	else:
+		os.system('clear')
+		screen = curses.initscr()
+		try:
+			curses.noecho()
+			curses.cbreak() 
+			curses.start_color() 
+			screen.keypad(1)
+			curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
+			highlightColor = curses.color_pair(1) 
+			normalColor = curses.A_NORMAL 
+			processmenu(menu_data)
+		finally:
+			curses.endwin()
+			os.system('clear')
+
+
 
     

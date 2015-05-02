@@ -4,13 +4,8 @@ export DH_VERBOSE=1
 
 export PYBUILD_NAME=guh-cli
 
-clean::
-	rm -rf MANIFEST dist deb_dist 
-	dh_clean
-
-override_dh_auto_install:
-	python setup.py install --root=debian/guh-cli --install-layout=deb --install-lib=/usr/share/guh-cli --install-scripts=/usr/share/guh-cli
-
 %:
-	dh $@ --with python2 --buildsystem=pybuild --install-layout=deb,quilt
+	dh $@ --with python2 --buildsystem=pybuild
 
+override_dh_auto_build:
+	exit 0

@@ -1,9 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
 # -*- coding: UTF-8 -*-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stürz <simon.stuerz@guh.guru>                 #
+#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -21,35 +22,34 @@
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-try:	
-	from ez_setup import use_setuptools
-	use_setuptools()
-	from setuptools import setup	
-except ImportError:
-	from distutils.core import setup
+from distutils.core import setup
 
-config = {
-	'author': 'Simon Stuerz',
-	'author_email':"simon.stuerz@guh.guru",
-	'name': 'guh-cli',
-	'description': 'guh command line interface - python',
-	"long_description":"""\
+setup(	name = "guh-cli",
+	author = "Simon Stuerz",
+	author_email = "simon.stuerz@guh.guru",
+	description = "guh command line interface - python",
+	long_description = """\
 	The guh-cli (command line interface) is an admin tool written in python to communicate 
 	with the guh JSON-RPC API and test functionality of guh.
 	""",
-	'url': 'https://github.com/guh/guh-cli.git',
-	'version': '1.0',
-	'package_dir': {
-		'guh': 'guh/guh',
-	},
-	'scripts': 'guh-cli',
-	'classifiers': [
-		"Development Status :: 5 - unstable",
-		"Topic :: Utilities",
-		"License :: GPLv2"
+	url = "https://github.com/guh/guh-cli.git",
+	version = "1.0.0",
+	py_modules = [
+		"guh.actions",
+		"guh.devices",
+		"guh.events",
+		"guh.guh",
+		"guh.logs",
+		"guh.notifications",
+		"guh.parameters",
+		"guh.ruleactions",
+		"guh.rules",
+		"guh.selector",
+		"guh.states"
 	],
-	
-	
-}
-setup(**config)
-
+	scripts = ["guh-cli"],
+	data_files = [ 
+		("/usr/share/man/man1", ["guh-cli.1"]),
+		("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
+	]
+)
