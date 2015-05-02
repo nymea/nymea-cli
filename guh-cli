@@ -1,8 +1,9 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 guh                                                 #
+#  Copyright (C) 2015 Simon Stürz <simon.stuerz@guh.guru>                 #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -26,19 +27,17 @@ import json
 import curses
 import traceback
 import atexit
-import time
-
-import guh
-import devices
-import events
-import actions
-import rules
-import logs
-import notifications
-
 from time import sleep
 import curses
 import os
+
+from guh import guh
+from guh import devices
+from guh import events
+from guh import actions
+from guh import rules
+from guh import logs
+from guh import notifications
 
 
 MENU = "menu"

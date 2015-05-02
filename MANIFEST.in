@@ -1,0 +1,2 @@
+include guh-cli README
+recursive-include guh *.py

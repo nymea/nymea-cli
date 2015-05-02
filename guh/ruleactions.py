@@ -1,6 +1,8 @@
+# -*- coding: UTF-8 -*-
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 guh                                                 #
+#  Copyright (C) 2015 Simon Stürz <simon.stuerz@guh.guru>                 #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -16,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License      #
 #  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
 
 import guh
 import devices
