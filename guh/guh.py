@@ -35,14 +35,8 @@ import selector
 
 commandId=0
 
-def init_connection():
+def init_connection(host, port):
     global tn
-    host='localhost'
-    port=1234
-    if len(sys.argv) > 1:
-	host = sys.argv[1]
-    if len(sys.argv) > 2:
-	port = int(sys.argv[2])
     try:
 	tn = telnetlib.Telnet(host, port)
 	packet = tn.read_until("\n}\n")

@@ -5,23 +5,35 @@
 guh-cli \- guh command line interface written in python 
 .SH SYNOPSIS
 .B guh-cli
-[\fIHOST\fR] [\fIPORT\fR]
+[\fIOPTION\fR]
 .SH DESCRIPTION
 The guh-cli (command line interface) is an admin tool written in python to communicate 
 with the guh JSON-RPC API and test functionality of guh.
+.SH OPTIONS
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+show this help message and exit.
+.TP
+\fB\-\-host HOST\fR
+the location of the guh daemon (default 127.0.0.1)
+.TP
+\fB\-\-port PORT\fR
+the port of the the guh daemon (default 1234)
 .SH DEFAULTS
-By default guh-cli will use 
+By default guh-cli will try to connect to
 .IR localhost 
-(127.0.0.1) for
-.BR [HOST]
-and
-.IR 1234 
-for
-.BR [PORT] . 
+(127.0.0.1) and port
+.IR 1234 . 
 Both arguments are optional.
 .SH EXAMPLES
 .TP
-guh-cli 192.168.1.5 1234
+$ guh-cli --host 192.168.1.5 --port 1234
+.br
+will try to connect to guhd running on 192.168.1.5 and port 1234
+.TP
+$ guh-cli --port 666
+.br
+will try to connect to guhd running on localhost and port 666
 .SH SEE ALSO
 Full documentation at: <https://github.com/guh/guh/wiki/guh-cli>
 .SH "REPORTING BUGS"

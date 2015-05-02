@@ -49,7 +49,7 @@ setup(	name = "guh-cli",
 	],
 	scripts = ["guh-cli"],
 	data_files = [ 
-		("/usr/share/man/man1", ["guh-cli.1"]),
+		("/usr/share/man/man1", ["debian/guh-cli.1"]),
 		("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
 	]
 )
