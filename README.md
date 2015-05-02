@@ -15,6 +15,7 @@ If you want to download the source code you can run:
 
     $ sudo apt-get source guh-cli
 
+--------------------------------------------
 If you want to install it manually you can clone the repository and start the application directly in your folder.
 First make sure you have installed *python 2.7*. You can find the installation instruction on the [official python homepage](https://www.python.org/download/releases/2.7/).
 
