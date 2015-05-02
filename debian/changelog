@@ -1,5 +1,5 @@
-guh-cli (1.0.0) unstable; urgency=low
+guh-cli (1.0.0) vivid; urgency=low
 
-  * source package automatically created by stdeb 0.8.2
+  * First version of debian package
 
  -- Simon Stuerz <simon.stuerz@guh.guru>  Sat, 02 May 2015 02:08:03 +0200

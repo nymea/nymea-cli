@@ -6,6 +6,3 @@ export PYBUILD_NAME=guh-cli
 
 %:
 	dh $@ --with python2 --buildsystem=pybuild
-
-override_dh_auto_build:
-	exit 0
