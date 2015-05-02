@@ -1,8 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/env python
+
+# -*- coding: UTF-8 -*-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 guh                                                 #
+#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -26,19 +28,17 @@ import json
 import curses
 import traceback
 import atexit
-import time
-
-import guh
-import devices
-import events
-import actions
-import rules
-import logs
-import notifications
-
 from time import sleep
 import curses
 import os
+
+from guh import guh
+from guh import devices
+from guh import events
+from guh import actions
+from guh import rules
+from guh import logs
+from guh import notifications
 
 
 MENU = "menu"
@@ -340,22 +340,26 @@ def processmenu(menu, parent=None):
 	    exitmenu = True
 
 # Main 
-if not guh.init_connection():
-    exit()
-else:
-    os.system('clear')
-    screen = curses.initscr()
-    try:
-	curses.noecho()
-	curses.cbreak() 
-	curses.start_color() 
-	screen.keypad(1)
-	curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
-	highlightColor = curses.color_pair(1) 
-	normalColor = curses.A_NORMAL 
-	processmenu(menu_data)
-    finally:
-	curses.endwin()
-	os.system('clear')
+
+if __name__ == "__main__":
+	if not guh.init_connection():
+		exit()
+	else:
+		os.system('clear')
+		screen = curses.initscr()
+		try:
+			curses.noecho()
+			curses.cbreak() 
+			curses.start_color() 
+			screen.keypad(1)
+			curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
+			highlightColor = curses.color_pair(1) 
+			normalColor = curses.A_NORMAL 
+			processmenu(menu_data)
+		finally:
+			curses.endwin()
+			os.system('clear')
+
+
 
     

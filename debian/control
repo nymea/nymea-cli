@@ -1,0 +1,19 @@
+Source: guh-cli
+Maintainer: Simon Stuerz <simon.stuerz@guh.guru>
+Section: python
+Priority: optional
+Build-Depends: python-all (>= 2.6.6-3),
+	debhelper (>= 9),
+	python-setuptools
+X-Python-Version: >= 2.7
+Standards-Version: 3.9.6
+
+Package: guh-cli
+Architecture: all
+Depends: ${misc:Depends}, 
+	${python:Depends}
+Description: guh command line interface - python
+ The guh-cli (command line interface) is an admin tool written in python 
+ to communicate with the guh JSON-RPC API and test functionality of guh.
+ 	
+

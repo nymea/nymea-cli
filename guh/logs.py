@@ -1,6 +1,8 @@
+# -*- coding: UTF-8 -*-
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 guh                                                 #
+#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                 #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
