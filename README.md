@@ -16,6 +16,7 @@ If you want to download the source code you can run:
     $ sudo apt-get source guh-cli
 
 --------------------------------------------
+
 If you want to install it manually you can clone the repository and start the application directly in your folder.
 First make sure you have installed *python 2.7*. You can find the installation instruction on the [official python homepage](https://www.python.org/download/releases/2.7/).
 
@@ -24,6 +25,7 @@ Now you can clone the [guh-cli repository](https://github.com/guh/guh-cli) from 
     $ git clone https://github.com/guh/guh-cli.git
     $ cd guh-cli/    
     $ ./guh-cli
+
 ### Usage 
 --------------------------------------------
 
@@ -31,11 +33,11 @@ In order to start guh-cli you need to know on which host *guh* is currently runn
 
     $ guh-cli
 
-if you need help you can run:
+If you need help you can run:
 
     $ man guh-cli
     
-or
+or you can run directly:
 
     $ guh-cli -h
     usage: guh-cli [-h] [--host HOST] [--port PORT]
