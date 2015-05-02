@@ -32,8 +32,10 @@ setup(	name = "guh-cli",
 	The guh-cli (command line interface) is an admin tool written in python to communicate 
 	with the guh JSON-RPC API and test functionality of guh.
 	""",
-	url = "https://github.com/guh/guh-cli.git",
+	url = "https://github.com/guh/guh-cli",
 	version = "1.0.0",
+	keywords = ["guh", "tune", "cli"],
+	scripts = ["guh-cli"],
 	py_modules = [
 		"guh.actions",
 		"guh.devices",
@@ -45,11 +47,21 @@ setup(	name = "guh-cli",
 		"guh.ruleactions",
 		"guh.rules",
 		"guh.selector",
-		"guh.states"
+		"guh.states",
+		"tests.licensetest"
 	],
-	scripts = ["guh-cli"],
 	data_files = [ 
 		("/usr/share/man/man1", ["debian/guh-cli.1"]),
 		("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
-	]
+	],
+	classifiers = [
+		"Programming Language :: Python",
+		"Programming Language :: Python :: 2",
+		"Development Status :: 4 - Beta",
+		"Intended Audience :: Developers",
+		"License :: OSI Approved :: GNU General Public License version 2 (GPLv2)",
+		"Operating System :: OS Independent",
+		"Topic :: Software Development :: Libraries :: Python Modules",
+		"Topic :: Testing :: Home Automation"
+        ]
 )

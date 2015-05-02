@@ -1,8 +1,9 @@
+#!/usr/bin/env python
+
 # -*- coding: UTF-8 -*-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -19,3 +20,16 @@
 #  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+import sys
+import os
+import subprocess
+import unittest
+
+class TestStringMethods(unittest.TestCase):
+	def test_license(self):
+		result = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep -v 'GPL (v2)'", shell=True, stdout=subprocess.PIPE).stdout.read()
+		self.assertEqual(result, "")
+
+if __name__ == '__main__':
+	unittest.main()
