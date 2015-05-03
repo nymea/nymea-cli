@@ -47,143 +47,148 @@ COMMAND = "command"
 EXITMENU = "exitmenu"
 
 menu_data = {
-    'title': "guh-cli", 
-    'type': MENU, 
-    'subtitle': "Please select an option...",
-    'options':[
+	'title': "guh-cli", 
+	'type': MENU, 
+	'subtitle': "Please select an option...",
+	'options':[
 	{ 
-	    'title': "Devices", 
-	    'type': MENU,
-	    'subtitle': "Please select an option...",
-	    'options': [
+		'title': "Devices", 
+		'type': MENU,
+		'subtitle': "Please select an option...",
+		'options': [
 		{ 
-		    'title': "Add a new device", 
-		    'type': COMMAND, 
-		    'command': 'method_add_device' 
+			'title': "Add a new device", 
+			'type': COMMAND, 
+			'command': 'method_add_device' 
 		},
 		{
-		    'title': "Remove a device", 
-		    'type': COMMAND, 
-		    'command': 'method_remove_device' 
+			'title': "Remove a device", 
+			'type': COMMAND, 
+			'command': 'method_remove_device' 
 		},
 		{
-		    'title': "List configured devices", 
-		    'type': COMMAND, 
-		    'command': 'method_list_configured_devices' 
+			'title': "List configured devices", 
+			'type': COMMAND, 
+			'command': 'method_list_configured_devices' 
 		},
 		{
-		    'title': "List device parameters", 
-		    'type': COMMAND, 
-		    'command': 'method_list_configured_device_params' 
+			'title': "List device parameters", 
+			'type': COMMAND, 
+			'command': 'method_list_configured_device_params' 
 		},
 		{
-		    'title': "List device states", 
-		    'type': COMMAND, 
-		    'command': 'method_list_device_states' 
+			'title': "List device states", 
+			'type': COMMAND, 
+			'command': 'method_list_device_states' 
 		},
 		{
-		    'title': "Execute an action", 
-		    'type': COMMAND, 
-		    'command': 'method_execute_action' 
+			'title': "Execute an action", 
+			'type': COMMAND, 
+			'command': 'method_execute_action' 
 		},
 		{
-		    'title': "List supported vendors", 
-		    'type': COMMAND, 
-		    'command': 'method_list_vendors' 
+			'title': "List supported vendors", 
+			'type': COMMAND, 
+			'command': 'method_list_vendors' 
 		},
 		{
-		    'title': "List supported devices", 
-		    'type': COMMAND, 
-		    'command': 'method_list_deviceClasses' 
+			'title': "List supported devices", 
+			'type': COMMAND, 
+			'command': 'method_list_deviceClasses' 
 		},
 	    ]
 	},
 	{
-	    'title': "Rules", 
-	    'type': MENU,
-	    'subtitle': "Please select an option...",
-	    'options': [
+		'title': "Rules", 
+		'type': MENU,
+		'subtitle': "Please select an option...",
+		'options': [
 		{ 
-		    'title': "Add a new rule", 
-		    'type': COMMAND, 
-		    'command': 'method_add_rule' 
+			'title': "Add a new rule", 
+			'type': COMMAND, 
+			'command': 'method_add_rule' 
 		},
 		{ 
-		    'title': "Remove a rule", 
-		    'type': COMMAND, 
-		    'command': 'method_remove_rule' 
+			'title': "Remove a rule", 
+			'type': COMMAND, 
+			'command': 'method_remove_rule' 
 		},
 		{ 
-		    'title': "Rule details", 
-		    'type': COMMAND, 
-		    'command': 'method_list_rule_detail' 
+			'title': "Rule details", 
+			'type': COMMAND, 
+			'command': 'method_list_rule_detail' 
 		},
 		{ 
-		    'title': "Enable/Disable a rule", 
-		    'type': COMMAND, 
-		    'command': 'method_enable_disable_rule' 
+			'title': "Enable/Disable a rule", 
+			'type': COMMAND, 
+			'command': 'method_enable_disable_rule' 
 		},
 		{ 
-		    'title': "List rules", 
-		    'type': COMMAND, 
-		    'command': 'method_list_rules' 
+			'title': "List rules", 
+			'type': COMMAND, 
+			'command': 'method_list_rules' 
 		},
 		{ 
-		    'title': "List rules containing a certain device", 
-		    'type': COMMAND, 
-		    'command': 'method_list_rules_containig_deviceId' 
+			'title': "List rules containing a certain device", 
+			'type': COMMAND, 
+			'command': 'method_list_rules_containig_deviceId' 
 		},
 	    ]
 	},
 	{
-	    'title': "Log monitor", 
-	    'type': COMMAND, 
-	    'command': 'method_list_log_entries' 
+		'title': "Log monitor", 
+		'type': COMMAND, 
+		'command': 'method_list_log_entries' 
 	},  
 	{ 
-	    'title': "Notifications sniffer", 
-	    'type': COMMAND, 
-	    'command': 'method_notification_sniffer' 
+		'title': "Notifications sniffer", 
+		'type': COMMAND, 
+		'command': 'method_notification_sniffer' 
 	},     
 	{
-	    'title': "System Info", 
-	    'type': MENU,
-	    'subtitle': "Please select an option...",
-	    'options': [
+		'title': "System Info", 
+		'type': MENU,
+		'subtitle': "Please select an option...",
+		'options': [
 		{ 
-		    'title': "Version", 
-		    'type': COMMAND, 
-		    'command': 'method_list_server_info' 
+			'title': "Version", 
+			'type': COMMAND, 
+			'command': 'method_list_server_info' 
 		},
 		{ 
-		    'title': "List plugins", 
-		    'type': COMMAND, 
-		    'command': 'method_list_plugins' 
+			'title': "List plugins", 
+			'type': COMMAND, 
+			'command': 'method_list_plugins' 
 		},
 		{ 
-		    'title': "List plugin configuration", 
-		    'type': COMMAND, 
-		    'command': 'method_list_plugin_configuration' 
+			'title': "List plugin configuration", 
+			'type': COMMAND, 
+			'command': 'method_list_plugin_configuration' 
 		},
 		{ 
-		    'title': "Print API", 
-		    'type': COMMAND, 
-		    'command': 'method_print_api' 
+			'title': "Print device Descriptor", 
+			'type': COMMAND, 
+			'command': 'method_print_deviceDescriptor' 
 		},
 		{ 
-		    'title': "List API method", 
-		    'type': COMMAND, 
-		    'command': 'method_print_api_method' 
+			'title': "Print API", 
+			'type': COMMAND, 
+			'command': 'method_print_api' 
 		},
 		{ 
-		    'title': "List API notification", 
-		    'type': COMMAND, 
-		    'command': 'method_print_api_notification' 
+			'title': "List API method", 
+			'type': COMMAND, 
+			'command': 'method_print_api_method' 
 		},
 		{ 
-		    'title': "List API type", 
-		    'type': COMMAND, 
-		    'command': 'method_print_api_type' 
+			'title': "List API notification", 
+			'type': COMMAND, 
+			'command': 'method_print_api_notification' 
+		},
+		{ 
+			'title': "List API type", 
+			'type': COMMAND, 
+			'command': 'method_print_api_type' 
 		}
 	    ]
 	}
@@ -192,175 +197,178 @@ menu_data = {
 
 
 def method_add_device():
-    devices.add_device()
+	devices.add_device()
 
 def method_remove_device():
-    devices.remove_configured_device()
+	devices.remove_configured_device()
 
 def method_execute_action():
-    actions.execute_action()
+	actions.execute_action()
 
 def method_add_rule():
-    rules.add_rule()
+	rules.add_rule()
 
 def method_remove_rule():
-    rules.remove_rule()
+	rules.remove_rule()
 
 def method_enable_disable_rule():
-    rules.enable_disable_rule()
+	rules.enable_disable_rule()
 
 def method_list_configured_device_params():
-    devices.list_configured_device_params()
+	devices.list_configured_device_params()
 
 def method_list_device_states():
-    devices.list_device_states()
+	devices.list_device_states()
 
 def method_list_vendors():
-    devices.list_vendors()
+	devices.list_vendors()
  
 def method_list_plugins():
-    devices.list_plugins()
+	devices.list_plugins()
     
 def method_list_plugin_configuration():
-    devices.list_plugin_configuration()
+	devices.list_plugin_configuration()
     
 def method_list_configured_devices():
-    devices.list_configured_devices()
+	devices.list_configured_devices()
     
 def method_list_deviceClasses(vendorId = None):
-    devices.list_deviceClasses()
+	devices.list_deviceClasses()
 
 def method_list_deviceClasses_by_vendor():
-    method_list_deviceClasses(devices.select_vendor())
+	method_list_deviceClasses(devices.select_vendor())
     
 def method_list_rule_detail():
-    rules.list_rule_details()
+	rules.list_rule_details()
     
 def method_list_rules():
-    rules.list_rules()
+	rules.list_rules()
     
 def method_list_rules_containig_deviceId():
-    rules.list_rules_containig_deviceId()
+	rules.list_rules_containig_deviceId()
 
 def method_list_log_entries():
-    logs.log_window()
+	logs.log_window()
     
 def method_notification_sniffer():
-    notifications.notification_sniffer()
+	notifications.notification_sniffer()
     
 def method_list_server_info():
-    guh.print_server_version()
+	guh.print_server_version()
+    
+def method_print_deviceClass():
+	devices.print_deviceClass()
 
 def method_print_api():
-    guh.print_api()
+	guh.print_api()
 
 def method_print_api_method():
-    guh.print_api_method()
+	guh.print_api_method()
     
 def method_print_api_notification():
-    guh.print_api_notifications()
+	guh.print_api_notifications()
 
 def method_print_api_type():
-    guh.print_api_type()
+	guh.print_api_type()
 
 def runmenu(menu, parent):
-    if parent is None:
-	lastoption = "Exit"
-    else:
-	lastoption = "Return to %s menu" % parent['title']
+	if parent is None:
+		lastoption = "Exit"
+	else:
+		lastoption = "Return to %s menu" % parent['title']
     
-    optioncount = len(menu['options']) 
-    pos=0 
-    oldpos=None 
-    x = None 
+	optioncount = len(menu['options']) 
+	pos=0 
+	oldpos=None 
+	x = None 
     
-    # Loop until return key is pressed
-    while x !=ord('\n'):
-	if pos != oldpos:
-	    oldpos = pos
-	screen.border(0)
-	screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
-	screen.addstr(4,2, menu['subtitle'], curses.A_BOLD) 
-	# Display all the menu items, showing the 'pos' item highlighted
-	for index in range(optioncount):
-	    textstyle = normalColor
-	    if pos==index:
-		textstyle = highlightColor
-	    screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
-	textstyle = normalColor
-	if pos==optioncount:
-	    textstyle = highlightColor
-	screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, lastoption), textstyle)
-	screen.refresh()
-	x = screen.getch()
-	if x >= ord('1') and x <= ord(str(optioncount+1)):
-	    pos = x - ord('0') - 1 
-	if x == curses.KEY_DOWN:
-	    if pos < optioncount:
-		pos += 1
-	    else: pos = 0
-	elif x == curses.KEY_UP: 
-	    if pos > 0:
-		pos += -1
-	    else: pos = optioncount
-	elif x == curses.KEY_BACKSPACE:
-	    pos = optioncount
-	elif x == 27:
-	    pos = optioncount
-    # return index of the selected item
-    return pos
+	# Loop until return key is pressed
+	while x !=ord('\n'):
+		if pos != oldpos:
+			oldpos = pos
+		screen.border(0)
+		screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
+		screen.addstr(4,2, menu['subtitle'], curses.A_BOLD) 
+		# Display all the menu items, showing the 'pos' item highlighted
+		for index in range(optioncount):
+			textstyle = normalColor
+			if pos==index:
+				textstyle = highlightColor
+			screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
+		textstyle = normalColor
+		if pos==optioncount:
+			textstyle = highlightColor
+		screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, lastoption), textstyle)
+		screen.refresh()
+		x = screen.getch()
+		if x >= ord('1') and x <= ord(str(optioncount+1)):
+			pos = x - ord('0') - 1 
+		if x == curses.KEY_DOWN:
+			if pos < optioncount:
+				pos += 1
+			else: 
+				pos = 0
+		elif x == curses.KEY_UP: 
+			if pos > 0:
+				pos += -1
+			else: pos = optioncount
+		elif x == curses.KEY_BACKSPACE:
+			pos = optioncount
+		elif x == 27:
+			pos = optioncount
+	# return index of the selected item
+	return pos
     
 
 def processmenu(menu, parent=None):
-    global screen
-    optioncount = len(menu['options'])
-    exitmenu = False
-    while not exitmenu:
-	getin = runmenu(menu, parent)
-	if getin == optioncount:
-	    exitmenu = True
-	elif menu['options'][getin]['type'] == COMMAND:
-	    ###############################
-	    curses.endwin()
-	    print "========================================================"
-	    methodCall = globals()[menu['options'][getin]['command']]
-	    methodCall()
-	    print "--------------------------------------------------------"
-	    raw_input("\nPress \"enter\" to return to the menu...\n")
-	    ###############################
-	    screen = curses.initscr()
-	    screen.clear()
-	    curses.reset_prog_mode()
-	    curses.curs_set(1)
-	    curses.curs_set(0)
-	elif menu['options'][getin]['type'] == MENU:
-	    screen.clear()
-	    processmenu(menu['options'][getin], menu)
-	    screen.clear() 
-	elif menu['options'][getin]['type'] == EXITMENU:
-	    exitmenu = True
+	global screen
+	optioncount = len(menu['options'])
+	exitmenu = False
+	while not exitmenu:
+		getin = runmenu(menu, parent)
+		if getin == optioncount:
+			exitmenu = True
+		elif menu['options'][getin]['type'] == COMMAND:
+			###############################
+			curses.endwin()
+			print "========================================================"
+			methodCall = globals()[menu['options'][getin]['command']]
+			methodCall()
+			print "--------------------------------------------------------"
+			raw_input("\nPress \"enter\" to return to the menu...\n")
+			###############################
+			screen = curses.initscr()
+			screen.clear()
+			curses.reset_prog_mode()
+			curses.curs_set(1)
+			curses.curs_set(0)
+		elif menu['options'][getin]['type'] == MENU:
+			screen.clear()
+			processmenu(menu['options'][getin], menu)
+			screen.clear() 
+		elif menu['options'][getin]['type'] == EXITMENU:
+			exitmenu = True
 
 # Main 
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
 	parser.add_argument('--host', type=str, help='the location of the guh daemon (default 127.0.0.1)')
 	parser.add_argument('--port', type=int, help='the port of the the guh daemon (default 1234)')
-	
+
 	args = parser.parse_args()
 	
 	host='localhost'
 	port=1234
-	
+
 	if args.host:
 		host=args.host
 	if args.port:
 		port=args.port
-	
+
 	# check connection
 	if not guh.init_connection(host, port):
 		exit()
-	
+
 	os.system('clear')
 	screen = curses.initscr()
 	try:
@@ -375,8 +383,4 @@ if __name__ == "__main__":
 	finally:
 		curses.endwin()
 		os.system('clear')
-		print "Bye, have a nice day! :)"
-
-
-
-    
+		print "Bye, have a nice day! :)"    

@@ -24,7 +24,7 @@
 
 from distutils.core import setup
 
-setup(	name = "guh-cli",
+setup(name = "guh-cli",
 	author = "Simon Stuerz",
 	author_email = "simon.stuerz@guh.guru",
 	description = "guh command line interface - python",
@@ -63,5 +63,5 @@ setup(	name = "guh-cli",
 		"Operating System :: OS Independent",
 		"Topic :: Software Development :: Libraries :: Python Modules",
 		"Topic :: Testing :: Home Automation"
-        ]
+	]
 )
