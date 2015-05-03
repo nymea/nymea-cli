@@ -88,9 +88,9 @@ def select_actionType(deviceClassId):
 	if not actions:
 		return None
 	actionList = []
-	print "got actions", actions
+	#print "got actions", actions
 	for i in range(len(actions)):
-		print "got actiontype", actions[i]
+		#print "got actiontype", actions[i]
 		actionList.append(actions[i]['name'])
 	selection = guh.get_selection("Please select an action type:", actionList)
 	if selection != None:
@@ -107,3 +107,17 @@ def print_actionList(actionList):
 		print  "%5s. ->  %40s -> action: \"%s\"" %(i, device['name'], actionType['name'])
 		for i in range(len(actionParams)):
 			print "%50s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
+
+
+def print_actionType():
+	deviceId = devices.select_configured_device()
+	if deviceId == None:
+		return None
+	device = devices.get_device(deviceId)
+	actionType = select_actionType(device['deviceClassId'])
+	#print guh.print_json_format(actionType)
+	if actionType == None:
+		print "\n    This device has no actions"
+		return None
+	actionType = get_actionType(actionType['id'])
+	guh.print_json_format(actionType)

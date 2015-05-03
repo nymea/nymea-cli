@@ -163,3 +163,18 @@ def print_stateEvaluator(stateEvaluator):
 			if i != (len(stateEvaluator['childEvaluators']) - 1):
 				print "%s%s" % (guh.get_stateEvaluator_string(stateEvaluator['operator']), guh.get_stateEvaluator_string(stateEvaluator['operator'])),
 		print "\n"
+
+
+def print_stateType():
+	deviceId = devices.select_configured_device()
+	device = devices.get_device(deviceId)
+	if device == None:
+		return None
+	stateType = select_stateType(device['deviceClassId']);
+	if stateType == None:
+		return None
+	guh.print_json_format(stateType)
+
+
+
+

@@ -75,6 +75,7 @@ def create_eventDescriptor():
 		return None
 	eventType = select_eventType(device['deviceClassId']); 
 	if not eventType:
+		print "\n    This device has no events"
 		return None
 	params = parameters.read_paramDescriptors(eventType['paramTypes'])
 	eventDescriptor = {}
@@ -94,3 +95,15 @@ def print_eventDescriptors(eventDescriptors):
 		print  "%5s. -> %40s -> event: \"%s\"" %(i, device['name'], eventType['name'])
 		for i in range(len(paramDescriptors)):
 			print "%50s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
+
+
+def print_eventType():
+	deviceId = devices.select_configured_device()
+	device = devices.get_device(deviceId)
+	if not device:
+		return None
+	eventType = select_eventType(device['deviceClassId']); 
+	if not eventType:
+		print "\n    This device has no events"
+		return None
+	guh.print_json_format(eventType)

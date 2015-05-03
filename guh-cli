@@ -36,6 +36,7 @@ from time import sleep
 from guh import guh
 from guh import devices
 from guh import events
+from guh import states
 from guh import actions
 from guh import rules
 from guh import logs
@@ -51,147 +52,176 @@ menu_data = {
 	'type': MENU, 
 	'subtitle': "Please select an option...",
 	'options':[
-	{ 
-		'title': "Devices", 
-		'type': MENU,
-		'subtitle': "Please select an option...",
-		'options': [
 		{ 
-			'title': "Add a new device", 
-			'type': COMMAND, 
-			'command': 'method_add_device' 
+			'title': "Devices", 
+			'type': MENU,
+			'subtitle': "Please select an option...",
+			'options': [
+				{ 
+					'title': "Add a new device", 
+					'type': COMMAND, 
+					'command': 'method_add_device' 
+				},
+				{
+					'title': "Remove a device", 
+					'type': COMMAND, 
+					'command': 'method_remove_device' 
+				},
+				{
+					'title': "Execute an action", 
+					'type': COMMAND, 
+					'command': 'method_execute_action' 
+				},
+				{
+					'title': "List...", 
+					'type': MENU,
+					'subtitle': "Please select what you want to list...",
+					'options': [
+						{
+							'title': "List configured devices", 
+							'type': COMMAND, 
+							'command': 'method_list_configured_devices' 
+						},
+						{
+							'title': "List device parameters", 
+							'type': COMMAND, 
+							'command': 'method_list_configured_device_params' 
+						},
+						{
+							'title': "List device states", 
+							'type': COMMAND, 
+							'command': 'method_list_device_states' 
+						},
+						{
+							'title': "List supported vendors", 
+							'type': COMMAND, 
+							'command': 'method_list_vendors' 
+						},
+						{
+							'title': "List supported devices", 
+							'type': COMMAND, 
+							'command': 'method_list_deviceClasses' 
+						}
+					]
+				},
+				{
+					'title': "Print...", 
+					'type': MENU,
+					'subtitle': "Please select what you want to print...",
+					'options': [
+						{ 
+							'title': "Print DeviceClass", 
+							'type': COMMAND, 
+							'command': 'method_print_deviceClass' 
+						},
+						{ 
+							'title': "Print ActionType", 
+							'type': COMMAND, 
+							'command': 'method_print_actionType' 
+						},
+						{ 
+							'title': "Print EventType", 
+							'type': COMMAND, 
+							'command': 'method_print_eventType' 
+						},
+						{ 
+							'title': "Print StateType", 
+							'type': COMMAND, 
+							'command': 'method_print_stateType' 
+						}
+					]
+				}
+			]
 		},
 		{
-			'title': "Remove a device", 
-			'type': COMMAND, 
-			'command': 'method_remove_device' 
+			'title': "Rules", 
+			'type': MENU,
+			'subtitle': "Please select an option...",
+			'options': [
+				{ 
+					'title': "Add a new rule", 
+					'type': COMMAND, 
+					'command': 'method_add_rule' 
+				},
+				{ 
+					'title': "Remove a rule", 
+					'type': COMMAND, 
+					'command': 'method_remove_rule' 
+				},
+				{ 
+					'title': "Rule details", 
+					'type': COMMAND, 
+					'command': 'method_list_rule_detail' 
+				},
+				{ 
+					'title': "Enable/Disable a rule", 
+					'type': COMMAND, 
+					'command': 'method_enable_disable_rule' 
+				},
+				{ 
+					'title': "List rules", 
+					'type': COMMAND, 
+					'command': 'method_list_rules' 
+				},
+				{ 
+					'title': "List rules containing a certain device", 
+					'type': COMMAND, 
+					'command': 'method_list_rules_containig_deviceId' 
+				}
+			]
 		},
 		{
-			'title': "List configured devices", 
+			'title': "Log monitor", 
 			'type': COMMAND, 
-			'command': 'method_list_configured_devices' 
-		},
+			'command': 'method_list_log_entries' 
+		},  
+		{ 
+			'title': "Notifications sniffer", 
+			'type': COMMAND, 
+			'command': 'method_notification_sniffer' 
+		},     
 		{
-			'title': "List device parameters", 
-			'type': COMMAND, 
-			'command': 'method_list_configured_device_params' 
-		},
-		{
-			'title': "List device states", 
-			'type': COMMAND, 
-			'command': 'method_list_device_states' 
-		},
-		{
-			'title': "Execute an action", 
-			'type': COMMAND, 
-			'command': 'method_execute_action' 
-		},
-		{
-			'title': "List supported vendors", 
-			'type': COMMAND, 
-			'command': 'method_list_vendors' 
-		},
-		{
-			'title': "List supported devices", 
-			'type': COMMAND, 
-			'command': 'method_list_deviceClasses' 
-		},
-	    ]
-	},
-	{
-		'title': "Rules", 
-		'type': MENU,
-		'subtitle': "Please select an option...",
-		'options': [
-		{ 
-			'title': "Add a new rule", 
-			'type': COMMAND, 
-			'command': 'method_add_rule' 
-		},
-		{ 
-			'title': "Remove a rule", 
-			'type': COMMAND, 
-			'command': 'method_remove_rule' 
-		},
-		{ 
-			'title': "Rule details", 
-			'type': COMMAND, 
-			'command': 'method_list_rule_detail' 
-		},
-		{ 
-			'title': "Enable/Disable a rule", 
-			'type': COMMAND, 
-			'command': 'method_enable_disable_rule' 
-		},
-		{ 
-			'title': "List rules", 
-			'type': COMMAND, 
-			'command': 'method_list_rules' 
-		},
-		{ 
-			'title': "List rules containing a certain device", 
-			'type': COMMAND, 
-			'command': 'method_list_rules_containig_deviceId' 
-		},
-	    ]
-	},
-	{
-		'title': "Log monitor", 
-		'type': COMMAND, 
-		'command': 'method_list_log_entries' 
-	},  
-	{ 
-		'title': "Notifications sniffer", 
-		'type': COMMAND, 
-		'command': 'method_notification_sniffer' 
-	},     
-	{
-		'title': "System Info", 
-		'type': MENU,
-		'subtitle': "Please select an option...",
-		'options': [
-		{ 
-			'title': "Version", 
-			'type': COMMAND, 
-			'command': 'method_list_server_info' 
-		},
-		{ 
-			'title': "List plugins", 
-			'type': COMMAND, 
-			'command': 'method_list_plugins' 
-		},
-		{ 
-			'title': "List plugin configuration", 
-			'type': COMMAND, 
-			'command': 'method_list_plugin_configuration' 
-		},
-		{ 
-			'title': "Print device Descriptor", 
-			'type': COMMAND, 
-			'command': 'method_print_deviceDescriptor' 
-		},
-		{ 
-			'title': "Print API", 
-			'type': COMMAND, 
-			'command': 'method_print_api' 
-		},
-		{ 
-			'title': "List API method", 
-			'type': COMMAND, 
-			'command': 'method_print_api_method' 
-		},
-		{ 
-			'title': "List API notification", 
-			'type': COMMAND, 
-			'command': 'method_print_api_notification' 
-		},
-		{ 
-			'title': "List API type", 
-			'type': COMMAND, 
-			'command': 'method_print_api_type' 
+			'title': "System Info", 
+			'type': MENU,
+			'subtitle': "Please select an option...",
+			'options': [
+				{ 
+					'title': "Version", 
+					'type': COMMAND, 
+					'command': 'method_list_server_info' 
+				},
+				{ 
+					'title': "List plugins", 
+					'type': COMMAND, 
+					'command': 'method_list_plugins' 
+				},
+				{ 
+					'title': "List plugin configuration", 
+					'type': COMMAND, 
+					'command': 'method_list_plugin_configuration' 
+				},
+				{ 
+					'title': "Print API", 
+					'type': COMMAND, 
+					'command': 'method_print_api' 
+				},
+				{ 
+					'title': "List API method", 
+					'type': COMMAND, 
+					'command': 'method_print_api_method' 
+				},
+				{ 
+					'title': "List API notification", 
+					'type': COMMAND, 
+					'command': 'method_print_api_notification' 
+				},
+				{ 
+					'title': "List API type", 
+					'type': COMMAND, 
+					'command': 'method_print_api_type' 
+				}
+			]
 		}
-	    ]
-	}
     ]
 }
 
@@ -259,6 +289,15 @@ def method_list_server_info():
 def method_print_deviceClass():
 	devices.print_deviceClass()
 
+def method_print_actionType():
+	actions.print_actionType()
+
+def method_print_eventType():
+	events.print_eventType()
+
+def method_print_stateType():
+	states.print_stateType()
+
 def method_print_api():
 	guh.print_api()
 
@@ -294,14 +333,14 @@ def runmenu(menu, parent):
 			textstyle = normalColor
 			if pos==index:
 				textstyle = highlightColor
-			screen.addstr(5+index,4, "%d - %s" % (index+1, menu['options'][index]['title']), textstyle)
+			screen.addstr(5 + index, 4, "%d - %s" % (index + 1, menu['options'][index]['title']), textstyle)
 		textstyle = normalColor
 		if pos==optioncount:
 			textstyle = highlightColor
-		screen.addstr(5+optioncount,4, "%d - %s" % (optioncount+1, lastoption), textstyle)
+		screen.addstr( 5 + optioncount, 4, "%d - %s" % (optioncount + 1, lastoption), textstyle)
 		screen.refresh()
 		x = screen.getch()
-		if x >= ord('1') and x <= ord(str(optioncount+1)):
+		if x >= ord('1') and x <= ord(str(optioncount + 1)):
 			pos = x - ord('0') - 1 
 		if x == curses.KEY_DOWN:
 			if pos < optioncount:
@@ -311,7 +350,8 @@ def runmenu(menu, parent):
 		elif x == curses.KEY_UP: 
 			if pos > 0:
 				pos += -1
-			else: pos = optioncount
+			else: 
+				pos = optioncount
 		elif x == curses.KEY_BACKSPACE:
 			pos = optioncount
 		elif x == 27:
@@ -349,7 +389,10 @@ def processmenu(menu, parent=None):
 		elif menu['options'][getin]['type'] == EXITMENU:
 			exitmenu = True
 
+###########################################################
 # Main 
+###########################################################
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
 	parser.add_argument('--host', type=str, help='the location of the guh daemon (default 127.0.0.1)')
