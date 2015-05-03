@@ -33,6 +33,7 @@ import curses
 import argparse
 from time import sleep
 
+from guh import __version__
 from guh import guh
 from guh import devices
 from guh import events
@@ -394,21 +395,14 @@ def processmenu(menu, parent=None):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
-	parser.add_argument('--host', type=str, help='the location of the guh daemon (default 127.0.0.1)')
-	parser.add_argument('--port', type=int, help='the port of the the guh daemon (default 1234)')
+	parser.add_argument('-v','--version', action='version', version=__version__)
+	parser.add_argument('--host', type=str, default='localhost', help='the location of the guh daemon (default 127.0.0.1)')
+	parser.add_argument('--port', type=int, default=1234, help='the port of the the guh daemon (default 1234)')
 
 	args = parser.parse_args()
-	
-	host='localhost'
-	port=1234
-
-	if args.host:
-		host=args.host
-	if args.port:
-		port=args.port
 
 	# check connection
-	if not guh.init_connection(host, port):
+	if not guh.init_connection(args.host, args.port):
 		exit()
 
 	os.system('clear')
