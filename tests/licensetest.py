@@ -4,6 +4,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
+#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -28,8 +29,19 @@ import unittest
 
 class TestStringMethods(unittest.TestCase):
 	def test_license(self):
-		result = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep -v 'GPL (v2)'", shell=True, stdout=subprocess.PIPE).stdout.read()
-		self.assertEqual(result, "")
+		licenseResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep -v 'GPL (v2)'", shell=True, stdout=subprocess.PIPE).stdout.read()
+		if licenseResult != "":
+			print "Missing license GPL (v2) in following files:"
+			print licenseResult
+		self.assertEqual(licenseResult, "")
+
+	def test_copyright(self):
+		copyrightResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep 'No copyright'", shell=True, stdout=subprocess.PIPE).stdout.read()
+		if copyrightResult != "":
+			print "Missing copyright in following files:"
+			print copyrightResult
+		self.assertEqual(copyrightResult, "")
+
 
 if __name__ == '__main__':
 	unittest.main()

@@ -22,6 +22,7 @@
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
+from guh import __version__
 from distutils.core import setup
 
 setup(name = "guh-cli",
@@ -33,7 +34,7 @@ setup(name = "guh-cli",
 	with the guh JSON-RPC API and test functionality of guh.
 	""",
 	url = "https://github.com/guh/guh-cli",
-	version = "1.0.0",
+	version = __version__,
 	keywords = ["guh", "tune", "cli"],
 	scripts = ["guh-cli"],
 	py_modules = [

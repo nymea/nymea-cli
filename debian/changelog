@@ -1,5 +1,6 @@
 guh-cli (1.0.0) vivid; urgency=low
 
+  [ Simon Stuerz ]
   * First version of debian package
 
- -- Simon Stuerz <simon.stuerz@guh.guru>  Sat, 02 May 2015 02:08:03 +0200
+ -- Simon Stürz <timon@unix-mb>  Sun, 03 May 2015 22:50:59 +0200

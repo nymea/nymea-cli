@@ -42,7 +42,6 @@ from guh import rules
 from guh import logs
 from guh import notifications
 
-
 MENU = "menu"
 COMMAND = "command"
 EXITMENU = "exitmenu"
