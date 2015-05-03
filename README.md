@@ -40,14 +40,17 @@ If you need help you can run:
 or you can run directly:
 
     $ guh-cli -h
-    usage: guh-cli [-h] [--host HOST] [--port PORT]
-    
-    The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.
+    usage: guh-cli [-h] [-v] [--host HOST] [--port PORT]
+
+    The guh-cli (command line interface) is an admin tool written in python to
+    communicate with the guh daemon JSON-RPC API and test functionality of guh.
 
     optional arguments:
-    -h, --help   show this help message and exit
-    --host HOST  the location of the guh daemon (default 127.0.0.1)
-    --port PORT  the port of the the guh daemon (default 1234)
+      -h, --help     show this help message and exit
+      -v, --version  show program's version number and exit
+      --host HOST    the location of the guh daemon (default 127.0.0.1)
+      --port PORT    the port of the the guh daemon (default 1234)
+
 
 Once *guh-cli* has established the connection to guhd, you will see the main menu. In the main menu you can either use the arrow keys to navigate or the item number of the menu list.
 
