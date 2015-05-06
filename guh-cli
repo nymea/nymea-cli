@@ -52,6 +52,7 @@ if __name__ == "__main__":
 	os.system('clear')
 	screen = curses.initscr()
 	try:
+		# run main menu
 		mainmenu.start()
 	finally:
 		curses.endwin()
