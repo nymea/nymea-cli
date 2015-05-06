@@ -344,5 +344,5 @@ def get_log_entry_line(entry):
 				deviceName = typeId
 			ruleIdCache[typeId] = deviceName
 	timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
-	line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString, timestamp, sourceType, deviceName, sourceName, symbolString, value, error)
+	line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
 	return line

@@ -27,7 +27,10 @@ import parameters
 def get_actionType(actionTypeId):
 	params = {}
 	params['actionTypeId'] = actionTypeId
-	return guh.send_command("Actions.GetActionType", params)['params']['actionType']
+	response = guh.send_command("Actions.GetActionType", params)
+	if not 'actionType' in response['params']:
+		return None
+	return response['params']['actionType']
 
 
 def get_actionTypes(deviceClassId):

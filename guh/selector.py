@@ -30,6 +30,7 @@ import rules
 
 import sys
 import curses
+import locale
 
 
 def get_selection(title, options):
@@ -39,7 +40,10 @@ def get_selection(title, options):
 	global highlightLineNum
 	global up
 	global down
-        
+    
+	#print options
+	#guh.debug_stop()
+    
 	sortedOptions = list(options)
 	sortedOptions.sort(key=lambda x: x.lower())
     
@@ -121,7 +125,7 @@ def runmenu(menu):
 		screen.border(0)
 		
 		# print title
-		screen.addstr(2,2, menu['title'], curses.A_STANDOUT)
+		screen.addstr(2,2, menu['title'].encode('utf-8'), curses.A_STANDOUT)
 		
 		top = topLineNum
 		bottom = topLineNum + screenHeight
@@ -130,13 +134,13 @@ def runmenu(menu):
 			linenum = topLineNum + index 
 			# print normal            
 			if index != highlightLineNum:
-				screen.addstr(index + 5, 5, "     " + menuItem['title'], curses.A_NORMAL )
+				screen.addstr(index + 5, 5, "     " + menuItem['title'].encode('utf-8'), curses.A_NORMAL )
 				# bold Cancel
 				if index == len(menu['options'])  - 1:
-					screen.addstr(index + 5, 5, "     " + menuItem['title'], curses.A_BOLD)
+					screen.addstr(index + 5, 5, "     " + menuItem['title'].encode('utf-8'), curses.A_BOLD)
 			else:
 				# print highlight current line
-				screen.addstr(index + 5, 5, " ->  " + menuItem['title'], curses.color_pair(1))
+				screen.addstr(index + 5, 5, " ->  " + menuItem['title'].encode('utf-8'), curses.color_pair(1))
 		
 		screen.refresh()
 		# get user input

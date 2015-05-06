@@ -33,7 +33,7 @@ import actions
 import rules
 import selector
 
-commandId=0
+commandId = 0
 
 def init_connection(host, port):
 	global tn
@@ -68,7 +68,11 @@ def send_command(method, params = None):
 
 def get_selection(title, options):
 	return selector.get_selection(title, options)
-    
+
+
+def debug_stop():
+	raw_input("\nDEBUG STOP: Press \"enter\" to continue...\n")
+
     
 def get_valueOperator_string(valueOperator):
 	if valueOperator == "ValueOperatorEquals":
