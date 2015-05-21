@@ -36,7 +36,7 @@ import actions
 import events
 import rules
 
-def log_window():
+def log_window(guhHost, guhPort):
 	global screen
 	global screenHeight
 	global allLines
@@ -49,16 +49,9 @@ def log_window():
 	commandId = 0
     
 	# Create notification handler
-	host='localhost'
-	port=1234
-	if len(sys.argv) > 1:
-		host = sys.argv[1]
-	if len(sys.argv) > 2:
-		port = sys.argv[2]
-    
 	print "Connecting notification handler..."
 	try:
-		tn = telnetlib.Telnet(host, port)
+		tn = telnetlib.Telnet(guhHost, guhPort)
 	except :
 		print "ERROR: notification socket could not connect the to guh-server. \n"
 		return None

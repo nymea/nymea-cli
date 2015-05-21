@@ -279,10 +279,14 @@ def method_list_rules_containig_deviceId():
 	rules.list_rules_containig_deviceId()
 
 def method_list_log_entries():
-	logs.log_window()
+	global guhHost
+	global guhPort
+	logs.log_window(guhHost, guhPort)
     
 def method_notification_sniffer():
-	notifications.notification_sniffer()
+	global guhHost
+	global guhPort
+	notifications.notification_sniffer(guhHost, guhPort)
     
 def method_list_server_info():
 	guh.print_server_version()
@@ -311,11 +315,15 @@ def method_print_api_notification():
 def method_print_api_type():
 	guh.print_api_type()
 
-def start():
+def start(host, port):
 	global menu_data
 	global screen
 	global highlightColor
 	global normalColor
+	global guhHost
+	global guhPort
+	guhHost = host
+	guhPort = port
 	
 	os.system('clear')
 	screen = curses.initscr()
