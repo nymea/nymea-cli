@@ -36,7 +36,7 @@ import actions
 import events
 import rules
 
-def log_window():
+def log_window(guhHost, guhPort):
 	global screen
 	global screenHeight
 	global allLines
@@ -49,16 +49,9 @@ def log_window():
 	commandId = 0
     
 	# Create notification handler
-	host='localhost'
-	port=1234
-	if len(sys.argv) > 1:
-		host = sys.argv[1]
-	if len(sys.argv) > 2:
-		port = sys.argv[2]
-    
 	print "Connecting notification handler..."
 	try:
-		tn = telnetlib.Telnet(host, port)
+		tn = telnetlib.Telnet(guhHost, guhPort)
 	except :
 		print "ERROR: notification socket could not connect the to guh-server. \n"
 		return None
@@ -344,5 +337,5 @@ def get_log_entry_line(entry):
 				deviceName = typeId
 			ruleIdCache[typeId] = deviceName
 	timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
-	line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString, timestamp, sourceType, deviceName, sourceName, symbolString, value, error)
+	line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
 	return line

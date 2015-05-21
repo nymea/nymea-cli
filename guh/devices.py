@@ -89,15 +89,17 @@ def add_device():
 	if deviceClassId == None:
 		return None
 	deviceClass = get_deviceClass(deviceClassId)
-	print "createmethods are", deviceClass['createMethods']
-	if "CreateMethodUser" in deviceClass['createMethods']:
+	createMethod = select_createMethod("Please select how do you want to add this device", deviceClass['createMethods'])	
+	print " --> Using create method \"%s\"" % (createMethod)
+	guh.debug_stop
+	if createMethod == "CreateMethodUser":
 		add_configured_device(deviceClassId)
-	elif "CreateMethodDiscovery" in deviceClass['createMethods']:
+	elif createMethod ==  "CreateMethodDiscovery":
 		deviceDescriptorId = discover_device(deviceClassId)
 		if deviceDescriptorId == None:
 			return None
 		add_discovered_device(deviceClassId, deviceDescriptorId)
-	elif "CreateMethodAuto" in deviceClass['createMethods']:
+	elif createMethod == "CreateMethodAuto":
 		print "\nCan't create this device manually. It'll be created automatically when hardware is discovered.\n"
     
 
@@ -143,6 +145,37 @@ def remove_configured_device():
 	guh.print_device_error_code(response['params']['deviceError'])
 
 
+def edit_device():
+	deviceId = select_configured_device()
+	device = get_device(deviceId)
+	if not device:
+		return None
+	
+	deviceClass = get_deviceClass(device['deviceClassId'])
+	deviceParamTypes = deviceClass['paramTypes']
+	currentDeviceParams = device['params']
+	createMethod = select_createMethod("Please select how do you want to edit this device", deviceClass['createMethods'])	
+	print " --> Using create method \"%s\"" % (createMethod)
+	params = {}
+	if createMethod == "CreateMethodUser":
+		newDeviceParams = parameters.edit_params(currentDeviceParams, deviceParamTypes)
+		params['deviceId'] = deviceId
+		params['deviceParams'] = newDeviceParams
+		response = guh.send_command("Devices.EditDevice", params)
+		guh.print_device_error_code(response['params']['deviceError'])
+	elif createMethod ==  "CreateMethodDiscovery":
+		deviceDescriptorId = discover_device(device['deviceClassId'])
+		if not deviceDescriptorId:
+			return None
+		print "using descriptorId %s" % (deviceDescriptorId)
+		params['deviceId'] = deviceId
+		params['deviceDescriptorId'] = deviceDescriptorId
+		response = guh.send_command("Devices.EditDevice", params)
+		guh.print_device_error_code(response['params']['deviceError'])
+	elif createMethod == "CreateMethodAuto":
+		print "\nCan't edit this device. It'll be created automatically when hardware is discovered.\n"
+
+
 def discover_device(deviceClassId = None):
 	if deviceClassId == None:
 		deviceClassId = select_deviceClass()
@@ -156,7 +189,11 @@ def discover_device(deviceClassId = None):
 		params['discoveryParams'] = discoveryParams
 	print "\ndiscovering..."
 	response = guh.send_command("Devices.GetDiscoveredDevices", params)
-	print response
+	guh.print_json_format(response)
+	guh.debug_stop()
+	if not 'deviceDescriptors' in response['params']:
+		print "no devices found"
+
 	deviceDescriptorList = [];
 	deviceDescriptorIdList = [];
 	for deviceDescriptor in response['params']['deviceDescriptors']:
@@ -170,6 +207,20 @@ def discover_device(deviceClassId = None):
 		return deviceDescriptorIdList[selection]
 	return None
 
+
+def select_createMethod(title, createMethods):
+	if len(createMethods) == 0:
+		print "ERROR: this device has no createMethods. Please check the plugin code!!!"
+		return None
+	elif len(createMethods) == 1:
+		return createMethods[0]
+	else:
+		selection = guh.get_selection(title, createMethods)
+		if selection == None:
+			print "ERROR: could not get selection of CreateMethod"
+			return None
+		return createMethods[selection]
+    
 
 def select_configured_device():
 	devices = get_configured_devices()
@@ -217,6 +268,7 @@ def select_plugin():
 	if selection != None:
 		return pluginIdList[selection]
 	return None
+
 
 def select_deviceClass():
 	vendorId = select_vendor()
@@ -296,6 +348,7 @@ def list_plugins():
 	for plugin in plugins:
 		print "%35s %s" % (plugin['name'], plugin['id'])
 
+
 def list_plugin_configuration():
 	pluginId = select_plugin()
 	if not pluginId:
@@ -308,7 +361,6 @@ def list_plugin_configuration():
 	print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['name'], plugin['id'])
 	for i in range(len(pluginConfiguration)):
 		print "%35s: %s" % (pluginConfiguration[i]['name'], pluginConfiguration[i]['value'])
-    
     
 
 def print_deviceClass():

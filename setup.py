@@ -43,13 +43,14 @@ setup(name = "guh-cli",
 		"guh.events",
 		"guh.guh",
 		"guh.logs",
+		"guh.mainmenu",
 		"guh.notifications",
 		"guh.parameters",
 		"guh.ruleactions",
 		"guh.rules",
 		"guh.selector",
 		"guh.states",
-		"tests.licensetest"
+		"tests.licensetests"
 	],
 	data_files = [ 
 		("/usr/share/man/man1", ["debian/guh-cli.1"]),
