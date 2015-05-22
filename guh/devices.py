@@ -150,8 +150,9 @@ def edit_device():
 	device = get_device(deviceId)
 	if not device:
 		return None
-	
 	deviceClass = get_deviceClass(device['deviceClassId'])
+	if not deviceClass:
+		return None
 	deviceParamTypes = deviceClass['paramTypes']
 	currentDeviceParams = device['params']
 	createMethod = select_createMethod("Please select how do you want to edit this device", deviceClass['createMethods'])	
@@ -189,11 +190,8 @@ def discover_device(deviceClassId = None):
 		params['discoveryParams'] = discoveryParams
 	print "\ndiscovering..."
 	response = guh.send_command("Devices.GetDiscoveredDevices", params)
-	guh.print_json_format(response)
-	guh.debug_stop()
 	if not 'deviceDescriptors' in response['params']:
 		print "no devices found"
-
 	deviceDescriptorList = [];
 	deviceDescriptorIdList = [];
 	for deviceDescriptor in response['params']['deviceDescriptors']:
