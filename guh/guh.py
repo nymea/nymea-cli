@@ -139,6 +139,8 @@ def print_device_error_code(deviceError):
 		print "\nERROR: the device is currently in use. Try again later. (", deviceError, ")"
 	elif deviceError == "DeviceErrorPairingTransactionIdNotFound":
 		print "\nERROR: the pairingTransactionId could not be found. (", deviceError, ")"
+	elif deviceError == "DeviceErrorParameterNotWritable":
+		print "\nERROR: one of the parameters is not writable. (", deviceError, ")"
 	else:
 		print "\nERROR: Unknown error code: ", deviceError,  "Please take a look at the newest API version."
 
