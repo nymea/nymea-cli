@@ -62,8 +62,10 @@ def edit_params(currentDeviceParams, paramTypes):
 		print guh.print_json_format(paramType)
 		if 'readOnly' in paramType:
 			if paramType['readOnly'] == True:
-				print "\nThe param \"%s\" is not editable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['name'], currentDeviceParams))
+				print "--------------------------------------------------------"
+				print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['name'], currentDeviceParams))
 				raw_input("\nPress \"enter\" to continue...\n")
+				print "--------------------------------------------------------"
 				continue
 		param = {}
 		if any("allowedValues" in item for item in paramType):
