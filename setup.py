@@ -26,44 +26,44 @@ from guh import __version__
 from distutils.core import setup
 
 setup(name = "guh-cli",
-	author = "Simon Stuerz",
-	author_email = "simon.stuerz@guh.guru",
-	description = "guh command line interface - python",
-	long_description = """\
-	The guh-cli (command line interface) is an admin tool written in python to communicate 
-	with the guh JSON-RPC API and test functionality of guh.
-	""",
-	url = "https://github.com/guh/guh-cli",
-	version = __version__,
-	keywords = ["guh", "tune", "cli"],
-	scripts = ["guh-cli"],
-	py_modules = [
-		"guh.actions",
-		"guh.devices",
-		"guh.events",
-		"guh.guh",
-		"guh.logs",
-		"guh.mainmenu",
-		"guh.notifications",
-		"guh.parameters",
-		"guh.ruleactions",
-		"guh.rules",
-		"guh.selector",
-		"guh.states",
-		"tests.licensetests"
-	],
-	data_files = [ 
-		("/usr/share/man/man1", ["debian/guh-cli.1"]),
-		("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
-	],
-	classifiers = [
-		"Programming Language :: Python",
-		"Programming Language :: Python :: 2",
-		"Development Status :: 4 - Beta",
-		"Intended Audience :: Developers",
-		"License :: OSI Approved :: GNU General Public License version 2 (GPLv2)",
-		"Operating System :: OS Independent",
-		"Topic :: Software Development :: Libraries :: Python Modules",
-		"Topic :: Testing :: Home Automation"
-	]
+    author = "Simon Stuerz",
+    author_email = "simon.stuerz@guh.guru",
+    description = "guh command line interface - python",
+    long_description = """\
+    The guh-cli (command line interface) is an admin tool written in python to communicate 
+    with the guh JSON-RPC API and test functionality of guh.
+    """,
+    url = "https://github.com/guh/guh-cli",
+    version = __version__,
+    keywords = ["guh", "tune", "cli"],
+    scripts = ["guh-cli"],
+    py_modules = [
+        "guh.actions",
+        "guh.devices",
+        "guh.events",
+        "guh.guh",
+        "guh.logs",
+        "guh.mainmenu",
+        "guh.notifications",
+        "guh.parameters",
+        "guh.ruleactions",
+        "guh.rules",
+        "guh.selector",
+        "guh.states",
+        "tests.licensetests"
+    ],
+    data_files = [ 
+        ("/usr/share/man/man1", ["debian/guh-cli.1"]),
+        ("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
+    ],
+    classifiers = [
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2",
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License version 2 (GPLv2)",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Testing :: Home Automation"
+    ]
 )
