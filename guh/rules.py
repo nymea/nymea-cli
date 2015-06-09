@@ -78,103 +78,107 @@ def add_rule():
 		response = guh.send_command("Rules.AddRule", params)
 		guh.print_rule_error_code(response['params']['ruleError'])
 
+
 def select_rule():
-	ruleIds = guh.send_command("Rules.GetRules", {})['params']['ruleIds']
-	if not ruleIds:
+	ruleDescriptions = []
+	ruleDescriptions = guh.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
+	if not ruleDescriptions:
 		return None
-	selection = guh.get_selection("Please select rule:", ruleIds)
+	descriptions = []
+	for ruleDescription in ruleDescriptions:
+		descriptions.append("%s (%s) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(ruleDescription['enabled']), print_rule_active_status(ruleDescription['active'])))
+	selection = guh.get_selection("Please select rule:", descriptions)
 	if selection != None:
-		return ruleIds[selection]
+		return ruleDescriptions[selection]
 	return None
 
 
 def remove_rule():
-	ruleId = select_rule()
-	if ruleId == None:
+	ruleDescription = select_rule()
+	if ruleDescription == None:
 		print "\n    No rule found"
 		return None
 	params = {}
-	params['ruleId'] = ruleId
+	params['ruleId'] = ruleDescription['id']
 	response = guh.send_command("Rules.RemoveRule", params)
 	guh.print_rule_error_code(response['params']['ruleError'])
     
 
-def get_rule_status(ruleId):
-	response = get_rule_detail(ruleId)
-	if response['enabled'] == True:
+def print_rule_enabled_status(status):
+	if status == True:
 		return "enabled"
 	else:
 		return "disabled"
 
-def get_rule_name(ruleId):
-	response = get_rule_detail(ruleId)
-	return response['name']
+
+def print_rule_active_status(status):
+	if status == True:
+		return "active"
+	else:
+		return "inactive"
 
 
-def get_rule_detail(ruleId):
-	params = {}
-	params['ruleId'] = ruleId
-	response = guh.send_command("Rules.GetRuleDetails", params)
-	if 'rule' in response['params']:
-		return response['params']['rule']
+def get_rule_description(ruleId):
+	ruleDescriptions = []
+	ruleDescriptions = guh.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
+	for ruleDescription in ruleDescriptions:
+		if ruleDescription['id'] == ruleId:
+			return ruleDescription
 	return None
 
 
 def enable_disable_rule():
-	ruleId = select_rule()
-	if ruleId == None:
+	ruleDescription = select_rule()
+	if ruleDescription == None:
 		print "\n    No rules found"
 		return
 	actionTypes = ["enable", "disable"]
 	selection = guh.get_selection("What do you want to do with this rule: ", actionTypes)     
-	if selection == None:
+	if selection == 0:
 		params = {}
-		params['ruleId'] = ruleId
+		params['ruleId'] = ruleDescription['id']
 		response = guh.send_command("Rules.EnableRule", params)
 		guh.print_rule_error_code(response['params']['ruleError'])
 	else:
 		params = {}
-		params['ruleId'] = ruleId
+		params['ruleId'] = ruleDescription['id']
 		response = guh.send_command("Rules.DisableRule", params)
 		guh.print_rule_error_code(response['params']['ruleError'])
 
 
 def list_rules():
 	response = guh.send_command("Rules.GetRules", {})
-	if not response['params']['ruleIds']:
+	if not response['params']['ruleDescriptions']:
 		print "\n    No rules found. \n"
 		return None
-	print "-> List of configured Rules:"
-	for i in range(len(response['params']['ruleIds'])):
-		ruleId = response['params']['ruleIds'][i]
-		params = {}
-		params['ruleId'] = ruleId
-		ruleDetail = guh.send_command("Rules.GetRuleDetails", params)
-		print "%20s : %s : %s" %(get_rule_name(ruleId), ruleId, get_rule_status(ruleId))
+	print "-> List of configured Rules:\n"
+	for i in range(len(response['params']['ruleDescriptions'])):
+		ruleDescription = response['params']['ruleDescriptions'][i]
+		print "%20s ( %s ) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(bool(ruleDescription['enabled'])), print_rule_active_status(bool(ruleDescription['active'])))
 
 
 def list_rule_details():
-	ruleId = select_rule()
-	if ruleId == None:
+	ruleDescription = select_rule()
+	if ruleDescription == None:
 		print "\n    No rules found"
 		return None
 	params = {}
-	params['ruleId'] = ruleId
-	response = guh.send_command("Rules.GetRuleDetails", params)
-	print guh.print_json_format(response)
+	params['ruleId'] = ruleDescription['id']
+	rule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
+	print guh.print_json_format(rule)
 	print "========================================================"
-	print "-> Details for rule \"%s\" (%s) which currently is %s:" % (response['params']['rule']['name'], ruleId, get_rule_status(ruleId))
-	if len(response['params']['rule']['eventDescriptors']) > 0:
+	print "-> Details for rule \"%s\" (%s) which currently is %s / %s :" % (rule['name'], rule['id'], print_rule_enabled_status(bool(rule['enabled'])), print_rule_active_status(bool(rule['active'])))
+	if len(rule['eventDescriptors']) > 0:
 		print "\nEvents:\n"
-		events.print_eventDescriptors(response['params']['rule']['eventDescriptors'])
-	if response['params']['rule']['stateEvaluator']:
+		events.print_eventDescriptors(rule['eventDescriptors'])
+	if rule['stateEvaluator']:
 		print "\nStates:\n",
-		states.print_stateEvaluator(response['params']['rule']['stateEvaluator'])
+		states.print_stateEvaluator(rule['stateEvaluator'])
 	print "\nActions:\n"
-	ruleactions.print_ruleActionList(response['params']['rule']['actions'])
-	if len(response['params']['rule']['exitActions']) > 0:
+	ruleactions.print_ruleActionList(rule['actions'])
+	if len(rule['exitActions']) > 0:
 		print "\nExit actions:\n"
-		ruleactions.print_ruleActionList(response['params']['rule']['exitActions'])
+		ruleactions.print_ruleActionList(rule['exitActions'])
 
 
 def list_rules_containig_deviceId():
@@ -188,7 +192,7 @@ def list_rules_containig_deviceId():
 	if not response['params']['ruleIds']:
 		print "\nThere is no rule containig this device."
 		return None
-	print "\nFollowing rules contain this device %s" %(deviceId)
+	print "\nFollowing rules contain this device %s\n" %(deviceId)
 	for i in range(len(response['params']['ruleIds'])):
-		ruleId = response['params']['ruleIds'][i]
-		print "%20s : %s : %s" %(get_rule_name(ruleId), ruleId, get_rule_status(ruleId))
+		ruleDescription = get_rule_description(response['params']['ruleIds'][i])
+		print "%20s ( %s ) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(ruleDescription['enabled']), print_rule_active_status(ruleDescription['active']))
