@@ -28,20 +28,20 @@ import subprocess
 import unittest
 
 class TestStringMethods(unittest.TestCase):
-	def test_license(self):
-		licenseResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep -v 'GPL (v2)'", shell=True, stdout=subprocess.PIPE).stdout.read()
-		if licenseResult != "":
-			print "Missing license GPL (v2) in following files:"
-			print licenseResult
-		self.assertEqual(licenseResult, "")
+    def test_license(self):
+        licenseResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep -v 'GPL (v2)'", shell=True, stdout=subprocess.PIPE).stdout.read()
+        if licenseResult != "":
+            print "Missing license GPL (v2) in following files:"
+            print licenseResult
+        self.assertEqual(licenseResult, "")
 
-	def test_copyright(self):
-		copyrightResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep 'No copyright'", shell=True, stdout=subprocess.PIPE).stdout.read()
-		if copyrightResult != "":
-			print "Missing copyright in following files:"
-			print copyrightResult
-		self.assertEqual(copyrightResult, "")
+    def test_copyright(self):
+        copyrightResult = subprocess.Popen("licensecheck -r -c '\.(py)$' . | grep 'No copyright'", shell=True, stdout=subprocess.PIPE).stdout.read()
+        if copyrightResult != "":
+            print "Missing copyright in following files:"
+            print copyrightResult
+        self.assertEqual(copyrightResult, "")
 
 
 if __name__ == '__main__':
-	unittest.main()
+    unittest.main()

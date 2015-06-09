@@ -38,23 +38,23 @@ from guh import mainmenu
 ###########################################################
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
-	parser.add_argument('-v','--version', action='version', version=__version__)
-	parser.add_argument('--host', type=str, default='localhost', help='the location of the guh daemon (default 127.0.0.1)')
-	parser.add_argument('--port', type=int, default=1234, help='the port of the the guh daemon (default 1234)')
+    parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
+    parser.add_argument('-v','--version', action='version', version=__version__)
+    parser.add_argument('--host', type=str, default='localhost', help='the location of the guh daemon (default 127.0.0.1)')
+    parser.add_argument('--port', type=int, default=1234, help='the port of the the guh daemon (default 1234)')
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	# check connection
-	if not guh.init_connection(args.host, args.port):
-		exit()
+    # check connection
+    if not guh.init_connection(args.host, args.port):
+        exit()
 
-	os.system('clear')
-	screen = curses.initscr()
-	try:
-		# run main menu
-		mainmenu.start(args.host, args.port)
-	finally:
-		curses.endwin()
-		os.system('clear')
-		print "Bye, have a nice day! :)"    
+    os.system('clear')
+    screen = curses.initscr()
+    try:
+        # run main menu
+        mainmenu.start(args.host, args.port)
+    finally:
+        curses.endwin()
+        os.system('clear')
+        print "Bye, have a nice day! :)"    
