@@ -119,10 +119,10 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     paramValue = boolTypes[selection] 
                 else:
                     paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
-                param = {}
-                param['name'] = paramType['name']
-                param['value'] = paramValue
-                params.append(param)
+            param = {}
+            param['name'] = paramType['name']
+            param['value'] = paramValue
+            params.append(param)
     return params
 
 

@@ -330,7 +330,7 @@ def get_log_entry_line(entry):
         if typeId in ruleIdCache:
             deviceName = ruleIdCache[typeId]
         else:
-            rule = rules.get_rule_detail(typeId)
+            rule = rules.get_rule_description(typeId)
             if rule is not None and 'name' in rule:
                 deviceName = rule['name']
             else:
