@@ -61,7 +61,7 @@ def send_command(method, params = None):
     tn.write(command)
     response = json.loads(tn.read_until("\n}\n"))
     if response['status'] != "success":
-        print "JSON error happened: \n%s" % print_json_format(response)
+        print "JSON error happened: %s" % response['error']
         return None
     return response
 
@@ -178,6 +178,11 @@ def get_stateEvaluator_string(stateEvaluator):
 
 
 def print_device_error_code(deviceError):
+    
+    if deviceError == None:
+        print "timeout"
+        return
+    
     if deviceError == "DeviceErrorNoError":
         print "\nSuccess! (", deviceError, ")"
     elif deviceError == "DeviceErrorPluginNotFound":
