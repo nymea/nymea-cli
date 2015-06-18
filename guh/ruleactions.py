@@ -101,7 +101,11 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                         selection = guh.get_selection(selectionString, boolTypes)
                         if selection == None:
                             return None
-                        paramValue = boolTypes[selection] 
+                        paramValue = boolTypes[selection]
+                        param = {}
+                        param['name'] = paramType['name']
+                        param['value'] = paramValue
+                        params.append(param)
                     else:
                         paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
                         param = {}
@@ -116,13 +120,17 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     selection = guh.get_selection(selectionString, boolTypes)
                     if selection == None:
                         return None
-                    paramValue = boolTypes[selection] 
+                    paramValue = boolTypes[selection]
+                    param = {}
+                    param['name'] = paramType['name']
+                    param['value'] = paramValue
+                    params.append(param)
                 else:
                     paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
-            param = {}
-            param['name'] = paramType['name']
-            param['value'] = paramValue
-            params.append(param)
+                    param = {}
+                    param['name'] = paramType['name']
+                    param['value'] = paramValue
+                    params.append(param)
     return params
 
 
