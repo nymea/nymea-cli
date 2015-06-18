@@ -83,7 +83,8 @@ def execute_action():
     actionParams = parameters.read_params(actionType['paramTypes'])
     params['params'] = actionParams
     response = guh.send_command("Actions.ExecuteAction", params)
-    guh.print_device_error_code(response['params']['deviceError'])
+    if response:  
+        guh.print_device_error_code(response['params']['deviceError'])
     
     
 def select_actionType(deviceClassId):

@@ -83,7 +83,7 @@ def add_configured_device(deviceClassId):
     response = guh.send_command("Devices.AddConfiguredDevice", params)
     guh.print_device_error_code(response['params']['deviceError'])
 
-
+    
 def add_device():
     deviceClassId = select_deviceClass()
     if deviceClassId == None:
@@ -115,22 +115,38 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
             guh.print_device_error_code(response['params']['deviceError'])
         else:
             print "Device added successfully. Device ID: %s\n" % response['params']['deviceId']
-    else:
+    elif deviceClass['setupMethod'] == "SetupMethodPushButton":
         params = {}
         params['deviceClassId'] = deviceClassId
         params['deviceDescriptorId'] = deviceDescriptorId
         response = guh.send_command("Devices.PairDevice", params)
-        print "pairdevice response:", response
+        #guh.print_json_format(response)
         if not response['status'] == "success":
             print "Pairing failed: %s", response['params']['deviceError']
             return
-        else:
-            print "\nPairing device %s\n\n%s" % (deviceClass['name'], response['params']['displayMessage'])
-            if response['params']['setupMethod'] == "SetupMethodPushButton":
-                raw_input("Press enter to confirm")
-            params = {}
-            params['pairingTransactionId'] = response['params']['pairingTransactionId']
-            response = guh.send_command("Devices.ConfirmPairing", params)
+        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['name'], response['params']['displayMessage'])
+        if response['params']['setupMethod'] == "SetupMethodPushButton":
+            raw_input("\nPress \"enter\" to confirm\n")
+        params = {}
+        params['pairingTransactionId'] = response['params']['pairingTransactionId']
+        response = guh.send_command("Devices.ConfirmPairing", params)
+        guh.print_device_error_code(response['params']['deviceError'])
+    elif deviceClass['setupMethod'] == "SetupMethodDisplayPin":
+        params = {}
+        params['deviceClassId'] = deviceClassId
+        params['deviceDescriptorId'] = deviceDescriptorId
+        response = guh.send_command("Devices.PairDevice", params)
+        #guh.print_json_format(response)
+        if not response['status'] == "success":
+            print "Pairing failed: %s", response['params']['deviceError']
+            return
+        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['name'], response['params']['displayMessage'])
+        if response['params']['setupMethod'] == "SetupMethodDisplayPin":
+            pin = raw_input("Pin: ")
+        params = {}
+        params['secret'] = pin
+        params['pairingTransactionId'] = response['params']['pairingTransactionId']
+        response = guh.send_command("Devices.ConfirmPairing", params)
         guh.print_device_error_code(response['params']['deviceError'])
 
 
@@ -174,7 +190,11 @@ def edit_device():
         response = guh.send_command("Devices.EditDevice", params)
         guh.print_device_error_code(response['params']['deviceError'])
     elif createMethod == "CreateMethodAuto":
-        print "\nCan't edit this device. It'll be created automatically when hardware is discovered.\n"
+        newDeviceParams = parameters.edit_params(currentDeviceParams, deviceParamTypes)
+        params['deviceId'] = deviceId
+        params['deviceParams'] = newDeviceParams
+        response = guh.send_command("Devices.EditDevice", params)
+        guh.print_device_error_code(response['params']['deviceError'])
 
 
 def discover_device(deviceClassId = None):
@@ -228,7 +248,16 @@ def select_configured_device():
     deviceList = []
     deviceIdList = []
     for i in range(len(devices)):
-        deviceList.append(devices[i]['name'])
+        name = None
+        completeName = None
+        for paramType in devices[i]['params']:
+            if paramType['name'] == "name":
+                name = paramType['value']
+        if name != None:
+            completeName = "%s (%s)" % (name, devices[i]['name'])
+        else:
+            completeName = devices[i]['name']
+        deviceList.append(completeName)
         deviceIdList.append(devices[i]['id'])
     selection = guh.get_selection("Please select a device", deviceList)
     if selection != None:
@@ -294,7 +323,18 @@ def list_configured_devices():
         return None
     print "-> List of configured devices:\n"
     for device in deviceList:
-        print "%35s, ID: %s, DeviceClassID: %s" % (device['name'], device['id'], device['deviceClassId'])
+        name = None
+        for paramType in device['params']:
+            if paramType['name'] == "name":
+                name = paramType['value']
+        
+        completeName = None
+        if name != None:
+            completeName = "%s (%s)" % (name, device['name'])
+        else:
+            completeName = device['name']
+        print "%45s, id: %s, deviceClassId: %s" % (completeName, device['id'], device['deviceClassId'])
+
 
 
 def list_deviceClasses(vendorId = None):
