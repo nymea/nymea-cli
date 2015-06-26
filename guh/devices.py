@@ -22,6 +22,7 @@
 
 import guh
 import parameters
+import plugins
 
 def get_supported_vendors():
     return guh.send_command("Devices.GetSupportedVendors")
@@ -52,24 +53,6 @@ def get_device(deviceId):
 
 def get_configured_devices():
     return guh.send_command("Devices.GetConfiguredDevices")['params']['devices']
-    
-
-def get_plugins():
-    return guh.send_command("Devices.GetPlugins")['params']['plugins']
-
-
-def get_plugin(pluginId):
-    plugins = get_plugins()
-    for plugin in plugins:
-        if plugin['id'] == pluginId:
-            return plugin
-    return None
-
-
-def get_plugin_configuration(pluginId):
-    params = {}
-    params['pluginId'] = pluginId
-    return guh.send_command("Devices.GetPluginConfiguration", params)['params']['configuration']
     
     
 def add_configured_device(deviceClassId):
@@ -280,22 +263,6 @@ def select_vendor():
         return vendorIdList[selection]
     return None
     
-    
-def select_plugin():
-    plugins = get_plugins()
-    if not plugins:
-        print "\n    No plugins found. Please install guh-plugins and restart guhd."
-        return None
-    pluginList = []
-    pluginIdList = []
-    for i in range(0,len(plugins)):
-        pluginList.append(plugins[i]['name'])
-        pluginIdList.append(plugins[i]['id'])
-    selection = guh.get_selection("Please select a plugin", pluginList)
-    if selection != None:
-        return pluginIdList[selection]
-    return None
-
 
 def select_deviceClass():
     vendorId = select_vendor()
@@ -376,30 +343,6 @@ def list_vendors():
     for vendor in response['params']['vendors']:
         print "%35s  %s" % (vendor['name'], vendor['id'])
 
-
-def list_plugins():
-    plugins = get_plugins();
-    if not plugins:
-        print "\n    No plugins found. Please install guh-plugins and restart guhd."
-        return None
-    print "-> List of supported plugins:\n"
-    for plugin in plugins:
-        print "%35s %s" % (plugin['name'], plugin['id'])
-
-
-def list_plugin_configuration():
-    pluginId = select_plugin()
-    if not pluginId:
-        return None
-    plugin = get_plugin(pluginId)
-    pluginConfiguration = get_plugin_configuration(pluginId)
-    if not pluginConfiguration:
-        print "\n    The plugin \"%s\" has no configuration parameters.\n" % (plugin['name'])
-        return None
-    print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['name'], plugin['id'])
-    for i in range(len(pluginConfiguration)):
-        print "%35s: %s" % (pluginConfiguration[i]['name'], pluginConfiguration[i]['value'])
-    
 
 def print_deviceClass():
     deviceClassId = select_deviceClass()

@@ -28,6 +28,7 @@ import curses
 
 import guh
 import devices
+import plugins
 import events
 import states
 import actions
@@ -169,6 +170,33 @@ menu_data = {
             ]
         },
         {
+            'title': "Plugins", 
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                { 
+                    'title': "Set plugin configuration", 
+                    'type': COMMAND, 
+                    'command': 'method_set_plugin_configuration' 
+                },
+                { 
+                    'title': "Get plugin configuration", 
+                    'type': COMMAND, 
+                    'command': 'method_list_plugin_configuration' 
+                },
+                { 
+                    'title': "List plugins", 
+                    'type': COMMAND, 
+                    'command': 'method_list_plugins' 
+                },
+                { 
+                    'title': "Print plugin info", 
+                    'type': COMMAND, 
+                    'command': 'method_list_plugin_info' 
+                }
+            ]
+        },
+        {
             'title': "Log monitor", 
             'type': COMMAND, 
             'command': 'method_list_log_entries' 
@@ -187,16 +215,6 @@ menu_data = {
                     'title': "Version", 
                     'type': COMMAND, 
                     'command': 'method_list_server_info' 
-                },
-                { 
-                    'title': "List plugins", 
-                    'type': COMMAND, 
-                    'command': 'method_list_plugins' 
-                },
-                { 
-                    'title': "List plugin configuration", 
-                    'type': COMMAND, 
-                    'command': 'method_list_plugin_configuration' 
                 },
                 { 
                     'title': "Print API", 
@@ -255,10 +273,16 @@ def method_list_vendors():
     devices.list_vendors()
  
 def method_list_plugins():
-    devices.list_plugins()
+    plugins.list_plugins()
+    
+def method_set_plugin_configuration():
+    plugins.set_plugin_configuration()
     
 def method_list_plugin_configuration():
-    devices.list_plugin_configuration()
+    plugins.list_plugin_configuration()
+    
+def method_list_plugin_info():
+    plugins.list_plugin_info()
     
 def method_list_configured_devices():
     devices.list_configured_devices()
@@ -344,7 +368,7 @@ def runmenu(menu, parent):
     if parent is None:
         lastoption = "Exit"
     else:
-        lastoption = "Return to %s menu" % parent['title']
+        lastoption = "<-- %s menu" % parent['title']
     
     optioncount = len(menu['options']) 
     pos=0 
