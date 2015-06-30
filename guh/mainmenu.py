@@ -148,6 +148,11 @@ menu_data = {
                     'command': 'method_remove_rule' 
                 },
                 { 
+                    'title': "Edit Rule", 
+                    'type': COMMAND, 
+                    'command': 'method_edit_rule' 
+                },
+                { 
                     'title': "Rule details", 
                     'type': COMMAND, 
                     'command': 'method_list_rule_detail' 
@@ -292,6 +297,9 @@ def method_list_deviceClasses(vendorId = None):
 
 def method_list_deviceClasses_by_vendor():
     method_list_deviceClasses(devices.select_vendor())
+
+def method_edit_rule():
+    rules.edit_rule()
     
 def method_list_rule_detail():
     rules.list_rule_details()

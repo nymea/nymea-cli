@@ -29,55 +29,151 @@ import states
 import parameters
 
 def add_rule():
-    ruleTypes = ["Create a reaction (Event based rule)", "Create a behaviour (State based rule)"]
-    boolTypes = ["true","false"]
-    ruleType = guh.get_selection("Please select a rule type:", ruleTypes)
-    if ruleType == None:
-        return None
-    if ruleType == 0:    #Create a reaction (Event based rule)
-        params = {}
-        params['name'] = raw_input("Please enter the name of the rule: ")
-        print "\n========================================================"
-        raw_input("-> Press \"enter\" to create an event descriptor!  ")
+    params = {}
+    params['name'] = raw_input("Please enter the name of the rule: ")
+    print "\n========================================================"    
+    boolTypes = ["yes","no"]
+    selection = guh.get_selection("Do you want to define \"Events\" for this rule?", boolTypes)
+    if selection != None:
+        eventsEnabled = boolTypes[selection]
+
+    if (boolTypes[selection] == "yes"):
         eventDescriptors = events.create_eventDescriptors()
         print guh.print_json_format(eventDescriptors)
         if len(eventDescriptors) > 1:
             params['eventDescriptorList'] = eventDescriptors
         else:
             params['eventDescriptor'] = eventDescriptors[0]
-        input = raw_input("-> Do you want to add state conditions to your reaction? (y/N): ")
-        if input == "y":
+            
+        createStates = boolTypes[guh.get_selection("Do you want to add conditions (\"States\") for the events?", boolTypes)]
+        if createStates == "yes":
+            print "\n========================================================"
+            raw_input("-> Create a state descriptor!  ")
             stateEvaluator = states.create_stateEvaluator()
             params['stateEvaluator'] = stateEvaluator
         
         params['actions'] = ruleactions.create_rule_actions(eventDescriptors)
         
-        selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
-        if selection == None:
-            return None
-        params['enabled'] = boolTypes[selection]
-        print "adding rule with params:\n", guh.print_json_format(params)
-        response = guh.send_command("Rules.AddRule", params)
-        guh.print_rule_error_code(response['params']['ruleError'])
-    if ruleType == 1:    #Create a behaviour (State based rule)
-        params = {}
-        params['name'] = raw_input("Please enter the name of the rule: ")
+    else:
         print "\n========================================================"
         raw_input("-> Press \"enter\" to create a state descriptor!  ")
         params['stateEvaluator'] = states.create_stateEvaluator()
         params['actions'] = ruleactions.create_rule_actions()
-        print "\n========================================================"
-        input = raw_input("Do you want to add exitAction? (Y/n): ")
-        if not input == "n":
-            params['exitActions'] = ruleactions.create_rule_actions()
-        selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
+        selection = guh.get_selection("Do you want to add (\"ExitActions\") for this rule?", boolTypes)
         if selection == None:
             return None
-        params['enabled'] = boolTypes[selection]
-        print "adding rule with params:\n", guh.print_json_format(params)
-        response = guh.send_command("Rules.AddRule", params)
-        guh.print_rule_error_code(response['params']['ruleError'])
+        ceateExitActions =  boolTypes[selection]
+        if ceateExitActions == "yes":
+            params['exitActions'] = ruleactions.create_rule_actions()
+    
+    selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
+    if selection == None:
+        return None
+    params['enabled'] = boolTypes[selection]
+    print "adding rule with params:\n", guh.print_json_format(params)
+    response = guh.send_command("Rules.AddRule", params)
+    guh.print_rule_error_code(response['params']['ruleError'])
 
+    
+def edit_rule():
+    
+    ruleDescription = select_rule()
+    if ruleDescription == None:
+        print "\n    No rules found"
+        return None
+    
+    boolTypes = ["yes","no"]
+    
+    params = {}
+    params['ruleId'] = ruleDescription['id']
+    originalRule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
+    print guh.print_json_format(originalRule)
+
+    print "\n========================================================"    
+    selection = guh.get_selection("Do you want to change the name (current = \"%s\"): " % (originalRule['name']), boolTypes)
+    
+    if (boolTypes[selection] == "yes"):
+        params['name'] = raw_input("Please enter the name of the rule (current = \"%s\"): " % (originalRule['name']))
+    else:
+        params['name'] = originalRule['name']
+        
+    print "\n========================================================"
+    
+    if len(originalRule['eventDescriptors']) > 0:
+        print "\ncurrent \"Events\":\n"
+        events.print_eventDescriptors(originalRule['eventDescriptors'])
+        print "\n========================================================\n"
+
+        input = raw_input("Do you want change this \"Events\" (y/N): ")
+        if input == "y":
+            eventDescriptors = events.create_eventDescriptors()
+            print guh.print_json_format(eventDescriptors)
+            if len(eventDescriptors) > 1:
+                params['eventDescriptorList'] = eventDescriptors
+            else:
+                params['eventDescriptor'] = eventDescriptors[0]
+        
+        else:
+            params['eventDescriptorList'] = originalRule['eventDescriptors']
+        
+        if originalRule['stateEvaluator']:
+            print "\nStates:\n",
+            states.print_stateEvaluator(originalRule['stateEvaluator'])
+        
+        createStates = boolTypes[guh.get_selection("Do you want to add conditions (\"States\") for the events?", boolTypes)]
+        if createStates == "yes":
+            print "\n========================================================"
+            raw_input("-> Create a state descriptor!  ")
+            stateEvaluator = states.create_stateEvaluator()
+            params['stateEvaluator'] = stateEvaluator
+        
+        print "\ncurrent \"Actions\":\n"
+        ruleactions.print_ruleActionList(originalRule['actions'])
+        print "\n========================================================\n"
+        input = raw_input("Do you want change this \"Actions\" (y/N): ")
+        if input == "y":
+            params['actions'] = ruleactions.create_rule_actions()
+        else:
+            params['actions'] = originalRule['actions']
+    else:
+        print "\n========================================================"
+        raw_input("-> Press \"enter\" to create a state descriptor!  ")
+        params['stateEvaluator'] = states.create_stateEvaluator()
+        
+        print "\ncurrent \"Actions\":\n"
+        ruleactions.print_ruleActionList(originalRule['actions'])
+        print "\n========================================================\n"
+        input = raw_input("Do you want change this \"Actions\" (y/N): ")
+        if input == "y":
+            params['actions'] = ruleactions.create_rule_actions()
+        else:
+            params['actions'] = originalRule['actions']
+        
+        if originalRule['exitActions']:
+            print "\ncurrent \"Actions\":\n"
+            ruleactions.print_ruleActionList(originalRule['exitActions'])
+            input = raw_input("Do you want change this \"Events\" (y/N): ")
+            if input == "y":
+                params['exitActions'] = ruleactions.create_rule_actions()
+            else:
+                params['exitActions'] = originalRule['exitActions']
+                
+        else:        
+            selection = guh.get_selection("Do you want to add (\"ExitActions\") for this rule?", boolTypes)
+            if selection == None:
+                return None
+            ceateExitActions =  boolTypes[selection]
+            if ceateExitActions == "yes":
+                params['exitActions'] = ruleactions.create_rule_actions()
+        
+    selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
+    if selection == None:
+        return None
+    params['enabled'] = boolTypes[selection]
+    print "adding rule with params:\n", guh.print_json_format(params)
+    response = guh.send_command("Rules.EditRule", params)
+    guh.print_rule_error_code(response['params']['ruleError'])
+    
 
 def select_rule():
     ruleDescriptions = []
