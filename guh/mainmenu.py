@@ -202,9 +202,31 @@ menu_data = {
             ]
         },
         {
-            'title': "Log monitor", 
-            'type': COMMAND, 
-            'command': 'method_list_log_entries' 
+            'title': "Logs", 
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                { 
+                    'title': "Device logs", 
+                    'type': COMMAND, 
+                    'command': 'method_device_logs' 
+                },
+                { 
+                    'title': "Rule logs", 
+                    'type': COMMAND, 
+                    'command': 'method_rule_logs' 
+                },
+                { 
+                    'title': "Create Custom Log Filter", 
+                    'type': COMMAND, 
+                    'command': 'method_create_logfilter' 
+                },  
+                { 
+                    'title': "Logmonitor (all logs)", 
+                    'type': COMMAND, 
+                    'command': 'method_list_log_entries' 
+                }
+            ]
         },  
         { 
             'title': "Notifications sniffer", 
@@ -315,6 +337,25 @@ def method_list_log_entries():
     global guhPort
     logs.log_window(guhHost, guhPort)
     
+def method_device_logs():
+    global guhHost
+    global guhPort
+    params = logs.create_device_logfilter()
+    logs.log_window(guhHost, guhPort, params)
+    
+def method_rule_logs():
+    global guhHost
+    global guhPort
+    params = logs.create_rule_logfilter()
+    logs.log_window(guhHost, guhPort, params)
+        
+    
+def method_create_logfilter():
+    global guhHost
+    global guhPort
+    params = logs.create_logfilter()
+    logs.log_window(guhHost, guhPort, params)
+
 def method_notification_sniffer():
     global guhHost
     global guhPort

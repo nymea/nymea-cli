@@ -36,7 +36,7 @@ import actions
 import events
 import rules
 
-def log_window(guhHost, guhPort):
+def log_window(guhHost, guhPort, params = None):
     global screen
     global screenHeight
     global allLines
@@ -59,7 +59,7 @@ def log_window(guhHost, guhPort):
     
     #enable_notification(notificationSocket)
     enable_notification(tn.get_socket())
-    create_log_window()
+    create_log_window(params)
     
     try:
         x = None
@@ -103,7 +103,7 @@ def log_window(guhHost, guhPort):
 
     
     
-def create_log_window():
+def create_log_window(params):
     global screen
     global screenHeight
     global allLines
@@ -123,9 +123,9 @@ def create_log_window():
     screen.keypad(1)
     screen.timeout(50)
     screen.clear()
-    
-    allLines = get_log_entry_lines()
     screenHeight = curses.LINES - 2
+    screen.addstr(1, 2, "Loading...", curses.COLOR_GREEN)
+    allLines = get_log_entry_lines(params)
     scroll_to_bottom()
 
 def scroll_to_bottom():
@@ -209,14 +209,14 @@ def moveUpDown(direction):
 
 def list_logEntries():
     params = {}
+    lines = []
     response = guh.send_command("Logging.GetLogEntries", params)
     for i in range(len(response['params']['logEntries'])):
         line = get_log_entry_line(response['params']['logEntries'][i])
         print line
 
 
-def get_log_entry_lines():
-    params = {}
+def get_log_entry_lines(params):
     lines = []
     response = guh.send_command("Logging.GetLogEntries", params)
     for i in range(len(response['params']['logEntries'])):
@@ -339,3 +339,150 @@ def get_log_entry_line(entry):
     timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
     line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
     return line
+
+def create_device_logfilter():
+    params = {}
+    deviceIds = []
+    deviceId = devices.select_configured_device()
+    deviceIds.append(deviceId)
+    params['deviceIds'] = deviceIds
+    return params
+
+
+def create_rule_logfilter():
+    params = {}
+    sources = []
+    ruleIds = []
+    rule = rules.select_rule()
+    ruleIds.append(rule['id'])
+    sources.append("LoggingSourceRules")
+    params['loggingSources'] = sources
+    params['typeIds'] = ruleIds
+    return params
+
+def create_logfilter():
+    params = {}
+    boolTypes = ["yes","no"]
+    
+    # Devices
+    selection = guh.get_selection("Do you want to filter for \"Devices\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        deviceIds = []
+        deviceId = devices.select_configured_device()
+        deviceIds.append(deviceId)
+        
+        
+        finished = False
+        while not finished:
+            selection = guh.get_selection("Do you want to add an other \"Device\"? ", boolTypes)
+            if boolTypes[selection] == "no":
+                finished = True
+                break
+            deviceId = devices.select_configured_device()
+            if not deviceId:
+                params['deviceIds'] = deviceIds
+                return params
+            deviceIds.append(deviceId)
+            
+      
+        params['deviceIds'] = deviceIds
+    
+    # LoggingSources
+    selection = guh.get_selection("Do you want to filter for \"LoggingSource\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        sources = []
+        finished = False
+        loggingSources = ["LoggingSourceSystem", "LoggingSourceEvents", "LoggingSourceActions", "LoggingSourceStates", "LoggingSourceRules"]
+        selection = guh.get_selection("Please select a \"LoggingSource\": ", loggingSources)
+        if selection:
+            sources.append(loggingSources[selection])
+        else:
+            finished = True
+
+        while not finished:
+            selection = guh.get_selection("Do you want to add an other \"LoggingSource\"? ", boolTypes)
+            if boolTypes[selection] == "no":
+                finished = True
+                break
+            
+            selection = get_selection("Please select a \"LoggingSource\": ", loggingSources)
+            if selection:
+                sources.append(loggingSources[selection])
+            else:
+                finished = True
+                break
+        params['loggingSources'] = sources
+    
+    # LoggingLevel
+    selection = guh.get_selection("Do you want to filter for \"LoggingLevel\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        levels = []
+        loggingLevels = ["LoggingLevelInfo", "LoggingLevelAlert"]
+        selection = guh.get_selection("Please select a \"LoggingLevel\": ", loggingLevels)
+        if selection:
+            levels.append(loggingLevels[selection])
+
+        params['loggingLevels'] = levels
+    
+    # LoggingEventType
+    selection = guh.get_selection("Do you want to filter for \"LoggingEventType\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        types = []
+        loggingEventTypes = ["LoggingEventTypeTrigger", "LoggingEventTypeActiveChange"]
+        selection = guh.get_selection("Please select a \"LoggingEventType\": ", loggingEventTypes)
+        if selection:
+            types.append(loggingEventTypes[selection])
+
+        params['eventTypes'] = types
+    
+    # Value
+    selection = guh.get_selection("Do you want to filter for certain log \"Values\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        values = []
+        finished = False
+        value = raw_input("Please enter value which should be filtered out: ")
+        values.append(value)
+        
+        while not finished:
+            selection = guh.get_selection("Do you want to add an other \"Value\"? ", boolTypes)
+            if boolTypes[selection] == "no":
+                finished = True
+                break
+            value = raw_input("Please enter value which should be filtered out: ")
+            values.append(value)
+        
+        params['values'] = values
+    
+    # Times
+    selection = guh.get_selection("Do you want to add a \"TimeFilter\"? ", boolTypes)
+    if boolTypes[selection] == "yes":
+        timeFilters = []  
+        finished = False
+        
+        timeFilters.append(create_time_filter())
+        while not finished:
+            selection = guh.get_selection("Do you want to add an other \"TimeFilter\"? ", boolTypes)
+            if boolTypes[selection] == "no":
+                finished = True
+                break
+
+            timeFilters.append(create_time_filter())
+            
+        params['timeFilters'] = timeFilters
+        
+    guh.print_json_format(params)
+    guh.debug_stop()
+    return params
+    
+
+def create_time_filter():
+    timeFilter = {}
+    boolTypes = ["yes","no"]
+    selection = guh.get_selection("Do you want to define a \"Start date\"?", boolTypes)
+    if boolTypes[selection] == "yes":
+        timeFilter['startDate'] = raw_input("Please enter the \"Start date\": ")
+    selection = guh.get_selection("Do you want to define a \"End date\"?", boolTypes)
+    if boolTypes[selection] == "yes":
+        timeFilter['endDate'] = raw_input("Please enter the \"End date\": ")
+    return timeFilter
+        
