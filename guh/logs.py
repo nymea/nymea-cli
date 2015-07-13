@@ -28,6 +28,7 @@ import json
 import select
 import telnetlib
 import string
+import time
 
 import guh
 import states
@@ -35,6 +36,14 @@ import devices
 import actions
 import events
 import rules
+
+global stateTypeIdCache
+global actionTypeIdCache
+global eventTypeIdCache
+global deviceIdCache
+global ruleIdCache
+global logFilter
+
 
 def log_window(guhHost, guhPort, params = None):
     global screen
@@ -46,6 +55,20 @@ def log_window(guhHost, guhPort, params = None):
     global down
     global commandId
 
+    global stateTypeIdCache
+    global actionTypeIdCache
+    global eventTypeIdCache
+    global deviceIdCache
+    global ruleIdCache
+    global logFilter
+
+    stateTypeIdCache = {}
+    actionTypeIdCache = {}
+    eventTypeIdCache = {}
+    deviceIdCache = {}
+    ruleIdCache = {}
+    logFilter = params
+    
     commandId = 0
     
     # Create notification handler
@@ -59,7 +82,7 @@ def log_window(guhHost, guhPort, params = None):
     
     #enable_notification(notificationSocket)
     enable_notification(tn.get_socket())
-    create_log_window(params)
+    create_log_window()
     
     try:
         x = None
@@ -74,15 +97,17 @@ def log_window(guhHost, guhPort, params = None):
                     if 'notification' in packet:
                         if packet['notification'] == "Logging.LogEntryAdded":
                             entry = packet['params']['logEntry']
-                            line = get_log_entry_line(entry)
+                            line = get_log_entry_line(entry, True)
                             # scroll to bottom if curser was at the bottom
                             if topLineNum + highlightLineNum == len(allLines) - 1:
-                                allLines.append(line)
-                                scroll_to_bottom()
+                                if line != None:
+                                    allLines.append(line)
+                                    scroll_to_bottom()
                             else:
-                                allLines.append(line)
-                                # flash to tell that there is a new entry
-                                curses.flash()
+                                if line != None:
+                                    allLines.append(line)
+                                    # flash to tell that there is a new entry
+                                    curses.flash()
                     draw_screen()
                 else:
                     x = screen.getch() # timeout of 50 ms (screen.timout(50))
@@ -103,7 +128,7 @@ def log_window(guhHost, guhPort, params = None):
 
     
     
-def create_log_window(params):
+def create_log_window():
     global screen
     global screenHeight
     global allLines
@@ -111,6 +136,7 @@ def create_log_window(params):
     global highlightLineNum
     global up
     global down
+
     
     # init
     up = -1
@@ -124,8 +150,9 @@ def create_log_window(params):
     screen.timeout(50)
     screen.clear()
     screenHeight = curses.LINES - 2
-    screen.addstr(1, 2, "Loading...", curses.COLOR_GREEN)
-    allLines = get_log_entry_lines(params)
+    #screen.addstr(1, 2, "Loading...", curses.COLOR_GREEN)
+    #draw_screen()
+    allLines = get_log_entry_lines()
     scroll_to_bottom()
 
 def scroll_to_bottom():
@@ -216,21 +243,29 @@ def list_logEntries():
         print line
 
 
-def get_log_entry_lines(params):
+def get_log_entry_lines():
+    global logFilter
     lines = []
-    response = guh.send_command("Logging.GetLogEntries", params)
+    response = guh.send_command("Logging.GetLogEntries", logFilter)
     for i in range(len(response['params']['logEntries'])):
         line = get_log_entry_line(response['params']['logEntries'][i])
         lines.append(line)
     return lines
 
 
-def get_log_entry_line(entry):
-    stateTypeIdCache = {}
-    actionTypeIdCache = {}
-    eventTypeIdCache = {}
-    deviceIdCache = {}
-    ruleIdCache = {}
+def get_log_entry_line(entry, checkFilter = False):
+    global stateTypeIdCache
+    global actionTypeIdCache
+    global eventTypeIdCache
+    global deviceIdCache
+    global ruleIdCache
+    
+    global logFilter
+
+    if checkFilter:
+        if not verify_filter(entry):
+            return None
+
     if entry['loggingLevel'] == "LoggingLevelInfo":
         levelString = "(I)"
         error = "-"
@@ -260,15 +295,7 @@ def get_log_entry_line(entry):
             else:
                 sourceName = typeId
         value = entry['value']
-        if entry['deviceId'] in deviceIdCache:
-            deviceName = deviceIdCache[entry['deviceId']]
-        else:
-            device = devices.get_device(entry['deviceId'])
-            if device is not None:
-                deviceName = device['name']
-            else:
-                deviceName = entry['deviceId']
-            deviceIdCache[entry['deviceId']] = deviceName
+        deviceName = get_device_name(entry)
     if entry['source'] == "LoggingSourceActions":
         typeId = entry['typeId']
         sourceType = "Action executed"
@@ -283,15 +310,7 @@ def get_log_entry_line(entry):
                 sourceName = typeId
             actionTypeIdCache[typeId] = sourceName
         value = entry['value']
-        if entry['deviceId'] in deviceIdCache:
-            deviceName = deviceIdCache[entry['deviceId']]
-        else:
-            device = devices.get_device(entry['deviceId'])
-            if device is not None:
-                deviceName = device['name']
-            else:
-                deviceName = entry['deviceId']
-            deviceIdCache[entry['deviceId']] = deviceName
+        deviceName = get_device_name(entry)
     if entry['source'] == "LoggingSourceEvents":
         typeId = entry['typeId']
         sourceType = "Event triggered"
@@ -303,15 +322,7 @@ def get_log_entry_line(entry):
             sourceName = eventType['name']
             eventTypeIdCache[typeId] = sourceName
         value = entry['value']
-        if entry['deviceId'] in deviceIdCache:
-            deviceName = deviceIdCache[entry['deviceId']]
-        else:
-            device = devices.get_device(entry['deviceId'])
-            if device is not None:
-                deviceName = device['name']
-            else:
-                deviceName = entry['deviceId']
-            deviceIdCache[entry['deviceId']] = deviceName
+        deviceName = get_device_name(entry)
     if entry['source'] == "LoggingSourceRules":
         typeId = entry['typeId']
         if entry['eventType'] == "LoggingEventTypeTrigger":
@@ -337,13 +348,15 @@ def get_log_entry_line(entry):
                 deviceName = typeId
             ruleIdCache[typeId] = deviceName
     timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
-    line = "%s %s | %20s | %38s | %30s %5s %20s | %20s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
+    line = "%s %s | %19s | %38s | %20s %3s %20s | %10s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
     return line
 
 def create_device_logfilter():
     params = {}
     deviceIds = []
     deviceId = devices.select_configured_device()
+    if not deviceId:
+        return None
     deviceIds.append(deviceId)
     params['deviceIds'] = deviceIds
     return params
@@ -354,11 +367,25 @@ def create_rule_logfilter():
     sources = []
     ruleIds = []
     rule = rules.select_rule()
+    if not rule:
+        return None
+        
     ruleIds.append(rule['id'])
     sources.append("LoggingSourceRules")
     params['loggingSources'] = sources
     params['typeIds'] = ruleIds
     return params
+
+def create_last_time_logfilter(minutes):
+    offsetSeconds = 60 * minutes;
+    params = {}
+    timeFilters = []
+    timeFilter = {}
+    timeFilter['startDate'] = int(time.time()) - offsetSeconds
+    timeFilters.append(timeFilter)        
+    params['timeFilters'] = timeFilters
+    return params
+
 
 def create_logfilter():
     params = {}
@@ -486,3 +513,90 @@ def create_time_filter():
         timeFilter['endDate'] = raw_input("Please enter the \"End date\": ")
     return timeFilter
         
+
+def get_device_name(entry):
+    global deviceIdCache
+    
+    deviceName = None
+    name = None
+    
+    if entry['deviceId'] in deviceIdCache:
+            deviceName = deviceIdCache[entry['deviceId']]
+    else:
+        device = devices.get_device(entry['deviceId'])
+        if device is not None:
+            for paramType in device['params']:
+                if paramType['name'] == "name":
+                    name = paramType['value']
+        
+            if not name:
+                deviceName = device['name']
+            else:
+                deviceName = "%s (%s)" % (name, device['name'])
+        else:
+            deviceName = entry['deviceId']
+        
+        deviceIdCache[entry['deviceId']] = deviceName
+    
+    return deviceName
+
+
+def verify_filter(entry):
+    global logFilter
+    
+    if not logFilter:
+        return True
+    
+    # check if we should filter for deviceIds
+    if 'deviceIds' in logFilter:
+        found = False
+        for deviceId in logFilter['deviceIds']:
+            if deviceId == entry['deviceId']:
+                found = True
+                break
+        if not found:
+            return False
+
+    # check if we should filter for ruleId
+    if 'typeIds' in logFilter:
+        found = False
+        for ruleId in logFilter['typeIds']:
+            if ruleId == entry['typeId']:
+                found = True
+                break
+        if not found:
+            return False
+    
+    # check if we should filter for loggingSource
+    if 'loggingSources' in logFilter:
+        found = False
+        for loggingSource in logFilter['loggingSources']:
+            if loggingSource == entry['source']:
+                found = True
+                break
+        if not found:
+            return False
+
+    # check if we should filter for values
+    if 'values' in logFilter:
+        found = False
+        for value in logFilter['values']:
+            if value == entry['value']:
+                found = True
+                break
+        if not found:
+            return False
+
+    # check if we should filter for loggingLevels
+    if 'loggingLevels' in logFilter:
+        found = False
+        for loggingLevel in logFilter['loggingLevels']:
+            if loggingLevel == entry['loggingLevel']:
+                found = True
+                break
+        if not found:
+            return False
+        
+
+    return True
+    

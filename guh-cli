@@ -58,3 +58,6 @@ if __name__ == "__main__":
         curses.endwin()
         os.system('clear')
         print "Bye, have a nice day! :)"    
+
+
+

@@ -209,3 +209,6 @@ def scrollToTop(menu):
     # scroll to the top
     topLineNum = 0
     highlightLineNum = 0
+
+
+

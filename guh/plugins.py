@@ -115,3 +115,7 @@ def select_configurable_plugin():
     if selection != None:
         return pluginIdList[selection]
     return None
+
+
+
+

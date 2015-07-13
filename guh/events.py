@@ -89,10 +89,10 @@ def create_eventDescriptor():
 def print_eventDescriptors(eventDescriptors):
     for i in range(len(eventDescriptors)):
         eventDescriptor = eventDescriptors[i]
-        device = devices.get_device(eventDescriptor['deviceId'])
+        deviceName = devices.get_full_device_name(eventDescriptor['deviceId'])
         eventType = get_eventType(eventDescriptor['eventTypeId'])
         paramDescriptors = eventDescriptor['paramDescriptors']
-        print  "%5s. -> %40s -> event: \"%s\"" %(i, device['name'], eventType['name'])
+        print  "%5s. -> %40s -> event: \"%s\"" %(i, deviceName, eventType['name'])
         for i in range(len(paramDescriptors)):
             print "%50s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
 
@@ -107,3 +107,6 @@ def print_eventType():
         print "\n    This device has no events"
         return None
     guh.print_json_format(eventType)
+
+
+

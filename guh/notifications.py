@@ -74,3 +74,6 @@ def enable_notification(notifySocket):
     command = json.dumps(commandObj) + '\n'
     commandId = commandId + 1
     notifySocket.send(command)
+
+
+
