@@ -202,9 +202,78 @@ menu_data = {
             ]
         },
         {
-            'title': "Log monitor", 
-            'type': COMMAND, 
-            'command': 'method_list_log_entries' 
+            'title': "Logs", 
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                { 
+                    'title': "Device logs", 
+                    'type': COMMAND, 
+                    'command': 'method_device_logs' 
+                },
+                { 
+                    'title': "Rule logs", 
+                    'type': COMMAND, 
+                    'command': 'method_rule_logs' 
+                },
+                { 
+                    'title': "Logs from the last...", 
+                    'type': MENU, 
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "...30 minutes", 
+                            'type': COMMAND, 
+                            'command': 'method_last_30_minutes' 
+                        },
+                        { 
+                            'title': "...60 minutes", 
+                            'type': COMMAND, 
+                            'command': 'method_last_60_minutes' 
+                        },
+                        { 
+                            'title': "...120 minutes", 
+                            'type': COMMAND, 
+                            'command': 'method_last_120_minutes' 
+                        },
+                        { 
+                            'title': "...6 hours", 
+                            'type': COMMAND, 
+                            'command': 'method_last_6_hours' 
+                        },
+                        { 
+                            'title': "...12 hours", 
+                            'type': COMMAND, 
+                            'command': 'method_last_12_hours' 
+                        },
+                        { 
+                            'title': "...24 hours", 
+                            'type': COMMAND, 
+                            'command': 'method_last_24_hours' 
+                        },
+                        { 
+                            'title': "...48 hours", 
+                            'type': COMMAND, 
+                            'command': 'method_last_48_hours' 
+                        },
+                        { 
+                            'title': "...72 hours", 
+                            'type': COMMAND, 
+                            'command': 'method_last_72_hours' 
+                        }
+                    ] 
+                },
+                { 
+                    'title': "Create Custom Log Filter", 
+                    'type': COMMAND, 
+                    'command': 'method_create_logfilter' 
+                },  
+                { 
+                    'title': "Logmonitor (all logs)", 
+                    'type': COMMAND, 
+                    'command': 'method_list_log_entries' 
+                }
+            ]
         },  
         { 
             'title': "Notifications sniffer", 
@@ -246,7 +315,9 @@ menu_data = {
     ]
 }
 
-
+######################################################################
+# Devices
+######################################################################
 def method_add_device():
     devices.add_device()
 
@@ -258,15 +329,6 @@ def method_edit_device():
 
 def method_execute_action():
     actions.execute_action()
-
-def method_add_rule():
-    rules.add_rule()
-
-def method_remove_rule():
-    rules.remove_rule()
-
-def method_enable_disable_rule():
-    rules.enable_disable_rule()
 
 def method_list_configured_device_params():
     devices.list_configured_device_params()
@@ -298,6 +360,19 @@ def method_list_deviceClasses(vendorId = None):
 def method_list_deviceClasses_by_vendor():
     method_list_deviceClasses(devices.select_vendor())
 
+######################################################################
+# Rules
+######################################################################
+
+def method_add_rule():
+    rules.add_rule()
+
+def method_remove_rule():
+    rules.remove_rule()
+
+def method_enable_disable_rule():
+    rules.enable_disable_rule()
+
 def method_edit_rule():
     rules.edit_rule()
     
@@ -310,16 +385,104 @@ def method_list_rules():
 def method_list_rules_containig_deviceId():
     rules.list_rules_containig_deviceId()
 
+######################################################################
+# Logs
+######################################################################
+
 def method_list_log_entries():
     global guhHost
     global guhPort
     logs.log_window(guhHost, guhPort)
     
+def method_device_logs():
+    global guhHost
+    global guhPort
+    params = logs.create_device_logfilter()
+    if params:
+        logs.log_window(guhHost, guhPort, params)
+    
+def method_rule_logs():
+    global guhHost
+    global guhPort
+    params = logs.create_rule_logfilter()
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_30_minutes():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(30)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_60_minutes():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(60)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_120_minutes():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(120)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_6_hours():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(360)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_12_hours():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(720)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_24_hours():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(24 * 60)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+    
+def method_last_48_hours():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(48 * 60)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+   
+def method_last_72_hours():
+    global guhHost
+    global guhPort
+    params = logs.create_last_time_logfilter(72 * 60)
+    if params:
+        logs.log_window(guhHost, guhPort, params)        
+   
+def method_create_logfilter():
+    global guhHost
+    global guhPort
+    params = logs.create_logfilter()
+    logs.log_window(guhHost, guhPort, params)
+
+######################################################################
+# Notification sniffer
+######################################################################
+
 def method_notification_sniffer():
     global guhHost
     global guhPort
     notifications.notification_sniffer(guhHost, guhPort)
     
+######################################################################
+# System Info
+######################################################################
+
 def method_list_server_info():
     guh.print_server_version()
     
@@ -346,6 +509,10 @@ def method_print_api_notification():
 
 def method_print_api_type():
     guh.print_api_type()
+
+######################################################################
+# Menu functions
+#####################################################################
 
 def start(host, port):
     global menu_data
@@ -421,6 +588,9 @@ def runmenu(menu, parent):
     # return index of the selected item
     return pos
     
+######################################################################
+# Process menu
+#####################################################################
 
 def processmenu(menu, parent=None):
     global screen
@@ -452,3 +622,6 @@ def processmenu(menu, parent=None):
             screen.clear()
         elif menu['options'][getin]['type'] == EXITMENU:
             exitmenu = True
+
+
+

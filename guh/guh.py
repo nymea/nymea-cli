@@ -329,3 +329,6 @@ def select_stateOperator():
     if selection != None:
         return stateOperators[selection]
     return None
+
+
+

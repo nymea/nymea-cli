@@ -179,6 +179,7 @@ def select_rule():
     ruleDescriptions = []
     ruleDescriptions = guh.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
     if not ruleDescriptions:
+        print "\n    No rule found"
         return None
     descriptions = []
     for ruleDescription in ruleDescriptions:
@@ -292,3 +293,6 @@ def list_rules_containig_deviceId():
     for i in range(len(response['params']['ruleIds'])):
         ruleDescription = get_rule_description(response['params']['ruleIds'][i])
         print "%20s ( %s ) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(ruleDescription['enabled']), print_rule_active_status(ruleDescription['active']))
+
+
+

@@ -50,6 +50,22 @@ def get_device(deviceId):
             return device
     return None
 
+def get_full_device_name(deviceId):
+    devices = get_configured_devices()
+    for device in devices:
+        if device['id'] == deviceId:
+            for paramType in device['params']:
+                if paramType['name'] == "name":
+                    name = paramType['value']
+        
+            if not name:
+                deviceName = device['name']
+            else:
+                deviceName = "%s (%s)" % (name, device['name'])            
+            
+            return deviceName
+    return None
+
 
 def get_configured_devices():
     return guh.send_command("Devices.GetConfiguredDevices")['params']['devices']
@@ -349,3 +365,6 @@ def print_deviceClass():
     if deviceClassId == None:
         return None
     guh.print_json_format(get_deviceClass(deviceClassId))
+
+
+

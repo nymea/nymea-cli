@@ -138,10 +138,10 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
 def print_ruleActionList(actionList):
     for i in range(len(actionList)):
         action = actionList[i]
-        device = devices.get_device(action['deviceId'])
+        deviceName = devices.get_full_device_name(action['deviceId'])
         actionType = actions.get_actionType(actionList[i]['actionTypeId'])
         actionParams = actionList[i]['ruleActionParams']
-        print  "%5s. -> %40s -> action: \"%s\"" %(i, device['name'], actionType['name'])
+        print  "%5s. -> %40s -> action: \"%s\"" %(i, deviceName, actionType['name'])
         for i in range(len(actionParams)):
             if 'eventTypeId' in actionParams[i].keys():
                 eventTypeId = actionParams[i]['eventTypeId']
@@ -149,3 +149,5 @@ def print_ruleActionList(actionList):
             else:
                 print "%50s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
     
+
+
