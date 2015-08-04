@@ -1,6 +1,6 @@
 .\" Manpage for guh-cli.
 .\" Contact simon.stuerz@guh.guru to correct errors or typos.
-.TH man 1 "May 2015" "1.1" "guh-cli man page"
+.TH man 1 "August 2015" "1.2" "guh-cli man page"
 .SH NAME
 guh-cli \- guh command line interface written in python 
 .SH SYNOPSIS
@@ -21,18 +21,18 @@ show program's version number and exit
 the location of the guh daemon (default 127.0.0.1)
 .TP
 \fB\-\-port PORT\fR
-the port of the the guh daemon (default 1234)
+the port of the the guh daemon (default 2222)
 .SH DEFAULTS
 By default guh-cli will try to connect to
 .IR localhost 
 (127.0.0.1) and port
-.IR 1234 . 
+.IR 2222 . 
 Both arguments are optional.
 .SH EXAMPLES
 .TP
-$ guh-cli --host 192.168.1.5 --port 1234
+$ guh-cli --host 192.168.1.5 --port 2222
 .br
-will try to connect to guhd running on 192.168.1.5 and port 1234
+will try to connect to guhd running on 192.168.1.5 and port 2222
 .TP
 $ guh-cli --port 666
 .br
