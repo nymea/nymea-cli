@@ -57,12 +57,20 @@ def send_command(method, params = None):
     if not params == None and len(params) > 0:
         commandObj['params'] = params
     command = json.dumps(commandObj) + '\n'
-    commandId = commandId + 1
     tn.write(command)
-    response = json.loads(tn.read_until("\n}\n"))
+    # wait for the response with id = commandId
+    responseId = -1
+    while responseId != commandId:
+        data = tn.read_until("\n}\n")
+        response = json.loads(data)
+        if 'notification' in response:
+            continue
+        responseId = response['id']
+    commandId = commandId + 1
     if response['status'] != "success":
         print "JSON error happened: %s" % response['error']
         return None
+
     return response
 
 
@@ -266,7 +274,7 @@ def print_api():
 
 def print_json_format(string):
     print json.dumps(string, sort_keys=True, indent=4, separators=(',', ': '))
-    print "\n"
+    #print "\n"
 
 
 def print_api_method():

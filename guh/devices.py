@@ -78,7 +78,7 @@ def add_configured_device(deviceClassId):
     deviceParams = parameters.read_params(deviceClass['paramTypes'])
     if deviceParams:
         params['deviceParams'] = deviceParams
-    print "add device command params:", params
+    print "\nAdding device with params:", guh.print_json_format(params)
     response = guh.send_command("Devices.AddConfiguredDevice", params)
     guh.print_device_error_code(response['params']['deviceError'])
 
@@ -99,7 +99,7 @@ def add_device():
             return None
         add_discovered_device(deviceClassId, deviceDescriptorId)
     elif createMethod == "CreateMethodAuto":
-        print "\nCan't create this device manually. It'll be created automatically when hardware is discovered.\n"
+        print "\nCan't create this device manually. It'll be created automatically when hardware is avaiable.\n"
     
 
 def add_discovered_device(deviceClassId, deviceDescriptorId):
@@ -153,7 +153,7 @@ def remove_configured_device():
     deviceId = select_configured_device()
     if not deviceId:
         return None
-    print "should remove device", deviceId
+    print "Removing device with DeviceId%s" % deviceId
     params = {}
     params['deviceId'] = deviceId
     response = guh.send_command("Devices.RemoveConfiguredDevice", params)
@@ -171,7 +171,7 @@ def edit_device():
     deviceParamTypes = deviceClass['paramTypes']
     currentDeviceParams = device['params']
     createMethod = select_createMethod("Please select how do you want to edit this device", deviceClass['createMethods'])    
-    print " --> Using create method \"%s\"" % (createMethod)
+    print " --> Using create method \"%s\"\n" % (createMethod)
     params = {}
     if createMethod == "CreateMethodUser":
         newDeviceParams = parameters.edit_params(currentDeviceParams, deviceParamTypes)
@@ -316,13 +316,13 @@ def list_configured_devices():
             completeName = "%s (%s)" % (name, device['name'])
         else:
             completeName = device['name']
-        print "%45s, id: %s, deviceClassId: %s" % (completeName, device['id'], device['deviceClassId'])
+        print "%45s, id: %s, deviceClassId: %s" % (get_full_device_name(device['id']), device['id'], device['deviceClassId'])
 
 
 
 def list_deviceClasses(vendorId = None):
     response = get_deviceClasses(vendorId)
-    print "-> List of device classes:\n"
+    print "-> List of all device classes:\n"
     for deviceClass in response:
         print "%35s  %s" % (deviceClass['name'], deviceClass['id'])
 
@@ -333,7 +333,7 @@ def list_device_states():
         return None
     device = get_device(deviceId)
     deviceClass = get_deviceClass(device['deviceClassId'])
-    print "-> States of device \"%s\" %s:\n" % (device['name'], device['id'])
+    print "-> States of device \"%s\" %s:\n" % (get_full_device_name(deviceId), device['id'])
     for i in range(len(deviceClass['stateTypes'])):
         params = {}
         params['deviceId'] = deviceId
@@ -348,7 +348,7 @@ def list_configured_device_params():
     if not device:
         return None
     deviceParams = device['params']
-    print "-> Params of device \"%s\" %s\n:" %(device['name'], device['id'])
+    print "-> Params of device \"%s\" %s:\n" %(get_full_device_name(deviceId), device['id'])
     for i in range(len(deviceParams)):
         print "%35s: %s" % (deviceParams[i]['name'], deviceParams[i]['value'])
 
