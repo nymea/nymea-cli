@@ -25,7 +25,7 @@ import guh
 def read_params(paramTypes):
     params = []
     for paramType in paramTypes:
-        print guh.print_json_format(paramType)
+        print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
         if any("allowedValues" in item for item in paramType):
             # has to be a string (for sorting list)
             allowedValues = []
@@ -59,7 +59,7 @@ def read_params(paramTypes):
 def edit_params(currentDeviceParams, paramTypes):
     params = []
     for paramType in paramTypes:
-        print guh.print_json_format(paramType)
+        print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
         if 'readOnly' in paramType:
             if paramType['readOnly'] == True:
                 print "--------------------------------------------------------"
