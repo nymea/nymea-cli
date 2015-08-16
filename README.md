@@ -49,7 +49,7 @@ or you can run directly:
       -h, --help     show this help message and exit
       -v, --version  show program's version number and exit
       --host HOST    the location of the guh daemon (default 127.0.0.1)
-      --port PORT    the port of the the guh daemon (default 1234)
+      --port PORT    the port of the the guh daemon (default 2222)
 
 
 Once *guh-cli* has established the connection to guhd, you will see the main menu. In the main menu you can either use the arrow keys to navigate or the item number of the menu list.
