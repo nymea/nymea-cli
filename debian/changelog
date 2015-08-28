@@ -1,3 +1,9 @@
+guh-cli (1.0.5) vivid; urgency=low
+
+  * Add standalone script
+
+ -- Simon Stürz <simon.stuerz@guh.guru>  Fri, 28 August 2015 18:10:38 +0200
+
 guh-cli (1.0.0) vivid; urgency=low
 
   * First version of debian package
