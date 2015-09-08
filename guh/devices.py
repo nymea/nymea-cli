@@ -55,15 +55,16 @@ def get_full_device_name(deviceId):
     for device in devices:
         if device['id'] == deviceId:
             for paramType in device['params']:
+                name = None
                 if paramType['name'] == "name":
                     name = paramType['value']
         
-            if not name:
-                deviceName = device['name']
-            else:
-                deviceName = "%s (%s)" % (name, device['name'])            
-            
-            return deviceName
+                if not name:
+                    deviceName = device['name']
+                else:
+                    deviceName = "%s (%s)" % (name, device['name'])            
+                
+                return deviceName
     return None
 
 
