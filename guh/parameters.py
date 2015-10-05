@@ -46,7 +46,13 @@ def read_params(paramTypes):
                 selection = guh.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
-                paramValue = boolTypes[selection] 
+                paramValue = boolTypes[selection]
+            elif paramType['type'] == "int": 
+                paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+            elif paramType['type'] == "double": 
+                paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+            elif paramType['type'] == "uint": 
+                paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
             else:
                 paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
             param = {}
