@@ -149,6 +149,8 @@ def get_unit_string(unit):
         return "kW"
     elif unit == "UnitKiloWattHour":
         return "kWh"
+    elif unit == "UnitEuroPerMegaWattHour":
+        return "€/MWh"
     elif unit == "UnitPercentage":
         return "%"
     elif unit == "UnitEuro":
@@ -257,7 +259,13 @@ def print_rule_error_code(ruleError):
     elif ruleError == "RuleErrorInvalidRuleFormat":
         print "\nERROR: this rule has not the correct format. (", ruleError, ")"
     elif ruleError == "RuleErrorTypesNotMatching":
-        print "\nERROR: the event and the action params have not the same type. (", ruleError, ")"    
+        print "\nERROR: the event and the action params have not the same type. (", ruleError, ")"
+    elif ruleError == "RuleErrorNotExecutable":
+        print "\nERROR: the rule is not executable. (", ruleError, ")"   
+    elif ruleError == "RuleErrorContainsEventBasesAction":
+        print "\nERROR: the rule contains an event value based action. (", ruleError, ")"    
+    elif ruleError == "RuleErrorNoExitActions":
+        print "\nERROR: the rule has no exit actions which can be executed. (", ruleError, ")"
     else:
         print "\nERROR: Unknown error code: ", ruleError,  "Please take a look at the newest API version."
 

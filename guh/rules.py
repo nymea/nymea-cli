@@ -53,11 +53,17 @@ def add_rule():
             params['stateEvaluator'] = stateEvaluator
         
         params['actions'] = ruleactions.create_rule_actions(eventDescriptors)
-        
-    else:
-        print "\n========================================================"
-        raw_input("-> Press \"enter\" to create a state descriptor!  ")
-        params['stateEvaluator'] = states.create_stateEvaluator()
+    
+    else:  
+        selection = guh.get_selection("Do you want to define \"States\" for this rule?", boolTypes)
+        if selection != None:
+            eventsEnabled = boolTypes[selection]
+
+        if (boolTypes[selection] == "yes"):
+            print "\n========================================================"
+            raw_input("-> Press \"enter\" to create a state descriptor!  ")
+            params['stateEvaluator'] = states.create_stateEvaluator()
+
         params['actions'] = ruleactions.create_rule_actions()
         selection = guh.get_selection("Do you want to add (\"ExitActions\") for this rule?", boolTypes)
         if selection == None:
@@ -65,18 +71,21 @@ def add_rule():
         ceateExitActions =  boolTypes[selection]
         if ceateExitActions == "yes":
             params['exitActions'] = ruleactions.create_rule_actions()
-    
+
     selection = guh.get_selection("-> Should the rule initially be enabled?", boolTypes)
     if selection == None:
         return None
     params['enabled'] = boolTypes[selection]
+    selection = guh.get_selection("-> Should the rule be executable?", boolTypes)
+    if selection == None:
+        return None
+    params['executable'] = boolTypes[selection]
     print "adding rule with params:\n", guh.print_json_format(params)
     response = guh.send_command("Rules.AddRule", params)
     guh.print_rule_error_code(response['params']['ruleError'])
 
     
 def edit_rule():
-    
     ruleDescription = select_rule()
     if ruleDescription == None:
         print "\n    No rules found"
@@ -214,6 +223,12 @@ def print_rule_active_status(status):
     else:
         return "inactive"
 
+def print_rule_executable_status(status):
+    if status == True:
+        return "executable"
+    else:
+        return "not executable"
+
 
 def get_rule_description(ruleId):
     ruleDescriptions = []
@@ -264,7 +279,11 @@ def list_rule_details():
     rule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
     print guh.print_json_format(rule)
     print "========================================================"
-    print "-> Details for rule \"%s\" (%s) which currently is %s / %s :" % (rule['name'], rule['id'], print_rule_enabled_status(bool(rule['enabled'])), print_rule_active_status(bool(rule['active'])))
+    print "-> Details for rule \"%s\" (%s):\n" % (rule['name'], rule['id'])
+    print "Rule is %s" % (print_rule_enabled_status(bool(rule['enabled'])))
+    print "Rule is %s" % (print_rule_active_status(bool(rule['active'])))
+    print "Rule is %s" % (print_rule_executable_status(bool(rule['executable'])))
+
     if len(rule['eventDescriptors']) > 0:
         print "\nEvents:\n"
         events.print_eventDescriptors(rule['eventDescriptors'])
@@ -276,6 +295,38 @@ def list_rule_details():
     if len(rule['exitActions']) > 0:
         print "\nExit actions:\n"
         ruleactions.print_ruleActionList(rule['exitActions'])
+
+
+def execute_rule_actions():
+    ruleDescription = select_rule()
+    if ruleDescription == None:
+            print "\n    No rules found"
+            return None
+    ruleId = ruleDescription['id']
+    params = {}
+    params['ruleId'] = ruleId
+
+    rule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
+
+    if len(rule['exitActions']) == 0:
+        options = ["Execute actions"]
+        selection = guh.get_selection("Which actions of the rule should be executed?", options)
+        response = guh.send_command("Rules.ExecuteActions", params)
+        guh.print_rule_error_code(response['params']['ruleError'])
+    else:
+        options = ["Execute actions","Execute exit actions"]
+        selection = guh.get_selection("Which actions of the rule should be executed?", options)
+        if selection == None:
+            return None
+
+        if (options[selection] == "Execute actions"):
+            response = guh.send_command("Rules.ExecuteActions", params)
+            guh.print_rule_error_code(response['params']['ruleError'])
+        else:
+            response = guh.send_command("Rules.ExecuteExitActions", params)
+            guh.print_rule_error_code(response['params']['ruleError'])
+    
+    return None
 
 
 def list_rules_containig_deviceId():
