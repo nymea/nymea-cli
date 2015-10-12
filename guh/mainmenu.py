@@ -158,6 +158,11 @@ menu_data = {
                     'command': 'method_list_rule_detail' 
                 },
                 { 
+                    'title': "Execute rule actions", 
+                    'type': COMMAND, 
+                    'command': 'method_execute_rule_actions' 
+                },
+                { 
                     'title': "Enable/Disable a rule", 
                     'type': COMMAND, 
                     'command': 'method_enable_disable_rule' 
@@ -379,6 +384,9 @@ def method_edit_rule():
 def method_list_rule_detail():
     rules.list_rule_details()
     
+def method_execute_rule_actions():
+    rules.execute_rule_actions()
+
 def method_list_rules():
     rules.list_rules()
     
