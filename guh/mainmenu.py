@@ -411,6 +411,7 @@ def method_device_logs():
     global guhHost
     global guhPort
     params = logs.create_device_logfilter()
+    print "\nThe filter:\n"
     guh.print_json_format(params)
     guh.debug_stop()
     if params:
@@ -440,6 +441,9 @@ def method_last_30_minutes():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(30)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -447,6 +451,9 @@ def method_last_60_minutes():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(60)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -454,6 +461,9 @@ def method_last_120_minutes():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(120)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -461,6 +471,9 @@ def method_last_6_hours():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(360)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -468,6 +481,9 @@ def method_last_12_hours():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(720)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -475,6 +491,9 @@ def method_last_24_hours():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(24 * 60)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -482,6 +501,9 @@ def method_last_48_hours():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(48 * 60)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
    
@@ -489,6 +511,9 @@ def method_last_72_hours():
     global guhHost
     global guhPort
     params = logs.create_last_time_logfilter(72 * 60)
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
    
