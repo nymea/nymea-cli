@@ -217,6 +217,11 @@ menu_data = {
                     'command': 'method_device_logs' 
                 },
                 { 
+                    'title': "Device state logs", 
+                    'type': COMMAND, 
+                    'command': 'method_device_state_logs' 
+                },
+                { 
                     'title': "Rule logs", 
                     'type': COMMAND, 
                     'command': 'method_rule_logs' 
@@ -406,13 +411,28 @@ def method_device_logs():
     global guhHost
     global guhPort
     params = logs.create_device_logfilter()
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)
     
+def method_device_state_logs():
+    global guhHost
+    global guhPort
+    params = logs.create_device_state_logfilter()
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
+    if params:
+        logs.log_window(guhHost, guhPort, params)    
+
 def method_rule_logs():
     global guhHost
     global guhPort
     params = logs.create_rule_logfilter()
+    print "\nThe filter:\n"
+    guh.print_json_format(params)
+    guh.debug_stop()
     if params:
         logs.log_window(guhHost, guhPort, params)        
     
@@ -596,6 +616,7 @@ def runmenu(menu, parent):
     # return index of the selected item
     return pos
     
+
 ######################################################################
 # Process menu
 #####################################################################
