@@ -351,6 +351,7 @@ def get_log_entry_line(entry, checkFilter = False):
     line = "%s %s | %19s | %38s | %20s %3s %20s | %10s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
     return line
 
+
 def create_device_logfilter():
     params = {}
     deviceIds = []
@@ -360,6 +361,28 @@ def create_device_logfilter():
     deviceIds.append(deviceId)
     params['deviceIds'] = deviceIds
     return params
+
+
+def create_device_state_logfilter():
+    params = {}
+    deviceIds = []
+    typeIds = []
+    loggingSources = []
+    loggingSources.append("LoggingSourceStates")
+    params['loggingSources'] = loggingSources
+    deviceId = devices.select_configured_device()
+    if not deviceId:
+        return None
+    deviceIds.append(deviceId)
+    params['deviceIds'] = deviceIds
+    device = devices.get_device(deviceId)
+    stateType = states.select_stateType(device['deviceClassId'])
+    if not stateType:
+        return None
+    typeIds.append(stateType['id'])
+    params['typeIds'] = typeIds
+    return params
+
 
 
 def create_rule_logfilter():
