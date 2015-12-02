@@ -40,18 +40,18 @@ def read_params(paramTypes):
             param['value'] = paramValue
         else:
             # make bool selectable to make shore they are "true" or "false"
-            if paramType['type'] == "bool":
+            if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
                 selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
                 selection = guh.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
-            elif paramType['type'] == "int": 
+            elif paramType['type'] == "Int": 
                 paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
-            elif paramType['type'] == "double": 
+            elif paramType['type'] == "Double": 
                 paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
-            elif paramType['type'] == "uint": 
+            elif paramType['type'] == "Uint": 
                 paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
             else:
                 paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
@@ -85,7 +85,7 @@ def edit_params(currentDeviceParams, paramTypes):
             params.append(param)
         else:
             # make bool selectable to make shore they are "true" or "false"
-            if paramType['type'] == "bool":
+            if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
                 selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['name'], currentDeviceParams), paramType['name'], paramType['type'])
                 selection = guh.get_selection(selectionString, boolTypes)
@@ -117,7 +117,7 @@ def read_paramDescriptors(paramTypes):
         if selectionTypes[selection] == "no":
             continue
         operator = guh.select_valueOperator(paramType['name'])
-        if paramType['type'] == "bool":
+        if paramType['type'] == "Bool":
             boolTypes = ["true","false"]
             selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
             selection = guh.get_selection(selectionString, boolTypes)

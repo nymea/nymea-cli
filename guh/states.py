@@ -67,18 +67,39 @@ def create_stateDescriptor():
     if stateType == None:
         return None
     valueOperator = guh.select_valueOperator(stateType['name'])
+
+    stateDescriptor = {}
+
+    print "\nThe StateType looks like this:\n", guh.print_json_format(stateType)
     print "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
     # make bool selectable to make shore they are "true" or "false"
-    if stateType['type'] == "bool":
-        boolTypes = ["true","false"]
-        selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
-        selection = guh.get_selection(selectionString, boolTypes)
+    if any("possibleValues" in item for item in stateType):
+        # has to be a string (for sorting list)
+        possibleValues = []
+        for value in stateType['possibleValues']:
+            possibleValues.append(str(value))
+        selection = guh.get_selection("Please select one of following possible values:", possibleValues)
         if selection == None:
             return None
-        stateValue = boolTypes[selection] 
+        stateValue = stateType['possibleValues'][selection]
     else:
-        stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
-    stateDescriptor = {}
+        # make bool selectable to make shore they are "true" or "false"
+        if stateType['type'] == "Bool":
+            boolTypes = ["true","false"]
+            selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
+            selection = guh.get_selection(selectionString, boolTypes)
+            if selection == None:
+                return None
+            stateValue = boolTypes[selection] 
+        elif stateType['type'] == "Int": 
+            stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+        elif stateType['type'] == "Double": 
+            stateValue = double(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+        elif stateType['type'] == "Uint": 
+            stateValue = uint(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+        else:
+            stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
+
     stateDescriptor['deviceId'] = deviceId
     stateDescriptor['stateTypeId'] = stateType['id']
     stateDescriptor['value'] = stateValue

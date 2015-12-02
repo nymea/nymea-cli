@@ -95,7 +95,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     params.append(param)
                 else:
                     # make bool selectable to make shore they are "true" or "false"
-                    if paramType['type'] == "bool":
+                    if paramType['type'] == "Bool":
                         boolTypes = ["true","false"]
                         selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
                         selection = guh.get_selection(selectionString, boolTypes)
@@ -114,7 +114,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                         params.append(param)
             else:
                 # make bool selectable to make shore they are "true" or "false"
-                if paramType['type'] == "bool":
+                if paramType['type'] == "Bool":
                     boolTypes = ["true","false"]
                     selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
                     selection = guh.get_selection(selectionString, boolTypes)

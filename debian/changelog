@@ -1,3 +1,9 @@
+guh-cli (1.0.6) wily; urgency=low
+
+  * Update API changes
+
+ -- Simon Stürz <simon.stuerz@guh.guru>  Wed, 02 December 2015 14:22:46 +0100
+
 guh-cli (1.0.5) vivid; urgency=low
 
   * Add standalone script
