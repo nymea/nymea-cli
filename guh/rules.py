@@ -32,12 +32,13 @@ def add_rule():
     params = {}
     params['name'] = raw_input("Please enter the name of the rule: ")
     print "\n========================================================"    
-    boolTypes = ["yes","no"]
-    selection = guh.get_selection("Do you want to define \"Events\" for this rule?", boolTypes)
+    responseTypes = ["yes","no"]    
+    boolTypes = ["true","false"]
+    selection = guh.get_selection("Do you want to define \"Events\" for this rule?", responseTypes)
     if selection != None:
         eventsEnabled = boolTypes[selection]
 
-    if (boolTypes[selection] == "yes"):
+    if (responseTypes[selection] == "yes"):
         eventDescriptors = events.create_eventDescriptors()
         print guh.print_json_format(eventDescriptors)
         if len(eventDescriptors) > 1:
@@ -45,7 +46,7 @@ def add_rule():
         else:
             params['eventDescriptor'] = eventDescriptors[0]
             
-        createStates = boolTypes[guh.get_selection("Do you want to add conditions (\"States\") for the events?", boolTypes)]
+        createStates = responseTypes[guh.get_selection("Do you want to add conditions (\"States\") for the events?", responseTypes)]
         if createStates == "yes":
             print "\n========================================================"
             raw_input("-> Create a state descriptor!  ")
@@ -55,20 +56,20 @@ def add_rule():
         params['actions'] = ruleactions.create_rule_actions(eventDescriptors)
     
     else:  
-        selection = guh.get_selection("Do you want to define \"States\" for this rule?", boolTypes)
+        selection = guh.get_selection("Do you want to define \"States\" for this rule?", responseTypes)
         if selection != None:
-            eventsEnabled = boolTypes[selection]
+            eventsEnabled = responseTypes[selection]
 
-        if (boolTypes[selection] == "yes"):
+        if (responseTypes[selection] == "yes"):
             print "\n========================================================"
             raw_input("-> Press \"enter\" to create a state descriptor!  ")
             params['stateEvaluator'] = states.create_stateEvaluator()
 
         params['actions'] = ruleactions.create_rule_actions()
-        selection = guh.get_selection("Do you want to add (\"ExitActions\") for this rule?", boolTypes)
+        selection = guh.get_selection("Do you want to add (\"ExitActions\") for this rule?", responseTypes)
         if selection == None:
             return None
-        ceateExitActions =  boolTypes[selection]
+        ceateExitActions =  responseTypes[selection]
         if ceateExitActions == "yes":
             params['exitActions'] = ruleactions.create_rule_actions()
 

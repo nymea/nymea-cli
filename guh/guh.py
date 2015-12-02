@@ -197,6 +197,8 @@ def print_device_error_code(deviceError):
         print "\nSuccess! (", deviceError, ")"
     elif deviceError == "DeviceErrorPluginNotFound":
         print "\nERROR: the plugin could not be found. (", deviceError, ")"
+    elif deviceError == "DeviceErrorVendorNotFound":
+        print "\nERROR: the vendor could not be found. (", deviceError, ")"
     elif deviceError == "DeviceErrorDeviceNotFound":
         print "\nERROR: the device could not be found. (", deviceError, ")"
     elif deviceError == "DeviceErrorDeviceClassNotFound":
@@ -233,6 +235,8 @@ def print_device_error_code(deviceError):
         print "\nERROR: the pairingTransactionId could not be found. (", deviceError, ")"
     elif deviceError == "DeviceErrorParameterNotWritable":
         print "\nERROR: one of the parameters is not writable. (", deviceError, ")"
+    elif deviceError == "DeviceErrorAuthentificationFailure":
+        print "\nERROR: could not authenticate. (", deviceError, ")"
     else:
         print "\nERROR: Unknown error code: ", deviceError,  "Please take a look at the newest API version."
 
@@ -248,6 +252,8 @@ def print_rule_error_code(ruleError):
         print "\nERROR: the device could not be found for this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorEventTypeNotFound":
         print "\nERROR: the eventType could not be found for this rule. (", ruleError, ")"
+    elif ruleError == "RuleErrorStateTypeNotFound":
+        print "\nERROR: the stateType could not be found for this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorActionTypeNotFound":
         print "\nERROR: the actionType could not be found for this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorInvalidParameter":
@@ -258,6 +264,8 @@ def print_rule_error_code(ruleError):
         print "\nERROR: one of the actions parameters in this rule is not valid. (", ruleError, ")"
     elif ruleError == "RuleErrorInvalidRuleFormat":
         print "\nERROR: this rule has not the correct format. (", ruleError, ")"
+    elif ruleError == "RuleErrorInvalidStateEvaluatorValue":
+        print "\nERROR: this rule has an invalid state evaluator value. (", ruleError, ")"
     elif ruleError == "RuleErrorTypesNotMatching":
         print "\nERROR: the event and the action params have not the same type. (", ruleError, ")"
     elif ruleError == "RuleErrorNotExecutable":

@@ -92,14 +92,13 @@ def create_stateDescriptor():
                 return None
             stateValue = boolTypes[selection] 
         elif stateType['type'] == "Int": 
-            stateValue = int(raw_input(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator)))))
+            stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Double": 
-            stateValue = double(raw_input(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator)))))
+            stateValue = double(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Uint": 
-            stateValue = uint(raw_input(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator)))))
+            stateValue = uint(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         else:
             stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
-
 
     stateDescriptor['deviceId'] = deviceId
     stateDescriptor['stateTypeId'] = stateType['id']
