@@ -102,16 +102,18 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                         if selection == None:
                             return None
                         paramValue = boolTypes[selection]
-                        param = {}
-                        param['name'] = paramType['name']
-                        param['value'] = paramValue
-                        params.append(param)
+                    elif paramType['type'] == "Int": 
+                        paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                    elif paramType['type'] == "Double": 
+                        paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                    elif paramType['type'] == "Uint": 
+                        paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
                     else:
-                        paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
-                        param = {}
-                        param['name'] = paramType['name']
-                        param['value'] = paramValue
-                        params.append(param)
+                        paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
+                    param = {}
+                    param['name'] = paramType['name']
+                    param['value'] = paramValue
+                    params.append(param)
             else:
                 # make bool selectable to make shore they are "true" or "false"
                 if paramType['type'] == "Bool":
@@ -121,16 +123,19 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     if selection == None:
                         return None
                     paramValue = boolTypes[selection]
-                    param = {}
-                    param['name'] = paramType['name']
-                    param['value'] = paramValue
-                    params.append(param)
+                elif paramType['type'] == "Int": 
+                    paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                elif paramType['type'] == "Double": 
+                    paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                elif paramType['type'] == "Uint": 
+                    paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
                 else:
-                    paramValue = raw_input("Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type']))
-                    param = {}
-                    param['name'] = paramType['name']
-                    param['value'] = paramValue
-                    params.append(param)
+                    paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
+                
+                param = {}
+                param['name'] = paramType['name']
+                param['value'] = paramValue
+                params.append(param)
     return params
 
 
