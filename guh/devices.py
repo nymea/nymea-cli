@@ -54,19 +54,7 @@ def get_full_device_name(deviceId):
     devices = get_configured_devices()
     for device in devices:
         if device['id'] == deviceId:
-            name = None
-            paramTypes = device['params'];
-            for paramType in paramTypes:
-                if paramType['name'] == "name":
-                    name = paramType['value']
-                    break
-
-            if not name:
-                deviceName = device['name']
-            else:
-                deviceName = "%s (%s)" % (name, device['name'])            
-            
-            return deviceName                    
+            return device['name']                    
     return None
 
 
@@ -78,6 +66,7 @@ def add_configured_device(deviceClassId):
     deviceClass = get_deviceClass(deviceClassId)
     params = {}
     params['deviceClassId'] = deviceClassId
+    params['name'] = raw_input("\nEnter the \"name\" of the device: ")
     deviceParams = parameters.read_params(deviceClass['paramTypes'])
     if deviceParams:
         params['deviceParams'] = deviceParams
@@ -106,12 +95,13 @@ def add_device():
     
 
 def add_discovered_device(deviceClassId, deviceDescriptorId):
-    params = {}
-    params['deviceClassId'] = deviceClassId
-    params['deviceDescriptorId'] = deviceDescriptorId
-
+    
     deviceClass = get_deviceClass(deviceClassId)
     if deviceClass['setupMethod'] == "SetupMethodJustAdd":
+        params = {}
+        params['deviceClassId'] = deviceClassId
+        params['deviceDescriptorId'] = deviceDescriptorId
+        params['name'] = raw_input("\nEnter the \"name\" of the device: ")
         response = guh.send_command("Devices.AddConfiguredDevice", params)
         if not response['status'] != "success":
             guh.print_device_error_code(response['params']['deviceError'])
@@ -121,6 +111,7 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
         params = {}
         params['deviceClassId'] = deviceClassId
         params['deviceDescriptorId'] = deviceDescriptorId
+        params['name'] = raw_input("\nEnter the \"name\" of the device: ")
         response = guh.send_command("Devices.PairDevice", params)
         #guh.print_json_format(response)
         if not response['status'] == "success":
@@ -137,6 +128,7 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
         params = {}
         params['deviceClassId'] = deviceClassId
         params['deviceDescriptorId'] = deviceDescriptorId
+        params['name'] = raw_input("\nEnter the \"name\" of the device: ")
         response = guh.send_command("Devices.PairDevice", params)
         #guh.print_json_format(response)
         if not response['status'] == "success":
@@ -162,8 +154,16 @@ def remove_configured_device():
     response = guh.send_command("Devices.RemoveConfiguredDevice", params)
     guh.print_device_error_code(response['params']['deviceError'])
 
-
 def edit_device():
+    deviceId = select_configured_device()
+    params = {}
+    params['deviceId'] = deviceId
+    params['name'] = raw_input("\nEnter the new \"name\" of the device: ")
+    response = guh.send_command("Devices.EditDevice", params)
+    guh.print_device_error_code(response['params']['deviceError'])
+
+
+def reconfigure_device():
     deviceId = select_configured_device()
     device = get_device(deviceId)
     if not device:
@@ -180,7 +180,7 @@ def edit_device():
         newDeviceParams = parameters.edit_params(currentDeviceParams, deviceParamTypes)
         params['deviceId'] = deviceId
         params['deviceParams'] = newDeviceParams
-        response = guh.send_command("Devices.EditDevice", params)
+        response = guh.send_command("Devices.ReconfigureDevice", params)
         guh.print_device_error_code(response['params']['deviceError'])
     elif createMethod ==  "CreateMethodDiscovery":
         deviceDescriptorId = discover_device(device['deviceClassId'])
@@ -189,13 +189,13 @@ def edit_device():
         print "using descriptorId %s" % (deviceDescriptorId)
         params['deviceId'] = deviceId
         params['deviceDescriptorId'] = deviceDescriptorId
-        response = guh.send_command("Devices.EditDevice", params)
+        response = guh.send_command("Devices.ReconfigureDevice", params)
         guh.print_device_error_code(response['params']['deviceError'])
     elif createMethod == "CreateMethodAuto":
         newDeviceParams = parameters.edit_params(currentDeviceParams, deviceParamTypes)
         params['deviceId'] = deviceId
         params['deviceParams'] = newDeviceParams
-        response = guh.send_command("Devices.EditDevice", params)
+        response = guh.send_command("Devices.ReconfigureDevice", params)
         guh.print_device_error_code(response['params']['deviceError'])
 
 

@@ -67,6 +67,11 @@ menu_data = {
                     'command': 'method_edit_device' 
                 },
                 {
+                    'title': "Reconfigure device", 
+                    'type': COMMAND, 
+                    'command': 'method_reconfigure_device' 
+                },
+                {
                     'title': "Execute an action", 
                     'type': COMMAND, 
                     'command': 'method_execute_action' 
@@ -336,6 +341,9 @@ def method_remove_device():
 
 def method_edit_device():
     devices.edit_device()
+
+def method_reconfigure_device():
+    devices.reconfigure_device()
 
 def method_execute_action():
     actions.execute_action()
