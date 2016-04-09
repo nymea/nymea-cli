@@ -1,3 +1,9 @@
+guh-cli (1.0.7) xenial; urgency=low
+
+  * Add timedescriptors and improve rules
+
+ -- Simon Stürz <simon.stuerz@guh.guru>  Sat, 09 April 2016 18:39:22 +0200
+
 guh-cli (1.0.6) wily; urgency=low
 
   * Update API changes
