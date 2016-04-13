@@ -54,3 +54,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+.pybuild/
+debian/files
+debian/guh-cli.postinst.debhelper
+debian/guh-cli.prerm.debhelper
+debian/guh-cli.substvars
+debian/guh-cli/
