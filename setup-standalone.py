@@ -55,6 +55,7 @@ setup(name = "guh-cli",
         "guh.rules",
         "guh.selector",
         "guh.states",
+        "guh.timedescriptor",
         "tests.licensetests"
     ],
     data_files = [ 

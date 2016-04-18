@@ -100,7 +100,21 @@ def process_selection_menu(menu):
     else:
         return None
     
-    
+
+def getYesNoSelection(question):
+    responseTypes = ["yes","no"]
+    selection = guh.get_selection(question, responseTypes)
+    if responseTypes[selection] == "yes":
+        return True
+    else:
+        return False
+  
+def getBoolSelection(question):
+    responseTypes = ["true","false"]
+    selection = guh.get_selection(question, responseTypes)
+    return responseTypes[selection]
+                
+        
 def runmenu(menu):
     global screen
     global screenHeight
