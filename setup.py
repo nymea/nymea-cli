@@ -54,9 +54,9 @@ setup(name = "guh-cli",
         "guh.timedescriptor",
         "tests.licensetests"
     ],
-    data_files = [ 
+    data_files = [
         ("/usr/share/man/man1", ["debian/guh-cli.1"]),
-        ("/usr/share/doc/guh-cli/", ["debian/changelog"]) 
+        ("/usr/share/doc/guh-cli/", ["debian/changelog"])
     ],
     classifiers = [
         "Programming Language :: Python",
