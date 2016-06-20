@@ -23,6 +23,7 @@
 import guh
 import parameters
 import plugins
+import selector
 
 def get_supported_vendors():
     return guh.send_command("Devices.GetSupportedVendors")
@@ -152,14 +153,31 @@ def remove_configured_device():
     params = {}
     params['deviceId'] = deviceId
     response = guh.send_command("Devices.RemoveConfiguredDevice", params)
+
+    if response['params']['deviceError'] == 'DeviceErrorDeviceInRule':
+            selectionString = "This device is used in a rule. How do you want to remove the device from the rules?"
+            removePolicys = ["Remove the device from the rules","Delete all offending rules"]
+            selection = guh.get_selection(selectionString, removePolicys)
+            
+            if removePolicys[selection] == "Remove the device from the rules":
+                params['removePolicy'] = "RemovePolicyUpdate"
+            else:
+                params['removePolicy'] = "RemovePolicyCascade"
+            
+            response = guh.send_command("Devices.RemoveConfiguredDevice", params)
+            
+
+  
     guh.print_device_error_code(response['params']['deviceError'])
+
+    
 
 def edit_device():
     deviceId = select_configured_device()
     params = {}
     params['deviceId'] = deviceId
     params['name'] = raw_input("\nEnter the new \"name\" of the device: ")
-    response = guh.send_command("Devices.EditDevice", params)
+    response = guh.send_command("Devices.EditDevice", params)   
     guh.print_device_error_code(response['params']['deviceError'])
 
 

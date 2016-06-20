@@ -35,6 +35,7 @@ import actions
 import rules
 import logs
 import notifications
+import settings
 
 
 MENU = "menu"
@@ -296,7 +297,7 @@ menu_data = {
             'command': 'method_notification_sniffer' 
         },     
         {
-            'title': "System Info", 
+            'title': "System info", 
             'type': MENU,
             'subtitle': "Please select an option...",
             'options': [
@@ -324,6 +325,40 @@ menu_data = {
                     'title': "List API type", 
                     'type': COMMAND, 
                     'command': 'method_print_api_type' 
+                }
+            ]
+        },     
+        {
+            'title': "System settings", 
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                { 
+                    'title': "Cloud connection", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "Authenticate", 
+                            'type': COMMAND, 
+                            'command': 'method_cloud_authenticate' 
+                        },
+                        { 
+                            'title': "Get status", 
+                            'type': COMMAND, 
+                            'command': 'method_cloud_status' 
+                        },
+                        { 
+                            'title': "Enable cloud connection", 
+                            'type': COMMAND, 
+                            'command': 'method_enable_cloud_connection' 
+                        },
+                        { 
+                            'title': "Disable cloud connection", 
+                            'type': COMMAND, 
+                            'command': 'method_disable_cloud_connection' 
+                        }
+                    ]
                 }
             ]
         }
@@ -541,7 +576,7 @@ def method_notification_sniffer():
     notifications.notification_sniffer(guhHost, guhPort)
     
 ######################################################################
-# System Info
+# System info
 ######################################################################
 
 def method_list_server_info():
@@ -570,6 +605,24 @@ def method_print_api_notification():
 
 def method_print_api_type():
     guh.print_api_type()
+
+######################################################################
+# System settings
+######################################################################
+
+def method_cloud_authenticate():
+    settings.cloud_authenticate()
+
+def method_cloud_status():
+    settings.print_cloud_status()
+
+def method_enable_cloud_connection():
+    settings.enable_cloud_connection()
+
+def method_disable_cloud_connection():
+    settings.disable_cloud_connection()
+
+
 
 ######################################################################
 # Menu functions

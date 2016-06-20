@@ -4,7 +4,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015 - 2016 Simon Stuerz <simon.stuerz@guh.guru>         #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -52,6 +52,7 @@ setup(name = "guh-cli",
         "guh.selector",
         "guh.states",
         "guh.timedescriptor",
+        "guh.settings",
         "tests.licensetests"
     ],
     data_files = [
