@@ -32,6 +32,7 @@ import events
 import actions
 import rules
 import selector
+import settings
 
 commandId = 0
 
@@ -237,6 +238,10 @@ def print_device_error_code(deviceError):
         print "\nERROR: one of the parameters is not writable. (", deviceError, ")"
     elif deviceError == "DeviceErrorAuthentificationFailure":
         print "\nERROR: could not authenticate. (", deviceError, ")"
+    elif deviceError == "DeviceErrorDeviceIsChild":
+        print "\nERROR: this device is a child device (", deviceError, "). Please remove the parent device." 
+    elif deviceError == "DeviceErrorDeviceInRule":
+        print "\nERROR: this device gets used in a rule (", deviceError, "). Please specify the remove policy."
     else:
         print "\nERROR: Unknown error code: ", deviceError,  "Please take a look at the newest API version."
 
@@ -276,6 +281,24 @@ def print_rule_error_code(ruleError):
         print "\nERROR: the rule has no exit actions which can be executed. (", ruleError, ")"
     else:
         print "\nERROR: Unknown error code: ", ruleError,  "Please take a look at the newest API version."
+
+def print_cloud_error_code(cloudError):
+    if cloudError == "CloudErrorNoError":
+        print "\nSuccess! (", cloudError, ")"
+    elif cloudError == "CloudErrorAuthenticationFailed":
+        print "\nERROR: the given username or password is not valid. (", cloudError, ")"
+    elif cloudError == "CloudErrorCloudConnectionDisabled":
+        print "\nERROR: the cloud connection is disabled. (", cloudError, ")"
+    elif cloudError == "CloudErrorCloudServerNotReachable":
+        print "\nERROR: the cloud server is not reachable. (", cloudError, ")"
+    elif cloudError == "CloudErrorIdentityServerNotReachable":
+        print "\nERROR: the cloud identity server is not reachable. (", cloudError, ")"
+    elif cloudError == "CloudErrorProxyServerNotReachable":
+        print "\nERROR: the cloud proxy server is not reachable. (", cloudError, ")"
+    elif cloudError == "CloudErrorLoginCredentialsMissing":
+        print "\nERROR: the cloud login credentials are missing (token or username and password neede). (", cloudError, ")"
+    else:
+        print "\nERROR: Unknown error code: ", cloudError,  "Please take a look at the newest API version."
 
 
 def print_server_version():
