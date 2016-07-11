@@ -94,9 +94,9 @@ def create_stateDescriptor():
         elif stateType['type'] == "Int": 
             stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Double": 
-            stateValue = double(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = float(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Uint": 
-            stateValue = uint(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
         else:
             stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
 
