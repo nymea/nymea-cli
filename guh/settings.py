@@ -60,6 +60,10 @@ def get_timezones():
     response = guh.send_command("Configuration.GetTimeZones", params)
     return response['params']['timeZones']
 
+def show_tcpServer_configuration():
+    response = guh.send_command("Configuration.GetConfigurations")
+    print "TCP server configuration\n"
+    guh.print_json_format(response['params']['tcpServerConfiguration'])
 
 def configure_tcpServer():
     params = {}
@@ -67,6 +71,32 @@ def configure_tcpServer():
     params['port'] = raw_input("\nEnter the \"port\" of the TCP server (default 2222): ")
     response = guh.send_command("Configuration.SetTcpServerConfiguration", params)
     guh.print_json_format(response['params'])
+
+def configure_webServer():
+    params = {}
+    params['host'] = raw_input("\nEnter the \"host\" of the web server (default \"0.0.0.0\"): ")
+    params['port'] = raw_input("\nEnter the \"port\" of the web server (default 3333): ")
+    response = guh.send_command("Configuration.SetWebServerConfiguration", params)
+    guh.print_json_format(response['params'])
+
+def show_webServer_configuration():
+    response = guh.send_command("Configuration.GetConfigurations")
+    print "Web server configuration\n"
+    guh.print_json_format(response['params']['webServerConfiguration'])
+    
+
+def configure_webSocketServer():
+    params = {}
+    params['host'] = raw_input("\nEnter the \"host\" of the web socket server (default \"0.0.0.0\"): ")
+    params['port'] = raw_input("\nEnter the \"port\" of the web socket server (default 4444): ")
+    response = guh.send_command("Configuration.SetWebSocketServerConfiguration", params)
+    guh.print_json_format(response['params'])
+
+def show_webSocketServer_configuration():
+    response = guh.send_command("Configuration.GetConfigurations")
+    print "Web socket server configuration\n"
+    guh.print_json_format(response['params']['webSocketServerConfiguration'])
+
 
 def cloud_authenticate():
     params = {}

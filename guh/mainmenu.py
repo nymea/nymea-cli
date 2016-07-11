@@ -359,9 +359,48 @@ menu_data = {
                     'subtitle': "Please select an option...",
                     'options': [
                         { 
+                            'title': "Show TCP server configuration", 
+                            'type': COMMAND, 
+                            'command': 'method_show_tcpServer_configuration' 
+                        },
+                        { 
                             'title': "Configure TCP server", 
                             'type': COMMAND, 
                             'command': 'method_configure_tcpServer' 
+                        }
+                    ]
+                },
+                { 
+                    'title': "Web server", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "Show web server configuration", 
+                            'type': COMMAND, 
+                            'command': 'method_show_webServer_configuration' 
+                        },
+                        { 
+                            'title': "Configure web server", 
+                            'type': COMMAND, 
+                            'command': 'method_configure_webServer' 
+                        }
+                    ]
+                },
+                { 
+                    'title': "Web socket server", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "Show web socket server configuration", 
+                            'type': COMMAND, 
+                            'command': 'method_show_webSocketServer_configuration' 
+                        },
+                        { 
+                            'title': "Configure web socket server", 
+                            'type': COMMAND, 
+                            'command': 'method_configure_webSocketServer' 
                         }
                     ]
                 },
@@ -654,8 +693,23 @@ def method_set_timezone():
 def method_set_serverName():
     settings.set_serverName()
 
+def method_show_tcpServer_configuration():
+    settings.show_tcpServer_configuration()
+
 def method_configure_tcpServer():
     settings.configure_tcpServer()
+
+def method_configure_webServer():
+    settings.configure_webServer()
+
+def method_show_webServer_configuration():
+    settings.show_webServer_configuration()
+
+def method_configure_webSocketServer():
+    settings.configure_webSocketServer()
+
+def method_show_webSocketServer_configuration():
+    settings.show_webSocketServer_configuration()
 
 def method_cloud_authenticate():
     settings.cloud_authenticate()
