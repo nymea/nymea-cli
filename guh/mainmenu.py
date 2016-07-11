@@ -329,10 +329,42 @@ menu_data = {
             ]
         },     
         {
-            'title': "System settings", 
+            'title': "Settings", 
             'type': MENU,
             'subtitle': "Please select an option...",
             'options': [
+                { 
+                    'title': "Show configurations", 
+                    'type': COMMAND, 
+                    'command': 'method_list_configurations' 
+                },
+                { 
+                    'title': "List time zones", 
+                    'type': COMMAND, 
+                    'command': 'method_list_timezones' 
+                },
+                { 
+                    'title': "Set server name", 
+                    'type': COMMAND, 
+                    'command': 'method_set_serverName' 
+                },
+                { 
+                    'title': "Set time zone", 
+                    'type': COMMAND, 
+                    'command': 'method_set_timezone' 
+                },
+                { 
+                    'title': "TCP server", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "Configure TCP server", 
+                            'type': COMMAND, 
+                            'command': 'method_configure_tcpServer' 
+                        }
+                    ]
+                },
                 { 
                     'title': "Cloud connection", 
                     'type': MENU,
@@ -609,6 +641,21 @@ def method_print_api_type():
 ######################################################################
 # System settings
 ######################################################################
+
+def method_list_configurations():
+    settings.list_configurations()
+
+def method_list_timezones():
+    settings.list_timezones()
+
+def method_set_timezone():
+    settings.set_timezone()
+
+def method_set_serverName():
+    settings.set_serverName()
+
+def method_configure_tcpServer():
+    settings.configure_tcpServer()
 
 def method_cloud_authenticate():
     settings.cloud_authenticate()
