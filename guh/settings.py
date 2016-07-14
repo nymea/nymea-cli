@@ -66,16 +66,18 @@ def show_tcpServer_configuration():
     guh.print_json_format(response['params']['tcpServerConfiguration'])
 
 def configure_tcpServer():
+    configuration = guh.send_command("Configuration.GetConfigurations")
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the TCP server (default \"0.0.0.0\"): ")
-    params['port'] = raw_input("\nEnter the \"port\" of the TCP server (default 2222): ")
+    params['host'] = raw_input("\nEnter the \"host\" of the TCP server (current \"%s\"): " % (configuration['params']['tcpServerConfiguration']['host'])) 
+    params['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (configuration['params']['tcpServerConfiguration']['port']))
     response = guh.send_command("Configuration.SetTcpServerConfiguration", params)
     guh.print_json_format(response['params'])
 
 def configure_webServer():
+    configuration = guh.send_command("Configuration.GetConfigurations")
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the web server (default \"0.0.0.0\"): ")
-    params['port'] = raw_input("\nEnter the \"port\" of the web server (default 3333): ")
+    params['host'] = raw_input("\nEnter the \"host\" of the web server (current \"%s\"): " % (configuration['params']['webServerConfiguration']['host'])) 
+    params['port'] = raw_input("\nEnter the \"port\" of the web server (current %s): "% (configuration['params']['webServerConfiguration']['port']))
     response = guh.send_command("Configuration.SetWebServerConfiguration", params)
     guh.print_json_format(response['params'])
 
@@ -87,8 +89,8 @@ def show_webServer_configuration():
 
 def configure_webSocketServer():
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the web socket server (default \"0.0.0.0\"): ")
-    params['port'] = raw_input("\nEnter the \"port\" of the web socket server (default 4444): ")
+    params['host'] = raw_input("\nEnter the \"host\" of the web socket server (current \"%s\"): " % (configuration['params']['webSocketServerConfiguration']['host'])) 
+    params['port'] = raw_input("\nEnter the \"port\" of the web socket server (current %s): "% (configuration['params']['webSocketServerConfiguration']['port']))
     response = guh.send_command("Configuration.SetWebSocketServerConfiguration", params)
     guh.print_json_format(response['params'])
 
@@ -102,7 +104,7 @@ def cloud_authenticate():
     params = {}
     params['username'] = raw_input("\nEnter the \"username\" of your cloud account: ")
     params['password'] = raw_input("\nEnter the \"password\" of your cloud account: ")
-    response = guh.send_command("Cloud.Authenticate", params)
+    response = guh.send_command("Cloud.Authenticate1", params)
     guh.print_cloud_error_code(response['params']['cloudError'])
     
     

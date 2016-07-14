@@ -1,3 +1,11 @@
+guh-cli (1.1.0) xenial; urgency=low
+
+  * Add system settings
+  * Improve log db
+  * Update API
+
+ -- Simon Stürz <simon.stuerz@guh.guru>  Thu, 14 July 2016 16:36:45 +0200
+
 guh-cli (1.0.9) xenial; urgency=low
 
   * Add cloud connection and settings menu

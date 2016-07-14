@@ -274,7 +274,7 @@ def get_log_entry_line(entry, checkFilter = False):
         error = entry['errorCode']
     if entry['source'] == "LoggingSourceSystem":
         deviceName = "Guh Server"
-        sourceType = "System Event"
+        sourceType = "System"
         symbolString = "->"
         sourceName = "Active changed"
         if entry['active'] == True:
@@ -330,14 +330,34 @@ def get_log_entry_line(entry, checkFilter = False):
             sourceName = "triggered"
             symbolString = "()"
             value = ""
-        else:
-            sourceType = "Rule active changed"
+        elif entry['eventType'] == "LoggingEventTypeActionsExecuted":
+            sourceType = "Rule executed"
+            sourceName = "actions"
+            symbolString = "()"
+            value = ""      
+        elif entry['eventType'] == "LoggingEventTypeExitActionsExecuted":
+            sourceType = "Rule executed"
+            sourceName = "exit actions"
+            symbolString = "()" 
+            value = ""
+        elif entry['eventType'] == "LoggingEventTypeEnabledChange":
+            sourceType = "Rule changed"
+            sourceName = "enabled"
+            symbolString = "->" 
+            if entry['active']:
+                value = "true"
+            else:
+                value = "false"
+                
+        else:             
+            sourceType = "Rule changed"
             symbolString = "()"
             sourceName = "active"
             if entry['active']:
                 value = "active"
             else:
                 value = "inactive"
+        
         if typeId in ruleIdCache:
             deviceName = ruleIdCache[typeId]
         else:
@@ -478,7 +498,7 @@ def create_logfilter():
     selection = guh.get_selection("Do you want to filter for \"LoggingEventType\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         types = []
-        loggingEventTypes = ["LoggingEventTypeTrigger", "LoggingEventTypeActiveChange"]
+        loggingEventTypes = ["LoggingEventTypeTrigger", "LoggingEventTypeActiveChange", "LoggingEventTypeEnabledChange", "LoggingEventTypeActionsExecuted", "LoggingEventTypeExitActionsExecuted"]
         selection = guh.get_selection("Please select a \"LoggingEventType\": ", loggingEventTypes)
         if selection:
             types.append(loggingEventTypes[selection])
