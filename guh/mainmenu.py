@@ -339,14 +339,14 @@ menu_data = {
                     'command': 'method_list_configurations' 
                 },
                 { 
-                    'title': "List time zones", 
-                    'type': COMMAND, 
-                    'command': 'method_list_timezones' 
-                },
-                { 
                     'title': "Set server name", 
                     'type': COMMAND, 
                     'command': 'method_set_serverName' 
+                },
+                {
+                    'title': "Set language", 
+                    'type': COMMAND, 
+                    'command': 'method_set_language'
                 },
                 { 
                     'title': "Set time zone", 
@@ -354,53 +354,60 @@ menu_data = {
                     'command': 'method_set_timezone' 
                 },
                 { 
-                    'title': "TCP server", 
+                    'title': "Configure server interfaces", 
                     'type': MENU,
                     'subtitle': "Please select an option...",
                     'options': [
                         { 
-                            'title': "Show TCP server configuration", 
-                            'type': COMMAND, 
-                            'command': 'method_show_tcpServer_configuration' 
+                            'title': "TCP server", 
+                            'type': MENU,
+                            'subtitle': "Please select an option...",
+                            'options': [
+                                { 
+                                    'title': "Show TCP server configuration", 
+                                    'type': COMMAND, 
+                                    'command': 'method_show_tcpServer_configuration' 
+                                },
+                                { 
+                                    'title': "Configure TCP server", 
+                                    'type': COMMAND, 
+                                    'command': 'method_configure_tcpServer' 
+                                }
+                            ]
                         },
                         { 
-                            'title': "Configure TCP server", 
-                            'type': COMMAND, 
-                            'command': 'method_configure_tcpServer' 
-                        }
-                    ]
-                },
-                { 
-                    'title': "Web server", 
-                    'type': MENU,
-                    'subtitle': "Please select an option...",
-                    'options': [
-                        { 
-                            'title': "Show web server configuration", 
-                            'type': COMMAND, 
-                            'command': 'method_show_webServer_configuration' 
+                            'title': "Web server", 
+                            'type': MENU,
+                            'subtitle': "Please select an option...",
+                            'options': [
+                                { 
+                                    'title': "Show web server configuration", 
+                                    'type': COMMAND, 
+                                    'command': 'method_show_webServer_configuration' 
+                                },
+                                { 
+                                    'title': "Configure web server", 
+                                    'type': COMMAND, 
+                                    'command': 'method_configure_webServer' 
+                                }
+                            ]
                         },
                         { 
-                            'title': "Configure web server", 
-                            'type': COMMAND, 
-                            'command': 'method_configure_webServer' 
-                        }
-                    ]
-                },
-                { 
-                    'title': "Web socket server", 
-                    'type': MENU,
-                    'subtitle': "Please select an option...",
-                    'options': [
-                        { 
-                            'title': "Show web socket server configuration", 
-                            'type': COMMAND, 
-                            'command': 'method_show_webSocketServer_configuration' 
-                        },
-                        { 
-                            'title': "Configure web socket server", 
-                            'type': COMMAND, 
-                            'command': 'method_configure_webSocketServer' 
+                            'title': "Web socket server", 
+                            'type': MENU,
+                            'subtitle': "Please select an option...",
+                            'options': [
+                                { 
+                                    'title': "Show web socket server configuration", 
+                                    'type': COMMAND, 
+                                    'command': 'method_show_webSocketServer_configuration' 
+                                },
+                                { 
+                                    'title': "Configure web socket server", 
+                                    'type': COMMAND, 
+                                    'command': 'method_configure_webSocketServer' 
+                                }
+                            ]
                         }
                     ]
                 },
@@ -686,6 +693,9 @@ def method_list_configurations():
 
 def method_list_timezones():
     settings.list_timezones()
+
+def method_set_language():
+    settings.set_language()
 
 def method_set_timezone():
     settings.set_timezone()
