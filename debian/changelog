@@ -1,3 +1,9 @@
+guh-cli (1.1.1) xenial; urgency=low
+
+  * Add translations and change param handling
+
+ -- Simon Stürz <simon.stuerz@guh.guru>  Tur, 24 July 2016 19:18:32 +0200
+
 guh-cli (1.1.0) xenial; urgency=low
 
   * Add system settings
