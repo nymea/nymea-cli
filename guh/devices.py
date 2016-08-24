@@ -318,19 +318,7 @@ def list_configured_devices():
         return None
     print "-> List of configured devices:\n"
     for device in deviceList:
-        name = None
-        for paramType in device['params']:
-            if paramType['name'] == "name":
-                name = paramType['value']
-        
-        completeName = None
-        if name != None:
-            completeName = "%s (%s)" % (name, device['name'])
-        else:
-            completeName = device['name']
         print "%45s, id: %s, deviceClassId: %s" % (get_full_device_name(device['id']), device['id'], device['deviceClassId'])
-
-
 
 def list_deviceClasses(vendorId = None):
     response = get_deviceClasses(vendorId)
@@ -359,10 +347,11 @@ def list_configured_device_params():
     device = get_device(deviceId)
     if not device:
         return None
+    paramTypes = get_deviceClass(device['deviceClassId'])['paramTypes']
     deviceParams = device['params']
     print "-> Params of device \"%s\" %s:\n" %(get_full_device_name(deviceId), device['id'])
     for i in range(len(deviceParams)):
-        print "%35s: %s" % (deviceParams[i]['name'], deviceParams[i]['value'])
+        print "%35s: %s" % (parameters.getParamName(deviceParams[i]['paramTypeId'], paramTypes), deviceParams[i]['value'])
 
 
 def list_vendors():
