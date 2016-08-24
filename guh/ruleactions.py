@@ -66,7 +66,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                 return None
             paramValue = paramType['allowedValues'][selection]
             param = {}
-            param['name'] = paramType['name']
+            param['paramTypeId'] = paramType['id']
             param['value'] = paramValue
             params.append(param)
         else:
@@ -85,16 +85,17 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     eventTypeId = eventTypeIds[selection]
                     eventType = events.get_eventType(eventTypeId)
                     eventParamNames = []
+                    eventParamTypeIds = []
                     for i in eventType['paramTypes']:
                         eventParamNames.append(i['name'])
-                    paramNameSelection = guh.get_selection("Please select the name of the eventParam for the action", eventParamNames)
+                        eventParamTypeIds.append(i['id'])
+                    paramSelection = guh.get_selection("Please select the name of the eventParam for the action", eventParamNames)
                     param = {}
-                    param['name'] = paramType['name']
+                    param['paramTypeId'] = paramType['id']
                     param['eventTypeId'] = eventTypeId
-                    param['eventParamName'] = eventParamNames[paramNameSelection]
+                    param['eventParamTypeId'] = eventParamTypeIds[paramSelection]
                     params.append(param)
                 else:
-                    # make bool selectable to make shore they are "true" or "false"
                     if paramType['type'] == "Bool":
                         boolTypes = ["true","false"]
                         selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
@@ -111,7 +112,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     else:
                         paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
                     param = {}
-                    param['name'] = paramType['name']
+                    param['paramTypeId'] = paramType['id']
                     param['value'] = paramValue
                     params.append(param)
             else:
@@ -133,11 +134,10 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
                 
                 param = {}
-                param['name'] = paramType['name']
+                param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
                 params.append(param)
     return params
-
 
 
 def print_ruleActionList(actionList):
@@ -150,9 +150,10 @@ def print_ruleActionList(actionList):
         for i in range(len(actionParams)):
             if 'eventTypeId' in actionParams[i].keys():
                 eventTypeId = actionParams[i]['eventTypeId']
-                print "%50s: -> value from event:  \"%s\" %s -> param \"%s\"" %(actionParams[i]['name'], events.get_eventType(eventTypeId)['name'], eventTypeId,actionParams[i]['eventParamName'])
+                eventType = events.get_eventType(eventTypeId)
+                print "%50s: -> value from event:  \"%s\" %s -> param \"%s\"" %(parameters.getParamName(actionParams[i]['paramTypeId'], actionType['paramTypes']), eventType['name'], eventTypeId, parameters.getParamName(actionParams[i]['eventParamTypeId'], eventType['paramTypes']))
             else:
-                print "%50s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
+                print "%50s: %s" %(parameters.getParamName(actionParams[i]['paramTypeId'], actionType['paramTypes']), actionParams[i]['value'])
     
 
 

@@ -36,7 +36,7 @@ def read_params(paramTypes):
                 return None
             paramValue = paramType['allowedValues'][selection]
             param = {}
-            param['name'] = paramType['name']
+            param['paramTypeId'] = paramType['id']
             param['value'] = paramValue
         else:
             # make bool selectable to make shore they are "true" or "false"
@@ -56,7 +56,7 @@ def read_params(paramTypes):
             else:
                 paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
             param = {}
-            param['name'] = paramType['name']
+            param['paramTypeId'] = paramType['id']
             param['value'] = paramValue
         params.append(param)
     return params
@@ -80,7 +80,7 @@ def edit_params(currentDeviceParams, paramTypes):
             if selection == None:
                 return None
             paramValue = paramType['allowedValues'][selection]
-            param['name'] = paramType['name']
+            param['paramTypeId'] = paramType['id']
             param['value'] = paramValue
             params.append(param)
         else:
@@ -92,19 +92,25 @@ def edit_params(currentDeviceParams, paramTypes):
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
-                param['name'] = paramType['name']
+                param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
             else:
                 paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['name'], currentDeviceParams), paramType['name'], paramType['type']))
-                param['name'] = paramType['name']
+                param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
         params.append(param)
     return params
 
+def getParamName(paramTypeId, paramTypes):
+    for paramType in paramTypes:
+        if paramType['id'] == paramTypeId:
+            return paramType['name']
+    
+    return ""
 
-def get_param_value(name, params):
+def get_param_value(paramTypeId, params):
     for param in params:
-        if param['name'] == name:
+        if param['id'] == paramTypeId:
             return param['value']
     return None
 
@@ -118,7 +124,7 @@ def read_paramDescriptors(paramTypes):
             continue
         operator = guh.select_valueOperator(paramType['name'])
         if paramType['type'] == "Bool":
-            boolTypes = ["true","false"]
+            boolTypes = ["true", "false"]
             selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
             selection = guh.get_selection(selectionString, boolTypes)
             if selection == None:
@@ -128,7 +134,7 @@ def read_paramDescriptors(paramTypes):
                 print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
                 paramValue = raw_input("%s %s " % (paramType['name'], guh.get_valueOperator_string(operator)))
         param = {}
-        param['name'] = paramType['name']
+        param['paramTypeId'] = paramType['id']
         param['value'] = paramValue
         param['operator'] = operator
         params.append(param)

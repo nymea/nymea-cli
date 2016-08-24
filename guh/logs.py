@@ -567,18 +567,7 @@ def get_device_name(entry):
             deviceName = deviceIdCache[entry['deviceId']]
     else:
         device = devices.get_device(entry['deviceId'])
-        if device is not None:
-            for paramType in device['params']:
-                if paramType['name'] == "name":
-                    name = paramType['value']
-        
-            if not name:
-                deviceName = device['name']
-            else:
-                deviceName = "%s (%s)" % (name, device['name'])
-        else:
-            deviceName = entry['deviceId']
-        
+        deviceName = device['name']
         deviceIdCache[entry['deviceId']] = deviceName
     
     return deviceName

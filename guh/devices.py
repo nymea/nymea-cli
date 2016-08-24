@@ -268,16 +268,7 @@ def select_configured_device():
     deviceList = []
     deviceIdList = []
     for i in range(len(devices)):
-        name = None
-        completeName = None
-        for paramType in devices[i]['params']:
-            if paramType['name'] == "name":
-                name = paramType['value']
-        if name != None:
-            completeName = "%s (%s)" % (name, devices[i]['name'])
-        else:
-            completeName = devices[i]['name']
-        deviceList.append(completeName)
+        deviceList.append(devices[i]['name'])
         deviceIdList.append(devices[i]['id'])
     selection = guh.get_selection("Please select a device", deviceList)
     if selection != None:
