@@ -104,7 +104,7 @@ def cloud_authenticate():
     params = {}
     params['username'] = raw_input("\nEnter the \"username\" of your cloud account: ")
     params['password'] = raw_input("\nEnter the \"password\" of your cloud account: ")
-    response = guh.send_command("Cloud.Authenticate1", params)
+    response = guh.send_command("Cloud.Authenticate", params)
     guh.print_cloud_error_code(response['params']['cloudError'])
     
     
