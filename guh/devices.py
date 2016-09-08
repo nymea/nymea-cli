@@ -96,7 +96,6 @@ def add_device():
     
 
 def add_discovered_device(deviceClassId, deviceDescriptorId):
-    
     deviceClass = get_deviceClass(deviceClassId)
     if deviceClass['setupMethod'] == "SetupMethodJustAdd":
         params = {}
