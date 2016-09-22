@@ -36,7 +36,7 @@ def get_plugin_configuration(pluginId):
 def set_plugin_configuration():
     pluginId = select_configurable_plugin()
     plugin = get_plugin(pluginId)
-    paramTypes = plugin['params']
+    paramTypes = plugin['paramTypes']
     params = {}
     params['pluginId'] = pluginId
     params['configuration'] = parameters.read_params(paramTypes)
@@ -61,6 +61,11 @@ def list_plugins():
     for plugin in plugins:
         print "%35s %s" % (plugin['name'], plugin['id'])
     
+def getParamName(paramTypes, paramTypeId):
+    for paramType in paramTypes:
+        if paramType['id'] == paramTypeId:
+            return paramType['name']
+    
     
 def list_plugin_configuration():
     pluginId = select_configurable_plugin()
@@ -73,7 +78,8 @@ def list_plugin_configuration():
         return None
     print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['name'], plugin['id'])
     for i in range(len(pluginConfiguration)):
-        print "%35s: %s" % (pluginConfiguration[i]['name'], pluginConfiguration[i]['value'])
+        paramTypeId = pluginConfiguration[i]['paramTypeId']
+        print("%35s (%s): %s" % (getParamName(plugin['paramTypes'], paramTypeId), paramTypeId, pluginConfiguration[i]['value']))
     
 
 def list_plugin_info():
@@ -107,7 +113,7 @@ def select_configurable_plugin():
     pluginList = []
     pluginIdList = []
     for i in range(0,len(plugins)):
-        if (len(plugins[i]['params']) > 0):
+        if (len(plugins[i]['paramTypes']) > 0):
             #guh.print_json_format(plugins[i])
             pluginList.append(plugins[i]['name'])
             pluginIdList.append(plugins[i]['id'])

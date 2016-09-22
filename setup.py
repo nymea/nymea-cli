@@ -35,7 +35,7 @@ setup(name = "guh-cli",
     """,
     url = "https://github.com/guh/guh-cli",
     version = __version__,
-    keywords = ["guh", "tune", "cli"],
+    keywords = ["guh", "cli", "command line interface"],
     scripts = ["guh-cli"],
     py_modules = [
         "guh.actions",

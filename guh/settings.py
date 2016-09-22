@@ -47,6 +47,16 @@ def set_timezone():
     response = guh.send_command("Configuration.SetTimeZone", params)
     guh.print_json_format(response['params'])
 
+def set_language():
+    params = {}
+    languages = get_languages()
+    selection = guh.get_selection("Please select one of following allowed values:", languages)
+    if selection == None:
+        return None
+
+    params['language'] = languages[selection]
+    response = guh.send_command("Configuration.SetLanguage", params)
+    guh.print_json_format(response['params'])
 
 def set_serverName():
     params = {}         
@@ -54,6 +64,10 @@ def set_serverName():
     response = guh.send_command("Configuration.SetServerName", params)
     guh.print_json_format(response['params'])
 
+def get_languages():
+    params = {}
+    response = guh.send_command("Configuration.GetAvailableLanguages", params)
+    return response['params']['languages']
 
 def get_timezones():
     params = {}
