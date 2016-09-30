@@ -139,4 +139,12 @@ def disable_cloud_connection():
     response = guh.send_command("Cloud.Disable", params)
     guh.print_json_format(response['params'])
     
+    
+def list_wirelessaccesspoints():
+    params = {}
+    response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
+    for accessPoint in response['params']['wirelessAccessPoints']:
+        print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
+        #guh.print_json_format(response['params'])
+    
 

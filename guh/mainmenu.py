@@ -437,6 +437,18 @@ menu_data = {
                             'command': 'method_disable_cloud_connection' 
                         }
                     ]
+                },
+                { 
+                    'title': "Network manager", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "List wireless access points", 
+                            'type': COMMAND, 
+                            'command': 'method_list_wirelessaccesspoints' 
+                        }
+                    ]
                 }
             ]
         }
@@ -733,6 +745,8 @@ def method_enable_cloud_connection():
 def method_disable_cloud_connection():
     settings.disable_cloud_connection()
 
+def method_list_wirelessaccesspoints():
+    settings.list_wirelessaccesspoints()
 
 
 ######################################################################
