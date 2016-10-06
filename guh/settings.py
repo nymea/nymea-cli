@@ -35,6 +35,7 @@ def list_timezones():
     response = guh.send_command("Configuration.GetTimeZones", params)
     guh.print_json_format(response['params'])
 
+
 def set_timezone():
     params = {}
     timeZones = []
@@ -47,6 +48,7 @@ def set_timezone():
     response = guh.send_command("Configuration.SetTimeZone", params)
     guh.print_json_format(response['params'])
 
+
 def set_language():
     params = {}
     languages = get_languages()
@@ -58,26 +60,31 @@ def set_language():
     response = guh.send_command("Configuration.SetLanguage", params)
     guh.print_json_format(response['params'])
 
+
 def set_serverName():
     params = {}         
     params['serverName'] = raw_input("Please enter the server name:")
     response = guh.send_command("Configuration.SetServerName", params)
     guh.print_json_format(response['params'])
 
+
 def get_languages():
     params = {}
     response = guh.send_command("Configuration.GetAvailableLanguages", params)
     return response['params']['languages']
+
 
 def get_timezones():
     params = {}
     response = guh.send_command("Configuration.GetTimeZones", params)
     return response['params']['timeZones']
 
+
 def show_tcpServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
     print "TCP server configuration\n"
     guh.print_json_format(response['params']['tcpServerConfiguration'])
+
 
 def configure_tcpServer():
     configuration = guh.send_command("Configuration.GetConfigurations")
@@ -87,6 +94,7 @@ def configure_tcpServer():
     response = guh.send_command("Configuration.SetTcpServerConfiguration", params)
     guh.print_json_format(response['params'])
 
+
 def configure_webServer():
     configuration = guh.send_command("Configuration.GetConfigurations")
     params = {}
@@ -94,6 +102,7 @@ def configure_webServer():
     params['port'] = raw_input("\nEnter the \"port\" of the web server (current %s): "% (configuration['params']['webServerConfiguration']['port']))
     response = guh.send_command("Configuration.SetWebServerConfiguration", params)
     guh.print_json_format(response['params'])
+
 
 def show_webServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
@@ -107,6 +116,7 @@ def configure_webSocketServer():
     params['port'] = raw_input("\nEnter the \"port\" of the web socket server (current %s): "% (configuration['params']['webSocketServerConfiguration']['port']))
     response = guh.send_command("Configuration.SetWebSocketServerConfiguration", params)
     guh.print_json_format(response['params'])
+
 
 def show_webSocketServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
@@ -143,8 +153,81 @@ def disable_cloud_connection():
 def list_wirelessaccesspoints():
     params = {}
     response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
-    for accessPoint in response['params']['wirelessAccessPoints']:
-        print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
-        #guh.print_json_format(response['params'])
+    if 'networkManagerError' in response['params']:
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    else:
+        for accessPoint in response['params']['wirelessAccessPoints']:
+            print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
     
+    
+    
+def scan_wirelessaccesspoints():
+    params = {}  
+    response = guh.send_command("NetworkManager.ScanWifiNetworks", params)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])        
+        
+        
+def show_network_status():
+    params = {}
+    response = guh.send_command("NetworkManager.GetNetworkStatus", params)
+    if 'networkManagerError' in response['params']:
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    else:
+        guh.print_json_format(response['params'])
+    
+   
+def enable_networking():
+    params = {}
+    options = ["enable", "disable"]
+    selection = guh.get_selection("Do you want to do with the networking: ", options)     
+    if selection == 0:
+        params['enable'] = True
+    else:
+        params['enable'] = False
+
+    response = guh.send_command("NetworkManager.EnableNetworking", params)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+
+def enable_wirelessnetworking():
+    params = {}
+    options = ["enable", "disable"]
+    selection = guh.get_selection("Do you want to do with the wirless networking: ", options)     
+    if selection == 0:
+        params['enable'] = True
+    else:
+        params['enable'] = False
+
+    response = guh.send_command("NetworkManager.EnableWirelessNetworking", params)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    
+    
+def list_network_devices():
+    params = {}
+    response = guh.send_command("NetworkManager.GetNetworkDevices", params)
+    if 'networkManagerError' in response['params']:
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    else:
+        guh.print_json_format(response['params'])
+    
+
+def connect_wifi():
+    params = {}
+    wifiNetworks = []
+    wifiNetworkStrings = []
+    
+    response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
+    wifiNetworks = response['params']['wirelessAccessPoints']
+    for accessPoint in wifiNetworks:
+        wifiNetworkStrings.append(("%10s | %s%s | %s %s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress'])))
+    
+    selection = selector.get_selection("Wifi access points", wifiNetworkStrings)
+    if not selection:
+        return None
+    
+    params['ssid'] = wifiNetworks[selection]['ssid']
+    params['password'] = raw_input("Please enter the password for wifi network %s: " % (params['ssid']))
+    response = guh.send_command("NetworkManager.ConnectWifiNetwork", params)
+    guh.print_networkmanager_error_code(response)
+
+
 

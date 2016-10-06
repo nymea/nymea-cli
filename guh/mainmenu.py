@@ -444,9 +444,39 @@ menu_data = {
                     'subtitle': "Please select an option...",
                     'options': [
                         { 
+                            'title': "Show network status", 
+                            'type': COMMAND, 
+                            'command': 'method_show_network_status' 
+                        },
+                        { 
+                            'title': "Network devices", 
+                            'type': COMMAND, 
+                            'command': 'method_list_network_devices' 
+                        },
+                        { 
+                            'title': "Enable / Disable networking", 
+                            'type': COMMAND, 
+                            'command': 'method_enable_networking' 
+                        },
+                        { 
+                            'title': "Enable / Disable wireless networking", 
+                            'type': COMMAND, 
+                            'command': 'method_enable_wirelessnetworking' 
+                        },
+                        { 
                             'title': "List wireless access points", 
                             'type': COMMAND, 
                             'command': 'method_list_wirelessaccesspoints' 
+                        },
+                        { 
+                            'title': "Scan wireless access points", 
+                            'type': COMMAND, 
+                            'command': 'method_scan_wirelessaccesspoints' 
+                        },
+                        { 
+                            'title': "Connect to wifi network", 
+                            'type': COMMAND, 
+                            'command': 'method_connect_wifi' 
                         }
                     ]
                 }
@@ -748,6 +778,23 @@ def method_disable_cloud_connection():
 def method_list_wirelessaccesspoints():
     settings.list_wirelessaccesspoints()
 
+def method_scan_wirelessaccesspoints():
+    settings.scan_wirelessaccesspoints()
+
+def method_show_network_status():
+    settings.show_network_status()
+    
+def method_list_network_devices():
+    settings.list_network_devices()
+    
+def method_connect_wifi():
+    settings.connect_wifi()
+    
+def method_enable_networking():
+    settings.enable_networking()
+
+def method_enable_wirelessnetworking():
+    settings.enable_wirelessnetworking()
 
 ######################################################################
 # Menu functions
