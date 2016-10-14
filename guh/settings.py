@@ -140,42 +140,26 @@ def print_cloud_status():
     
 def enable_cloud_connection():
     params = {}
+    options = ["enable", "disable"]
+    selection = guh.get_selection("Do you want to do with the cloud connection: ", options)     
+    if selection == 0:
+        params['enable'] = True
+    else:
+        params['enable'] = False
+    
     response = guh.send_command("Cloud.Enable", params)
     guh.print_json_format(response['params'])
 
 
-def disable_cloud_connection():
-    params = {}
-    response = guh.send_command("Cloud.Disable", params)
-    guh.print_json_format(response['params'])
-    
-    
-def list_wirelessaccesspoints():
-    params = {}
-    response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
-    if 'networkManagerError' in response['params']:
-        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
-    else:
-        for accessPoint in response['params']['wirelessAccessPoints']:
-            print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
-    
-    
-    
-def scan_wirelessaccesspoints():
-    params = {}  
-    response = guh.send_command("NetworkManager.ScanWifiNetworks", params)
-    guh.print_networkmanager_error_code(response['params']['networkManagerError'])        
-        
-        
 def show_network_status():
     params = {}
     response = guh.send_command("NetworkManager.GetNetworkStatus", params)
-    if 'networkManagerError' in response['params']:
-        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    if 'status' in response['params']:
+        guh.print_json_format(response['params']['status'])
     else:
-        guh.print_json_format(response['params'])
-    
-   
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+
+      
 def enable_networking():
     params = {}
     options = ["enable", "disable"]
@@ -187,6 +171,7 @@ def enable_networking():
 
     response = guh.send_command("NetworkManager.EnableNetworking", params)
     guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+
 
 def enable_wirelessnetworking():
     params = {}
@@ -200,21 +185,71 @@ def enable_wirelessnetworking():
     response = guh.send_command("NetworkManager.EnableWirelessNetworking", params)
     guh.print_networkmanager_error_code(response['params']['networkManagerError'])
     
+
+def selectWirelessInterface():
+    params = {}    
+    response = guh.send_command("NetworkManager.GetNetworkDevices", params)
+    if response['params']['networkManagerError'] != 'NetworkManagerErrorNoError':
+        print ("There is no wireless interface available")
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+        return None
     
+    if len(response['params']['wirelessNetworkDevices']) is 1:
+        return response['params']['wirelessNetworkDevices'][0]['interface']
+    else:
+        interfaces = []
+        for wirelessNetworkDevice in response['params']['wirelessNetworkDevices']:
+            interfaces.append(wirelessNetworkDevice['interface'])
+        
+        selection = guh.get_selection("Please select a wifi interface:", interfaces)     
+        return interfaces[selection]
+    
+    
+def list_wirelessaccesspoints():
+    interface = selectWirelessInterface()
+    if interface is None:
+        return
+        
+    params = {}
+    params['interface'] = interface 
+    response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
+    if response['params']['networkManagerError'] != 'NetworkManagerErrorNoError':
+        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
+    else:
+        print ("Wireless accesspoints for interface %s" % interface)
+        print ("---------------------------------------------------------------------")
+        for accessPoint in response['params']['wirelessAccessPoints']:
+            print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
+    
+
+def scan_wirelessaccesspoints():
+    interface = selectWirelessInterface()
+    if interface is None:
+        print "There is no wireless interface available"
+        return
+        
+    params = {}
+    params['interface'] = interface 
+    response = guh.send_command("NetworkManager.ScanWifiNetworks", params)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])        
+        
+        
 def list_network_devices():
     params = {}
     response = guh.send_command("NetworkManager.GetNetworkDevices", params)
-    if 'networkManagerError' in response['params']:
-        guh.print_networkmanager_error_code(response['params']['networkManagerError'])
-    else:
-        guh.print_json_format(response['params'])
+    guh.print_json_format(response['params'])
     
 
 def connect_wifi():
+    interface = selectWirelessInterface()
+    if interface is None:
+        print "There is no wireless interface available"
+        return
+        
     params = {}
+    params['interface'] = interface 
     wifiNetworks = []
     wifiNetworkStrings = []
-    
     response = guh.send_command("NetworkManager.GetWirelessAccessPoints", params)
     wifiNetworks = response['params']['wirelessAccessPoints']
     for accessPoint in wifiNetworks:
@@ -227,7 +262,18 @@ def connect_wifi():
     params['ssid'] = wifiNetworks[selection]['ssid']
     params['password'] = raw_input("Please enter the password for wifi network %s: " % (params['ssid']))
     response = guh.send_command("NetworkManager.ConnectWifiNetwork", params)
-    guh.print_networkmanager_error_code(response)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])
 
+
+def disconnect_networkdevice():
+    interface = selectWirelessInterface()
+    if interface is None:
+        print "There is no wireless interface available"
+        return
+        
+    params = {}
+    params['interface'] = interface
+    response = guh.send_command("NetworkManager.DisconnectInterface", params)
+    guh.print_networkmanager_error_code(response['params']['networkManagerError'])
 
 
