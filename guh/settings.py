@@ -219,7 +219,7 @@ def list_wirelessaccesspoints():
         print ("Wireless accesspoints for interface %s" % interface)
         print ("---------------------------------------------------------------------")
         for accessPoint in response['params']['wirelessAccessPoints']:
-            print("%20s | %5s%s | %6s %6s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress']))
+            print("%20s | %5s%s | %6s %6s | %s | %s" % (accessPoint['ssid'], accessPoint['signalStrength'], '%', accessPoint['frequency'], '[GHz]', accessPoint['macAddress'], accessPoint['protected']))
     
 
 def scan_wirelessaccesspoints():
@@ -260,7 +260,9 @@ def connect_wifi():
         return None
     
     params['ssid'] = wifiNetworks[selection]['ssid']
-    params['password'] = raw_input("Please enter the password for wifi network %s: " % (params['ssid']))
+    if wifiNetworks[selection]['protected'] == True:
+        params['password'] = raw_input("Please enter the password for wifi network %s: " % (params['ssid']))
+        
     response = guh.send_command("NetworkManager.ConnectWifiNetwork", params)
     guh.print_networkmanager_error_code(response['params']['networkManagerError'])
 
