@@ -300,6 +300,27 @@ def print_cloud_error_code(cloudError):
     else:
         print "\nERROR: Unknown error code: ", cloudError,  "Please take a look at the newest API version."
 
+def print_networkmanager_error_code(networkManagerError):
+    if networkManagerError == "NetworkManagerErrorNoError":
+        print "\nSuccess! (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorUnknownError":
+        print "\nERROR: an unknown error occured (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorWirelessNotAvailable":
+        print "\nERROR: there is no wireless device available. (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorAccessPointNotFound":
+        print "\nERROR: the wifi access point could not be found. (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorWirelessNetworkingDisabled":
+        print "\nERROR: the wireless networking is disabled. (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorWirelessConnectionFailed":
+        print "\nERROR: could not connect to wireless network. (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorNetworkingDisabled":
+        print "\nERROR: the networking is disabled. (", networkManagerError, ")"
+    elif networkManagerError == "NetworkManagerErrorNetworkManagerNotAvailable":
+        print "\nERROR: the network manager (dbus) is not available. (", networkManagerError, ")"
+    else:
+        print "\nERROR: Unknown error code: ", networkManagerError,  "Please take a look at the newest API version."
+
+
 
 def print_server_version():
     response = send_command("JSONRPC.Version")

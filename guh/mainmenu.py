@@ -417,24 +417,66 @@ menu_data = {
                     'subtitle': "Please select an option...",
                     'options': [
                         { 
-                            'title': "Authenticate", 
-                            'type': COMMAND, 
-                            'command': 'method_cloud_authenticate' 
-                        },
-                        { 
                             'title': "Get status", 
                             'type': COMMAND, 
                             'command': 'method_cloud_status' 
                         },
                         { 
-                            'title': "Enable cloud connection", 
+                            'title': "Authenticate", 
                             'type': COMMAND, 
-                            'command': 'method_enable_cloud_connection' 
+                            'command': 'method_cloud_authenticate' 
                         },
                         { 
-                            'title': "Disable cloud connection", 
+                            'title': "Enable / Disable cloud connection", 
                             'type': COMMAND, 
-                            'command': 'method_disable_cloud_connection' 
+                            'command': 'method_enable_cloud_connection' 
+                        }
+                    ]
+                },
+                { 
+                    'title': "Network manager", 
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        { 
+                            'title': "Show network status", 
+                            'type': COMMAND, 
+                            'command': 'method_show_network_status' 
+                        },
+                        { 
+                            'title': "Network devices", 
+                            'type': COMMAND, 
+                            'command': 'method_list_network_devices' 
+                        },
+                        { 
+                            'title': "Enable / Disable networking", 
+                            'type': COMMAND, 
+                            'command': 'method_enable_networking' 
+                        },
+                        { 
+                            'title': "Enable / Disable wireless networking", 
+                            'type': COMMAND, 
+                            'command': 'method_enable_wirelessnetworking' 
+                        },
+                        { 
+                            'title': "List wireless access points", 
+                            'type': COMMAND, 
+                            'command': 'method_list_wirelessaccesspoints' 
+                        },
+                        { 
+                            'title': "Scan wireless access points", 
+                            'type': COMMAND, 
+                            'command': 'method_scan_wirelessaccesspoints' 
+                        },
+                        { 
+                            'title': "Connect to wifi network", 
+                            'type': COMMAND, 
+                            'command': 'method_connect_wifi' 
+                        },
+                        { 
+                            'title': "Disconnect network device", 
+                            'type': COMMAND, 
+                            'command': 'method_disconnect_networkdevice' 
                         }
                     ]
                 }
@@ -730,10 +772,29 @@ def method_cloud_status():
 def method_enable_cloud_connection():
     settings.enable_cloud_connection()
 
-def method_disable_cloud_connection():
-    settings.disable_cloud_connection()
+def method_list_wirelessaccesspoints():
+    settings.list_wirelessaccesspoints()
 
+def method_scan_wirelessaccesspoints():
+    settings.scan_wirelessaccesspoints()
 
+def method_show_network_status():
+    settings.show_network_status()
+    
+def method_list_network_devices():
+    settings.list_network_devices()
+    
+def method_connect_wifi():
+    settings.connect_wifi()
+    
+def method_enable_networking():
+    settings.enable_networking()
+
+def method_enable_wirelessnetworking():
+    settings.enable_wirelessnetworking()
+
+def method_disconnect_networkdevice():
+    settings.disconnect_networkdevice()
 
 ######################################################################
 # Menu functions
@@ -816,7 +877,7 @@ def runmenu(menu, parent):
 
 ######################################################################
 # Process menu
-#####################################################################
+######################################################################
 
 def processmenu(menu, parent=None):
     global screen
