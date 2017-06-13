@@ -321,6 +321,28 @@ def print_networkmanager_error_code(networkManagerError):
         print "\nERROR: Unknown error code: ", networkManagerError,  "Please take a look at the newest API version."
 
 
+def printSupportedDevicesStructure():
+    vendors = devices.get_supported_vendors()
+    for vendor in vendors['params']['vendors']:
+        print "- %s" % vendor['name']
+        deviceClasses = devices.get_deviceClasses(vendor['id'])
+        for deviceClass in deviceClasses:
+            print "    -> %s" % deviceClass['name']
+            if len(deviceClass['actionTypes']) != 0:
+                print "       Actions:"
+                for actionType in deviceClass['actionTypes']:
+                    print "         - %s" % actionType['name']
+
+            if len(deviceClass['stateTypes']) != 0:
+                print "       States:"
+                for stateType in deviceClass['stateTypes']:
+                    print "         - %s" % (stateType['name'])
+
+            if len(deviceClass['eventTypes']) != 0:
+                print "       Events:"
+                for eventType in deviceClass['eventTypes']:
+                    print "         - %s" % eventType['name']
+
 
 def print_server_version():
     response = send_command("JSONRPC.Version")
