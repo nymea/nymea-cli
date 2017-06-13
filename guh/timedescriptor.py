@@ -148,7 +148,7 @@ def printCalendarItems(calendarItems):
         calendarItem = calendarItems[i]
         
         #############################################
-        if 'datetime' in calendarItem:
+        if 'datetime' in calendarItem and calendarItem['datetime'] != 0:
             timeStamp = int(calendarItem['datetime'])
             
             if 'repeating' in calendarItem:
@@ -190,7 +190,7 @@ def printTimeEventItems(timeEventItems):
         timeEventItem = timeEventItems[i]
         
         #############################################
-        if 'datetime' in timeEventItem:
+        if 'datetime' in timeEventItem and timeEventItem['datetime'] != 0:
             timeStamp = int(timeEventItem['datetime'])
             if 'repeating' in timeEventItem:
                 eventTime = datetime.datetime.fromtimestamp(timeStamp).strftime("%d.%m %H:%M")

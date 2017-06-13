@@ -106,6 +106,11 @@ menu_data = {
                             'title': "List supported devices", 
                             'type': COMMAND, 
                             'command': 'method_list_deviceClasses' 
+                        },
+                        {
+                            'title': "List device hirarchy", 
+                            'type': COMMAND, 
+                            'command': 'method_printSupportedDevicesStructure' 
                         }
                     ]
                 },
@@ -532,6 +537,9 @@ def method_list_deviceClasses(vendorId = None):
 
 def method_list_deviceClasses_by_vendor():
     method_list_deviceClasses(devices.select_vendor())
+    
+def method_printSupportedDevicesStructure():
+    guh.printSupportedDevicesStructure()
 
 ######################################################################
 # Rules
