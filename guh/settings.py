@@ -22,6 +22,7 @@
 
 import guh
 import selector
+import uuid
 
         
 def list_configurations():
@@ -83,23 +84,103 @@ def get_timezones():
 def show_tcpServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
     print "TCP server configuration\n"
-    guh.print_json_format(response['params']['tcpServerConfiguration'])
+    guh.print_json_format(response['params']['tcpServerConfigurations'])
 
 
 def configure_tcpServer():
-    configuration = guh.send_command("Configuration.GetConfigurations")
+    configurations = guh.send_command("Configuration.GetConfigurations")
+    tcpConfigs = configurations['params']['tcpServerConfigurations']
+    configList = []
+    for i in range(len(tcpConfigs)):
+        configList.append("%s:%s   SSL:%s   Auth:%s" % (tcpConfigs[i]['address'], tcpConfigs[i]['port'], tcpConfigs[i]['sslEnabled'], tcpConfigs[i]['authenticationEnabled']))
+    configList.append("New entry")
+    selection = guh.get_selection("Please select a configuration", configList)
+    if selection == None:
+        return None
+
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the TCP server (current \"%s\"): " % (configuration['params']['tcpServerConfiguration']['host'])) 
-    params['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (configuration['params']['tcpServerConfiguration']['port']))
+    configuration = {}
+    if selection == len(configList) - 1:
+        # new config
+        configuration['id'] = str(uuid.uuid4())
+        configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server: ")
+        configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server: ")
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+    else:
+
+        selectedConfig = tcpConfigs[selection]
+
+        editList = []
+        editList.append("Modify")
+        editList.append("Delete")
+        editSelection = guh.get_selection("Do you want to edit or delete the server interface?", editList)
+        if editSelection == None:
+            return None
+
+        if editSelection == 1: #delete
+            params = {}
+            params['id'] = selectedConfig['id']
+            guh.send_command("Configuration.DeleteTcpServerConfiguration", params)
+            return None
+
+
+
+        configuration['id'] = selectedConfig['id']
+        configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server (current \"%s\"): " % (selectedConfig['address']))
+        configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (selectedConfig['port']))
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+    params['configuration'] = configuration
     response = guh.send_command("Configuration.SetTcpServerConfiguration", params)
     guh.print_json_format(response['params'])
 
 
 def configure_webServer():
-    configuration = guh.send_command("Configuration.GetConfigurations")
+    configurations = guh.send_command("Configuration.GetConfigurations")
+    webConfigs = configurations['params']['webServerConfigurations']
+    configList = []
+    for i in range(len(webConfigs)):
+        configList.append("%s:%s   SSL:%s   Auth:%s   Data: %s" % (webConfigs[i]['address'], webConfigs[i]['port'], webConfigs[i]['sslEnabled'], webConfigs[i]['authenticationEnabled'], webConfigs[i]['publicFolder']))
+    configList.append("New entry")
+    selection = guh.get_selection("Please select a configuration", configList)
+    if selection == None:
+        return None
+
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the web server (current \"%s\"): " % (configuration['params']['webServerConfiguration']['host'])) 
-    params['port'] = raw_input("\nEnter the \"port\" of the web server (current %s): "% (configuration['params']['webServerConfiguration']['port']))
+    configuration = {}
+    if selection == len(configList) - 1:
+        # new config
+        configuration['id'] = str(uuid.uuid4())
+        configuration['address'] = raw_input("\nEnter the \"address\" of the Web server: ")
+        configuration['port'] = raw_input("\nEnter the \"port\" of the Web server: ")
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+        configuration['publicFolder'] = raw_input("\nEnter the public folder for the webserver: ")
+    else:
+
+        selectedConfig = webConfigs[selection]
+
+        editList = []
+        editList.append("Modify")
+        editList.append("Delete")
+        editSelection = guh.get_selection("Do you want to edit or delete the server interface?", editList)
+        if editSelection == None:
+            return None
+
+        if editSelection == 1: #delete
+            params = {}
+            params['id'] = selectedConfig['id']
+            guh.send_command("Configuration.DeleteWebServerConfiguration", params)
+            return None
+
+        configuration['id'] = selectedConfig['id']
+        configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server (current \"%s\"): " % (selectedConfig['address']))
+        configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (selectedConfig['port']))
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+        configuration['publicFolder'] = raw_input("\nEnter the public folder for the webserver (current: %s): " % selectedConfig['publicFolder'])
+    params['configuration'] = configuration
     response = guh.send_command("Configuration.SetWebServerConfiguration", params)
     guh.print_json_format(response['params'])
 
@@ -107,13 +188,54 @@ def configure_webServer():
 def show_webServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
     print "Web server configuration\n"
-    guh.print_json_format(response['params']['webServerConfiguration'])
+    guh.print_json_format(response['params']['webServerConfigurations'])
     
 
 def configure_webSocketServer():
+    configurations = guh.send_command("Configuration.GetConfigurations")
+    webSocketConfigs = configurations['params']['webSocketServerConfigurations']
+    configList = []
+    for i in range(len(webSocketConfigs)):
+        configList.append("%s:%s   SSL:%s   Auth:%s" % (webSocketConfigs[i]['address'], webSocketConfigs[i]['port'], webSocketConfigs[i]['sslEnabled'], webSocketConfigs[i]['authenticationEnabled']))
+    configList.append("New entry")
+    selection = guh.get_selection("Please select a configuration", configList)
+    if selection == None:
+        return None
+
     params = {}
-    params['host'] = raw_input("\nEnter the \"host\" of the web socket server (current \"%s\"): " % (configuration['params']['webSocketServerConfiguration']['host'])) 
-    params['port'] = raw_input("\nEnter the \"port\" of the web socket server (current %s): "% (configuration['params']['webSocketServerConfiguration']['port']))
+    configuration = {}
+    if selection == len(configList) - 1:
+        # new config
+        configuration['id'] = str(uuid.uuid4())
+        configuration['address'] = raw_input("\nEnter the \"address\" of the WebSocket server: ")
+        configuration['port'] = raw_input("\nEnter the \"port\" of the WebSocket server: ")
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+    else:
+
+        selectedConfig = webSocketConfigs[selection]
+
+        editList = []
+        editList.append("Modify")
+        editList.append("Delete")
+        editSelection = guh.get_selection("Do you want to edit or delete the server interface?", editList)
+        if editSelection == None:
+            return None
+
+        if editSelection == 1: #delete
+            params = {}
+            params['id'] = selectedConfig['id']
+            guh.send_command("Configuration.DeleteWebSocketServerConfiguration", params)
+            return None
+
+
+
+        configuration['id'] = selectedConfig['id']
+        configuration['address'] = raw_input("\nEnter the \"address\" of the WebSocket server (current \"%s\"): " % (selectedConfig['address']))
+        configuration['port'] = raw_input("\nEnter the \"port\" of the WebSocket server (current %s): "% (selectedConfig['port']))
+        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+    params['configuration'] = configuration
     response = guh.send_command("Configuration.SetWebSocketServerConfiguration", params)
     guh.print_json_format(response['params'])
 
@@ -121,7 +243,7 @@ def configure_webSocketServer():
 def show_webSocketServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
     print "Web socket server configuration\n"
-    guh.print_json_format(response['params']['webSocketServerConfiguration'])
+    guh.print_json_format(response['params']['webSocketServerConfigurations'])
 
 
 def cloud_authenticate():
