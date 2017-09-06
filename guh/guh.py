@@ -33,8 +33,10 @@ import actions
 import rules
 import selector
 import settings
+import getpass
 
 commandId = 0
+token = ""
 
 def init_connection(host, port):
     global tn
@@ -43,18 +45,63 @@ def init_connection(host, port):
         packet = tn.read_until("\n}\n")
         packet = json.loads(packet)
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
+        if packet['initialSetupRequired'] == True:
+            print("Initial setup Required!")
+            result = createUser()
+            while result['params']['error'] != "UserErrorNoError":
+                print "Error creating user: %s" % userErrorToString(result['params']['error'])
+                result = createUser()
+
         return True
     except socket.error, e:
         print "ERROR:", e[1]," -> could not connect to guh."
         print "       Please check if guh is running on %s:%s" %(host,port)
         return False
-    
+
+def createUser():
+    user = raw_input("Please enter email for new user: " )
+    if not user:
+        user = getpass.getuser()
+    pprompt = lambda: (getpass.getpass(), getpass.getpass('Retype password: '))
+    p1, p2 = pprompt()
+    while p1 != p2:
+        print('Passwords do not match. Try again')
+        p1, p2 = pprompt()
+
+    params = {}
+    params['username'] = user
+    params['password'] = p1
+    return send_command("JSONRPC.CreateUser", params)
+
+def userErrorToString(error):
+    return {
+        'UserErrorBadPassword': "Password failed character validation",
+        'UserErrorBackendError': "Error creating user database",
+        'UserErrorInvalidUserId': "Invalid username. Must be an email address",
+        'UserErrorDuplicateUserId': "Username does already exist",
+        'UserErrorTokenNotFound': "Invalid token supplied",
+        'UserErrorPermissionDenied': "Permission denied"
+    }[error]
+
+def login():
+    print "Login required"
+    user = raw_input("Username: ")
+    password = getpass.getpass()
+    params = {}
+    params['username'] = user
+    params['password'] = password
+    params['deviceName'] = "guh-cli"
+    return send_command("JSONRPC.Authenticate", params)
+
 def send_command(method, params = None):
     global commandId
     global tn
+    global token
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['method'] = method
+    if len(token) > 0:
+        commandObj['token'] = token
     if not params == None and len(params) > 0:
         commandObj['params'] = params
     command = json.dumps(commandObj) + '\n'
@@ -68,6 +115,15 @@ def send_command(method, params = None):
             continue
         responseId = response['id']
     commandId = commandId + 1
+
+    if response['status'] == "unauthorized":
+        loginResponse = login()
+        while loginResponse['params']['success'] != True:
+            print "Login failed. Please try again."
+            loginResponse = login()
+        token = loginResponse['params']['token']
+        return send_command(method, params)
+
     if response['status'] != "success":
         print "JSON error happened: %s" % response['error']
         return None
