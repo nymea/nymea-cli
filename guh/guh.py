@@ -42,7 +42,7 @@ def init_connection(host, port):
     global tn
     try:
         tn = telnetlib.Telnet(host, port)
-        packet = tn.read_until("\n}\n")
+        packet = tn.read_until("}\n")
         packet = json.loads(packet)
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
         if packet['initialSetupRequired'] == True:
@@ -109,7 +109,7 @@ def send_command(method, params = None):
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
-        data = tn.read_until("\n}\n")
+        data = tn.read_until("}\n")
         response = json.loads(data)
         if 'notification' in response:
             continue
