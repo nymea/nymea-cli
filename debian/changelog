@@ -1,8 +1,14 @@
+guh-cli (1.1.2) xenial; urgency=medium
+
+  * Update json parsing
+
+ -- Simon Stürz <simon.stuerz@guh.io>  Mon, 02 Oct 2017 20:26:08 +0200
+
 guh-cli (1.1.1) xenial; urgency=low
 
   * Add translations and change param handling
 
- -- Simon Stürz <simon.stuerz@guh.guru>  Tur, 24 July 2016 19:18:32 +0200
+ -- Simon Stürz <simon.stuerz@guh.guru>  Thu, 24 July 2016 19:18:32 +0200
 
 guh-cli (1.1.0) xenial; urgency=low
 
