@@ -51,7 +51,7 @@ def notification_sniffer(guhHost, guhPort):
             for sock in read_sockets:
                 # notification messages:
                 if sock == tn.get_socket():
-                    packet = tn.read_until("\n}\n")
+                    packet = tn.read_until("}\n")
                     packet = json.loads(packet)
                     guh.print_json_format(packet)
                 elif sock == sys.stdin:
