@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                 #
+#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -92,7 +92,7 @@ def log_window(guhHost, guhPort, params = None):
             for sock in read_sockets:
                 # notification messages:
                 if sock == tn.get_socket():
-                    packet = tn.read_until("\n}\n")
+                    packet = tn.read_until("}\n")
                     packet = json.loads(packet)
                     if 'notification' in packet:
                         if packet['notification'] == "Logging.LogEntryAdded":
@@ -154,6 +154,7 @@ def create_log_window():
     #draw_screen()
     allLines = get_log_entry_lines()
     scroll_to_bottom()
+
 
 def scroll_to_bottom():
     global screenHeight
