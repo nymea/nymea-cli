@@ -69,13 +69,13 @@ def edit_params(currentDeviceParams, paramTypes):
         if 'readOnly' in paramType:
             if paramType['readOnly'] == True:
                 print "--------------------------------------------------------"
-                print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['name'], currentDeviceParams))
+                print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['id'], currentDeviceParams))
                 raw_input("\nPress \"enter\" to continue...\n")
                 print "--------------------------------------------------------"
                 continue
         param = {}
         if any("allowedValues" in item for item in paramType):
-            title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['name'], currentDeviceParams))
+            title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentDeviceParams))
             selection = guh.get_selection(title, paramType['allowedValues'])
             if selection == None:
                 return None
@@ -87,7 +87,7 @@ def edit_params(currentDeviceParams, paramTypes):
             # make bool selectable to make shore they are "true" or "false"
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
-                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['name'], currentDeviceParams), paramType['name'], paramType['type'])
+                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['name'], paramType['type'])
                 selection = guh.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
@@ -95,7 +95,7 @@ def edit_params(currentDeviceParams, paramTypes):
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
             else:
-                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['name'], currentDeviceParams), paramType['name'], paramType['type']))
+                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['name'], paramType['type']))
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
         params.append(param)
@@ -110,7 +110,7 @@ def getParamName(paramTypeId, paramTypes):
 
 def get_param_value(paramTypeId, params):
     for param in params:
-        if param['id'] == paramTypeId:
+        if param['paramTypeId'] == paramTypeId:
             return param['value']
     return None
 
