@@ -26,7 +26,15 @@ def read_params(paramTypes):
     params = []
     for paramType in paramTypes:
         print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
-        if any("allowedValues" in item for item in paramType):
+        if 'readOnly' in paramType and paramType['readOnly']:
+            print "--------------------------------------------------------"
+            print "\nThe param \"%s\" is not writable!)\n" %(paramType['name'])
+            raw_input("\nPress \"enter\" to continue...\n")
+            print "--------------------------------------------------------"
+            param = {}
+            param['paramTypeId'] = paramType['id']
+            param['value'] = paramType.get('defaultValue', '')
+        elif any("allowedValues" in item for item in paramType):
             # has to be a string (for sorting list)
             allowedValues = []
             for value in paramType['allowedValues']:
@@ -66,13 +74,12 @@ def edit_params(currentDeviceParams, paramTypes):
     params = []
     for paramType in paramTypes:
         print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
-        if 'readOnly' in paramType:
-            if paramType['readOnly'] == True:
-                print "--------------------------------------------------------"
-                print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['id'], currentDeviceParams))
-                raw_input("\nPress \"enter\" to continue...\n")
-                print "--------------------------------------------------------"
-                continue
+        if 'readOnly' in paramType and paramType['readOnly']:
+            print "--------------------------------------------------------"
+            print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['id'], currentDeviceParams))
+            raw_input("\nPress \"enter\" to continue...\n")
+            print "--------------------------------------------------------"
+            continue
         param = {}
         if any("allowedValues" in item for item in paramType):
             title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentDeviceParams))
