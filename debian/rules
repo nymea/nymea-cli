@@ -6,5 +6,9 @@ export PYBUILD_NAME=guh-cli
 override_dh_auto_test:
 	tests/licensetests.py
 
+override_dh_install:
+	dh_install --fail-missing
+	cp -a $(CURDIR)/data/bash-completion/guh-cli $(CURDIR)/debian/guh-cli/usr/share/bash-completion/completions/ || true
+
 %:
 	dh $@ --with python2 --buildsystem=pybuild

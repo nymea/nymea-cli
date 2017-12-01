@@ -1,0 +1,22 @@
+# guh-cli(1) completion                                       -*- shell-script -*-
+
+_guh-cli() 
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    opts="-h -v --version --help --host --port"
+
+    case "${prev}" in
+        --host)
+            COMPREPLY=( $(compgen -A hostname -- ${cur}) )
+            return 0
+            ;;
+        *)
+        ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+complete -F _guh-cli guh-cli

@@ -15,5 +15,4 @@ Depends: ${misc:Depends},
 Description: guh command line interface - python
   The guh-cli (command line interface) is an admin tool written in python 
   to communicate with the guh JSON-RPC API and test functionality of guh.
- 	
 
