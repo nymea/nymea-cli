@@ -65,6 +65,8 @@ def notification_sniffer(guhHost, guhPort):
 def enable_notification(notifySocket):
     global commandId
     
+    # TODO: authenticate
+    
     params = {}
     commandObj = {}
     commandObj['id'] = commandId

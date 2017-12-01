@@ -36,10 +36,16 @@ import settings
 import getpass
 
 commandId = 0
+usePushbutton=False
 token = ""
 
-def init_connection(host, port):
+def init_connection(host, port, pushbutton):
     global tn
+    global usePushbutton
+    global token
+    
+    usePushbutton = pushbutton
+    
     try:
         tn = telnetlib.Telnet(host, port)
         packet = tn.read_until("}\n")
@@ -47,11 +53,28 @@ def init_connection(host, port):
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
         if packet['initialSetupRequired'] == True:
             print("Initial setup Required!")
-            result = createUser()
-            while result['params']['error'] != "UserErrorNoError":
-                print "Error creating user: %s" % userErrorToString(result['params']['error'])
+            if usePushbutton:
+                token = pushbuttonAuthentication()
+            else:    
                 result = createUser()
-
+                while result['params']['error'] != "UserErrorNoError":
+                    print "Error creating user: %s" % userErrorToString(result['params']['error'])
+                    result = createUser()
+        else:
+            # Make Hello call in order to check if authentication is requred
+            send_command("JSONRPC.Hello")
+        
+        if packet['authenticationRequired'] == True and len(token) == 0:
+            if usePushbutton:
+                token = pushbuttonAuthentication()
+                return send_command(method, params)
+            else:
+                loginResponse = login()
+                while loginResponse['params']['success'] != True:
+                    print "Login failed. Please try again."
+                    loginResponse = login()
+            
+        
         return True
     except socket.error, e:
         print "ERROR:", e[1]," -> could not connect to guh."
@@ -93,19 +116,68 @@ def login():
     params['deviceName'] = "guh-cli"
     return send_command("JSONRPC.Authenticate", params)
 
+def pushbuttonAuthentication():
+    global tn
+    global commandId
+    global token
+    
+    if len(token) > 0:
+        return ""
+    
+    print "Using puh button authentication method..."
+    
+    params = {}
+    params['deviceName'] = 'guh-cli'
+    
+    commandObj = {}
+    commandObj['id'] = commandId
+    commandObj['params'] = params
+    commandObj['method'] = 'JSONRPC.RequestPushButtonAuth'
+    command = json.dumps(commandObj) + '\n'
+    tn.write(command)
+    
+    # wait for the response with id = commandId
+    responseId = -1
+    while responseId != commandId:
+        data = tn.read_until("}\n")
+        response = json.loads(data)
+        responseId = response['id']
+    
+    commandId = commandId + 1
+    
+    print "\n\nPlease press the pushbutton on the device."
+    
+    # wait for push button notification
+    while True:
+        data = tn.read_until("}\n")
+        response = json.loads(data)
+        if ('notification' in response) and response['notification'] == "JSONRPC.PushButtonAuthFinished":
+            print("Notification received:")
+            print_json_format(response)
+            if response['params']['success'] == True:
+                print("\nAuthenticated successfully!\n")
+                print("Token: %s" % response['params']['token'])         
+                debug_stop()
+                return response['params']['token']
+
+
+
 def send_command(method, params = None):
     global commandId
     global tn
     global token
+    
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['method'] = method
+    
     if len(token) > 0:
         commandObj['token'] = token
     if not params == None and len(params) > 0:
         commandObj['params'] = params
     command = json.dumps(commandObj) + '\n'
     tn.write(command)
+    
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
@@ -116,18 +188,27 @@ def send_command(method, params = None):
         responseId = response['id']
     commandId = commandId + 1
 
+    # If this call was unautorized, authenticate
     if response['status'] == "unauthorized":
-        loginResponse = login()
-        while loginResponse['params']['success'] != True:
-            print "Login failed. Please try again."
+        print("Unautorized json call")
+        if usePushbutton:
+            token = pushbuttonAuthentication()
+            return send_command(method, params)
+        else:
             loginResponse = login()
-        token = loginResponse['params']['token']
-        return send_command(method, params)
+            while loginResponse['params']['success'] != True:
+                print "Login failed. Please try again."
+                loginResponse = login()
+            
+            token = loginResponse['params']['token']
+            return send_command(method, params)
 
+    # if this call was not successfull
     if response['status'] != "success":
         print "JSON error happened: %s" % response['error']
         return None
 
+    # Call went fine, return the response
     return response
 
 
