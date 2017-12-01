@@ -36,13 +36,15 @@ import settings
 import getpass
 
 commandId = 0
-usePushbutton=False
-token = ""
+token = None
+usePushbutton = False
+authenticationRequired = False
 
 def init_connection(host, port, pushbutton):
     global tn
     global usePushbutton
     global token
+    global authenticationRequired
     
     usePushbutton = pushbutton
     
@@ -51,6 +53,9 @@ def init_connection(host, port, pushbutton):
         packet = tn.read_until("}\n")
         packet = json.loads(packet)
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
+        
+        authenticationRequired = packet['authenticationRequired']
+        
         if packet['initialSetupRequired'] == True:
             print("Initial setup Required!")
             if usePushbutton:
@@ -60,10 +65,18 @@ def init_connection(host, port, pushbutton):
                 while result['params']['error'] != "UserErrorNoError":
                     print "Error creating user: %s" % userErrorToString(result['params']['error'])
                     result = createUser()
-        else:
-            # Make Hello call in order to check if authentication is requred
-            send_command("JSONRPC.Hello")
-        
+                
+        if authenticationRequired and token is None:
+            if usePushbutton:
+                pushbuttonAuthentication()
+            else:
+                loginResponse = login()
+                while loginResponse['params']['success'] != True:
+                    print "Login failed. Please try again."
+                    loginResponse = login()
+                
+                token = loginResponse['params']['token']
+
         return True
     except socket.error, e:
         print "ERROR:", e[1]," -> could not connect to guh."
@@ -111,8 +124,7 @@ def pushbuttonAuthentication():
     global commandId
     global token
     
-    if len(token) > 0:
-        debug_stop()
+    if token != None:
         return
     
     print "Using puh button authentication method..."
@@ -162,15 +174,18 @@ def send_command(method, params = None):
     global commandId
     global tn
     global token
+    global authenticationRequired
     
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['method'] = method
     
-    if len(token) > 0:
+    if authenticationRequired and token is not None:
         commandObj['token'] = token
+        
     if not params == None and len(params) > 0:
         commandObj['params'] = params
+
     command = json.dumps(commandObj) + '\n'
     tn.write(command)
     
