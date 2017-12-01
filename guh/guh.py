@@ -152,8 +152,9 @@ def pushbuttonAuthentication():
     print("Initialized push button authentication. Response:")
     print_json_format(response)
     
-    print "\n\nPlease press the pushbutton on the device."
-    
+    print("\n\n##############################################")
+    print("# Please press the pushbutton on the device. #")
+    print("##############################################\n\n")
     # wait for push button notification
     while True:
         data = tn.read_until("}\n")
