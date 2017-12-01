@@ -54,7 +54,7 @@ def init_connection(host, port, pushbutton):
         if packet['initialSetupRequired'] == True:
             print("Initial setup Required!")
             if usePushbutton:
-                token = pushbuttonAuthentication()
+                pushbuttonAuthentication()
             else:    
                 result = createUser()
                 while result['params']['error'] != "UserErrorNoError":
@@ -63,17 +63,6 @@ def init_connection(host, port, pushbutton):
         else:
             # Make Hello call in order to check if authentication is requred
             send_command("JSONRPC.Hello")
-        
-        if packet['authenticationRequired'] == True and len(token) == 0:
-            if usePushbutton:
-                token = pushbuttonAuthentication()
-                return send_command(method, params)
-            else:
-                loginResponse = login()
-                while loginResponse['params']['success'] != True:
-                    print "Login failed. Please try again."
-                    loginResponse = login()
-            
         
         return True
     except socket.error, e:
@@ -116,13 +105,15 @@ def login():
     params['deviceName'] = "guh-cli"
     return send_command("JSONRPC.Authenticate", params)
 
+
 def pushbuttonAuthentication():
     global tn
     global commandId
     global token
     
     if len(token) > 0:
-        return ""
+        debug_stop()
+        return
     
     print "Using puh button authentication method..."
     
@@ -145,6 +136,10 @@ def pushbuttonAuthentication():
     
     commandId = commandId + 1
     
+    # check response
+    print("Initialized push button authentication. Response:")
+    print_json_format(response)
+    
     print "\n\nPlease press the pushbutton on the device."
     
     # wait for push button notification
@@ -158,7 +153,8 @@ def pushbuttonAuthentication():
                 print("\nAuthenticated successfully!\n")
                 print("Token: %s" % response['params']['token'])         
                 debug_stop()
-                return response['params']['token']
+                token = response['params']['token']
+                return
 
 
 
@@ -190,9 +186,10 @@ def send_command(method, params = None):
 
     # If this call was unautorized, authenticate
     if response['status'] == "unauthorized":
+        debug_stop()
         print("Unautorized json call")
         if usePushbutton:
-            token = pushbuttonAuthentication()
+            pushbuttonAuthentication()
             return send_command(method, params)
         else:
             loginResponse = login()
