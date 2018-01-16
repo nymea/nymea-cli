@@ -37,37 +37,48 @@ import getpass
 
 commandId = 0
 token = None
-usePushbutton = False
+pushButtonAuthAvailable = False
 authenticationRequired = False
+initialSetupRequired = False
 
-def init_connection(host, port, pushbutton):
+def init_connection(host, port):
     global tn
-    global usePushbutton
     global token
+    global initialSetupRequired
+    global pushButtonAuthAvailable
     global authenticationRequired
-    
-    usePushbutton = pushbutton
-    
+        
     try:
         tn = telnetlib.Telnet(host, port)
         packet = tn.read_until("}\n")
         packet = json.loads(packet)
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
         
-        authenticationRequired = packet['authenticationRequired']
+        print_json_format(packet)
         
-        if packet['initialSetupRequired'] == True:
-            print("Initial setup Required!")
-            if usePushbutton:
-                pushbuttonAuthentication()
-            else:    
+        initialSetupRequired  = packet['initialSetupRequired']
+        authenticationRequired = packet['authenticationRequired']
+        pushButtonAuthAvailable = packet['pushButtonAuthAvailable']
+            
+        # If we don't need any authentication, we are done
+        if not authenticationRequired:
+            return True  
+            
+        if initialSetupRequired and not pushButtonAuthAvailable:
+            print("\n\n##############################################")
+            print("# Start initial setup:")  
+            print("##############################################\n\n") 
+            result = createUser()
+            while result['params']['error'] != "UserErrorNoError":
+                print "Error creating user: %s" % userErrorToString(result['params']['error'])
                 result = createUser()
-                while result['params']['error'] != "UserErrorNoError":
-                    print "Error creating user: %s" % userErrorToString(result['params']['error'])
-                    result = createUser()
                 
-        if authenticationRequired and token is None:
-            if usePushbutton:
+            print("\n\nUser created successfully.\n\n")     
+            
+        
+        # Authenticate if no token
+        if authenticationRequired and token == None:
+            if pushButtonAuthAvailable:
                 pushbuttonAuthentication()
             else:
                 loginResponse = login()
@@ -109,7 +120,9 @@ def userErrorToString(error):
     }[error]
 
 def login():
-    print "Login required"
+    print("\n\n##############################################")
+    print("# Login:")
+    print("##############################################\n\n") 
     user = raw_input("Username: ")
     password = getpass.getpass()
     params = {}
@@ -127,7 +140,7 @@ def pushbuttonAuthentication():
     if token != None:
         return
     
-    print "Using puh button authentication method..."
+    print "\n\nUsing push button authentication method...\n\n"
     
     params = {}
     params['deviceName'] = 'guh-cli'
@@ -204,7 +217,7 @@ def send_command(method, params = None):
     if response['status'] == "unauthorized":
         debug_stop()
         print("Unautorized json call")
-        if usePushbutton:
+        if pushButtonAuthAvailable:
             pushbuttonAuthentication()
             return send_command(method, params)
         else:

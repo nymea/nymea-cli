@@ -42,12 +42,11 @@ if __name__ == "__main__":
     parser.add_argument('-v','--version', action='version', version=__version__)
     parser.add_argument('--host', type=str, default='localhost', help='the location of the guh daemon (default 127.0.0.1)')
     parser.add_argument('--port', type=int, default=2222, help='the port of the the guh daemon (default 2222)')
-    parser.add_argument('--push-button', action="store_true", dest="pushbutton", default=False, help='Use pushbutton authentication method instead of username password')
 
     args = parser.parse_args()
 
     # check connection
-    if not guh.init_connection(args.host, args.port, args.pushbutton):
+    if not guh.init_connection(args.host, args.port):
         exit()
 
     os.system('clear')

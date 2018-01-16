@@ -6,7 +6,7 @@ _guh-cli()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-h -v --version --help --host --port --push-button"
+    opts="-h -v --version --help --host --port"
 
     case "${prev}" in
         --host)
