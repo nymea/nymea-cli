@@ -36,21 +36,57 @@ import settings
 import getpass
 
 commandId = 0
-token = ""
+token = None
+pushButtonAuthAvailable = False
+authenticationRequired = False
+initialSetupRequired = False
 
 def init_connection(host, port):
     global tn
+    global token
+    global initialSetupRequired
+    global pushButtonAuthAvailable
+    global authenticationRequired
+        
     try:
         tn = telnetlib.Telnet(host, port)
         packet = tn.read_until("}\n")
         packet = json.loads(packet)
         print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
-        if packet['initialSetupRequired'] == True:
-            print("Initial setup Required!")
+        
+        print_json_format(packet)
+        
+        initialSetupRequired  = packet['initialSetupRequired']
+        authenticationRequired = packet['authenticationRequired']
+        pushButtonAuthAvailable = packet['pushButtonAuthAvailable']
+            
+        # If we don't need any authentication, we are done
+        if not authenticationRequired:
+            return True  
+            
+        if initialSetupRequired and not pushButtonAuthAvailable:
+            print("\n\n##############################################")
+            print("# Start initial setup:")  
+            print("##############################################\n\n") 
             result = createUser()
             while result['params']['error'] != "UserErrorNoError":
                 print "Error creating user: %s" % userErrorToString(result['params']['error'])
                 result = createUser()
+                
+            print("\n\nUser created successfully.\n\n")     
+            
+        
+        # Authenticate if no token
+        if authenticationRequired and token == None:
+            if pushButtonAuthAvailable:
+                pushbuttonAuthentication()
+            else:
+                loginResponse = login()
+                while loginResponse['params']['success'] != True:
+                    print "Login failed. Please try again."
+                    loginResponse = login()
+                
+                token = loginResponse['params']['token']
 
         return True
     except socket.error, e:
@@ -84,7 +120,9 @@ def userErrorToString(error):
     }[error]
 
 def login():
-    print "Login required"
+    print("\n\n##############################################")
+    print("# Login:")
+    print("##############################################\n\n") 
     user = raw_input("Username: ")
     password = getpass.getpass()
     params = {}
@@ -93,19 +131,78 @@ def login():
     params['deviceName'] = "guh-cli"
     return send_command("JSONRPC.Authenticate", params)
 
+
+def pushbuttonAuthentication():
+    global tn
+    global commandId
+    global token
+    
+    if token != None:
+        return
+    
+    print "\n\nUsing push button authentication method...\n\n"
+    
+    params = {}
+    params['deviceName'] = 'guh-cli'
+    
+    commandObj = {}
+    commandObj['id'] = commandId
+    commandObj['params'] = params
+    commandObj['method'] = 'JSONRPC.RequestPushButtonAuth'
+    command = json.dumps(commandObj) + '\n'
+    tn.write(command)
+    
+    # wait for the response with id = commandId
+    responseId = -1
+    while responseId != commandId:
+        data = tn.read_until("}\n")
+        response = json.loads(data)
+        responseId = response['id']
+    
+    commandId = commandId + 1
+    
+    # check response
+    print("Initialized push button authentication. Response:")
+    print_json_format(response)
+    
+    print("\n\n##############################################")
+    print("# Please press the pushbutton on the device. #")
+    print("##############################################\n\n")
+    # wait for push button notification
+    while True:
+        data = tn.read_until("}\n")
+        response = json.loads(data)
+        if ('notification' in response) and response['notification'] == "JSONRPC.PushButtonAuthFinished":
+            print("Notification received:")
+            print_json_format(response)
+            if response['params']['success'] == True:
+                print("\nAuthenticated successfully!\n")
+                print("Token: %s" % response['params']['token'])         
+                debug_stop()
+                token = response['params']['token']
+                return
+
+
+
 def send_command(method, params = None):
     global commandId
     global tn
     global token
+    global authenticationRequired
+    
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['method'] = method
-    if len(token) > 0:
+    
+    if authenticationRequired and token is not None:
         commandObj['token'] = token
+        
     if not params == None and len(params) > 0:
         commandObj['params'] = params
+
     command = json.dumps(commandObj) + '\n'
     tn.write(command)
+    
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
@@ -116,18 +213,28 @@ def send_command(method, params = None):
         responseId = response['id']
     commandId = commandId + 1
 
+    # If this call was unautorized, authenticate
     if response['status'] == "unauthorized":
-        loginResponse = login()
-        while loginResponse['params']['success'] != True:
-            print "Login failed. Please try again."
+        debug_stop()
+        print("Unautorized json call")
+        if pushButtonAuthAvailable:
+            pushbuttonAuthentication()
+            return send_command(method, params)
+        else:
             loginResponse = login()
-        token = loginResponse['params']['token']
-        return send_command(method, params)
+            while loginResponse['params']['success'] != True:
+                print "Login failed. Please try again."
+                loginResponse = login()
+            
+            token = loginResponse['params']['token']
+            return send_command(method, params)
 
+    # if this call was not successfull
     if response['status'] != "success":
         print "JSON error happened: %s" % response['error']
         return None
 
+    # Call went fine, return the response
     return response
 
 
