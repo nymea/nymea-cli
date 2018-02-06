@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -95,7 +95,7 @@ def select_actionType(deviceClassId):
     #print "got actions", actions
     for i in range(len(actions)):
         #print "got actiontype", actions[i]
-        actionList.append(actions[i]['name'])
+        actionList.append(actions[i]['displayName'])
     selection = guh.get_selection("Please select an action type:", actionList)
     if selection != None:
         return actions[selection]
@@ -108,9 +108,9 @@ def print_actionList(actionList):
         device = devices.get_device(action['deviceId'])
         actionType = get_actionType(actionList[i]['actionTypeId'])
         actionParams = actionList[i]['params']
-        print  "%5s. ->  %40s -> action: \"%s\"" %(i, device['name'], actionType['name'])
+        print  "%5s. ->  %40s -> action: \"%s\"" %(i, device['name'], actionType['displayName'])
         for i in range(len(actionParams)):
-            print "%50s: %s" %(actionParams[i]['name'], actionParams[i]['value'])
+            print "%50s: %s" %(actionParams[i]['displayName'], actionParams[i]['value'])
 
 
 def print_actionType():

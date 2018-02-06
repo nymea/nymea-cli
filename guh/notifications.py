@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -64,8 +64,6 @@ def notification_sniffer(guhHost, guhPort):
     
 def enable_notification(notifySocket):
     global commandId
-    
-    # TODO: authenticate
     
     params = {}
     commandObj = {}

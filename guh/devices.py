@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -117,7 +117,7 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
         if not response['status'] == "success":
             print "Pairing failed: %s", response['params']['deviceError']
             return
-        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['name'], response['params']['displayMessage'])
+        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['displayName'], response['params']['displayMessage'])
         if response['params']['setupMethod'] == "SetupMethodPushButton":
             raw_input("\nPress \"enter\" to confirm\n")
         params = {}
@@ -134,7 +134,7 @@ def add_discovered_device(deviceClassId, deviceDescriptorId):
         if not response['status'] == "success":
             print "Pairing failed: %s", response['params']['deviceError']
             return
-        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['name'], response['params']['displayMessage'])
+        print "\nPairing device %s\n\n%s\n\n" % (deviceClass['displayName'], response['params']['displayMessage'])
         if response['params']['setupMethod'] == "SetupMethodDisplayPin":
             pin = raw_input("Pin: ")
         params = {}
@@ -283,7 +283,7 @@ def select_vendor():
     vendorList = []
     vendorIdList = []
     for i in range(0,len(vendors)):
-        vendorList.append(vendors[i]['name'])
+        vendorList.append(vendors[i]['displayName'])
         vendorIdList.append(vendors[i]['id'])
     selection = guh.get_selection("Please select a vendor", vendorList)
     if selection != None:
@@ -302,7 +302,7 @@ def select_deviceClass():
     deviceClassList = []
     deviceClassIdList = []
     for i in range(0,len(deviceClasses)):
-        deviceClassList.append(deviceClasses[i]['name'])
+        deviceClassList.append(deviceClasses[i]['displayName'])
         deviceClassIdList.append(deviceClasses[i]['id'])
     selection = guh.get_selection("Please select device class", deviceClassList)
     if selection != None:
@@ -323,7 +323,7 @@ def list_deviceClasses(vendorId = None):
     response = get_deviceClasses(vendorId)
     print "-> List of all device classes:\n"
     for deviceClass in response:
-        print "%35s  %s" % (deviceClass['name'], deviceClass['id'])
+        print "%35s  %s" % (deviceClass['displayName'], deviceClass['id'])
 
 
 def list_device_states():
@@ -338,7 +338,7 @@ def list_device_states():
         params['deviceId'] = deviceId
         params['stateTypeId'] = deviceClass['stateTypes'][i]['id']
         response = guh.send_command("Devices.GetStateValue", params)
-        print "%35s: %s" % (deviceClass['stateTypes'][i]['name'], response['params']['value'])
+        print "%35s: %s" % (deviceClass['stateTypes'][i]['displayName'], response['params']['value'])
 
 
 def list_configured_device_params():
@@ -357,7 +357,7 @@ def list_vendors():
     response = get_supported_vendors();
     print "-> List of supported vendors:\n"
     for vendor in response['params']['vendors']:
-        print "%35s  %s" % (vendor['name'], vendor['id'])
+        print "%35s  %s" % (vendor['displayName'], vendor['id'])
 
 
 def print_deviceClass():

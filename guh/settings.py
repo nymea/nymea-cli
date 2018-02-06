@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2016 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -105,8 +105,8 @@ def configure_tcpServer():
         configuration['id'] = str(uuid.uuid4())
         configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server: ")
         configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server: ")
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled?")
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled?")
     else:
 
         selectedConfig = tcpConfigs[selection]
@@ -129,8 +129,8 @@ def configure_tcpServer():
         configuration['id'] = selectedConfig['id']
         configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server (current \"%s\"): " % (selectedConfig['address']))
         configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (selectedConfig['port']))
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled? (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled? (current %s): "% (selectedConfig['authenticationEnabled']))
     params['configuration'] = configuration
     response = guh.send_command("Configuration.SetTcpServerConfiguration", params)
     guh.print_json_format(response['params'])
@@ -154,8 +154,8 @@ def configure_webServer():
         configuration['id'] = str(uuid.uuid4())
         configuration['address'] = raw_input("\nEnter the \"address\" of the Web server: ")
         configuration['port'] = raw_input("\nEnter the \"port\" of the Web server: ")
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled?")
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled?")
         configuration['publicFolder'] = raw_input("\nEnter the public folder for the webserver: ")
     else:
 
@@ -177,8 +177,8 @@ def configure_webServer():
         configuration['id'] = selectedConfig['id']
         configuration['address'] = raw_input("\nEnter the \"address\" of the TCP server (current \"%s\"): " % (selectedConfig['address']))
         configuration['port'] = raw_input("\nEnter the \"port\" of the TCP server (current %s): "% (selectedConfig['port']))
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled? (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled? (current %s): "% (selectedConfig['authenticationEnabled']))
         configuration['publicFolder'] = raw_input("\nEnter the public folder for the webserver (current: %s): " % selectedConfig['publicFolder'])
     params['configuration'] = configuration
     response = guh.send_command("Configuration.SetWebServerConfiguration", params)
@@ -209,8 +209,8 @@ def configure_webSocketServer():
         configuration['id'] = str(uuid.uuid4())
         configuration['address'] = raw_input("\nEnter the \"address\" of the WebSocket server: ")
         configuration['port'] = raw_input("\nEnter the \"port\" of the WebSocket server: ")
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not: ")
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not: ")
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled?")
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled?")
     else:
 
         selectedConfig = webSocketConfigs[selection]
@@ -233,8 +233,8 @@ def configure_webSocketServer():
         configuration['id'] = selectedConfig['id']
         configuration['address'] = raw_input("\nEnter the \"address\" of the WebSocket server (current \"%s\"): " % (selectedConfig['address']))
         configuration['port'] = raw_input("\nEnter the \"port\" of the WebSocket server (current %s): "% (selectedConfig['port']))
-        configuration['sslEnabled'] = raw_input("\nEnter whether SSL should be enabled or not (current \"%s\"): " % (selectedConfig['sslEnabled']))
-        configuration['authenticationEnabled'] = raw_input("\nEnter whether authentication should be enabled or not (current %s): "% (selectedConfig['authenticationEnabled']))
+        configuration['sslEnabled'] = selector.getYesNoSelection("Should SSL be enabled? (current \"%s\"): " % (selectedConfig['sslEnabled']))
+        configuration['authenticationEnabled'] = selector.getYesNoSelection("Should authentication be enabled? (current %s): "% (selectedConfig['authenticationEnabled']))
     params['configuration'] = configuration
     response = guh.send_command("Configuration.SetWebSocketServerConfiguration", params)
     guh.print_json_format(response['params'])

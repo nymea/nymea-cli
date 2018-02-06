@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -109,6 +109,7 @@ def createUser():
     params['password'] = p1
     return send_command("JSONRPC.CreateUser", params)
 
+
 def userErrorToString(error):
     return {
         'UserErrorBadPassword': "Password failed character validation",
@@ -118,6 +119,7 @@ def userErrorToString(error):
         'UserErrorTokenNotFound': "Invalid token supplied",
         'UserErrorPermissionDenied': "Permission denied"
     }[error]
+
 
 def login():
     print("\n\n##############################################")
@@ -487,24 +489,24 @@ def print_networkmanager_error_code(networkManagerError):
 def printSupportedDevicesStructure():
     vendors = devices.get_supported_vendors()
     for vendor in vendors['params']['vendors']:
-        print "- %s" % vendor['name']
+        print "- %s" % vendor['displayName']
         deviceClasses = devices.get_deviceClasses(vendor['id'])
         for deviceClass in deviceClasses:
-            print "    -> %s" % deviceClass['name']
+            print "    -> %s" % deviceClass['displayName']
             if len(deviceClass['actionTypes']) != 0:
                 print "       Actions:"
                 for actionType in deviceClass['actionTypes']:
-                    print "         - %s" % actionType['name']
+                    print "         - %s" % actionType['displayName']
 
             if len(deviceClass['stateTypes']) != 0:
                 print "       States:"
                 for stateType in deviceClass['stateTypes']:
-                    print "         - %s" % (stateType['name'])
+                    print "         - %s" % (stateType['displayName'])
 
             if len(deviceClass['eventTypes']) != 0:
                 print "       Events:"
                 for eventType in deviceClass['eventTypes']:
-                    print "         - %s" % eventType['name']
+                    print "         - %s" % eventType['displayName']
 
 
 def print_server_version():
