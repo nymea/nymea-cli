@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -59,12 +59,12 @@ def list_plugins():
         return None
     print "-> List of supported plugins:\n"
     for plugin in plugins:
-        print "%35s %s" % (plugin['name'], plugin['id'])
+        print "%35s %s" % (plugin['displayName'], plugin['id'])
     
 def getParamName(paramTypes, paramTypeId):
     for paramType in paramTypes:
         if paramType['id'] == paramTypeId:
-            return paramType['name']
+            return paramType['displayName']
     
     
 def list_plugin_configuration():
@@ -74,9 +74,9 @@ def list_plugin_configuration():
     plugin = get_plugin(pluginId)
     pluginConfiguration = get_plugin_configuration(pluginId)
     if not pluginConfiguration:
-        print "\n    The plugin \"%s\" has no configuration parameters.\n" % (plugin['name'])
+        print "\n    The plugin \"%s\" has no configuration parameters.\n" % (plugin['displayName'])
         return None
-    print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['name'], plugin['id'])
+    print "-> The plugin \"%s\" %s has following configurations:\n" % (plugin['displayName'], plugin['id'])
     for i in range(len(pluginConfiguration)):
         paramTypeId = pluginConfiguration[i]['paramTypeId']
         print("%35s (%s): %s" % (getParamName(plugin['paramTypes'], paramTypeId), paramTypeId, pluginConfiguration[i]['value']))
@@ -97,7 +97,7 @@ def select_plugin():
     pluginList = []
     pluginIdList = []
     for i in range(0,len(plugins)):
-        pluginList.append(plugins[i]['name'])
+        pluginList.append(plugins[i]['displayName'])
         pluginIdList.append(plugins[i]['id'])
     selection = guh.get_selection("Please select a plugin", pluginList)
     if selection != None:
@@ -115,7 +115,7 @@ def select_configurable_plugin():
     for i in range(0,len(plugins)):
         if (len(plugins[i]['paramTypes']) > 0):
             #guh.print_json_format(plugins[i])
-            pluginList.append(plugins[i]['name'])
+            pluginList.append(plugins[i]['displayName'])
             pluginIdList.append(plugins[i]['id'])
     selection = guh.get_selection("Please select a plugin", pluginList)
     if selection != None:

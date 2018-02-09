@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -28,7 +28,7 @@ def read_params(paramTypes):
         print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
         if 'readOnly' in paramType and paramType['readOnly']:
             print "--------------------------------------------------------"
-            print "\nThe param \"%s\" is not writable!)\n" %(paramType['name'])
+            print "\nThe param \"%s\" is not writable!)\n" %(paramType['displayName'])
             raw_input("\nPress \"enter\" to continue...\n")
             print "--------------------------------------------------------"
             param = {}
@@ -50,19 +50,19 @@ def read_params(paramTypes):
             # make bool selectable to make shore they are "true" or "false"
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
-                selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
+                selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
                 selection = guh.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
             elif paramType['type'] == "Int": 
-                paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
             elif paramType['type'] == "Double": 
-                paramValue = float(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                paramValue = float(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
             elif paramType['type'] == "Uint": 
-                paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
             else:
-                paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
+                paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type']))
             param = {}
             param['paramTypeId'] = paramType['id']
             param['value'] = paramValue
@@ -76,7 +76,7 @@ def edit_params(currentDeviceParams, paramTypes):
         print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
         if 'readOnly' in paramType and paramType['readOnly']:
             print "--------------------------------------------------------"
-            print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['name'], get_param_value(paramType['id'], currentDeviceParams))
+            print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['displayName'], get_param_value(paramType['id'], currentDeviceParams))
             raw_input("\nPress \"enter\" to continue...\n")
             print "--------------------------------------------------------"
             continue
@@ -94,7 +94,7 @@ def edit_params(currentDeviceParams, paramTypes):
             # make bool selectable to make shore they are "true" or "false"
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
-                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['name'], paramType['type'])
+                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['displayName'], paramType['type'])
                 selection = guh.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
@@ -102,7 +102,7 @@ def edit_params(currentDeviceParams, paramTypes):
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
             else:
-                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['name'], paramType['type']))
+                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['displayName'], paramType['type']))
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
         params.append(param)
@@ -111,7 +111,7 @@ def edit_params(currentDeviceParams, paramTypes):
 def getParamName(paramTypeId, paramTypes):
     for paramType in paramTypes:
         if paramType['id'] == paramTypeId:
-            return paramType['name']
+            return paramType['displayName']
     
     return ""
 
@@ -125,21 +125,21 @@ def read_paramDescriptors(paramTypes):
     params = []
     for paramType in paramTypes:
         selectionTypes = ["yes","no"]
-        selectionText = "-> Do you want to create a descriptor for the param \"%s\"?" %(paramType['name'])
+        selectionText = "-> Do you want to create a descriptor for the param \"%s\"?" %(paramType['displayName'])
         selection = guh.get_selection(selectionText, selectionTypes)
         if selectionTypes[selection] == "no":
             continue
-        operator = guh.select_valueOperator(paramType['name'])
+        operator = guh.select_valueOperator(paramType['displayName'])
         if paramType['type'] == "Bool":
             boolTypes = ["true", "false"]
-            selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
+            selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
             selection = guh.get_selection(selectionString, boolTypes)
             if selection == None:
                 return None
             paramValue = boolTypes[selection] 
         else:
-                print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])
-                paramValue = raw_input("%s %s " % (paramType['name'], guh.get_valueOperator_string(operator)))
+                print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
+                paramValue = raw_input("%s %s " % (paramType['displayName'], guh.get_valueOperator_string(operator)))
         param = {}
         param['paramTypeId'] = paramType['id']
         param['value'] = paramValue

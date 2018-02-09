@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -291,7 +291,7 @@ def get_log_entry_line(entry, checkFilter = False):
         else:
             stateType = states.get_stateType(typeId)
             if stateType is not None:
-                sourceName = stateType["name"]
+                sourceName = stateType["displayName"]
                 stateTypeIdCache[typeId] = sourceName
             else:
                 sourceName = typeId
@@ -306,7 +306,7 @@ def get_log_entry_line(entry, checkFilter = False):
         else:
             actionType = actions.get_actionType(typeId)
             if actionType is not None:
-                sourceName = actionType['name']
+                sourceName = actionType['displayName']
             else:
                 sourceName = typeId
             actionTypeIdCache[typeId] = sourceName
@@ -320,7 +320,7 @@ def get_log_entry_line(entry, checkFilter = False):
             sourceName = eventTypeIdCache[typeId]
         else:
             eventType = events.get_eventType(typeId)
-            sourceName = eventType['name']
+            sourceName = eventType['displayName']
             eventTypeIdCache[typeId] = sourceName
         value = entry['value']
         deviceName = get_device_name(entry)

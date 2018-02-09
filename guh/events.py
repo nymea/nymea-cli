@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -46,7 +46,7 @@ def select_eventType(deviceClassId):
         return None
     eventTypeList = []
     for i in range(len(eventTypes)):
-        eventTypeList.append(eventTypes[i]['name'])
+        eventTypeList.append(eventTypes[i]['displayName'])
     selection = guh.get_selection("Please select an event type:", eventTypeList)
     if selection != None:
         return eventTypes[selection]
@@ -92,7 +92,7 @@ def print_eventDescriptors(eventDescriptors):
         deviceName = devices.get_full_device_name(eventDescriptor['deviceId'])
         eventType = get_eventType(eventDescriptor['eventTypeId'])
         paramDescriptors = eventDescriptor['paramDescriptors']
-        print  "%5s. -> %40s -> event: \"%s\"" %(i, deviceName, eventType['name'])
+        print  "%5s. -> %40s -> event: \"%s\"" %(i, deviceName, eventType['displayName'])
         for i in range(len(paramDescriptors)):
             print "%50s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
 

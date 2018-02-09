@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -51,7 +51,7 @@ def select_stateType(deviceClassId):
         return None
     stateTypeList = []
     for i in range(len(stateTypes)):
-        stateTypeList.append(stateTypes[i]['name'])
+        stateTypeList.append(stateTypes[i]['displayName'])
     selection = guh.get_selection("Please select a state type:", stateTypeList)
     if selection != None:
         return stateTypes[selection]
@@ -66,12 +66,12 @@ def create_stateDescriptor():
     stateType = select_stateType(device['deviceClassId']);
     if stateType == None:
         return None
-    valueOperator = guh.select_valueOperator(stateType['name'])
+    valueOperator = guh.select_valueOperator(stateType['displayName'])
 
     stateDescriptor = {}
 
     print "\nThe StateType looks like this:\n", guh.print_json_format(stateType)
-    print "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
+    print "Please enter the value for state \"%s\" (type: %s): " % (stateType['displayName'], stateType['type'])
     # make bool selectable to make shore they are "true" or "false"
     if any("possibleValues" in item for item in stateType):
         # has to be a string (for sorting list)
@@ -86,19 +86,19 @@ def create_stateDescriptor():
         # make bool selectable to make shore they are "true" or "false"
         if stateType['type'] == "Bool":
             boolTypes = ["true","false"]
-            selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['name'], stateType['type'])
+            selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['displayName'], stateType['type'])
             selection = guh.get_selection(selectionString, boolTypes)
             if selection == None:
                 return None
             stateValue = boolTypes[selection] 
         elif stateType['type'] == "Int": 
-            stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = int(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Double": 
-            stateValue = float(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = float(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Uint": 
-            stateValue = int(raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = int(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
         else:
-            stateValue = raw_input("%s %s " % (stateType['name'], guh.get_valueOperator_string(valueOperator))) 
+            stateValue = raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))) 
 
     stateDescriptor['deviceId'] = deviceId
     stateDescriptor['stateTypeId'] = stateType['id']
@@ -170,15 +170,15 @@ def print_stateEvaluator(stateEvaluator):
     if 'stateDescriptor' in stateEvaluator:
         stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
         deviceName = devices.get_full_device_name(stateEvaluator['stateDescriptor']['deviceId'])
-        print "%5s. -> %40s -> state: \"%s\"" %(0, deviceName, stateType['name'])
-        print "%50s %s %s" %(stateType['name'], guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']), stateEvaluator['stateDescriptor']['value'])
+        print "%5s. -> %40s -> state: \"%s\"" %(0, deviceName, stateType['displayName'])
+        print "%50s %s %s" %(stateType['displayName'], guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']), stateEvaluator['stateDescriptor']['value'])
     else:
         if not 'childEvaluators' in stateEvaluator:
             return None
         for i in range(len(stateEvaluator['childEvaluators'])):
             device = devices.get_device(stateEvaluator['childEvaluators'][i]['stateDescriptor']['deviceId'])
             stateType = get_stateType(stateEvaluator['childEvaluators'][i]['stateDescriptor']['stateTypeId'])
-            print "(%s:%s" % (device['name'], stateType['name']),
+            print "(%s:%s" % (device['name'], stateType['displayName']),
             print guh.get_valueOperator_string(stateEvaluator['childEvaluators'][i]['stateDescriptor']['operator']),
             print stateEvaluator['childEvaluators'][i]['stateDescriptor']['value'], ")", 
             if i != (len(stateEvaluator['childEvaluators']) - 1):

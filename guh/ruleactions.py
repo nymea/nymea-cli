@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
 #                                                                         #
 #  This file is part of guh-cli.                                          #
 #                                                                         #
@@ -73,7 +73,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
             # check if we want normal action params or if we want to use an eventtypeid
             if eventDescriptors:
                 selectionTypes = ["yes","no"]
-                selectionText = "-> Should the ruleActionParam \"%s\" depend on an event?" %(paramType['name'])
+                selectionText = "-> Should the ruleActionParam \"%s\" depend on an event?" %(paramType['displayName'])
                 selection = guh.get_selection(selectionText, selectionTypes)
                 if selection == None:
                     return None
@@ -87,7 +87,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     eventParamNames = []
                     eventParamTypeIds = []
                     for i in eventType['paramTypes']:
-                        eventParamNames.append(i['name'])
+                        eventParamNames.append(i['displayName'])
                         eventParamTypeIds.append(i['id'])
                     paramSelection = guh.get_selection("Please select the name of the eventParam for the action", eventParamNames)
                     param = {}
@@ -98,19 +98,19 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                 else:
                     if paramType['type'] == "Bool":
                         boolTypes = ["true","false"]
-                        selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
+                        selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['displayName'], paramType['type'])
                         selection = guh.get_selection(selectionString, boolTypes)
                         if selection == None:
                             return None
                         paramValue = boolTypes[selection]
                     elif paramType['type'] == "Int": 
-                        paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                        paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                     elif paramType['type'] == "Double": 
-                        paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                        paramValue = double(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                     elif paramType['type'] == "Uint": 
-                        paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                        paramValue = uint(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                     else:
-                        paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
+                        paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type']))
                     param = {}
                     param['paramTypeId'] = paramType['id']
                     param['value'] = paramValue
@@ -119,19 +119,19 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                 # make bool selectable to make shore they are "true" or "false"
                 if paramType['type'] == "Bool":
                     boolTypes = ["true","false"]
-                    selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['name'], paramType['type'])
+                    selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['displayName'], paramType['type'])
                     selection = guh.get_selection(selectionString, boolTypes)
                     if selection == None:
                         return None
                     paramValue = boolTypes[selection]
                 elif paramType['type'] == "Int": 
-                    paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                    paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                 elif paramType['type'] == "Double": 
-                    paramValue = float(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                    paramValue = float(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                 elif paramType['type'] == "Uint": 
-                    paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type'])))
+                    paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
                 else:
-                    paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['name'], paramType['type']))
+                    paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type']))
                 
                 param = {}
                 param['paramTypeId'] = paramType['id']
@@ -146,12 +146,12 @@ def print_ruleActionList(actionList):
         deviceName = devices.get_full_device_name(action['deviceId'])
         actionType = actions.get_actionType(actionList[i]['actionTypeId'])
         actionParams = actionList[i]['ruleActionParams']
-        print  "%5s. -> %40s -> action: \"%s\"" %(i, deviceName, actionType['name'])
+        print  "%5s. -> %40s -> action: \"%s\"" %(i, deviceName, actionType['displayName'])
         for i in range(len(actionParams)):
             if 'eventTypeId' in actionParams[i].keys():
                 eventTypeId = actionParams[i]['eventTypeId']
                 eventType = events.get_eventType(eventTypeId)
-                print "%50s: -> value from event:  \"%s\" %s -> param \"%s\"" %(parameters.getParamName(actionParams[i]['paramTypeId'], actionType['paramTypes']), eventType['name'], eventTypeId, parameters.getParamName(actionParams[i]['eventParamTypeId'], eventType['paramTypes']))
+                print "%50s: -> value from event:  \"%s\" %s -> param \"%s\"" %(parameters.getParamName(actionParams[i]['paramTypeId'], actionType['paramTypes']), eventType['displayName'], eventTypeId, parameters.getParamName(actionParams[i]['eventParamTypeId'], eventType['paramTypes']))
             else:
                 print "%50s: %s" %(parameters.getParamName(actionParams[i]['paramTypeId'], actionType['paramTypes']), actionParams[i]['value'])
     
