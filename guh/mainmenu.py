@@ -359,6 +359,11 @@ menu_data = {
                     'command': 'method_set_timezone' 
                 },
                 { 
+                    'title': "Configure debug server", 
+                    'type': COMMAND, 
+                    'command': 'method_set_debug_server_interface' 
+                },
+                { 
                     'title': "Configure server interfaces", 
                     'type': MENU,
                     'subtitle': "Please select an option...",
@@ -413,28 +418,6 @@ menu_data = {
                                     'command': 'method_configure_webSocketServer' 
                                 }
                             ]
-                        }
-                    ]
-                },
-                { 
-                    'title': "Cloud connection", 
-                    'type': MENU,
-                    'subtitle': "Please select an option...",
-                    'options': [
-                        { 
-                            'title': "Get status", 
-                            'type': COMMAND, 
-                            'command': 'method_cloud_status' 
-                        },
-                        { 
-                            'title': "Authenticate", 
-                            'type': COMMAND, 
-                            'command': 'method_cloud_authenticate' 
-                        },
-                        { 
-                            'title': "Enable / Disable cloud connection", 
-                            'type': COMMAND, 
-                            'command': 'method_enable_cloud_connection' 
                         }
                     ]
                 },
@@ -752,6 +735,9 @@ def method_set_timezone():
 
 def method_set_serverName():
     settings.set_serverName()
+
+def method_set_debug_server_interface():
+    settings.set_debug_server_interface()
 
 def method_show_tcpServer_configuration():
     settings.show_tcpServer_configuration()
