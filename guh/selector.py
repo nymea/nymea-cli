@@ -106,8 +106,11 @@ def getYesNoSelection(question):
     selection = guh.get_selection(question, responseTypes)
     if responseTypes[selection] == "yes":
         return True
-    else:
+    elif responseTypes[selection] == "no":
         return False
+    else:
+        return None
+  
   
 def getBoolSelection(question):
     responseTypes = ["true","false"]

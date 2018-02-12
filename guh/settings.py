@@ -81,6 +81,17 @@ def get_timezones():
     return response['params']['timeZones']
 
 
+def set_debug_server_interface():
+    params = {}
+    enabled = selector.getYesNoSelection("Should the debug server interface be enabled?")
+    if enabled == None:
+        return None
+        
+    params['enabled'] = enabled
+    response = guh.send_command("Configuration.SetDebugServerEnabled", params)
+    guh.print_json_format(response['params'])
+
+
 def show_tcpServer_configuration():
     response = guh.send_command("Configuration.GetConfigurations")
     print "TCP server configuration\n"
