@@ -2,31 +2,31 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import devices
 
 def get_stateType(stateTypeId):
     params = {}
     params['stateTypeId'] = stateTypeId
-    response = guh.send_command("States.GetStateType", params);
+    response = nymea.send_command("States.GetStateType", params);
     if "stateType" in response['params']:
         return response['params']['stateType']
     return None
@@ -35,7 +35,7 @@ def get_stateType(stateTypeId):
 def get_stateTypes(deviceClassId):
     params = {}
     params['deviceClassId'] = deviceClassId
-    response = guh.send_command("Devices.GetStateTypes", params);
+    response = nymea.send_command("Devices.GetStateTypes", params);
     if "stateTypes" in response['params']:
         return response['params']['stateTypes']
     else:
@@ -52,7 +52,7 @@ def select_stateType(deviceClassId):
     stateTypeList = []
     for i in range(len(stateTypes)):
         stateTypeList.append(stateTypes[i]['displayName'])
-    selection = guh.get_selection("Please select a state type:", stateTypeList)
+    selection = nymea.get_selection("Please select a state type:", stateTypeList)
     if selection != None:
         return stateTypes[selection]
     return None
@@ -66,11 +66,11 @@ def create_stateDescriptor():
     stateType = select_stateType(device['deviceClassId']);
     if stateType == None:
         return None
-    valueOperator = guh.select_valueOperator(stateType['displayName'])
+    valueOperator = nymea.select_valueOperator(stateType['displayName'])
 
     stateDescriptor = {}
 
-    print "\nThe StateType looks like this:\n", guh.print_json_format(stateType)
+    print "\nThe StateType looks like this:\n", nymea.print_json_format(stateType)
     print "Please enter the value for state \"%s\" (type: %s): " % (stateType['displayName'], stateType['type'])
     # make bool selectable to make shore they are "true" or "false"
     if any("possibleValues" in item for item in stateType):
@@ -78,7 +78,7 @@ def create_stateDescriptor():
         possibleValues = []
         for value in stateType['possibleValues']:
             possibleValues.append(str(value))
-        selection = guh.get_selection("Please select one of following possible values:", possibleValues)
+        selection = nymea.get_selection("Please select one of following possible values:", possibleValues)
         if selection == None:
             return None
         stateValue = stateType['possibleValues'][selection]
@@ -87,24 +87,24 @@ def create_stateDescriptor():
         if stateType['type'] == "Bool":
             boolTypes = ["true","false"]
             selectionString = "Please enter the value for state \"%s\" (type: %s): " % (stateType['displayName'], stateType['type'])
-            selection = guh.get_selection(selectionString, boolTypes)
+            selection = nymea.get_selection(selectionString, boolTypes)
             if selection == None:
                 return None
             stateValue = boolTypes[selection] 
         elif stateType['type'] == "Int": 
-            stateValue = int(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = int(raw_input("%s %s " % (stateType['displayName'], nymea.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Double": 
-            stateValue = float(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = float(raw_input("%s %s " % (stateType['displayName'], nymea.get_valueOperator_string(valueOperator))))
         elif stateType['type'] == "Uint": 
-            stateValue = int(raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))))
+            stateValue = int(raw_input("%s %s " % (stateType['displayName'], nymea.get_valueOperator_string(valueOperator))))
         else:
-            stateValue = raw_input("%s %s " % (stateType['displayName'], guh.get_valueOperator_string(valueOperator))) 
+            stateValue = raw_input("%s %s " % (stateType['displayName'], nymea.get_valueOperator_string(valueOperator))) 
 
     stateDescriptor['deviceId'] = deviceId
     stateDescriptor['stateTypeId'] = stateType['id']
     stateDescriptor['value'] = stateValue
     stateDescriptor['operator'] = valueOperator
-    print guh.print_json_format(stateDescriptor)
+    print nymea.print_json_format(stateDescriptor)
     return stateDescriptor
 
 
@@ -136,7 +136,7 @@ def create_stateEvaluator(stateDescriptors = None):
                 childEvaluators.append(create_stateEvaluator(stateDescriptor))        # append the new childEvaluator to the real child... recursive call
             stateEvaluator = {}
             stateEvaluator['childEvaluators'] = childEvaluators
-            stateEvaluator['operator'] = guh.select_stateOperator()
+            stateEvaluator['operator'] = nymea.select_stateOperator()
             return stateEvaluator
         else:
             # add single stateDescriptor to the stateEvaluator
@@ -155,7 +155,7 @@ def create_stateEvaluator(stateDescriptors = None):
                 childEvaluators.append(create_stateEvaluator(stateDescriptor))        # append the new childEvaluator to the real child... recursive call
             stateEvaluator = {}
             stateEvaluator['childEvaluators'] = childEvaluators
-            stateEvaluator['operator'] = guh.select_stateOperator()
+            stateEvaluator['operator'] = nymea.select_stateOperator()
             return stateEvaluator
         else:
             # add single stateDescriptor to the stateEvaluator
@@ -171,7 +171,7 @@ def print_stateEvaluator(stateEvaluator):
         stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
         deviceName = devices.get_full_device_name(stateEvaluator['stateDescriptor']['deviceId'])
         print "%5s. -> %40s -> state: \"%s\"" %(0, deviceName, stateType['displayName'])
-        print "%50s %s %s" %(stateType['displayName'], guh.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']), stateEvaluator['stateDescriptor']['value'])
+        print "%50s %s %s" %(stateType['displayName'], nymea.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']), stateEvaluator['stateDescriptor']['value'])
     else:
         if not 'childEvaluators' in stateEvaluator:
             return None
@@ -179,10 +179,10 @@ def print_stateEvaluator(stateEvaluator):
             device = devices.get_device(stateEvaluator['childEvaluators'][i]['stateDescriptor']['deviceId'])
             stateType = get_stateType(stateEvaluator['childEvaluators'][i]['stateDescriptor']['stateTypeId'])
             print "(%s:%s" % (device['name'], stateType['displayName']),
-            print guh.get_valueOperator_string(stateEvaluator['childEvaluators'][i]['stateDescriptor']['operator']),
+            print nymea.get_valueOperator_string(stateEvaluator['childEvaluators'][i]['stateDescriptor']['operator']),
             print stateEvaluator['childEvaluators'][i]['stateDescriptor']['value'], ")", 
             if i != (len(stateEvaluator['childEvaluators']) - 1):
-                print "%s%s" % (guh.get_stateEvaluator_string(stateEvaluator['operator']), guh.get_stateEvaluator_string(stateEvaluator['operator'])),
+                print "%s%s" % (nymea.get_stateEvaluator_string(stateEvaluator['operator']), nymea.get_stateEvaluator_string(stateEvaluator['operator'])),
         print "\n"
 
 
@@ -194,7 +194,7 @@ def print_stateType():
     stateType = select_stateType(device['deviceClassId']);
     if stateType == None:
         return None
-    guh.print_json_format(stateType)
+    nymea.print_json_format(stateType)
 
 
 

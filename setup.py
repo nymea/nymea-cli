@@ -4,60 +4,60 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2016 Simon Stuerz <simon.stuerz@guh.guru>         #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-from guh import __version__
+from nymea import __version__
 from distutils.core import setup
 
-setup(name = "guh-cli",
+setup(name = "nymea-cli",
     author = "Simon Stuerz",
-    author_email = "simon.stuerz@guh.guru",
-    description = "guh command line interface - python",
+    author_email = "simon.stuerz@guh.io",
+    description = "nymea command line interface - python",
     long_description = """\
-    The guh-cli (command line interface) is an admin tool written in python to communicate 
-    with the guh JSON-RPC API and test functionality of guh.
+    The nymea-cli (command line interface) is an admin tool written in python to communicate 
+    with the nymea JSON-RPC API and test functionality of nymea.
     """,
-    url = "https://github.com/guh/guh-cli",
+    url = "https://github.com/guh/nymea-cli",
     version = __version__,
-    keywords = ["guh", "cli", "command line interface"],
-    scripts = ["guh-cli"],
+    keywords = ["nymea", "cli", "command line interface"],
+    scripts = ["nymea-cli"],
     py_modules = [
-        "guh.actions",
-        "guh.devices",
-        "guh.events",
-        "guh.guh",
-        "guh.logs",
-        "guh.mainmenu",
-        "guh.notifications",
-        "guh.parameters",
-        "guh.plugins",
-        "guh.ruleactions",
-        "guh.rules",
-        "guh.selector",
-        "guh.states",
-        "guh.timedescriptor",
-        "guh.settings",
+        "nymea.actions",
+        "nymea.devices",
+        "nymea.events",
+        "nymea.nymea",
+        "nymea.logs",
+        "nymea.mainmenu",
+        "nymea.notifications",
+        "nymea.parameters",
+        "nymea.plugins",
+        "nymea.ruleactions",
+        "nymea.rules",
+        "nymea.selector",
+        "nymea.states",
+        "nymea.timedescriptor",
+        "nymea.settings",
         "tests.licensetests"
     ],
     data_files = [
-        ("/usr/share/man/man1", ["debian/guh-cli.1"]),
-        ("/usr/share/doc/guh-cli/", ["debian/changelog"])
+        ("/usr/share/man/man1", ["debian/nymea-cli.1"]),
+        ("/usr/share/doc/nymea-cli/", ["debian/changelog"])
     ],
     classifiers = [
         "Programming Language :: Python",

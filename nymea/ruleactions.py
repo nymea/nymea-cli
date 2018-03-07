@@ -2,25 +2,25 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import devices
 import parameters
 import actions
@@ -59,9 +59,9 @@ def create_rule_actions(eventDescriptors = []):
 def read_ruleActionParams(paramTypes, eventDescriptors = []):
     params = []
     for paramType in paramTypes:
-        print guh.print_json_format(paramType)
+        print nymea.print_json_format(paramType)
         if any("allowedValues" in item for item in paramType):
-            selection = guh.get_selection("Please select one of following allowed values:", paramType['allowedValues'])
+            selection = nymea.get_selection("Please select one of following allowed values:", paramType['allowedValues'])
             if selection == None:
                 return None
             paramValue = paramType['allowedValues'][selection]
@@ -74,14 +74,14 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
             if eventDescriptors:
                 selectionTypes = ["yes","no"]
                 selectionText = "-> Should the ruleActionParam \"%s\" depend on an event?" %(paramType['displayName'])
-                selection = guh.get_selection(selectionText, selectionTypes)
+                selection = nymea.get_selection(selectionText, selectionTypes)
                 if selection == None:
                     return None
                 if selectionTypes[selection] == "yes":
                     eventTypeIds = []
                     for i in eventDescriptors:
                         eventTypeIds.append(i['eventTypeId'])
-                    selection = guh.get_selection("Please select an eventTypeId", eventTypeIds)
+                    selection = nymea.get_selection("Please select an eventTypeId", eventTypeIds)
                     eventTypeId = eventTypeIds[selection]
                     eventType = events.get_eventType(eventTypeId)
                     eventParamNames = []
@@ -89,7 +89,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     for i in eventType['paramTypes']:
                         eventParamNames.append(i['displayName'])
                         eventParamTypeIds.append(i['id'])
-                    paramSelection = guh.get_selection("Please select the name of the eventParam for the action", eventParamNames)
+                    paramSelection = nymea.get_selection("Please select the name of the eventParam for the action", eventParamNames)
                     param = {}
                     param['paramTypeId'] = paramType['id']
                     param['eventTypeId'] = eventTypeId
@@ -99,7 +99,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                     if paramType['type'] == "Bool":
                         boolTypes = ["true","false"]
                         selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['displayName'], paramType['type'])
-                        selection = guh.get_selection(selectionString, boolTypes)
+                        selection = nymea.get_selection(selectionString, boolTypes)
                         if selection == None:
                             return None
                         paramValue = boolTypes[selection]
@@ -120,7 +120,7 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
                 if paramType['type'] == "Bool":
                     boolTypes = ["true","false"]
                     selectionString = "Please enter value for parameter %s (type: %s): " % (paramType['displayName'], paramType['type'])
-                    selection = guh.get_selection(selectionString, boolTypes)
+                    selection = nymea.get_selection(selectionString, boolTypes)
                     if selection == None:
                         return None
                     paramValue = boolTypes[selection]

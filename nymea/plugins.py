@@ -2,35 +2,35 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import parameters
 
 def get_plugins():
-    return guh.send_command("Devices.GetPlugins")['params']['plugins']
+    return nymea.send_command("Devices.GetPlugins")['params']['plugins']
 
 
 def get_plugin_configuration(pluginId):
     params = {}
     params['pluginId'] = pluginId
-    return guh.send_command("Devices.GetPluginConfiguration", params)['params']['configuration']
+    return nymea.send_command("Devices.GetPluginConfiguration", params)['params']['configuration']
 
 
 def set_plugin_configuration():
@@ -40,8 +40,8 @@ def set_plugin_configuration():
     params = {}
     params['pluginId'] = pluginId
     params['configuration'] = parameters.read_params(paramTypes)
-    response = guh.send_command("Devices.SetPluginConfiguration", params)
-    guh.print_device_error_code(response['params']['deviceError'])
+    response = nymea.send_command("Devices.SetPluginConfiguration", params)
+    nymea.print_device_error_code(response['params']['deviceError'])
     
 
 def get_plugin(pluginId):
@@ -55,7 +55,7 @@ def get_plugin(pluginId):
 def list_plugins():
     plugins = get_plugins();
     if not plugins:
-        print "\n    No plugins found. Please install guh-plugins and restart guhd."
+        print "\n    No plugins found. Please install nymea-plugins and restart nymead."
         return None
     print "-> List of supported plugins:\n"
     for plugin in plugins:
@@ -86,20 +86,20 @@ def list_plugin_info():
     pluginId = select_plugin()
     if not pluginId:
         return None
-    guh.print_json_format(get_plugin(pluginId))
+    nymea.print_json_format(get_plugin(pluginId))
     
 
 def select_plugin():
     plugins = get_plugins()
     if not plugins:
-        print "\n    No plugins found. Please install guh-plugins and restart guhd."
+        print "\n    No plugins found. Please install nymea-plugins and restart nymead."
         return None
     pluginList = []
     pluginIdList = []
     for i in range(0,len(plugins)):
         pluginList.append(plugins[i]['displayName'])
         pluginIdList.append(plugins[i]['id'])
-    selection = guh.get_selection("Please select a plugin", pluginList)
+    selection = nymea.get_selection("Please select a plugin", pluginList)
     if selection != None:
         return pluginIdList[selection]
     return None
@@ -108,16 +108,16 @@ def select_plugin():
 def select_configurable_plugin():
     plugins = get_plugins()
     if not plugins:
-        print "\n    No plugins found. Please install guh-plugins and restart guhd."
+        print "\n    No plugins found. Please install nymea-plugins and restart nymead."
         return None
     pluginList = []
     pluginIdList = []
     for i in range(0,len(plugins)):
         if (len(plugins[i]['paramTypes']) > 0):
-            #guh.print_json_format(plugins[i])
+            #nymea.print_json_format(plugins[i])
             pluginList.append(plugins[i]['displayName'])
             pluginIdList.append(plugins[i]['id'])
-    selection = guh.get_selection("Please select a plugin", pluginList)
+    selection = nymea.get_selection("Please select a plugin", pluginList)
     if selection != None:
         return pluginIdList[selection]
     return None

@@ -1,5 +1,5 @@
-Source: guh-cli
-Maintainer: Simon Stuerz <simon.stuerz@guh.guru>
+Source: nymea-cli
+Maintainer: Simon Stürz <simon.stuerz@guh.io>
 Section: python
 Priority: optional
 Build-Depends: python-all (>= 2.6.6-3),
@@ -8,11 +8,11 @@ Build-Depends: python-all (>= 2.6.6-3),
 X-Python-Version: >= 2.7
 Standards-Version: 3.9.6
 
-Package: guh-cli
+Package: nymea-cli
 Architecture: all
 Depends: ${misc:Depends}, 
   ${python:Depends}
-Description: guh command line interface - python
-  The guh-cli (command line interface) is an admin tool written in python 
-  to communicate with the guh JSON-RPC API and test functionality of guh.
+Description: nymea command line interface - python
+  The nymea-cli (command line interface) is an admin tool written in python 
+  to communicate with the nymea JSON-RPC API and test functionality of nymea.
 

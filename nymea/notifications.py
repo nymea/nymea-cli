@@ -2,21 +2,21 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -26,17 +26,17 @@ import json
 import select
 import telnetlib
 
-import guh
+import nymea
 
-def notification_sniffer(guhHost, guhPort):
+def notification_sniffer(nymeaHost, nymeaPort):
     global commandId
     
     commandId = 0
     print "Connecting notification handler..."
     try:
-        tn = telnetlib.Telnet(guhHost, guhPort)
+        tn = telnetlib.Telnet(nymeaHost, nymeaPort)
     except :
-        print "ERROR: notification socket could not connect the to guh-server. \n"
+        print "ERROR: notification socket could not connect the to nymea-server. \n"
         return None
     print "...OK \n"
     
@@ -53,7 +53,7 @@ def notification_sniffer(guhHost, guhPort):
                 if sock == tn.get_socket():
                     packet = tn.read_until("}\n")
                     packet = json.loads(packet)
-                    guh.print_json_format(packet)
+                    nymea.print_json_format(packet)
                 elif sock == sys.stdin:
                     x = sys.stdin.readline()
                     return None

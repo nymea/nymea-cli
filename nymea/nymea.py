@@ -2,21 +2,21 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -90,8 +90,8 @@ def init_connection(host, port):
 
         return True
     except socket.error, e:
-        print "ERROR:", e[1]," -> could not connect to guh."
-        print "       Please check if guh is running on %s:%s" %(host,port)
+        print "ERROR:", e[1]," -> could not connect to nymea."
+        print "       Please check if nymea is running on %s:%s" %(host,port)
         return False
 
 def createUser():
@@ -130,7 +130,7 @@ def login():
     params = {}
     params['username'] = user
     params['password'] = password
-    params['deviceName'] = "guh-cli"
+    params['deviceName'] = "nymea-cli"
     return send_command("JSONRPC.Authenticate", params)
 
 
@@ -145,7 +145,7 @@ def pushbuttonAuthentication():
     print "\n\nUsing push button authentication method...\n\n"
     
     params = {}
-    params['deviceName'] = 'guh-cli'
+    params['deviceName'] = 'nymea-cli'
     
     commandObj = {}
     commandObj['id'] = commandId
@@ -511,7 +511,7 @@ def printSupportedDevicesStructure():
 
 def print_server_version():
     response = send_command("JSONRPC.Version")
-    print "guh version: %5s" % (response['params']['version'])
+    print "nymea version: %5s" % (response['params']['version'])
     print "API version: %5s" % (response['params']['protocol version'])
 
 

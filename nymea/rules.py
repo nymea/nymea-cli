@@ -2,25 +2,25 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import devices
 import events
 import actions
@@ -40,7 +40,7 @@ def add_rule():
 
     if selector.getYesNoSelection("Do you want to define \"Events\" for this rule?"):
         eventDescriptors = events.create_eventDescriptors()
-        print guh.print_json_format(eventDescriptors)
+        print nymea.print_json_format(eventDescriptors)
         params['eventDescriptors'] = eventDescriptors
         
         if selector.getYesNoSelection("Do you want to add conditions (\"States\") for the events?"):
@@ -67,9 +67,9 @@ def add_rule():
     params['executable'] = selector.getBoolSelection("-> Should the rule be executable?")
     
     print "\n========================================================\n"    
-    print "Adding rule with params:\n", guh.print_json_format(params)
-    response = guh.send_command("Rules.AddRule", params)
-    guh.print_rule_error_code(response['params']['ruleError'])
+    print "Adding rule with params:\n", nymea.print_json_format(params)
+    response = nymea.send_command("Rules.AddRule", params)
+    nymea.print_rule_error_code(response['params']['ruleError'])
 
     
 def edit_rule():
@@ -82,10 +82,10 @@ def edit_rule():
     
     params = {}
     params['ruleId'] = ruleDescription['id']
-    originalRule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
+    originalRule = nymea.send_command("Rules.GetRuleDetails", params)['params']['rule']
     print "\n========================================================"
     print "Original rule JSON:\n"
-    print guh.print_json_format(originalRule)
+    print nymea.print_json_format(originalRule)
 
     if selector.getYesNoSelection("Do you want to chane the name (current = \"%s\"): " % (originalRule['name'])):
         print "\n========================================================"
@@ -102,7 +102,7 @@ def edit_rule():
         input = raw_input("Do you want change this \"Events\" (y/N): ")
         if input == "y":
             eventDescriptors = events.create_eventDescriptors()
-            print guh.print_json_format(eventDescriptors)
+            print nymea.print_json_format(eventDescriptors)
             params['eventDescriptors'] = eventDescriptors
         else:
             params['eventDescriptors'] = originalRule['eventDescriptors']
@@ -163,21 +163,21 @@ def edit_rule():
     params['executable'] = selector.getBoolSelection("-> Should the rule be executable?")
     
     print "\n========================================================\n"    
-    print "Edit rule with params:\n", guh.print_json_format(params)
-    response = guh.send_command("Rules.EditRule", params)
-    guh.print_rule_error_code(response['params']['ruleError'])
+    print "Edit rule with params:\n", nymea.print_json_format(params)
+    response = nymea.send_command("Rules.EditRule", params)
+    nymea.print_rule_error_code(response['params']['ruleError'])
     
 
 def select_rule():
     ruleDescriptions = []
-    ruleDescriptions = guh.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
+    ruleDescriptions = nymea.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
     if not ruleDescriptions:
         print "\n    No rule found"
         return None
     descriptions = []
     for ruleDescription in ruleDescriptions:
         descriptions.append("%s (%s) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(ruleDescription['enabled']), print_rule_active_status(ruleDescription['active'])))
-    selection = guh.get_selection("Please select rule:", descriptions)
+    selection = nymea.get_selection("Please select rule:", descriptions)
     if selection != None:
         return ruleDescriptions[selection]
     return None
@@ -190,8 +190,8 @@ def remove_rule():
         return None
     params = {}
     params['ruleId'] = ruleDescription['id']
-    response = guh.send_command("Rules.RemoveRule", params)
-    guh.print_rule_error_code(response['params']['ruleError'])
+    response = nymea.send_command("Rules.RemoveRule", params)
+    nymea.print_rule_error_code(response['params']['ruleError'])
     
 
 def print_rule_enabled_status(status):
@@ -216,7 +216,7 @@ def print_rule_executable_status(status):
 
 def get_rule_description(ruleId):
     ruleDescriptions = []
-    ruleDescriptions = guh.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
+    ruleDescriptions = nymea.send_command("Rules.GetRules", {})['params']['ruleDescriptions']
     for ruleDescription in ruleDescriptions:
         if ruleDescription['id'] == ruleId:
             return ruleDescription
@@ -229,21 +229,21 @@ def enable_disable_rule():
         print "\n    No rules found"
         return
     actionTypes = ["enable", "disable"]
-    selection = guh.get_selection("What do you want to do with this rule: ", actionTypes)     
+    selection = nymea.get_selection("What do you want to do with this rule: ", actionTypes)     
     if selection == 0:
         params = {}
         params['ruleId'] = ruleDescription['id']
-        response = guh.send_command("Rules.EnableRule", params)
-        guh.print_rule_error_code(response['params']['ruleError'])
+        response = nymea.send_command("Rules.EnableRule", params)
+        nymea.print_rule_error_code(response['params']['ruleError'])
     else:
         params = {}
         params['ruleId'] = ruleDescription['id']
-        response = guh.send_command("Rules.DisableRule", params)
-        guh.print_rule_error_code(response['params']['ruleError'])
+        response = nymea.send_command("Rules.DisableRule", params)
+        nymea.print_rule_error_code(response['params']['ruleError'])
 
 
 def list_rules():
-    response = guh.send_command("Rules.GetRules", {})
+    response = nymea.send_command("Rules.GetRules", {})
     if not response['params']['ruleDescriptions']:
         print "\n    No rules found. \n"
         return None
@@ -260,8 +260,8 @@ def list_rule_details():
         return None
     params = {}
     params['ruleId'] = ruleDescription['id']
-    rule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
-    print guh.print_json_format(rule)
+    rule = nymea.send_command("Rules.GetRuleDetails", params)['params']['rule']
+    print nymea.print_json_format(rule)
     print "========================================================"
     print "-> Details for rule \"%s\" (%s):\n" % (rule['name'], rule['id'])
     print "Rule is %s" % (print_rule_enabled_status(bool(rule['enabled'])))
@@ -293,25 +293,25 @@ def execute_rule_actions():
     params = {}
     params['ruleId'] = ruleId
 
-    rule = guh.send_command("Rules.GetRuleDetails", params)['params']['rule']
+    rule = nymea.send_command("Rules.GetRuleDetails", params)['params']['rule']
 
     if len(rule['exitActions']) == 0:
         options = ["Execute actions"]
-        selection = guh.get_selection("Which actions of the rule should be executed?", options)
-        response = guh.send_command("Rules.ExecuteActions", params)
-        guh.print_rule_error_code(response['params']['ruleError'])
+        selection = nymea.get_selection("Which actions of the rule should be executed?", options)
+        response = nymea.send_command("Rules.ExecuteActions", params)
+        nymea.print_rule_error_code(response['params']['ruleError'])
     else:
         options = ["Execute actions","Execute exit actions"]
-        selection = guh.get_selection("Which actions of the rule should be executed?", options)
+        selection = nymea.get_selection("Which actions of the rule should be executed?", options)
         if selection == None:
             return None
 
         if (options[selection] == "Execute actions"):
-            response = guh.send_command("Rules.ExecuteActions", params)
-            guh.print_rule_error_code(response['params']['ruleError'])
+            response = nymea.send_command("Rules.ExecuteActions", params)
+            nymea.print_rule_error_code(response['params']['ruleError'])
         else:
-            response = guh.send_command("Rules.ExecuteExitActions", params)
-            guh.print_rule_error_code(response['params']['ruleError'])
+            response = nymea.send_command("Rules.ExecuteExitActions", params)
+            nymea.print_rule_error_code(response['params']['ruleError'])
     
     return None
 
@@ -323,7 +323,7 @@ def list_rules_containig_deviceId():
     device = devices.get_device(deviceId)
     params = {}
     params['deviceId'] = deviceId
-    response = guh.send_command("Rules.FindRules", params)
+    response = nymea.send_command("Rules.FindRules", params)
     if not response['params']['ruleIds']:
         print "\nThere is no rule containig this device."
         return None

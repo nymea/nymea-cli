@@ -4,21 +4,21 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 Simon Stuerz <simon.stuerz@guh.guru>                #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -28,9 +28,9 @@ import traceback
 import curses
 import argparse
 
-from guh import __version__
-from guh import guh
-from guh import mainmenu
+from nymea import __version__
+from nymea import nymea
+from nymea import mainmenu
 
 
 ###########################################################
@@ -38,15 +38,15 @@ from guh import mainmenu
 ###########################################################
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='The guh-cli (command line interface) is an admin tool written in python to communicate with the guh daemon JSON-RPC API and test functionality of guh.')
+    parser = argparse.ArgumentParser(description='The nymea-cli (command line interface) is an admin tool written in python to communicate with the nymea daemon JSON-RPC API and test functionality of nymea.')
     parser.add_argument('-v','--version', action='version', version=__version__)
-    parser.add_argument('--host', type=str, default='localhost', help='the location of the guh daemon (default 127.0.0.1)')
-    parser.add_argument('--port', type=int, default=2222, help='the port of the the guh daemon (default 2222)')
+    parser.add_argument('--host', type=str, default='localhost', help='the location of the nymea daemon (default 127.0.0.1)')
+    parser.add_argument('--port', type=int, default=2222, help='the port of the the nymea daemon (default 2222)')
 
     args = parser.parse_args()
 
     # check connection
-    if not guh.init_connection(args.host, args.port):
+    if not nymea.init_connection(args.host, args.port):
         exit()
 
     os.system('clear')

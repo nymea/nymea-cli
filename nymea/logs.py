@@ -2,21 +2,21 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -30,7 +30,7 @@ import telnetlib
 import string
 import time
 
-import guh
+import nymea
 import states
 import devices
 import actions
@@ -45,7 +45,7 @@ global ruleIdCache
 global logFilter
 
 
-def log_window(guhHost, guhPort, params = None):
+def log_window(nymeaHost, nymeaPort, params = None):
     global screen
     global screenHeight
     global allLines
@@ -74,9 +74,9 @@ def log_window(guhHost, guhPort, params = None):
     # Create notification handler
     print "Connecting notification handler..."
     try:
-        tn = telnetlib.Telnet(guhHost, guhPort)
+        tn = telnetlib.Telnet(nymeaHost, nymeaPort)
     except :
-        print "ERROR: notification socket could not connect the to guh-server. \n"
+        print "ERROR: notification socket could not connect the to nymea-server. \n"
         return None
     print "...OK \n"
     
@@ -238,7 +238,7 @@ def moveUpDown(direction):
 def list_logEntries():
     params = {}
     lines = []
-    response = guh.send_command("Logging.GetLogEntries", params)
+    response = nymea.send_command("Logging.GetLogEntries", params)
     for i in range(len(response['params']['logEntries'])):
         line = get_log_entry_line(response['params']['logEntries'][i])
         print line
@@ -247,7 +247,7 @@ def list_logEntries():
 def get_log_entry_lines():
     global logFilter
     lines = []
-    response = guh.send_command("Logging.GetLogEntries", logFilter)
+    response = nymea.send_command("Logging.GetLogEntries", logFilter)
     for i in range(len(response['params']['logEntries'])):
         line = get_log_entry_line(response['params']['logEntries'][i])
         lines.append(line)
@@ -274,7 +274,7 @@ def get_log_entry_line(entry, checkFilter = False):
         levelString = "(A)"
         error = entry['errorCode']
     if entry['source'] == "LoggingSourceSystem":
-        deviceName = "Guh Server"
+        deviceName = "nymea server"
         sourceType = "System"
         symbolString = "->"
         sourceName = "Active changed"
@@ -436,7 +436,7 @@ def create_logfilter():
     boolTypes = ["yes","no"]
     
     # Devices
-    selection = guh.get_selection("Do you want to filter for \"Devices\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to filter for \"Devices\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         deviceIds = []
         deviceId = devices.select_configured_device()
@@ -445,7 +445,7 @@ def create_logfilter():
         
         finished = False
         while not finished:
-            selection = guh.get_selection("Do you want to add an other \"Device\"? ", boolTypes)
+            selection = nymea.get_selection("Do you want to add an other \"Device\"? ", boolTypes)
             if boolTypes[selection] == "no":
                 finished = True
                 break
@@ -459,19 +459,19 @@ def create_logfilter():
         params['deviceIds'] = deviceIds
     
     # LoggingSources
-    selection = guh.get_selection("Do you want to filter for \"LoggingSource\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to filter for \"LoggingSource\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         sources = []
         finished = False
         loggingSources = ["LoggingSourceSystem", "LoggingSourceEvents", "LoggingSourceActions", "LoggingSourceStates", "LoggingSourceRules"]
-        selection = guh.get_selection("Please select a \"LoggingSource\": ", loggingSources)
+        selection = nymea.get_selection("Please select a \"LoggingSource\": ", loggingSources)
         if selection:
             sources.append(loggingSources[selection])
         else:
             finished = True
 
         while not finished:
-            selection = guh.get_selection("Do you want to add an other \"LoggingSource\"? ", boolTypes)
+            selection = nymea.get_selection("Do you want to add an other \"LoggingSource\"? ", boolTypes)
             if boolTypes[selection] == "no":
                 finished = True
                 break
@@ -485,29 +485,29 @@ def create_logfilter():
         params['loggingSources'] = sources
     
     # LoggingLevel
-    selection = guh.get_selection("Do you want to filter for \"LoggingLevel\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to filter for \"LoggingLevel\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         levels = []
         loggingLevels = ["LoggingLevelInfo", "LoggingLevelAlert"]
-        selection = guh.get_selection("Please select a \"LoggingLevel\": ", loggingLevels)
+        selection = nymea.get_selection("Please select a \"LoggingLevel\": ", loggingLevels)
         if selection:
             levels.append(loggingLevels[selection])
 
         params['loggingLevels'] = levels
     
     # LoggingEventType
-    selection = guh.get_selection("Do you want to filter for \"LoggingEventType\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to filter for \"LoggingEventType\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         types = []
         loggingEventTypes = ["LoggingEventTypeTrigger", "LoggingEventTypeActiveChange", "LoggingEventTypeEnabledChange", "LoggingEventTypeActionsExecuted", "LoggingEventTypeExitActionsExecuted"]
-        selection = guh.get_selection("Please select a \"LoggingEventType\": ", loggingEventTypes)
+        selection = nymea.get_selection("Please select a \"LoggingEventType\": ", loggingEventTypes)
         if selection:
             types.append(loggingEventTypes[selection])
 
         params['eventTypes'] = types
     
     # Value
-    selection = guh.get_selection("Do you want to filter for certain log \"Values\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to filter for certain log \"Values\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         values = []
         finished = False
@@ -515,7 +515,7 @@ def create_logfilter():
         values.append(value)
         
         while not finished:
-            selection = guh.get_selection("Do you want to add an other \"Value\"? ", boolTypes)
+            selection = nymea.get_selection("Do you want to add an other \"Value\"? ", boolTypes)
             if boolTypes[selection] == "no":
                 finished = True
                 break
@@ -525,14 +525,14 @@ def create_logfilter():
         params['values'] = values
     
     # Times
-    selection = guh.get_selection("Do you want to add a \"TimeFilter\"? ", boolTypes)
+    selection = nymea.get_selection("Do you want to add a \"TimeFilter\"? ", boolTypes)
     if boolTypes[selection] == "yes":
         timeFilters = []  
         finished = False
         
         timeFilters.append(create_time_filter())
         while not finished:
-            selection = guh.get_selection("Do you want to add an other \"TimeFilter\"? ", boolTypes)
+            selection = nymea.get_selection("Do you want to add an other \"TimeFilter\"? ", boolTypes)
             if boolTypes[selection] == "no":
                 finished = True
                 break
@@ -541,18 +541,18 @@ def create_logfilter():
             
         params['timeFilters'] = timeFilters
         
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     return params
     
 
 def create_time_filter():
     timeFilter = {}
     boolTypes = ["yes","no"]
-    selection = guh.get_selection("Do you want to define a \"Start date\"?", boolTypes)
+    selection = nymea.get_selection("Do you want to define a \"Start date\"?", boolTypes)
     if boolTypes[selection] == "yes":
         timeFilter['startDate'] = raw_input("Please enter the \"Start date\": ")
-    selection = guh.get_selection("Do you want to define a \"End date\"?", boolTypes)
+    selection = nymea.get_selection("Do you want to define a \"End date\"?", boolTypes)
     if boolTypes[selection] == "yes":
         timeFilter['endDate'] = raw_input("Please enter the \"End date\": ")
     return timeFilter

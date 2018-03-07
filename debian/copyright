@@ -1,20 +1,12 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Author: Simon Stürz <stuerz.simon@guh.io>
-Download: http://www.github.com/guh/guh-cli
+Download: http://www.github.com/guh/nymea-cli
 
 License: GPL-2+
  On Debian systems, the complete text of the GNU General
  Public License can be found in `/usr/share/common-licenses/GPL-2'.
 
 Files: *
-Copyright: (C) 2015-1018 Simon Stürz <stuerz.simon@gmail.com>
-License: GPL-2+
-
-Files: debian/*
-Copyright: (C) 2015-2018 Simon Stürz <stuerz.simon@gmail.com>
-License: GPL-2+
-
-Files: guh/*
-Copyright: (C) 2015-2018 Simon Stürz <stuerz.simon@gmail.com>
+Copyright: (C) 2015-1018 Simon Stürz <stuerz.simon@guh.io>
 License: GPL-2+
 

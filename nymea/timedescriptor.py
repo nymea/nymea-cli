@@ -2,25 +2,25 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2016-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2016 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import selector
 import time
 import datetime
@@ -33,7 +33,7 @@ def createTimeDescriptor():
     enough = False
     
     options = ["Create calendar items", "Create time event items"]    
-    selection = guh.get_selection("Which kind of time items do you want to create?", options)
+    selection = nymea.get_selection("Which kind of time items do you want to create?", options)
     
     if options[selection] == "Create calendar items":
         calendarItems = []
@@ -102,7 +102,7 @@ def createRepeatingOption(forDateTime = False):
 
     if forDateTime:
         options = ["Repeat yearly"]
-        selection = guh.get_selection("Please select the repeating mode:", options)
+        selection = nymea.get_selection("Please select the repeating mode:", options)
         repeatingOption['mode'] = "RepeatingModeYearly"
         print repeatingOption
         return repeatingOption
@@ -113,7 +113,7 @@ def createRepeatingOption(forDateTime = False):
                "3. Repeat monthly", 
                "4. Repeat yearly"]
                
-    selection = guh.get_selection("Please select the repeating mode:", options)
+    selection = nymea.get_selection("Please select the repeating mode:", options)
     if selection is 0:
         repeatingOption['mode'] = "RepeatingModeHourly"
 

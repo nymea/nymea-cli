@@ -2,21 +2,21 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -26,7 +26,7 @@ import curses
 import traceback
 import curses
 
-import guh
+import nymea
 import devices
 import plugins
 import events
@@ -43,7 +43,7 @@ COMMAND = "command"
 EXITMENU = "exitmenu"
 
 menu_data = {
-    'title': "guh-cli", 
+    'title': "nymea-cli", 
     'type': MENU, 
     'subtitle': "Please select an option...",
     'options':[
@@ -522,7 +522,7 @@ def method_list_deviceClasses_by_vendor():
     method_list_deviceClasses(devices.select_vendor())
     
 def method_printSupportedDevicesStructure():
-    guh.printSupportedDevicesStructure()
+    nymea.printSupportedDevicesStructure()
 
 ######################################################################
 # Rules
@@ -557,141 +557,141 @@ def method_list_rules_containig_deviceId():
 ######################################################################
 
 def method_list_log_entries():
-    global guhHost
-    global guhPort
-    logs.log_window(guhHost, guhPort)
+    global nymeaHost
+    global nymeaPort
+    logs.log_window(nymeaHost, nymeaPort)
     
 def method_device_logs():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_device_logfilter()
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)
+        logs.log_window(nymeaHost, nymeaPort, params)
     
 def method_device_state_logs():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_device_state_logfilter()
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)    
+        logs.log_window(nymeaHost, nymeaPort, params)    
 
 def method_rule_logs():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_rule_logfilter()
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_30_minutes():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(30)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_60_minutes():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(60)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_120_minutes():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(120)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_6_hours():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(360)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_12_hours():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(720)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_24_hours():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(24 * 60)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
     
 def method_last_48_hours():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(48 * 60)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
    
 def method_last_72_hours():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_last_time_logfilter(72 * 60)
     print "\nThe filter:\n"
-    guh.print_json_format(params)
-    guh.debug_stop()
+    nymea.print_json_format(params)
+    nymea.debug_stop()
     if params:
-        logs.log_window(guhHost, guhPort, params)        
+        logs.log_window(nymeaHost, nymeaPort, params)        
    
 def method_create_logfilter():
-    global guhHost
-    global guhPort
+    global nymeaHost
+    global nymeaPort
     params = logs.create_logfilter()
-    logs.log_window(guhHost, guhPort, params)
+    logs.log_window(nymeaHost, nymeaPort, params)
 
 ######################################################################
 # Notification sniffer
 ######################################################################
 
 def method_notification_sniffer():
-    global guhHost
-    global guhPort
-    notifications.notification_sniffer(guhHost, guhPort)
+    global nymeaHost
+    global nymeaPort
+    notifications.notification_sniffer(nymeaHost, nymeaPort)
     
 ######################################################################
 # System info
 ######################################################################
 
 def method_list_server_info():
-    guh.print_server_version()
+    nymea.print_server_version()
     
 def method_print_deviceClass():
     devices.print_deviceClass()
@@ -706,16 +706,16 @@ def method_print_stateType():
     states.print_stateType()
 
 def method_print_api():
-    guh.print_api()
+    nymea.print_api()
 
 def method_print_api_method():
-    guh.print_api_method()
+    nymea.print_api_method()
     
 def method_print_api_notification():
-    guh.print_api_notifications()
+    nymea.print_api_notifications()
 
 def method_print_api_type():
-    guh.print_api_type()
+    nymea.print_api_type()
 
 ######################################################################
 # System settings
@@ -799,10 +799,10 @@ def start(host, port):
     global screen
     global highlightColor
     global normalColor
-    global guhHost
-    global guhPort
-    guhHost = host
-    guhPort = port
+    global nymeaHost
+    global nymeaPort
+    nymeaHost = host
+    nymeaPort = port
     
     os.system('clear')
     screen = curses.initscr()

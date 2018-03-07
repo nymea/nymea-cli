@@ -1,6 +1,6 @@
-# guh-cli(1) completion                                       -*- shell-script -*-
+# nymea-cli(1) completion                                       -*- shell-script -*-
 
-_guh-cli() 
+_nymea-cli() 
 {
     local cur prev opts
     COMPREPLY=()
@@ -19,4 +19,4 @@ _guh-cli()
 
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
-complete -F _guh-cli guh-cli
+complete -F _nymea-cli nymea-cli

@@ -2,30 +2,30 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 
 def read_params(paramTypes):
     params = []
     for paramType in paramTypes:
-        print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
+        print "\nThe ParamType looks like this:\n", nymea.print_json_format(paramType)
         if 'readOnly' in paramType and paramType['readOnly']:
             print "--------------------------------------------------------"
             print "\nThe param \"%s\" is not writable!)\n" %(paramType['displayName'])
@@ -39,7 +39,7 @@ def read_params(paramTypes):
             allowedValues = []
             for value in paramType['allowedValues']:
                 allowedValues.append(str(value))
-            selection = guh.get_selection("Please select one of following allowed values:", allowedValues)
+            selection = nymea.get_selection("Please select one of following allowed values:", allowedValues)
             if selection == None:
                 return None
             paramValue = paramType['allowedValues'][selection]
@@ -51,7 +51,7 @@ def read_params(paramTypes):
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
                 selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
-                selection = guh.get_selection(selectionString, boolTypes)
+                selection = nymea.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
@@ -73,7 +73,7 @@ def read_params(paramTypes):
 def edit_params(currentDeviceParams, paramTypes):
     params = []
     for paramType in paramTypes:
-        print "\nThe ParamType looks like this:\n", guh.print_json_format(paramType)
+        print "\nThe ParamType looks like this:\n", nymea.print_json_format(paramType)
         if 'readOnly' in paramType and paramType['readOnly']:
             print "--------------------------------------------------------"
             print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['displayName'], get_param_value(paramType['id'], currentDeviceParams))
@@ -83,7 +83,7 @@ def edit_params(currentDeviceParams, paramTypes):
         param = {}
         if any("allowedValues" in item for item in paramType):
             title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentDeviceParams))
-            selection = guh.get_selection(title, paramType['allowedValues'])
+            selection = nymea.get_selection(title, paramType['allowedValues'])
             if selection == None:
                 return None
             paramValue = paramType['allowedValues'][selection]
@@ -95,7 +95,7 @@ def edit_params(currentDeviceParams, paramTypes):
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
                 selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['displayName'], paramType['type'])
-                selection = guh.get_selection(selectionString, boolTypes)
+                selection = nymea.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
@@ -126,26 +126,26 @@ def read_paramDescriptors(paramTypes):
     for paramType in paramTypes:
         selectionTypes = ["yes","no"]
         selectionText = "-> Do you want to create a descriptor for the param \"%s\"?" %(paramType['displayName'])
-        selection = guh.get_selection(selectionText, selectionTypes)
+        selection = nymea.get_selection(selectionText, selectionTypes)
         if selectionTypes[selection] == "no":
             continue
-        operator = guh.select_valueOperator(paramType['displayName'])
+        operator = nymea.select_valueOperator(paramType['displayName'])
         if paramType['type'] == "Bool":
             boolTypes = ["true", "false"]
             selectionString = "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
-            selection = guh.get_selection(selectionString, boolTypes)
+            selection = nymea.get_selection(selectionString, boolTypes)
             if selection == None:
                 return None
             paramValue = boolTypes[selection] 
         else:
                 print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
-                paramValue = raw_input("%s %s " % (paramType['displayName'], guh.get_valueOperator_string(operator)))
+                paramValue = raw_input("%s %s " % (paramType['displayName'], nymea.get_valueOperator_string(operator)))
         param = {}
         param['paramTypeId'] = paramType['id']
         param['value'] = paramValue
         param['operator'] = operator
         params.append(param)
-    #print "got params:", guh.print_json_format(params)
+    #print "got params:", nymea.print_json_format(params)
     return params
 
 

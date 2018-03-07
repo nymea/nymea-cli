@@ -2,32 +2,32 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import devices
 import parameters
 
 def get_actionType(actionTypeId):
     params = {}
     params['actionTypeId'] = actionTypeId
-    response = guh.send_command("Actions.GetActionType", params)
+    response = nymea.send_command("Actions.GetActionType", params)
     if not 'actionType' in response['params']:
         return None
     return response['params']['actionType']
@@ -36,7 +36,7 @@ def get_actionType(actionTypeId):
 def get_actionTypes(deviceClassId):
     params = {}
     params['deviceClassId'] = deviceClassId
-    return guh.send_command("Devices.GetActionTypes", params)['params']['actionTypes']
+    return nymea.send_command("Devices.GetActionTypes", params)['params']['actionTypes']
 
 
 def create_actions():
@@ -71,7 +71,7 @@ def execute_action():
         return None
     device = devices.get_device(deviceId)
     actionType = select_actionType(device['deviceClassId'])
-    #print guh.print_json_format(actionType)
+    #print nymea.print_json_format(actionType)
     if actionType == None:
         print "\n    This device has no actions"
         return None
@@ -82,9 +82,9 @@ def execute_action():
     actionType = get_actionType(actionTypeId)
     actionParams = parameters.read_params(actionType['paramTypes'])
     params['params'] = actionParams
-    response = guh.send_command("Actions.ExecuteAction", params)
+    response = nymea.send_command("Actions.ExecuteAction", params)
     if response:  
-        guh.print_device_error_code(response['params']['deviceError'])
+        nymea.print_device_error_code(response['params']['deviceError'])
     
     
 def select_actionType(deviceClassId):
@@ -96,7 +96,7 @@ def select_actionType(deviceClassId):
     for i in range(len(actions)):
         #print "got actiontype", actions[i]
         actionList.append(actions[i]['displayName'])
-    selection = guh.get_selection("Please select an action type:", actionList)
+    selection = nymea.get_selection("Please select an action type:", actionList)
     if selection != None:
         return actions[selection]
     return None
@@ -119,12 +119,12 @@ def print_actionType():
         return None
     device = devices.get_device(deviceId)
     actionType = select_actionType(device['deviceClassId'])
-    #print guh.print_json_format(actionType)
+    #print nymea.print_json_format(actionType)
     if actionType == None:
         print "\n    This device has no actions"
         return None
     actionType = get_actionType(actionType['id'])
-    guh.print_json_format(actionType)
+    nymea.print_json_format(actionType)
 
 
 

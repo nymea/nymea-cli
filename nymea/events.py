@@ -2,39 +2,39 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015-2018 Simon Stuerz <simon.stuerz@guh.io>             #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
-#  This file is part of guh-cli.                                          #
+#  This file is part of nymea-cli.                                        #
 #                                                                         #
-#  guh-cli is free software: you can redistribute it and/or modify        #
+#  nymea-cli is free software: you can redistribute it and/or modify      #
 #  it under the terms of the GNU General Public License as published by   #
 #  the Free Software Foundation, version 2 of the License.                #
 #                                                                         #
-#  guh-cli is distributed in the hope that it will be useful,             #
+#  nymea-cli is distributed in the hope that it will be useful,           #
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of         #
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the           #
 #  GNU General Public License for more details.                           #
 #                                                                         #
 #  You should have received a copy of the GNU General Public License      #
-#  along with guh. If not, see <http://www.gnu.org/licenses/>.            #
+#  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-import guh
+import nymea
 import devices
 import parameters
 
 def get_eventType(eventTypeId):
     params = {}
     params['eventTypeId'] = eventTypeId
-    response = guh.send_command("Events.GetEventType", params)
+    response = nymea.send_command("Events.GetEventType", params)
     return response['params']['eventType']
 
 
 def get_eventTypes(deviceClassId):
     params = {}
     params['deviceClassId'] = deviceClassId
-    eventTypes = guh.send_command("Devices.GetEventTypes", params)['params']['eventTypes']
+    eventTypes = nymea.send_command("Devices.GetEventTypes", params)['params']['eventTypes']
     if eventTypes:
         return eventTypes
     return None
@@ -47,7 +47,7 @@ def select_eventType(deviceClassId):
     eventTypeList = []
     for i in range(len(eventTypes)):
         eventTypeList.append(eventTypes[i]['displayName'])
-    selection = guh.get_selection("Please select an event type:", eventTypeList)
+    selection = nymea.get_selection("Please select an event type:", eventTypeList)
     if selection != None:
         return eventTypes[selection]
     return None
@@ -94,7 +94,7 @@ def print_eventDescriptors(eventDescriptors):
         paramDescriptors = eventDescriptor['paramDescriptors']
         print  "%5s. -> %40s -> event: \"%s\"" %(i, deviceName, eventType['displayName'])
         for i in range(len(paramDescriptors)):
-            print "%50s %s %s" %(paramDescriptors[i]['name'], guh.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
+            print "%50s %s %s" %(paramDescriptors[i]['name'], nymea.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
 
 
 def print_eventType():
@@ -106,7 +106,7 @@ def print_eventType():
     if not eventType:
         print "\n    This device has no events"
         return None
-    guh.print_json_format(eventType)
+    nymea.print_json_format(eventType)
 
 
 
