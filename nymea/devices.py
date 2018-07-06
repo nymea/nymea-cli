@@ -332,6 +332,8 @@ def list_device_states():
         return None
     device = get_device(deviceId)
     deviceClass = get_deviceClass(device['deviceClassId'])
+
+    nymea.print_json_format(device)
     print "-> States of device \"%s\" %s:\n" % (get_full_device_name(deviceId), device['id'])
     for i in range(len(deviceClass['stateTypes'])):
         params = {}

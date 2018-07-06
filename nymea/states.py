@@ -165,26 +165,81 @@ def create_stateEvaluator(stateDescriptors = None):
 
 
 def print_stateEvaluator(stateEvaluator):
-    if not stateEvaluator:
-        return None
-    if 'stateDescriptor' in stateEvaluator:
-        stateType = get_stateType(stateEvaluator['stateDescriptor']['stateTypeId'])
-        deviceName = devices.get_full_device_name(stateEvaluator['stateDescriptor']['deviceId'])
-        print "%5s. -> %40s -> state: \"%s\"" %(0, deviceName, stateType['displayName'])
-        print "%50s %s %s" %(stateType['displayName'], nymea.get_valueOperator_string(stateEvaluator['stateDescriptor']['operator']), stateEvaluator['stateDescriptor']['value'])
-    else:
-        if not 'childEvaluators' in stateEvaluator:
-            return None
-        for i in range(len(stateEvaluator['childEvaluators'])):
-            device = devices.get_device(stateEvaluator['childEvaluators'][i]['stateDescriptor']['deviceId'])
-            stateType = get_stateType(stateEvaluator['childEvaluators'][i]['stateDescriptor']['stateTypeId'])
-            print "(%s:%s" % (device['name'], stateType['displayName']),
-            print nymea.get_valueOperator_string(stateEvaluator['childEvaluators'][i]['stateDescriptor']['operator']),
-            print stateEvaluator['childEvaluators'][i]['stateDescriptor']['value'], ")", 
-            if i != (len(stateEvaluator['childEvaluators']) - 1):
-                print "%s%s" % (nymea.get_stateEvaluator_string(stateEvaluator['operator']), nymea.get_stateEvaluator_string(stateEvaluator['operator'])),
-        print "\n"
+    print("%5s" % (getStateEvaluatorString(stateEvaluator)))
 
+
+def getStateEvaluatorString(stateEvaluator):
+    
+    stateEvaluatorString = ""
+    
+    if not stateEvaluator:
+        return stateEvaluatorString
+
+    if not 'stateDescriptor' in stateEvaluator and not 'operator' in stateEvaluator and not 'childEvaluators' in stateEvaluator:
+        return stateEvaluatorString
+
+    if 'stateDescriptor' in stateEvaluator:
+        stateDescriptorString = getStateDescriptorString(stateEvaluator['stateDescriptor'])
+        stateEvaluatorString += "%s" % stateDescriptorString
+
+    operator = ""        
+    if 'operator' in stateEvaluator:
+        operator = nymea.get_stateEvaluator_string(stateEvaluator['operator'])
+        
+    if 'childEvaluators' in stateEvaluator:
+        if not 'stateDescriptor' in stateEvaluator:
+            stateEvaluatorString += " ( %s ) " % (getChildEvaluatorString(stateEvaluator['childEvaluators'], operator))
+        else:
+            stateEvaluatorString += " %s ( %s )" % (operator, getChildEvaluatorString(stateEvaluator['childEvaluators'], operator))
+        
+    return stateEvaluatorString
+
+def getChildEvaluatorString(childEvaluators, operator):
+    
+    childEvaluatorString = ""
+    
+    if not childEvaluators:
+        return childEvaluatorString
+    
+    if len(childEvaluators) is 1:
+        return getStateEvaluatorString(childEvaluators[0])
+    
+    # We have more than one child evaluator
+    for i in range(len(childEvaluators)):
+        childEvaluatorString += getStateEvaluatorString(childEvaluators[i])
+        # Add the operator if this is not the last child evaluator
+        if i != len(childEvaluators) -1:
+            childEvaluatorString += operator
+        
+    return childEvaluatorString
+    
+
+def getStateDescriptorString(stateDescriptor):
+
+    global stateEvaluatorString
+
+    stateDescriptorString = ""
+    if not stateDescriptor:
+        return None
+       
+    if not 'deviceId' in stateDescriptor:
+        return stateDescriptorString
+    
+    if not 'operator' in stateDescriptor:
+        return stateDescriptorString
+    
+    if not 'stateTypeId' in stateDescriptor:
+        return stateDescriptorString
+    
+    if not 'value' in stateDescriptor:
+        return stateDescriptorString
+    
+    device = devices.get_device(stateDescriptor['deviceId'])
+    stateType = get_stateType(stateDescriptor['stateTypeId'])
+    operator = nymea.get_valueOperator_string(stateDescriptor['operator'])
+    
+    return (" %s:%s %s %s " % (device['name'], stateType['displayName'], operator, stateDescriptor['value'] ))
+   
 
 def print_stateType():
     deviceId = devices.select_configured_device()

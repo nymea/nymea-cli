@@ -262,6 +262,7 @@ def list_rule_details():
     params['ruleId'] = ruleDescription['id']
     rule = nymea.send_command("Rules.GetRuleDetails", params)['params']['rule']
     print nymea.print_json_format(rule)
+    nymea.debug_stop()
     print "========================================================"
     print "-> Details for rule \"%s\" (%s):\n" % (rule['name'], rule['id'])
     print "Rule is %s" % (print_rule_enabled_status(bool(rule['enabled'])))
@@ -274,6 +275,8 @@ def list_rule_details():
     if len(rule['eventDescriptors']) > 0:
         print "\nEvents:\n"
         events.print_eventDescriptors(rule['eventDescriptors'])
+        
+
     if rule['stateEvaluator']:
         print "\nStates:\n",
         states.print_stateEvaluator(rule['stateEvaluator'])
