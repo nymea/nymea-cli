@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
 #  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License      #
 #  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sys
 import telnetlib
@@ -50,16 +50,23 @@ def init_connection(host, port):
         
     try:
         tn = telnetlib.Telnet(host, port)
-        packet = tn.read_until("}\n")
-        packet = json.loads(packet)
-        print "connected to", packet["server"], "\nserver version:", packet["version"], "\nprotocol version:", packet["protocol version"], "\n"
         
-        print_json_format(packet)
+        # Perform initial handshake
+        print("\n\n##############################################")
+        print("# Handshake:")
+        print("##############################################\n\n") 
         
-        initialSetupRequired  = packet['initialSetupRequired']
-        authenticationRequired = packet['authenticationRequired']
-        pushButtonAuthAvailable = packet['pushButtonAuthAvailable']
-            
+        # TODO: get locale 
+        params = {}
+        handshakeMessage = send_command("JSONRPC.Hello", params)        
+        handshakeData = handshakeMessage['params']
+        print_json_format(handshakeData)
+        print("Connected to", handshakeData["server"], "\nserver version:", handshakeData["version"], "\nprotocol version:", handshakeData["protocol version"], "\n")
+
+        initialSetupRequired  = handshakeData['initialSetupRequired']
+        authenticationRequired = handshakeData['authenticationRequired']
+        pushButtonAuthAvailable = handshakeData['pushButtonAuthAvailable']
+   
         # If we don't need any authentication, we are done
         if not authenticationRequired:
             return True  
