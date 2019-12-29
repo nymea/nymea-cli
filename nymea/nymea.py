@@ -21,11 +21,11 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sys
-import telnetlib
 import socket
 import json
 import curses
 import os
+import ssl
 
 import devices
 import events
@@ -42,23 +42,31 @@ authenticationRequired = False
 initialSetupRequired = False
 
 def init_connection(host, port):
-    global tn
+    global sock
     global token
     global initialSetupRequired
     global pushButtonAuthAvailable
     global authenticationRequired
         
     try:
-        tn = telnetlib.Telnet(host, port)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((host, port));
         
-        # Perform initial handshake
-        print("\n\n##############################################")
-        print("# Handshake:")
-        print("##############################################\n\n") 
-        
-        # TODO: get locale 
-        params = {}
-        handshakeMessage = send_command("JSONRPC.Hello", params)        
+        # Perform initial handshake        
+        try:
+            handshakeMessage = send_command("JSONRPC.Hello", {})
+        except:
+            context = ssl.create_default_context()
+            context.check_hostname = False
+            context.verify_mode = ssl.CERT_NONE
+            try:
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((host, port));
+                sock = context.wrap_socket(sock)
+                handshakeMessage = send_command("JSONRPC.Hello", {})
+            except:
+                print("SSL handshake failed.")
+
         handshakeData = handshakeMessage['params']
         print_json_format(handshakeData)
         print("Connected to", handshakeData["server"], "\nserver version:", handshakeData["version"], "\nprotocol version:", handshakeData["protocol version"], "\n")
@@ -142,7 +150,7 @@ def login():
 
 
 def pushbuttonAuthentication():
-    global tn
+    global sock
     global commandId
     global token
     
@@ -159,12 +167,19 @@ def pushbuttonAuthentication():
     commandObj['params'] = params
     commandObj['method'] = 'JSONRPC.RequestPushButtonAuth'
     command = json.dumps(commandObj) + '\n'
-    tn.write(command)
+    sock.send(command)
     
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
-        data = tn.read_until("}\n")
+        
+        data = ''        
+        while "}\n" not in data:
+            chunk = sock.recv(4096)
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            data += chunk
+            
         response = json.loads(data)
         responseId = response['id']
     
@@ -179,7 +194,13 @@ def pushbuttonAuthentication():
     print("##############################################\n\n")
     # wait for push button notification
     while True:
-        data = tn.read_until("}\n")
+        data = ''
+        while "}\n" not in data:
+            chunk = sock.recv(4096)
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            data += chunk
+            
         response = json.loads(data)
         if ('notification' in response) and response['notification'] == "JSONRPC.PushButtonAuthFinished":
             print("Notification received:")
@@ -195,7 +216,7 @@ def pushbuttonAuthentication():
 
 def send_command(method, params = None):
     global commandId
-    global tn
+    global sock
     global token
     global authenticationRequired
     
@@ -210,12 +231,19 @@ def send_command(method, params = None):
         commandObj['params'] = params
 
     command = json.dumps(commandObj) + '\n'
-    tn.write(command)
+    sock.send(command)
     
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
-        data = tn.read_until("}\n")
+        data = ''
+        
+        while "}\n" not in data:
+            chunk = sock.recv(4096)
+            if chunk == '':
+                raise RuntimeError("socket connection broken")
+            data += chunk
+
         response = json.loads(data)
         if 'notification' in response:
             continue
