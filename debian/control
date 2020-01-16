@@ -4,6 +4,7 @@ Section: python
 Priority: optional
 Build-Depends: python-all (>= 2.6.6-3),
   debhelper (>= 9),
+  dh-python,
   python-setuptools
 X-Python-Version: >= 2.7
 Standards-Version: 3.9.6
