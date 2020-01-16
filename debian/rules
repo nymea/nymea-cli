@@ -3,9 +3,6 @@
 export DH_VERBOSE=1
 export PYBUILD_NAME=nymea-cli
 
-override_dh_auto_test:
-	tests/licensetests.py
-
 override_dh_install:
 	dh_install --fail-missing
 	cp -a $(CURDIR)/data/bash-completion/nymea-cli $(CURDIR)/debian/nymea-cli/usr/share/bash-completion/completions/ || true
