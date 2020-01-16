@@ -1,3 +1,10 @@
+nymea-cli (1.1.4) xenial; urgency=medium
+
+  [ Michael Zanetti ]
+  * Support connecting to SSL enabled nymea hosts
+
+ -- Jenkins <jenkins@nymea.io>  Thu, 16 Jan 2020 21:30:43 +0100
+
 nymea-cli (1.1.3) xenial; urgency=medium
 
   * Add push button authentication
