@@ -36,6 +36,7 @@ import rules
 import logs
 import notifications
 import settings
+import zigbeemanager
 
 
 MENU = "menu"
@@ -479,6 +480,23 @@ menu_data = {
                     ]
                 }
             ]
+        },
+        {
+            'title': "Zigbee Manager",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "Show available zigbee adapters",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_adapters'
+                },
+                {
+                    'title': "List zigbee networks",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_networks'
+                }
+            ]
         }
     ]
 }
@@ -806,6 +824,16 @@ def method_enable_wirelessnetworking():
 
 def method_disconnect_networkdevice():
     settings.disconnect_networkdevice()
+
+######################################################################
+# Zigbee manager
+######################################################################
+
+def method_list_zigbee_adapters():
+    zigbeemanager.list_available_adapters()
+
+def method_list_zigbee_networks():
+    zigbeemanager.list_networks()
 
 ######################################################################
 # Menu functions
