@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
 #  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License      #
 #  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import sys
 import os
@@ -43,428 +43,438 @@ COMMAND = "command"
 EXITMENU = "exitmenu"
 
 menu_data = {
-    'title': "nymea-cli", 
-    'type': MENU, 
+    'title': "nymea-cli",
+    'type': MENU,
     'subtitle': "Please select an option...",
     'options':[
-        { 
-            'title': "Devices", 
+        {
+            'title': "Devices",
             'type': MENU,
             'subtitle': "Please select an option...",
             'options': [
-                { 
-                    'title': "Add a new device", 
-                    'type': COMMAND, 
-                    'command': 'method_add_device' 
+                {
+                    'title': "Add a new device",
+                    'type': COMMAND,
+                    'command': 'method_add_device'
                 },
                 {
-                    'title': "Remove a device", 
-                    'type': COMMAND, 
-                    'command': 'method_remove_device' 
+                    'title': "Remove a device",
+                    'type': COMMAND,
+                    'command': 'method_remove_device'
                 },
                 {
-                    'title': "Edit device", 
-                    'type': COMMAND, 
-                    'command': 'method_edit_device' 
+                    'title': "Edit device",
+                    'type': COMMAND,
+                    'command': 'method_edit_device'
                 },
                 {
-                    'title': "Reconfigure device", 
-                    'type': COMMAND, 
-                    'command': 'method_reconfigure_device' 
+                    'title': "Reconfigure device",
+                    'type': COMMAND,
+                    'command': 'method_reconfigure_device'
                 },
                 {
-                    'title': "Execute an action", 
-                    'type': COMMAND, 
-                    'command': 'method_execute_action' 
+                    'title': "Execute an action",
+                    'type': COMMAND,
+                    'command': 'method_execute_action'
                 },
                 {
-                    'title': "List...", 
+                    'title': "List...",
                     'type': MENU,
                     'subtitle': "Please select what you want to list...",
                     'options': [
                         {
-                            'title': "List configured devices", 
-                            'type': COMMAND, 
-                            'command': 'method_list_configured_devices' 
+                            'title': "List configured devices",
+                            'type': COMMAND,
+                            'command': 'method_list_configured_devices'
                         },
                         {
-                            'title': "List device parameters", 
-                            'type': COMMAND, 
-                            'command': 'method_list_configured_device_params' 
+                            'title': "List device parameters",
+                            'type': COMMAND,
+                            'command': 'method_list_configured_device_params'
                         },
                         {
-                            'title': "List device states", 
-                            'type': COMMAND, 
-                            'command': 'method_list_device_states' 
+                            'title': "List device states",
+                            'type': COMMAND,
+                            'command': 'method_list_device_states'
                         },
                         {
-                            'title': "List supported vendors", 
-                            'type': COMMAND, 
-                            'command': 'method_list_vendors' 
+                            'title': "List supported vendors",
+                            'type': COMMAND,
+                            'command': 'method_list_vendors'
                         },
                         {
-                            'title': "List supported devices", 
-                            'type': COMMAND, 
-                            'command': 'method_list_deviceClasses' 
+                            'title': "List supported devices",
+                            'type': COMMAND,
+                            'command': 'method_list_deviceClasses'
                         },
                         {
-                            'title': "List device hirarchy", 
-                            'type': COMMAND, 
-                            'command': 'method_printSupportedDevicesStructure' 
+                            'title': "List device hirarchy",
+                            'type': COMMAND,
+                            'command': 'method_printSupportedDevicesStructure'
                         }
                     ]
                 },
                 {
-                    'title': "Print...", 
+                    'title': "Print...",
                     'type': MENU,
                     'subtitle': "Please select what you want to print...",
                     'options': [
-                        { 
-                            'title': "Print DeviceClass", 
-                            'type': COMMAND, 
-                            'command': 'method_print_deviceClass' 
+                        {
+                            'title': "Print DeviceClass",
+                            'type': COMMAND,
+                            'command': 'method_print_deviceClass'
                         },
-                        { 
-                            'title': "Print ActionType", 
-                            'type': COMMAND, 
-                            'command': 'method_print_actionType' 
+                        {
+                            'title': "Print ActionType",
+                            'type': COMMAND,
+                            'command': 'method_print_actionType'
                         },
-                        { 
-                            'title': "Print EventType", 
-                            'type': COMMAND, 
-                            'command': 'method_print_eventType' 
+                        {
+                            'title': "Print EventType",
+                            'type': COMMAND,
+                            'command': 'method_print_eventType'
                         },
-                        { 
-                            'title': "Print StateType", 
-                            'type': COMMAND, 
-                            'command': 'method_print_stateType' 
+                        {
+                            'title': "Print StateType",
+                            'type': COMMAND,
+                            'command': 'method_print_stateType'
                         }
                     ]
                 }
             ]
         },
         {
-            'title': "Rules", 
+            'title': "Rules",
             'type': MENU,
             'subtitle': "Please select an option...",
             'options': [
-                { 
-                    'title': "Add a new rule", 
-                    'type': COMMAND, 
-                    'command': 'method_add_rule' 
-                },
-                { 
-                    'title': "Remove a rule", 
-                    'type': COMMAND, 
-                    'command': 'method_remove_rule' 
-                },
-                { 
-                    'title': "Edit Rule", 
-                    'type': COMMAND, 
-                    'command': 'method_edit_rule' 
-                },
-                { 
-                    'title': "Rule details", 
-                    'type': COMMAND, 
-                    'command': 'method_list_rule_detail' 
-                },
-                { 
-                    'title': "Execute rule actions", 
-                    'type': COMMAND, 
-                    'command': 'method_execute_rule_actions' 
-                },
-                { 
-                    'title': "Enable/Disable a rule", 
-                    'type': COMMAND, 
-                    'command': 'method_enable_disable_rule' 
-                },
-                { 
-                    'title': "List rules", 
-                    'type': COMMAND, 
-                    'command': 'method_list_rules' 
-                },
-                { 
-                    'title': "List rules containing a certain device", 
-                    'type': COMMAND, 
-                    'command': 'method_list_rules_containig_deviceId' 
-                }
-            ]
-        },
-        {
-            'title': "Plugins", 
-            'type': MENU,
-            'subtitle': "Please select an option...",
-            'options': [
-                { 
-                    'title': "Set plugin configuration", 
-                    'type': COMMAND, 
-                    'command': 'method_set_plugin_configuration' 
-                },
-                { 
-                    'title': "Get plugin configuration", 
-                    'type': COMMAND, 
-                    'command': 'method_list_plugin_configuration' 
-                },
-                { 
-                    'title': "List plugins", 
-                    'type': COMMAND, 
-                    'command': 'method_list_plugins' 
-                },
-                { 
-                    'title': "Print plugin info", 
-                    'type': COMMAND, 
-                    'command': 'method_list_plugin_info' 
-                }
-            ]
-        },
-        {
-            'title': "Logs", 
-            'type': MENU,
-            'subtitle': "Please select an option...",
-            'options': [
-                { 
-                    'title': "Device logs", 
-                    'type': COMMAND, 
-                    'command': 'method_device_logs' 
-                },
-                { 
-                    'title': "Device state logs", 
-                    'type': COMMAND, 
-                    'command': 'method_device_state_logs' 
-                },
-                { 
-                    'title': "Rule logs", 
-                    'type': COMMAND, 
-                    'command': 'method_rule_logs' 
-                },
-                { 
-                    'title': "Logs from the last...", 
-                    'type': MENU, 
-                    'subtitle': "Please select an option...",
-                    'options': [
-                        { 
-                            'title': "...30 minutes", 
-                            'type': COMMAND, 
-                            'command': 'method_last_30_minutes' 
-                        },
-                        { 
-                            'title': "...60 minutes", 
-                            'type': COMMAND, 
-                            'command': 'method_last_60_minutes' 
-                        },
-                        { 
-                            'title': "...120 minutes", 
-                            'type': COMMAND, 
-                            'command': 'method_last_120_minutes' 
-                        },
-                        { 
-                            'title': "...6 hours", 
-                            'type': COMMAND, 
-                            'command': 'method_last_6_hours' 
-                        },
-                        { 
-                            'title': "...12 hours", 
-                            'type': COMMAND, 
-                            'command': 'method_last_12_hours' 
-                        },
-                        { 
-                            'title': "...24 hours", 
-                            'type': COMMAND, 
-                            'command': 'method_last_24_hours' 
-                        },
-                        { 
-                            'title': "...48 hours", 
-                            'type': COMMAND, 
-                            'command': 'method_last_48_hours' 
-                        },
-                        { 
-                            'title': "...72 hours", 
-                            'type': COMMAND, 
-                            'command': 'method_last_72_hours' 
-                        }
-                    ] 
-                },
-                { 
-                    'title': "Create Custom Log Filter", 
-                    'type': COMMAND, 
-                    'command': 'method_create_logfilter' 
-                },  
-                { 
-                    'title': "Logmonitor (all logs)", 
-                    'type': COMMAND, 
-                    'command': 'method_list_log_entries' 
-                }
-            ]
-        },  
-        { 
-            'title': "Notifications sniffer", 
-            'type': COMMAND, 
-            'command': 'method_notification_sniffer' 
-        },     
-        {
-            'title': "System info", 
-            'type': MENU,
-            'subtitle': "Please select an option...",
-            'options': [
-                { 
-                    'title': "Version", 
-                    'type': COMMAND, 
-                    'command': 'method_list_server_info' 
-                },
-                { 
-                    'title': "Print API", 
-                    'type': COMMAND, 
-                    'command': 'method_print_api' 
-                },
-                { 
-                    'title': "List API method", 
-                    'type': COMMAND, 
-                    'command': 'method_print_api_method' 
-                },
-                { 
-                    'title': "List API notification", 
-                    'type': COMMAND, 
-                    'command': 'method_print_api_notification' 
-                },
-                { 
-                    'title': "List API type", 
-                    'type': COMMAND, 
-                    'command': 'method_print_api_type' 
-                }
-            ]
-        },     
-        {
-            'title': "Settings", 
-            'type': MENU,
-            'subtitle': "Please select an option...",
-            'options': [
-                { 
-                    'title': "Show configurations", 
-                    'type': COMMAND, 
-                    'command': 'method_list_configurations' 
-                },
-                { 
-                    'title': "Set server name", 
-                    'type': COMMAND, 
-                    'command': 'method_set_serverName' 
+                {
+                    'title': "Add a new rule",
+                    'type': COMMAND,
+                    'command': 'method_add_rule'
                 },
                 {
-                    'title': "Set language", 
-                    'type': COMMAND, 
-                    'command': 'method_set_language'
+                    'title': "Remove a rule",
+                    'type': COMMAND,
+                    'command': 'method_remove_rule'
                 },
-                { 
-                    'title': "Set time zone", 
-                    'type': COMMAND, 
-                    'command': 'method_set_timezone' 
+                {
+                    'title': "Edit Rule",
+                    'type': COMMAND,
+                    'command': 'method_edit_rule'
                 },
-                { 
-                    'title': "Configure debug server", 
-                    'type': COMMAND, 
-                    'command': 'method_set_debug_server_interface' 
+                {
+                    'title': "Rule details",
+                    'type': COMMAND,
+                    'command': 'method_list_rule_detail'
                 },
-                { 
-                    'title': "Configure server interfaces", 
+                {
+                    'title': "Execute rule actions",
+                    'type': COMMAND,
+                    'command': 'method_execute_rule_actions'
+                },
+                {
+                    'title': "Enable/Disable a rule",
+                    'type': COMMAND,
+                    'command': 'method_enable_disable_rule'
+                },
+                {
+                    'title': "List rules",
+                    'type': COMMAND,
+                    'command': 'method_list_rules'
+                },
+                {
+                    'title': "List rules containing a certain device",
+                    'type': COMMAND,
+                    'command': 'method_list_rules_containig_deviceId'
+                }
+            ]
+        },
+        {
+            'title': "Plugins",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "Set plugin configuration",
+                    'type': COMMAND,
+                    'command': 'method_set_plugin_configuration'
+                },
+                {
+                    'title': "Get plugin configuration",
+                    'type': COMMAND,
+                    'command': 'method_list_plugin_configuration'
+                },
+                {
+                    'title': "List plugins",
+                    'type': COMMAND,
+                    'command': 'method_list_plugins'
+                },
+                {
+                    'title': "Print plugin info",
+                    'type': COMMAND,
+                    'command': 'method_list_plugin_info'
+                }
+            ]
+        },
+        {
+            'title': "Logs",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "Device logs",
+                    'type': COMMAND,
+                    'command': 'method_device_logs'
+                },
+                {
+                    'title': "Device state logs",
+                    'type': COMMAND,
+                    'command': 'method_device_state_logs'
+                },
+                {
+                    'title': "Rule logs",
+                    'type': COMMAND,
+                    'command': 'method_rule_logs'
+                },
+                {
+                    'title': "Logs from the last...",
                     'type': MENU,
                     'subtitle': "Please select an option...",
                     'options': [
-                        { 
-                            'title': "TCP server", 
+                        {
+                            'title': "...30 minutes",
+                            'type': COMMAND,
+                            'command': 'method_last_30_minutes'
+                        },
+                        {
+                            'title': "...60 minutes",
+                            'type': COMMAND,
+                            'command': 'method_last_60_minutes'
+                        },
+                        {
+                            'title': "...120 minutes",
+                            'type': COMMAND,
+                            'command': 'method_last_120_minutes'
+                        },
+                        {
+                            'title': "...6 hours",
+                            'type': COMMAND,
+                            'command': 'method_last_6_hours'
+                        },
+                        {
+                            'title': "...12 hours",
+                            'type': COMMAND,
+                            'command': 'method_last_12_hours'
+                        },
+                        {
+                            'title': "...24 hours",
+                            'type': COMMAND,
+                            'command': 'method_last_24_hours'
+                        },
+                        {
+                            'title': "...48 hours",
+                            'type': COMMAND,
+                            'command': 'method_last_48_hours'
+                        },
+                        {
+                            'title': "...72 hours",
+                            'type': COMMAND,
+                            'command': 'method_last_72_hours'
+                        }
+                    ]
+                },
+                {
+                    'title': "Create Custom Log Filter",
+                    'type': COMMAND,
+                    'command': 'method_create_logfilter'
+                },
+                {
+                    'title': "Logmonitor (all logs)",
+                    'type': COMMAND,
+                    'command': 'method_list_log_entries'
+                }
+            ]
+        },
+        {
+            'title': "Notifications sniffer",
+            'type': COMMAND,
+            'command': 'method_notification_sniffer'
+        },
+        {
+            'title': "System info",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "Version",
+                    'type': COMMAND,
+                    'command': 'method_list_server_info'
+                },
+                {
+                    'title': "Print API JSON",
+                    'type': COMMAND,
+                    'command': 'method_print_api'
+                },
+                {
+                    'title': "List API method",
+                    'type': COMMAND,
+                    'command': 'method_print_api_method'
+                },
+                {
+                    'title': "List API notification",
+                    'type': COMMAND,
+                    'command': 'method_print_api_notification'
+                },
+                {
+                    'title': "List API object",
+                    'type': COMMAND,
+                    'command': 'method_print_api_object'
+                },
+                {
+                    'title': "List API flags",
+                    'type': COMMAND,
+                    'command': 'method_print_api_flags'
+                },
+                {
+                    'title': "List API enums",
+                    'type': COMMAND,
+                    'command': 'method_print_api_enums'
+                }
+            ]
+        },
+        {
+            'title': "Settings",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "Show configurations",
+                    'type': COMMAND,
+                    'command': 'method_list_configurations'
+                },
+                {
+                    'title': "Set server name",
+                    'type': COMMAND,
+                    'command': 'method_set_serverName'
+                },
+                {
+                    'title': "Set language",
+                    'type': COMMAND,
+                    'command': 'method_set_language'
+                },
+                {
+                    'title': "Set time zone",
+                    'type': COMMAND,
+                    'command': 'method_set_timezone'
+                },
+                {
+                    'title': "Configure debug server",
+                    'type': COMMAND,
+                    'command': 'method_set_debug_server_interface'
+                },
+                {
+                    'title': "Configure server interfaces",
+                    'type': MENU,
+                    'subtitle': "Please select an option...",
+                    'options': [
+                        {
+                            'title': "TCP server",
                             'type': MENU,
                             'subtitle': "Please select an option...",
                             'options': [
-                                { 
-                                    'title': "Show TCP server configuration", 
-                                    'type': COMMAND, 
-                                    'command': 'method_show_tcpServer_configuration' 
+                                {
+                                    'title': "Show TCP server configuration",
+                                    'type': COMMAND,
+                                    'command': 'method_show_tcpServer_configuration'
                                 },
-                                { 
-                                    'title': "Configure TCP server", 
-                                    'type': COMMAND, 
-                                    'command': 'method_configure_tcpServer' 
+                                {
+                                    'title': "Configure TCP server",
+                                    'type': COMMAND,
+                                    'command': 'method_configure_tcpServer'
                                 }
                             ]
                         },
-                        { 
-                            'title': "Web server", 
+                        {
+                            'title': "Web server",
                             'type': MENU,
                             'subtitle': "Please select an option...",
                             'options': [
-                                { 
-                                    'title': "Show web server configuration", 
-                                    'type': COMMAND, 
-                                    'command': 'method_show_webServer_configuration' 
+                                {
+                                    'title': "Show web server configuration",
+                                    'type': COMMAND,
+                                    'command': 'method_show_webServer_configuration'
                                 },
-                                { 
-                                    'title': "Configure web server", 
-                                    'type': COMMAND, 
-                                    'command': 'method_configure_webServer' 
+                                {
+                                    'title': "Configure web server",
+                                    'type': COMMAND,
+                                    'command': 'method_configure_webServer'
                                 }
                             ]
                         },
-                        { 
-                            'title': "Web socket server", 
+                        {
+                            'title': "Web socket server",
                             'type': MENU,
                             'subtitle': "Please select an option...",
                             'options': [
-                                { 
-                                    'title': "Show web socket server configuration", 
-                                    'type': COMMAND, 
-                                    'command': 'method_show_webSocketServer_configuration' 
+                                {
+                                    'title': "Show web socket server configuration",
+                                    'type': COMMAND,
+                                    'command': 'method_show_webSocketServer_configuration'
                                 },
-                                { 
-                                    'title': "Configure web socket server", 
-                                    'type': COMMAND, 
-                                    'command': 'method_configure_webSocketServer' 
+                                {
+                                    'title': "Configure web socket server",
+                                    'type': COMMAND,
+                                    'command': 'method_configure_webSocketServer'
                                 }
                             ]
                         }
                     ]
                 },
-                { 
-                    'title': "Network manager", 
+                {
+                    'title': "Network manager",
                     'type': MENU,
                     'subtitle': "Please select an option...",
                     'options': [
-                        { 
-                            'title': "Show network status", 
-                            'type': COMMAND, 
-                            'command': 'method_show_network_status' 
+                        {
+                            'title': "Show network status",
+                            'type': COMMAND,
+                            'command': 'method_show_network_status'
                         },
-                        { 
-                            'title': "Network devices", 
-                            'type': COMMAND, 
-                            'command': 'method_list_network_devices' 
+                        {
+                            'title': "Network devices",
+                            'type': COMMAND,
+                            'command': 'method_list_network_devices'
                         },
-                        { 
-                            'title': "Enable / Disable networking", 
-                            'type': COMMAND, 
-                            'command': 'method_enable_networking' 
+                        {
+                            'title': "Enable / Disable networking",
+                            'type': COMMAND,
+                            'command': 'method_enable_networking'
                         },
-                        { 
-                            'title': "Enable / Disable wireless networking", 
-                            'type': COMMAND, 
-                            'command': 'method_enable_wirelessnetworking' 
+                        {
+                            'title': "Enable / Disable wireless networking",
+                            'type': COMMAND,
+                            'command': 'method_enable_wirelessnetworking'
                         },
-                        { 
-                            'title': "List wireless access points", 
-                            'type': COMMAND, 
-                            'command': 'method_list_wirelessaccesspoints' 
+                        {
+                            'title': "List wireless access points",
+                            'type': COMMAND,
+                            'command': 'method_list_wirelessaccesspoints'
                         },
-                        { 
-                            'title': "Scan wireless access points", 
-                            'type': COMMAND, 
-                            'command': 'method_scan_wirelessaccesspoints' 
+                        {
+                            'title': "Scan wireless access points",
+                            'type': COMMAND,
+                            'command': 'method_scan_wirelessaccesspoints'
                         },
-                        { 
-                            'title': "Connect to wifi network", 
-                            'type': COMMAND, 
-                            'command': 'method_connect_wifi' 
+                        {
+                            'title': "Connect to wifi network",
+                            'type': COMMAND,
+                            'command': 'method_connect_wifi'
                         },
-                        { 
-                            'title': "Disconnect network device", 
-                            'type': COMMAND, 
-                            'command': 'method_disconnect_networkdevice' 
+                        {
+                            'title': "Disconnect network device",
+                            'type': COMMAND,
+                            'command': 'method_disconnect_networkdevice'
                         }
                     ]
                 }
@@ -499,28 +509,28 @@ def method_list_device_states():
 
 def method_list_vendors():
     devices.list_vendors()
- 
+
 def method_list_plugins():
     plugins.list_plugins()
-    
+
 def method_set_plugin_configuration():
     plugins.set_plugin_configuration()
-    
+
 def method_list_plugin_configuration():
     plugins.list_plugin_configuration()
-    
+
 def method_list_plugin_info():
     plugins.list_plugin_info()
-    
+
 def method_list_configured_devices():
     devices.list_configured_devices()
-    
+
 def method_list_deviceClasses(vendorId = None):
     devices.list_deviceClasses()
 
 def method_list_deviceClasses_by_vendor():
     method_list_deviceClasses(devices.select_vendor())
-    
+
 def method_printSupportedDevicesStructure():
     nymea.printSupportedDevicesStructure()
 
@@ -539,16 +549,16 @@ def method_enable_disable_rule():
 
 def method_edit_rule():
     rules.edit_rule()
-    
+
 def method_list_rule_detail():
     rules.list_rule_details()
-    
+
 def method_execute_rule_actions():
     rules.execute_rule_actions()
 
 def method_list_rules():
     rules.list_rules()
-    
+
 def method_list_rules_containig_deviceId():
     rules.list_rules_containig_deviceId()
 
@@ -560,7 +570,7 @@ def method_list_log_entries():
     global nymeaHost
     global nymeaPort
     logs.log_window(nymeaHost, nymeaPort)
-    
+
 def method_device_logs():
     global nymeaHost
     global nymeaPort
@@ -570,7 +580,7 @@ def method_device_logs():
     nymea.debug_stop()
     if params:
         logs.log_window(nymeaHost, nymeaPort, params)
-    
+
 def method_device_state_logs():
     global nymeaHost
     global nymeaPort
@@ -579,7 +589,7 @@ def method_device_state_logs():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)    
+        logs.log_window(nymeaHost, nymeaPort, params)
 
 def method_rule_logs():
     global nymeaHost
@@ -589,8 +599,8 @@ def method_rule_logs():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_30_minutes():
     global nymeaHost
     global nymeaPort
@@ -599,8 +609,8 @@ def method_last_30_minutes():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_60_minutes():
     global nymeaHost
     global nymeaPort
@@ -609,8 +619,8 @@ def method_last_60_minutes():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_120_minutes():
     global nymeaHost
     global nymeaPort
@@ -619,8 +629,8 @@ def method_last_120_minutes():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_6_hours():
     global nymeaHost
     global nymeaPort
@@ -629,8 +639,8 @@ def method_last_6_hours():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_12_hours():
     global nymeaHost
     global nymeaPort
@@ -639,8 +649,8 @@ def method_last_12_hours():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_24_hours():
     global nymeaHost
     global nymeaPort
@@ -649,8 +659,8 @@ def method_last_24_hours():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-    
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_48_hours():
     global nymeaHost
     global nymeaPort
@@ -659,8 +669,8 @@ def method_last_48_hours():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-   
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_last_72_hours():
     global nymeaHost
     global nymeaPort
@@ -669,8 +679,8 @@ def method_last_72_hours():
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
-        logs.log_window(nymeaHost, nymeaPort, params)        
-   
+        logs.log_window(nymeaHost, nymeaPort, params)
+
 def method_create_logfilter():
     global nymeaHost
     global nymeaPort
@@ -685,14 +695,14 @@ def method_notification_sniffer():
     global nymeaHost
     global nymeaPort
     notifications.notification_sniffer(nymeaHost, nymeaPort)
-    
+
 ######################################################################
 # System info
 ######################################################################
 
 def method_list_server_info():
     nymea.print_server_version()
-    
+
 def method_print_deviceClass():
     devices.print_deviceClass()
 
@@ -710,12 +720,19 @@ def method_print_api():
 
 def method_print_api_method():
     nymea.print_api_method()
-    
+
 def method_print_api_notification():
     nymea.print_api_notifications()
 
-def method_print_api_type():
-    nymea.print_api_type()
+def method_print_api_object():
+    nymea.print_api_object()
+
+def method_print_api_enums():
+    nymea.print_api_enum()
+
+def method_print_api_flags():
+    nymea.print_api_flag()
+
 
 ######################################################################
 # System settings
@@ -774,13 +791,13 @@ def method_scan_wirelessaccesspoints():
 
 def method_show_network_status():
     settings.show_network_status()
-    
+
 def method_list_network_devices():
     settings.list_network_devices()
-    
+
 def method_connect_wifi():
     settings.connect_wifi()
-    
+
 def method_enable_networking():
     settings.enable_networking()
 
@@ -803,40 +820,40 @@ def start(host, port):
     global nymeaPort
     nymeaHost = host
     nymeaPort = port
-    
+
     os.system('clear')
     screen = curses.initscr()
     curses.noecho()
-    curses.cbreak() 
-    curses.start_color() 
+    curses.cbreak()
+    curses.start_color()
     screen.keypad(1)
     curses.init_pair(1,curses.COLOR_BLACK, curses.COLOR_GREEN)
-    highlightColor = curses.color_pair(1) 
-    normalColor = curses.A_NORMAL 
+    highlightColor = curses.color_pair(1)
+    normalColor = curses.A_NORMAL
     processmenu(menu_data)
 
 def runmenu(menu, parent):
     global screen
     global highlightColor
     global normalColor
-    
+
     if parent is None:
         lastoption = "Exit"
     else:
         lastoption = "<-- %s menu" % parent['title']
-    
-    optioncount = len(menu['options']) 
-    pos=0 
-    oldpos=None 
-    x = None 
-    
+
+    optioncount = len(menu['options'])
+    pos=0
+    oldpos=None
+    x = None
+
     # Loop until return key is pressed
     while x !=ord('\n'):
         if pos != oldpos:
             oldpos = pos
         screen.border(0)
-        screen.addstr(2,2, menu['title'], curses.A_STANDOUT) 
-        screen.addstr(4,2, menu['subtitle'], curses.A_BOLD) 
+        screen.addstr(2,2, menu['title'], curses.A_STANDOUT)
+        screen.addstr(4,2, menu['subtitle'], curses.A_BOLD)
         # Display all the menu items, showing the 'pos' item highlighted
         for index in range(optioncount):
             textstyle = normalColor
@@ -850,16 +867,16 @@ def runmenu(menu, parent):
         screen.refresh()
         x = screen.getch()
         if x >= ord('1') and x <= ord(str(optioncount + 1)):
-            pos = x - ord('0') - 1 
+            pos = x - ord('0') - 1
         if x == curses.KEY_DOWN:
             if pos < optioncount:
                 pos += 1
-            else: 
+            else:
                 pos = 0
-        elif x == curses.KEY_UP: 
+        elif x == curses.KEY_UP:
             if pos > 0:
                 pos += -1
-            else: 
+            else:
                 pos = optioncount
         elif x == curses.KEY_BACKSPACE:
             pos = optioncount
@@ -867,7 +884,7 @@ def runmenu(menu, parent):
             pos = optioncount
     # return index of the selected item
     return pos
-    
+
 
 ######################################################################
 # Process menu
@@ -903,6 +920,3 @@ def processmenu(menu, parent=None):
             screen.clear()
         elif menu['options'][getin]['type'] == EXITMENU:
             exitmenu = True
-
-
-

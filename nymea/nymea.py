@@ -47,12 +47,12 @@ def init_connection(host, port):
     global initialSetupRequired
     global pushButtonAuthAvailable
     global authenticationRequired
-        
+
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((host, port));
-        
-        # Perform initial handshake        
+
+        # Perform initial handshake
         try:
             handshakeMessage = send_command("JSONRPC.Hello", {})
         except:
@@ -74,23 +74,23 @@ def init_connection(host, port):
         initialSetupRequired  = handshakeData['initialSetupRequired']
         authenticationRequired = handshakeData['authenticationRequired']
         pushButtonAuthAvailable = handshakeData['pushButtonAuthAvailable']
-   
+
         # If we don't need any authentication, we are done
         if not authenticationRequired:
-            return True  
-            
+            return True
+
         if initialSetupRequired and not pushButtonAuthAvailable:
             print("\n\n##############################################")
-            print("# Start initial setup:")  
-            print("##############################################\n\n") 
+            print("# Start initial setup:")
+            print("##############################################\n\n")
             result = createUser()
             while result['params']['error'] != "UserErrorNoError":
                 print "Error creating user: %s" % userErrorToString(result['params']['error'])
                 result = createUser()
-                
-            print("\n\nUser created successfully.\n\n")     
-            
-        
+
+            print("\n\nUser created successfully.\n\n")
+
+
         # Authenticate if no token
         if authenticationRequired and token == None:
             if pushButtonAuthAvailable:
@@ -100,7 +100,7 @@ def init_connection(host, port):
                 while loginResponse['params']['success'] != True:
                     print "Login failed. Please try again."
                     loginResponse = login()
-                
+
                 token = loginResponse['params']['token']
 
         return True
@@ -139,7 +139,7 @@ def userErrorToString(error):
 def login():
     print("\n\n##############################################")
     print("# Login:")
-    print("##############################################\n\n") 
+    print("##############################################\n\n")
     user = raw_input("Username: ")
     password = getpass.getpass()
     params = {}
@@ -153,42 +153,42 @@ def pushbuttonAuthentication():
     global sock
     global commandId
     global token
-    
+
     if token != None:
         return
-    
+
     print "\n\nUsing push button authentication method...\n\n"
-    
+
     params = {}
     params['deviceName'] = 'nymea-cli'
-    
+
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['params'] = params
     commandObj['method'] = 'JSONRPC.RequestPushButtonAuth'
     command = json.dumps(commandObj) + '\n'
     sock.send(command)
-    
+
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
-        
-        data = ''        
+
+        data = ''
         while "}\n" not in data:
             chunk = sock.recv(4096)
             if chunk == '':
                 raise RuntimeError("socket connection broken")
             data += chunk
-            
+
         response = json.loads(data)
         responseId = response['id']
-    
+
     commandId = commandId + 1
-    
+
     # check response
     print("Initialized push button authentication. Response:")
     print_json_format(response)
-    
+
     print("\n\n##############################################")
     print("# Please press the pushbutton on the device. #")
     print("##############################################\n\n")
@@ -200,14 +200,14 @@ def pushbuttonAuthentication():
             if chunk == '':
                 raise RuntimeError("socket connection broken")
             data += chunk
-            
+
         response = json.loads(data)
         if ('notification' in response) and response['notification'] == "JSONRPC.PushButtonAuthFinished":
             print("Notification received:")
             print_json_format(response)
             if response['params']['success'] == True:
                 print("\nAuthenticated successfully!\n")
-                print("Token: %s" % response['params']['token'])         
+                print("Token: %s" % response['params']['token'])
                 debug_stop()
                 token = response['params']['token']
                 return
@@ -219,25 +219,25 @@ def send_command(method, params = None):
     global sock
     global token
     global authenticationRequired
-    
+
     commandObj = {}
     commandObj['id'] = commandId
     commandObj['method'] = method
-    
+
     if authenticationRequired and token is not None:
         commandObj['token'] = token
-        
+
     if not params == None and len(params) > 0:
         commandObj['params'] = params
 
     command = json.dumps(commandObj) + '\n'
     sock.send(command)
-    
+
     # wait for the response with id = commandId
     responseId = -1
     while responseId != commandId:
         data = ''
-        
+
         while "}\n" not in data:
             chunk = sock.recv(4096)
             if chunk == '':
@@ -262,7 +262,7 @@ def send_command(method, params = None):
             while loginResponse['params']['success'] != True:
                 print "Login failed. Please try again."
                 loginResponse = login()
-            
+
             token = loginResponse['params']['token']
             return send_command(method, params)
 
@@ -377,8 +377,8 @@ def get_valueOperator_string(valueOperator):
         return ">="
     else:
         return "<unknown value operator>"
-    
-    
+
+
 def get_stateEvaluator_string(stateEvaluator):
     if stateEvaluator == "StateOperatorAnd":
         return "&"
@@ -389,11 +389,11 @@ def get_stateEvaluator_string(stateEvaluator):
 
 
 def print_device_error_code(deviceError):
-    
+
     if deviceError == None:
         print "timeout"
         return
-    
+
     if deviceError == "DeviceErrorNoError":
         print "\nSuccess! (", deviceError, ")"
     elif deviceError == "DeviceErrorPluginNotFound":
@@ -439,7 +439,7 @@ def print_device_error_code(deviceError):
     elif deviceError == "DeviceErrorAuthentificationFailure":
         print "\nERROR: could not authenticate. (", deviceError, ")"
     elif deviceError == "DeviceErrorDeviceIsChild":
-        print "\nERROR: this device is a child device (", deviceError, "). Please remove the parent device." 
+        print "\nERROR: this device is a child device (", deviceError, "). Please remove the parent device."
     elif deviceError == "DeviceErrorDeviceInRule":
         print "\nERROR: this device gets used in a rule (", deviceError, "). Please specify the remove policy."
     else:
@@ -474,9 +474,9 @@ def print_rule_error_code(ruleError):
     elif ruleError == "RuleErrorTypesNotMatching":
         print "\nERROR: the event and the action params have not the same type. (", ruleError, ")"
     elif ruleError == "RuleErrorNotExecutable":
-        print "\nERROR: the rule is not executable. (", ruleError, ")"   
+        print "\nERROR: the rule is not executable. (", ruleError, ")"
     elif ruleError == "RuleErrorContainsEventBasesAction":
-        print "\nERROR: the rule contains an event value based action. (", ruleError, ")"    
+        print "\nERROR: the rule contains an event value based action. (", ruleError, ")"
     elif ruleError == "RuleErrorNoExitActions":
         print "\nERROR: the rule has no exit actions which can be executed. (", ruleError, ")"
     else:
@@ -586,17 +586,44 @@ def print_api_notifications():
     print print_json_format(notification)
 
 
-def print_api_type():
+def print_api_object():
     types = send_command("JSONRPC.Introspect")['params']['types']
     typesList = []
     for item in types:
         typesList.append(item)
-    selection = get_selection("Please select a notification:", typesList)
+    selection = get_selection("Please select an object:", typesList)
     if selection == None:
         return None
     type = {}
     type[typesList[selection]] = types[typesList[selection]]
     print print_json_format(type)
+
+def print_api_enum():
+    enums = send_command("JSONRPC.Introspect")['params']['enums']
+    enumsList = []
+    for item in enums:
+        enumsList.append(item)
+    selection = get_selection("Please select an enum:", enumsList)
+    if selection == None:
+        return None
+    enum = {}
+    enum[enumsList[selection]] = enums[enumsList[selection]]
+    print print_json_format(enum)
+
+
+def print_api_flag():
+    flags = send_command("JSONRPC.Introspect")['params']['flags']
+    flagsList = []
+    for item in flags:
+        flagsList.append(item)
+    selection = get_selection("Please select a flag:", flagsList)
+    if selection == None:
+        return None
+    flag = {}
+    flag[flagsList[selection]] = flags[flagsList[selection]]
+    print print_json_format(flag)
+
+
 
 
 def select_valueOperator(value):
@@ -619,6 +646,3 @@ def select_stateOperator():
     if selection != None:
         return stateOperators[selection]
     return None
-
-
-
