@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
 #  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License      #
 #  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import nymea
 import parameters
@@ -55,14 +55,14 @@ def get_full_device_name(deviceId):
     devices = get_configured_devices()
     for device in devices:
         if device['id'] == deviceId:
-            return device['name']                    
+            return device['name']
     return None
 
 
 def get_configured_devices():
     return nymea.send_command("Devices.GetConfiguredDevices")['params']['devices']
-    
-    
+
+
 def add_configured_device(deviceClassId):
     deviceClass = get_deviceClass(deviceClassId)
     params = {}
@@ -75,13 +75,13 @@ def add_configured_device(deviceClassId):
     response = nymea.send_command("Devices.AddConfiguredDevice", params)
     nymea.print_device_error_code(response['params']['deviceError'])
 
-    
+
 def add_device():
     deviceClassId = select_deviceClass()
     if deviceClassId == None:
         return None
     deviceClass = get_deviceClass(deviceClassId)
-    createMethod = select_createMethod("Please select how do you want to add this device", deviceClass['createMethods'])    
+    createMethod = select_createMethod("Please select how do you want to add this device", deviceClass['createMethods'])
     print " --> Using create method \"%s\"" % (createMethod)
     nymea.debug_stop
     if createMethod == "CreateMethodUser":
@@ -93,7 +93,7 @@ def add_device():
         add_discovered_device(deviceClassId, deviceDescriptorId)
     elif createMethod == "CreateMethodAuto":
         print "\nCan't create this device manually. It'll be created automatically when hardware is avaiable.\n"
-    
+
 
 def add_discovered_device(deviceClassId, deviceDescriptorId):
     deviceClass = get_deviceClass(deviceClassId)
@@ -157,26 +157,26 @@ def remove_configured_device():
             selectionString = "This device is used in a rule. How do you want to remove the device from the rules?"
             removePolicys = ["Remove the device from the rules","Delete all offending rules"]
             selection = nymea.get_selection(selectionString, removePolicys)
-            
+
             if removePolicys[selection] == "Remove the device from the rules":
                 params['removePolicy'] = "RemovePolicyUpdate"
             else:
                 params['removePolicy'] = "RemovePolicyCascade"
-            
-            response = nymea.send_command("Devices.RemoveConfiguredDevice", params)
-            
 
-  
+            response = nymea.send_command("Devices.RemoveConfiguredDevice", params)
+
+
+
     nymea.print_device_error_code(response['params']['deviceError'])
 
-    
+
 
 def edit_device():
     deviceId = select_configured_device()
     params = {}
     params['deviceId'] = deviceId
     params['name'] = raw_input("\nEnter the new \"name\" of the device: ")
-    response = nymea.send_command("Devices.EditDevice", params)   
+    response = nymea.send_command("Devices.EditDevice", params)
     nymea.print_device_error_code(response['params']['deviceError'])
 
 
@@ -190,7 +190,7 @@ def reconfigure_device():
         return None
     deviceParamTypes = deviceClass['paramTypes']
     currentDeviceParams = device['params']
-    createMethod = select_createMethod("Please select how do you want to edit this device", deviceClass['createMethods'])    
+    createMethod = select_createMethod("Please select how do you want to edit this device", deviceClass['createMethods'])
     print " --> Using create method \"%s\"\n" % (createMethod)
     params = {}
     if createMethod == "CreateMethodUser":
@@ -257,7 +257,7 @@ def select_createMethod(title, createMethods):
             print "ERROR: could not get selection of CreateMethod"
             return None
         return createMethods[selection]
-    
+
 
 def select_configured_device():
     devices = get_configured_devices()
@@ -289,7 +289,7 @@ def select_vendor():
     if selection != None:
         return vendorIdList[selection]
     return None
-    
+
 
 def select_deviceClass():
     vendorId = select_vendor()
@@ -367,6 +367,3 @@ def print_deviceClass():
     if deviceClassId == None:
         return None
     nymea.print_json_format(get_deviceClass(deviceClassId))
-
-
-

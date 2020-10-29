@@ -487,7 +487,7 @@ menu_data = {
             'subtitle': "Please select an option...",
             'options': [
                 {
-                    'title': "Show available zigbee adapters",
+                    'title': "List zigbee adapters",
                     'type': COMMAND,
                     'command': 'method_list_zigbee_adapters'
                 },
@@ -495,6 +495,16 @@ menu_data = {
                     'title': "List zigbee networks",
                     'type': COMMAND,
                     'command': 'method_list_zigbee_networks'
+                },
+                {
+                    'title': "Add zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_add_zigbee_network'
+                },
+                {
+                    'title': "Remove zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_remove_zigbee_network'
                 }
             ]
         }
@@ -834,6 +844,13 @@ def method_list_zigbee_adapters():
 
 def method_list_zigbee_networks():
     zigbeemanager.list_networks()
+
+def method_add_zigbee_network():
+    zigbeemanager.add_network()
+
+def method_remove_zigbee_network():
+    zigbeemanager.remove_network()
+
 
 ######################################################################
 # Menu functions
