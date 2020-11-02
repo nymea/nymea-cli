@@ -505,6 +505,16 @@ menu_data = {
                     'title': "Remove zigbee network",
                     'type': COMMAND,
                     'command': 'method_remove_zigbee_network'
+                },
+                {
+                    'title': "Factory reset zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_factory_reset_zigbee_network'
+                },
+                {
+                    'title': "Allow/deny nodes to join zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_permit_join_zigbee_network'
                 }
             ]
         }
@@ -851,6 +861,11 @@ def method_add_zigbee_network():
 def method_remove_zigbee_network():
     zigbeemanager.remove_network()
 
+def method_factory_reset_zigbee_network():
+    zigbeemanager.factory_reset_network()
+
+def method_permit_join_zigbee_network():
+    zigbeemanager.permit_join_network()
 
 ######################################################################
 # Menu functions
