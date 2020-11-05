@@ -48,7 +48,7 @@ def add_network():
 
     adapterList = [];
     for adapter in response['params']['adapters']:
-        adapterList.append("%s (%s) - %s" % (adapter['description'], adapter['systemLocation'], adapter['name']))
+        adapterList.append("%s (%s) - %s" % (adapter['description'], adapter['serialPort'], adapter['name']))
 
     selection = nymea.get_selection("Please select a device descriptor", adapterList)
     selectedAdapter = {}
@@ -61,9 +61,13 @@ def add_network():
     print("Selected adapter:")
     nymea.print_json_format(selectedAdapter)
     params = {}
-    params["adapter"] = selectedAdapter
+    params["serialPort"] = selectedAdapter["serialPort"]
+    params["baudRate"] = selectedAdapter["baudRate"]
+    params["backendType"] = selectedAdapter["backendType"]
     response = nymea.send_command("Zigbee.AddNetwork", params)
     print("Add network returned %s" % response["params"]["zigbeeError"])
+    if response["params"]["zigbeeError"] == "ZigbeeErrorNoError":
+        print("New network has the uuid %s" % response["params"]["networkUuid"])
 
 
 def remove_network():
