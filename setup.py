@@ -53,6 +53,7 @@ setup(name = "nymea-cli",
         "nymea.states",
         "nymea.timedescriptor",
         "nymea.settings",
+        "nymea.zigbeemanager",
         "tests.licensetests"
     ],
     data_files = [
