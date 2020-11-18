@@ -33,11 +33,35 @@ def list_available_adapters():
     nymea.print_json_format(response['params'])
 
 
+def list_backends():
+    params = {}
+    response = nymea.send_command("Zigbee.GetAvailableBackends", params)
+    nymea.print_json_format(response['params'])
+
+
 def list_networks():
     params = {}
     response = nymea.send_command("Zigbee.GetNetworks", params)
     nymea.print_json_format(response['params'])
 
+def selectNetwork(message):
+    params = {}
+    response = nymea.send_command("Zigbee.GetNetworks", params)
+    nymea.print_json_format(response['params'])
+    if len(response['params']['zigbeeNetworks']) == 0:
+        print "ERROR: there are no networks configured."
+        return None
+
+    networkList = [];
+    for network in response['params']['zigbeeNetworks']:
+        networkList.append("%s %s (channel %s) - %s" % (network['backend'], network['macAddress'], network['channel'], network['serialPort']))
+
+    selection = nymea.get_selection(message, networkList)
+    selectedNetwork = {}
+    if selection != None:
+        return response['params']['zigbeeNetworks'][selection]
+    else:
+        return None
 
 def add_network():
     # First get the list of adapters
@@ -63,7 +87,7 @@ def add_network():
     params = {}
     params["serialPort"] = selectedAdapter["serialPort"]
     params["baudRate"] = selectedAdapter["baudRate"]
-    params["backendType"] = selectedAdapter["backendType"]
+    params["backend"] = selectedAdapter["backend"]
     response = nymea.send_command("Zigbee.AddNetwork", params)
     print("Add network returned %s" % response["params"]["zigbeeError"])
     if response["params"]["zigbeeError"] == "ZigbeeErrorNoError":
@@ -71,23 +95,8 @@ def add_network():
 
 
 def remove_network():
-    params = {}
-    response = nymea.send_command("Zigbee.GetNetworks", params)
-    nymea.print_json_format(response['params'])
-    if len(response['params']['zigbeeNetworks']) == 0:
-        print "ERROR: there are no networks configured."
-        return None
-
-    networkList = [];
-    for network in response['params']['zigbeeNetworks']:
-        networkList.append("%s (channel %s) - %s" % (network['macAddress'], network['channel'], network['serialPort']))
-
-    selection = nymea.get_selection("Please select the network you want to remove", networkList)
-    selectedNetwork = {}
-    if selection != None:
-        selectedNetwork = response['params']['zigbeeNetworks'][selection]
-    else:
-        print "ERROR: invalid network selection."
+    selectedNetwork = selectNetwork("Please select the network you want to remove")
+    if selectedNetwork is None:
         return None
 
     print("Selected network:")
@@ -99,23 +108,8 @@ def remove_network():
 
 
 def factory_reset_network():
-    params = {}
-    response = nymea.send_command("Zigbee.GetNetworks", params)
-    nymea.print_json_format(response['params'])
-    if len(response['params']['zigbeeNetworks']) == 0:
-        print "ERROR: there are no networks configured."
-        return None
-
-    networkList = [];
-    for network in response['params']['zigbeeNetworks']:
-        networkList.append("%s (channel %s) - %s" % (network['macAddress'], network['channel'], network['serialPort']))
-
-    selection = nymea.get_selection("Please select the network you want to factory reset", networkList)
-    selectedNetwork = {}
-    if selection != None:
-        selectedNetwork = response['params']['zigbeeNetworks'][selection]
-    else:
-        print "ERROR: invalid network selection."
+    selectedNetwork = selectNetwork("Please select the network you want to factory reset")
+    if selectedNetwork is None:
         return None
 
     print("Selected network:")
@@ -127,23 +121,8 @@ def factory_reset_network():
 
 
 def permit_join_network():
-    params = {}
-    response = nymea.send_command("Zigbee.GetNetworks", params)
-    nymea.print_json_format(response['params'])
-    if len(response['params']['zigbeeNetworks']) == 0:
-        print "ERROR: there are no networks configured."
-        return None
-
-    networkList = [];
-    for network in response['params']['zigbeeNetworks']:
-        networkList.append("%s (channel %s) - %s" % (network['macAddress'], network['channel'], network['serialPort']))
-
-    selection = nymea.get_selection("Please select the network you want to allow/deny joining nodes", networkList)
-    selectedNetwork = {}
-    if selection != None:
-        selectedNetwork = response['params']['zigbeeNetworks'][selection]
-    else:
-        print "ERROR: invalid network selection."
+    selectedNetwork = selectNetwork("Please select the network you want to allow/deny joining nodes")
+    if selectedNetwork is None:
         return None
 
     print("Selected network:")

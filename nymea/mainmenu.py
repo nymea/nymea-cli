@@ -492,6 +492,11 @@ menu_data = {
                     'command': 'method_list_zigbee_adapters'
                 },
                 {
+                    'title': "List available backends",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_backends'
+                },
+                {
                     'title': "List zigbee networks",
                     'type': COMMAND,
                     'command': 'method_list_zigbee_networks'
@@ -851,6 +856,9 @@ def method_disconnect_networkdevice():
 
 def method_list_zigbee_adapters():
     zigbeemanager.list_available_adapters()
+
+def method_list_zigbee_backends():
+    zigbeemanager.list_backends()
 
 def method_list_zigbee_networks():
     zigbeemanager.list_networks()
