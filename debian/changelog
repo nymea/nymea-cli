@@ -1,3 +1,14 @@
+nymea-cli (1.1.5) xenial; urgency=medium
+
+  [ Simon Stürz ]
+  * Add missing api type browser
+  * WIP: Zigbee network methods
+
+  [ Michael Zanetti ]
+  * Don't depend on pybuild in the clean step
+
+ -- Jenkins <jenkins@nymea.io>  Tue, 15 Dec 2020 11:06:53 +0100
+
 nymea-cli (1.1.4) xenial; urgency=medium
 
   [ Michael Zanetti ]
