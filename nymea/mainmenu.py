@@ -36,6 +36,7 @@ import rules
 import logs
 import notifications
 import settings
+import zigbeemanager
 
 
 MENU = "menu"
@@ -479,6 +480,48 @@ menu_data = {
                     ]
                 }
             ]
+        },
+        {
+            'title': "Zigbee Manager",
+            'type': MENU,
+            'subtitle': "Please select an option...",
+            'options': [
+                {
+                    'title': "List zigbee adapters",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_adapters'
+                },
+                {
+                    'title': "List available backends",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_backends'
+                },
+                {
+                    'title': "List zigbee networks",
+                    'type': COMMAND,
+                    'command': 'method_list_zigbee_networks'
+                },
+                {
+                    'title': "Add zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_add_zigbee_network'
+                },
+                {
+                    'title': "Remove zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_remove_zigbee_network'
+                },
+                {
+                    'title': "Factory reset zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_factory_reset_zigbee_network'
+                },
+                {
+                    'title': "Allow/deny nodes to join zigbee network",
+                    'type': COMMAND,
+                    'command': 'method_permit_join_zigbee_network'
+                }
+            ]
         }
     ]
 }
@@ -806,6 +849,31 @@ def method_enable_wirelessnetworking():
 
 def method_disconnect_networkdevice():
     settings.disconnect_networkdevice()
+
+######################################################################
+# Zigbee manager
+######################################################################
+
+def method_list_zigbee_adapters():
+    zigbeemanager.list_available_adapters()
+
+def method_list_zigbee_backends():
+    zigbeemanager.list_backends()
+
+def method_list_zigbee_networks():
+    zigbeemanager.list_networks()
+
+def method_add_zigbee_network():
+    zigbeemanager.add_network()
+
+def method_remove_zigbee_network():
+    zigbeemanager.remove_network()
+
+def method_factory_reset_zigbee_network():
+    zigbeemanager.factory_reset_network()
+
+def method_permit_join_zigbee_network():
+    zigbeemanager.permit_join_network()
 
 ######################################################################
 # Menu functions
