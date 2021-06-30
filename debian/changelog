@@ -1,3 +1,10 @@
+nymea-cli (1.1.7) xenial; urgency=medium
+
+  [ Simon Stürz ]
+  * Fix reading params when adding or editing thing
+
+ -- Jenkins <jenkins@nymea.io>  Wed, 30 Jun 2021 12:45:12 +0200
+
 nymea-cli (1.1.6) xenial; urgency=medium
 
   [ Simon Stürz ]
