@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
 #  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
 #                                                                         #
@@ -18,7 +18,7 @@
 #  You should have received a copy of the GNU General Public License      #
 #  along with nymea-cli. If not, see <http://www.gnu.org/licenses/>.      #
 #                                                                         #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 import nymea
 
@@ -34,7 +34,7 @@ def read_params(paramTypes):
             param = {}
             param['paramTypeId'] = paramType['id']
             param['value'] = paramType.get('defaultValue', '')
-        elif any("allowedValues" in item for item in paramType):
+        elif any("allowedValues" in item for item in paramType) and len(paramType['allowedValues']) != 0:
             # has to be a string (for sorting list)
             allowedValues = []
             for value in paramType['allowedValues']:
@@ -55,11 +55,11 @@ def read_params(paramTypes):
                 if selection == None:
                     return None
                 paramValue = boolTypes[selection]
-            elif paramType['type'] == "Int": 
+            elif paramType['type'] == "Int":
                 paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
-            elif paramType['type'] == "Double": 
+            elif paramType['type'] == "Double":
                 paramValue = float(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
-            elif paramType['type'] == "Uint": 
+            elif paramType['type'] == "Uint":
                 paramValue = int(raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])))
             else:
                 paramValue = raw_input("Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type']))
@@ -81,7 +81,7 @@ def edit_params(currentDeviceParams, paramTypes):
             print "--------------------------------------------------------"
             continue
         param = {}
-        if any("allowedValues" in item for item in paramType):
+        if any("allowedValues" in item for item in paramType) and len(paramType['allowedValues']) != 0:
             title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentDeviceParams))
             selection = nymea.get_selection(title, paramType['allowedValues'])
             if selection == None:
@@ -112,7 +112,7 @@ def getParamName(paramTypeId, paramTypes):
     for paramType in paramTypes:
         if paramType['id'] == paramTypeId:
             return paramType['displayName']
-    
+
     return ""
 
 def get_param_value(paramTypeId, params):
@@ -136,7 +136,7 @@ def read_paramDescriptors(paramTypes):
             selection = nymea.get_selection(selectionString, boolTypes)
             if selection == None:
                 return None
-            paramValue = boolTypes[selection] 
+            paramValue = boolTypes[selection]
         else:
                 print "Please enter value for parameter \"%s\" (type: %s): " % (paramType['displayName'], paramType['type'])
                 paramValue = raw_input("%s %s " % (paramType['displayName'], nymea.get_valueOperator_string(operator)))
@@ -147,6 +147,3 @@ def read_paramDescriptors(paramTypes):
         params.append(param)
     #print "got params:", nymea.print_json_format(params)
     return params
-
-
-
