@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -21,7 +21,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import nymea
-import devices
+import things
 import events
 import actions
 import ruleactions
@@ -319,18 +319,18 @@ def execute_rule_actions():
     return None
 
 
-def list_rules_containig_deviceId():
-    deviceId = devices.select_configured_device()
-    if not deviceId:
+def list_rules_containig_thingId():
+    thingId = things.select_configured_thing()
+    if not thingId:
         return None
-    device = devices.get_device(deviceId)
+    thing = things.get_thing(thingId)
     params = {}
-    params['deviceId'] = deviceId
+    params['thingId'] = thingId
     response = nymea.send_command("Rules.FindRules", params)
     if not response['params']['ruleIds']:
-        print "\nThere is no rule containig this device."
+        print "\nThere is no rule containig this thing."
         return None
-    print "\nFollowing rules contain this device %s\n" %(deviceId)
+    print "\nFollowing rules contain this thing %s\n" %(thingId)
     for i in range(len(response['params']['ruleIds'])):
         ruleDescription = get_rule_description(response['params']['ruleIds'][i])
         print "%20s ( %s ) -> %s / %s" % (ruleDescription['name'], ruleDescription['id'], print_rule_enabled_status(ruleDescription['enabled']), print_rule_active_status(ruleDescription['active']))

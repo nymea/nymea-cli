@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -22,7 +22,7 @@
 
 import nymea
 import states
-import devices
+import things
 import actions
 import events
 import rules

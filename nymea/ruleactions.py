@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -21,7 +21,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import nymea
-import devices
+import things
 import parameters
 import actions
 import events
@@ -32,20 +32,20 @@ def create_rule_actions(eventDescriptors = []):
     while not enough:
         print "\n========================================================"
         raw_input("-> Press \"enter\" to create rule actions!  ")
-        deviceId = devices.select_configured_device()
-        if not deviceId:
+        thingId = things.select_configured_thing()
+        if not thingId:
             return None
-        device = devices.get_device(deviceId)
-        if not device:
+        thing = things.get_thing(thingId)
+        if not thing:
             return None
-        actionType = actions.select_actionType(device['deviceClassId'])
+        actionType = actions.select_actionType(thing['thingClassId'])
         if not actionType:
             continue
 
         params = read_ruleActionParams(actionType['paramTypes'], eventDescriptors)
     
         action = {}
-        action['deviceId'] = deviceId
+        action['thingId'] = thingId
         action['actionTypeId'] = actionType['id']
         if len(params) > 0:
             action['ruleActionParams'] = params
@@ -143,10 +143,10 @@ def read_ruleActionParams(paramTypes, eventDescriptors = []):
 def print_ruleActionList(actionList):
     for i in range(len(actionList)):
         action = actionList[i]
-        deviceName = devices.get_full_device_name(action['deviceId'])
+        thingName = things.get_full_thing_name(action['thingId'])
         actionType = actions.get_actionType(actionList[i]['actionTypeId'])
         actionParams = actionList[i]['ruleActionParams']
-        print  "%5s. -> %40s -> action: \"%s\"" %(i, deviceName, actionType['displayName'])
+        print  "%5s. -> %40s -> action: \"%s\"" %(i, thingName, actionType['displayName'])
         for i in range(len(actionParams)):
             if 'eventTypeId' in actionParams[i].keys():
                 eventTypeId = actionParams[i]['eventTypeId']

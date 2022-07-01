@@ -4,7 +4,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -31,7 +31,7 @@ buildOptions = dict(packages = [], excludes = [])
 
 setup(name = "nymea-cli",
     author = "Simon Stuerz",
-    author_email = "simon.stuerz@guh.io",
+    author_email = "simon.stuerz@nymea.io",
     description = "nymea command line interface - python",
     long_description = """\
     The nymea-cli (command line interface) is an admin tool written in python to communicate 
@@ -43,7 +43,7 @@ setup(name = "nymea-cli",
     scripts = ["nymea-cli"],
     py_modules = [
         "nymea.actions",
-        "nymea.devices",
+        "nymea.things",
         "nymea.events",
         "nymea.nymea",
         "nymea.logs",

@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -21,7 +21,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import nymea
-import devices
+import things
 import parameters
 
 def get_actionType(actionTypeId):
@@ -33,10 +33,10 @@ def get_actionType(actionTypeId):
     return response['params']['actionType']
 
 
-def get_actionTypes(deviceClassId):
+def get_actionTypes(thingClassId):
     params = {}
-    params['deviceClassId'] = deviceClassId
-    return nymea.send_command("Devices.GetActionTypes", params)['params']['actionTypes']
+    params['thingClassId'] = thingClassId
+    return nymea.send_command("Integrations.GetActionTypes", params)['params']['actionTypes']
 
 
 def create_actions():
@@ -45,16 +45,16 @@ def create_actions():
     while not enough:
         print "\n========================================================"
         raw_input("-> Press \"enter\" to create actions!  ")
-        deviceId = devices.select_configured_device()
-        if not deviceId:
+        thingId = things.select_configured_thing()
+        if not thingId:
             return None
-        device = devices.get_device(deviceId)
-        actionType = select_actionType(device['deviceClassId'])
+        thing = things.get_thing(thingId)
+        actionType = select_actionType(thing['thingClassId'])
         if not actionType:
             continue
         params = parameters.read_params(actionType['paramTypes'])
         action = {}
-        action['deviceId'] = deviceId
+        action['thingId'] = thingId
         action['actionTypeId'] = actionType['id']
         if len(params) > 0:
             action['params'] = params
@@ -66,29 +66,29 @@ def create_actions():
 
 
 def execute_action():
-    deviceId = devices.select_configured_device()
-    if deviceId == None:
+    thingId = things.select_configured_thing()
+    if thingId == None:
         return None
-    device = devices.get_device(deviceId)
-    actionType = select_actionType(device['deviceClassId'])
+    thing = things.get_thing(thingId)
+    actionType = select_actionType(thing['thingClassId'])
     #print nymea.print_json_format(actionType)
     if actionType == None:
-        print "\n    This device has no actions"
+        print "\n    This thing has no actions"
         return None
     actionTypeId = actionType['id']
     params = {}
     params['actionTypeId'] = actionTypeId
-    params['deviceId'] = deviceId
+    params['thingId'] = thingId
     actionType = get_actionType(actionTypeId)
     actionParams = parameters.read_params(actionType['paramTypes'])
     params['params'] = actionParams
     response = nymea.send_command("Actions.ExecuteAction", params)
     if response:  
-        nymea.print_device_error_code(response['params']['deviceError'])
+        nymea.print_thing_error_code(response['params']['thingError'])
     
     
-def select_actionType(deviceClassId):
-    actions = get_actionTypes(deviceClassId)
+def select_actionType(thingClassId):
+    actions = get_actionTypes(thingClassId)
     if not actions:
         return None
     actionList = []
@@ -105,23 +105,23 @@ def select_actionType(deviceClassId):
 def print_actionList(actionList):
     for i in range(len(actionList)):
         action = actionList[i]
-        device = devices.get_device(action['deviceId'])
+        thing = things.get_thing(action['thingId'])
         actionType = get_actionType(actionList[i]['actionTypeId'])
         actionParams = actionList[i]['params']
-        print  "%5s. ->  %40s -> action: \"%s\"" %(i, device['name'], actionType['displayName'])
+        print  "%5s. ->  %40s -> action: \"%s\"" %(i, thing['name'], actionType['displayName'])
         for i in range(len(actionParams)):
             print "%50s: %s" %(actionParams[i]['displayName'], actionParams[i]['value'])
 
 
 def print_actionType():
-    deviceId = devices.select_configured_device()
-    if deviceId == None:
+    thingId = things.select_configured_thing()
+    if thingId == None:
         return None
-    device = devices.get_device(deviceId)
-    actionType = select_actionType(device['deviceClassId'])
+    thing = things.get_thing(thingId)
+    actionType = select_actionType(thing['thingClassId'])
     #print nymea.print_json_format(actionType)
     if actionType == None:
-        print "\n    This device has no actions"
+        print "\n    This thing has no actions"
         return None
     actionType = get_actionType(actionType['id'])
     nymea.print_json_format(actionType)

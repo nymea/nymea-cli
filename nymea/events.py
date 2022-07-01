@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -21,7 +21,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import nymea
-import devices
+import things
 import parameters
 
 def get_eventType(eventTypeId):
@@ -31,17 +31,17 @@ def get_eventType(eventTypeId):
     return response['params']['eventType']
 
 
-def get_eventTypes(deviceClassId):
+def get_eventTypes(thingClassId):
     params = {}
-    params['deviceClassId'] = deviceClassId
-    eventTypes = nymea.send_command("Devices.GetEventTypes", params)['params']['eventTypes']
+    params['thingClassId'] = thingClassId
+    eventTypes = nymea.send_command("Integrations.GetEventTypes", params)['params']['eventTypes']
     if eventTypes:
         return eventTypes
     return None
 
 
-def select_eventType(deviceClassId):
-    eventTypes = get_eventTypes(deviceClassId)
+def select_eventType(thingClassId):
+    eventTypes = get_eventTypes(thingClassId)
     if not eventTypes:
         return None
     eventTypeList = []
@@ -69,17 +69,17 @@ def create_eventDescriptors():
 
 def create_eventDescriptor():
     print " -> Creating EventDescriptor:\n"
-    deviceId = devices.select_configured_device()
-    device = devices.get_device(deviceId)
-    if not device:
+    thingId = things.select_configured_thing()
+    thing = things.get_thing(thingId)
+    if not thing:
         return None
-    eventType = select_eventType(device['deviceClassId']); 
+    eventType = select_eventType(thing['thingClassId']); 
     if not eventType:
-        print "\n    This device has no events"
+        print "\n    This thing has no events"
         return None
     params = parameters.read_paramDescriptors(eventType['paramTypes'])
     eventDescriptor = {}
-    eventDescriptor['deviceId'] = deviceId
+    eventDescriptor['thingId'] = thingId
     eventDescriptor['eventTypeId'] = eventType['id']
     if len(params) > 0:
         eventDescriptor['paramDescriptors'] = params
@@ -89,22 +89,22 @@ def create_eventDescriptor():
 def print_eventDescriptors(eventDescriptors):
     for i in range(len(eventDescriptors)):
         eventDescriptor = eventDescriptors[i]
-        deviceName = devices.get_full_device_name(eventDescriptor['deviceId'])
+        thingName = things.get_full_thing_name(eventDescriptor['thingId'])
         eventType = get_eventType(eventDescriptor['eventTypeId'])
         paramDescriptors = eventDescriptor['paramDescriptors']
-        print  "%5s. -> %40s -> event: \"%s\"" %(i, deviceName, eventType['displayName'])
+        print  "%5s. -> %40s -> event: \"%s\"" %(i, thingName, eventType['displayName'])
         for i in range(len(paramDescriptors)):
             print "%50s %s %s" %(paramDescriptors[i]['name'], nymea.get_valueOperator_string(paramDescriptors[i]['operator']), paramDescriptors[i]['value'])
 
 
 def print_eventType():
-    deviceId = devices.select_configured_device()
-    device = devices.get_device(deviceId)
-    if not device:
+    thingId = things.select_configured_thing()
+    thing = things.get_thing(thingId)
+    if not thing:
         return None
-    eventType = select_eventType(device['deviceClassId']); 
+    eventType = select_eventType(thing['thingClassId']); 
     if not eventType:
-        print "\n    This device has no events"
+        print "\n    This thing has no events"
         return None
     nymea.print_json_format(eventType)
 

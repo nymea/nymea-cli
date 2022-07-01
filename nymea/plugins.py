@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -24,13 +24,13 @@ import nymea
 import parameters
 
 def get_plugins():
-    return nymea.send_command("Devices.GetPlugins")['params']['plugins']
+    return nymea.send_command("Integrations.GetPlugins")['params']['plugins']
 
 
 def get_plugin_configuration(pluginId):
     params = {}
     params['pluginId'] = pluginId
-    return nymea.send_command("Devices.GetPluginConfiguration", params)['params']['configuration']
+    return nymea.send_command("Integrations.GetPluginConfiguration", params)['params']['configuration']
 
 
 def set_plugin_configuration():
@@ -40,8 +40,8 @@ def set_plugin_configuration():
     params = {}
     params['pluginId'] = pluginId
     params['configuration'] = parameters.read_params(paramTypes)
-    response = nymea.send_command("Devices.SetPluginConfiguration", params)
-    nymea.print_device_error_code(response['params']['deviceError'])
+    response = nymea.send_command("Integrations.SetPluginConfiguration", params)
+    nymea.print_thing_error_code(response['params']['thingError'])
     
 
 def get_plugin(pluginId):

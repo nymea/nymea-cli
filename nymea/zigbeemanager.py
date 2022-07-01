@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
-#  Copyright (C) 2015 - 2020gu  de Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2020gu  de Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -74,7 +74,7 @@ def add_network():
     for adapter in response['params']['adapters']:
         adapterList.append("%s (%s) - %s" % (adapter['description'], adapter['serialPort'], adapter['name']))
 
-    selection = nymea.get_selection("Please select a device descriptor", adapterList)
+    selection = nymea.get_selection("Please select a thing descriptor", adapterList)
     selectedAdapter = {}
     if selection != None:
         selectedAdapter = response['params']['adapters'][selection]
