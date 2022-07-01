@@ -1,5 +1,5 @@
 Source: nymea-cli
-Maintainer: Simon Stürz <simon.stuerz@guh.io>
+Maintainer: Simon Stürz <simon.stuerz@nymea.io>
 Section: python
 Priority: optional
 Build-Depends: python-all (>= 2.6.6-3),

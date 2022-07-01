@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -367,7 +367,7 @@ def scan_wirelessaccesspoints():
     nymea.print_networkmanager_error_code(response['params']['networkManagerError'])        
         
         
-def list_network_devices():
+def list_network_things():
     params = {}
     response = nymea.send_command("NetworkManager.GetNetworkDevices", params)
     nymea.print_json_format(response['params'])
@@ -400,7 +400,7 @@ def connect_wifi():
     nymea.print_networkmanager_error_code(response['params']['networkManagerError'])
 
 
-def disconnect_networkdevice():
+def disconnect_networkthing():
     interface = selectWirelessInterface()
     if interface is None:
         print "There is no wireless interface available"

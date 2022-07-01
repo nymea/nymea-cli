@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -27,7 +27,7 @@ import curses
 import os
 import ssl
 
-import devices
+import things
 import events
 import actions
 import rules
@@ -388,62 +388,62 @@ def get_stateEvaluator_string(stateEvaluator):
         return "<unknown state evaluator>"
 
 
-def print_device_error_code(deviceError):
+def print_thing_error_code(thingError):
 
-    if deviceError == None:
+    if thingError == None:
         print "timeout"
         return
 
-    if deviceError == "DeviceErrorNoError":
-        print "\nSuccess! (", deviceError, ")"
-    elif deviceError == "DeviceErrorPluginNotFound":
-        print "\nERROR: the plugin could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorVendorNotFound":
-        print "\nERROR: the vendor could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDeviceNotFound":
-        print "\nERROR: the device could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDeviceClassNotFound":
-        print "\nERROR: the deviceClass could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorActionTypeNotFound":
-        print "\nERROR: the actionType could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorStateTypeNotFound":
-        print "\nERROR: the stateType could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorEventTypeNotFound":
-        print "\nERROR: the eventType could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDeviceDescriptorNotFound":
-        print "\nERROR: the deviceDescriptor could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorMissingParameter":
-        print "\nERROR: some parameters are missing. (", deviceError, ")"
-    elif deviceError == "DeviceErrorInvalidParameter":
-        print "\nERROR: invalid parameter. (", deviceError, ")"
-    elif deviceError == "DeviceErrorSetupFailed":
-        print "\nERROR: setup failed. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDuplicateUuid":
-        print "\nERROR: uuid allready exists. (", deviceError, ")"
-    elif deviceError == "DeviceErrorCreationMethodNotSupported":
-        print "\nERROR: the selected CreationMethod is not supported for this device. (", deviceError, ")"
-    elif deviceError == "DeviceErrorSetupMethodNotSupported":
-        print "\nERROR: the selected SetupMethod is not supported for this device. (", deviceError, ")"
-    elif deviceError == "DeviceErrorHardwareNotAvailable":
-        print "\nERROR: the hardware is not available. (", deviceError, ")"
-    elif deviceError == "DeviceErrorHardwareFailure":
-        print "\nERROR: hardware failure. Something went wrong with the hardware. (", deviceError, ")"
-    elif deviceError == "DeviceErrorAsync":
-        print "\nINFO: the response will need some time. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDeviceInUse":
-        print "\nERROR: the device is currently in use. Try again later. (", deviceError, ")"
-    elif deviceError == "DeviceErrorPairingTransactionIdNotFound":
-        print "\nERROR: the pairingTransactionId could not be found. (", deviceError, ")"
-    elif deviceError == "DeviceErrorParameterNotWritable":
-        print "\nERROR: one of the parameters is not writable. (", deviceError, ")"
-    elif deviceError == "DeviceErrorAuthentificationFailure":
-        print "\nERROR: could not authenticate. (", deviceError, ")"
-    elif deviceError == "DeviceErrorDeviceIsChild":
-        print "\nERROR: this device is a child device (", deviceError, "). Please remove the parent device."
-    elif deviceError == "DeviceErrorDeviceInRule":
-        print "\nERROR: this device gets used in a rule (", deviceError, "). Please specify the remove policy."
+    if thingError == "ThingErrorNoError":
+        print "\nSuccess! (", thingError, ")"
+    elif thingError == "ThingErrorPluginNotFound":
+        print "\nERROR: the plugin could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorVendorNotFound":
+        print "\nERROR: the vendor could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorThingNotFound":
+        print "\nERROR: the thing could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorthingClassNotFound":
+        print "\nERROR: the thingClass could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorActionTypeNotFound":
+        print "\nERROR: the actionType could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorStateTypeNotFound":
+        print "\nERROR: the stateType could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorEventTypeNotFound":
+        print "\nERROR: the eventType could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorThingDescriptorNotFound":
+        print "\nERROR: the thingDescriptor could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorMissingParameter":
+        print "\nERROR: some parameters are missing. (", thingError, ")"
+    elif thingError == "ThingErrorInvalidParameter":
+        print "\nERROR: invalid parameter. (", thingError, ")"
+    elif thingError == "ThingErrorSetupFailed":
+        print "\nERROR: setup failed. (", thingError, ")"
+    elif thingError == "ThingErrorDuplicateUuid":
+        print "\nERROR: uuid allready exists. (", thingError, ")"
+    elif thingError == "ThingErrorCreationMethodNotSupported":
+        print "\nERROR: the selected CreationMethod is not supported for this thing. (", thingError, ")"
+    elif thingError == "ThingErrorSetupMethodNotSupported":
+        print "\nERROR: the selected SetupMethod is not supported for this thing. (", thingError, ")"
+    elif thingError == "ThingErrorHardwareNotAvailable":
+        print "\nERROR: the hardware is not available. (", thingError, ")"
+    elif thingError == "ThingErrorHardwareFailure":
+        print "\nERROR: hardware failure. Something went wrong with the hardware. (", thingError, ")"
+    elif thingError == "ThingErrorAsync":
+        print "\nINFO: the response will need some time. (", thingError, ")"
+    elif thingError == "ThingErrorThingInUse":
+        print "\nERROR: the thing is currently in use. Try again later. (", thingError, ")"
+    elif thingError == "ThingErrorPairingTransactionIdNotFound":
+        print "\nERROR: the pairingTransactionId could not be found. (", thingError, ")"
+    elif thingError == "ThingErrorParameterNotWritable":
+        print "\nERROR: one of the parameters is not writable. (", thingError, ")"
+    elif thingError == "ThingErrorAuthentificationFailure":
+        print "\nERROR: could not authenticate. (", thingError, ")"
+    elif thingError == "ThingErrorThingIsChild":
+        print "\nERROR: this thing is a child thing (", thingError, "). Please remove the parent thing."
+    elif thingError == "ThingErrorThingInRule":
+        print "\nERROR: this thing gets used in a rule (", thingError, "). Please specify the remove policy."
     else:
-        print "\nERROR: Unknown error code: ", deviceError,  "Please take a look at the newest API version."
+        print "\nERROR: Unknown error code: ", thingError,  "Please take a look at the newest API version."
 
 
 def print_rule_error_code(ruleError):
@@ -453,8 +453,8 @@ def print_rule_error_code(ruleError):
         print "\nERROR: the ruleId is not valid. (", ruleError, ")"
     elif ruleError == "RuleErrorRuleNotFound":
         print "\nERROR: the rule could not be found. (", ruleError, ")"
-    elif ruleError == "RuleErrorDeviceNotFound":
-        print "\nERROR: the device could not be found for this rule. (", ruleError, ")"
+    elif ruleError == "RuleErrorThingNotFound":
+        print "\nERROR: the thing could not be found for this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorEventTypeNotFound":
         print "\nERROR: the eventType could not be found for this rule. (", ruleError, ")"
     elif ruleError == "RuleErrorStateTypeNotFound":
@@ -506,7 +506,7 @@ def print_networkmanager_error_code(networkManagerError):
     elif networkManagerError == "NetworkManagerErrorUnknownError":
         print "\nERROR: an unknown error occured (", networkManagerError, ")"
     elif networkManagerError == "NetworkManagerErrorWirelessNotAvailable":
-        print "\nERROR: there is no wireless device available. (", networkManagerError, ")"
+        print "\nERROR: there is no wireless thing available. (", networkManagerError, ")"
     elif networkManagerError == "NetworkManagerErrorAccessPointNotFound":
         print "\nERROR: the wifi access point could not be found. (", networkManagerError, ")"
     elif networkManagerError == "NetworkManagerErrorWirelessNetworkingDisabled":
@@ -521,26 +521,26 @@ def print_networkmanager_error_code(networkManagerError):
         print "\nERROR: Unknown error code: ", networkManagerError,  "Please take a look at the newest API version."
 
 
-def printSupportedDevicesStructure():
-    vendors = devices.get_supported_vendors()
+def printSupportedThingsStructure():
+    vendors = things.get_supported_vendors()
     for vendor in vendors['params']['vendors']:
         print "- %s" % vendor['displayName']
-        deviceClasses = devices.get_deviceClasses(vendor['id'])
-        for deviceClass in deviceClasses:
-            print "    -> %s" % deviceClass['displayName']
-            if len(deviceClass['actionTypes']) != 0:
+        thingClasses = things.get_thingClasses(vendor['id'])
+        for thingClass in thingClasses:
+            print "    -> %s" % thingClass['displayName']
+            if len(thingClass['actionTypes']) != 0:
                 print "       Actions:"
-                for actionType in deviceClass['actionTypes']:
+                for actionType in thingClass['actionTypes']:
                     print "         - %s" % actionType['displayName']
 
-            if len(deviceClass['stateTypes']) != 0:
+            if len(thingClass['stateTypes']) != 0:
                 print "       States:"
-                for stateType in deviceClass['stateTypes']:
+                for stateType in thingClass['stateTypes']:
                     print "         - %s" % (stateType['displayName'])
 
-            if len(deviceClass['eventTypes']) != 0:
+            if len(thingClass['eventTypes']) != 0:
                 print "       Events:"
-                for eventType in deviceClass['eventTypes']:
+                for eventType in thingClass['eventTypes']:
                     print "         - %s" % eventType['displayName']
 
 

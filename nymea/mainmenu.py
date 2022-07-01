@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -27,7 +27,7 @@ import traceback
 import curses
 
 import nymea
-import devices
+import things
 import plugins
 import events
 import states
@@ -49,29 +49,29 @@ menu_data = {
     'subtitle': "Please select an option...",
     'options':[
         {
-            'title': "Devices",
+            'title': "Things",
             'type': MENU,
             'subtitle': "Please select an option...",
             'options': [
                 {
-                    'title': "Add a new device",
+                    'title': "Add a new thing",
                     'type': COMMAND,
-                    'command': 'method_add_device'
+                    'command': 'method_add_thing'
                 },
                 {
-                    'title': "Remove a device",
+                    'title': "Remove a thing",
                     'type': COMMAND,
-                    'command': 'method_remove_device'
+                    'command': 'method_remove_thing'
                 },
                 {
-                    'title': "Edit device",
+                    'title': "Edit thing",
                     'type': COMMAND,
-                    'command': 'method_edit_device'
+                    'command': 'method_edit_thing'
                 },
                 {
-                    'title': "Reconfigure device",
+                    'title': "Reconfigure thing",
                     'type': COMMAND,
-                    'command': 'method_reconfigure_device'
+                    'command': 'method_reconfigure_thing'
                 },
                 {
                     'title': "Execute an action",
@@ -84,19 +84,19 @@ menu_data = {
                     'subtitle': "Please select what you want to list...",
                     'options': [
                         {
-                            'title': "List configured devices",
+                            'title': "List configured things",
                             'type': COMMAND,
-                            'command': 'method_list_configured_devices'
+                            'command': 'method_list_configured_things'
                         },
                         {
-                            'title': "List device parameters",
+                            'title': "List thing parameters",
                             'type': COMMAND,
-                            'command': 'method_list_configured_device_params'
+                            'command': 'method_list_configured_thing_params'
                         },
                         {
-                            'title': "List device states",
+                            'title': "List thing states",
                             'type': COMMAND,
-                            'command': 'method_list_device_states'
+                            'command': 'method_list_thing_states'
                         },
                         {
                             'title': "List supported vendors",
@@ -104,14 +104,14 @@ menu_data = {
                             'command': 'method_list_vendors'
                         },
                         {
-                            'title': "List supported devices",
+                            'title': "List supported things",
                             'type': COMMAND,
-                            'command': 'method_list_deviceClasses'
+                            'command': 'method_list_thingClasses'
                         },
                         {
-                            'title': "List device hirarchy",
+                            'title': "List thing hirarchy",
                             'type': COMMAND,
-                            'command': 'method_printSupportedDevicesStructure'
+                            'command': 'method_printSupportedThingsStructure'
                         }
                     ]
                 },
@@ -121,9 +121,9 @@ menu_data = {
                     'subtitle': "Please select what you want to print...",
                     'options': [
                         {
-                            'title': "Print DeviceClass",
+                            'title': "Print thingClass",
                             'type': COMMAND,
-                            'command': 'method_print_deviceClass'
+                            'command': 'method_print_thingClass'
                         },
                         {
                             'title': "Print ActionType",
@@ -185,9 +185,9 @@ menu_data = {
                     'command': 'method_list_rules'
                 },
                 {
-                    'title': "List rules containing a certain device",
+                    'title': "List rules containing a certain thing",
                     'type': COMMAND,
-                    'command': 'method_list_rules_containig_deviceId'
+                    'command': 'method_list_rules_containig_thingId'
                 }
             ]
         },
@@ -224,14 +224,14 @@ menu_data = {
             'subtitle': "Please select an option...",
             'options': [
                 {
-                    'title': "Device logs",
+                    'title': "Thing logs",
                     'type': COMMAND,
-                    'command': 'method_device_logs'
+                    'command': 'method_thing_logs'
                 },
                 {
-                    'title': "Device state logs",
+                    'title': "Thing state logs",
                     'type': COMMAND,
-                    'command': 'method_device_state_logs'
+                    'command': 'method_thing_state_logs'
                 },
                 {
                     'title': "Rule logs",
@@ -443,9 +443,9 @@ menu_data = {
                             'command': 'method_show_network_status'
                         },
                         {
-                            'title': "Network devices",
+                            'title': "Network things",
                             'type': COMMAND,
-                            'command': 'method_list_network_devices'
+                            'command': 'method_list_network_things'
                         },
                         {
                             'title': "Enable / Disable networking",
@@ -473,9 +473,9 @@ menu_data = {
                             'command': 'method_connect_wifi'
                         },
                         {
-                            'title': "Disconnect network device",
+                            'title': "Disconnect network thing",
                             'type': COMMAND,
-                            'command': 'method_disconnect_networkdevice'
+                            'command': 'method_disconnect_networkthing'
                         }
                     ]
                 }
@@ -527,31 +527,31 @@ menu_data = {
 }
 
 ######################################################################
-# Devices
+# Things
 ######################################################################
-def method_add_device():
-    devices.add_device()
+def method_add_thing():
+    things.add_thing()
 
-def method_remove_device():
-    devices.remove_configured_device()
+def method_remove_thing():
+    things.remove_configured_thing()
 
-def method_edit_device():
-    devices.edit_device()
+def method_edit_thing():
+    things.edit_thing()
 
-def method_reconfigure_device():
-    devices.reconfigure_device()
+def method_reconfigure_thing():
+    things.reconfigure_thing()
 
 def method_execute_action():
     actions.execute_action()
 
-def method_list_configured_device_params():
-    devices.list_configured_device_params()
+def method_list_configured_thing_params():
+    things.list_configured_thing_params()
 
-def method_list_device_states():
-    devices.list_device_states()
+def method_list_thing_states():
+    things.list_thing_states()
 
 def method_list_vendors():
-    devices.list_vendors()
+    things.list_vendors()
 
 def method_list_plugins():
     plugins.list_plugins()
@@ -565,17 +565,17 @@ def method_list_plugin_configuration():
 def method_list_plugin_info():
     plugins.list_plugin_info()
 
-def method_list_configured_devices():
-    devices.list_configured_devices()
+def method_list_configured_things():
+    things.list_configured_things()
 
-def method_list_deviceClasses(vendorId = None):
-    devices.list_deviceClasses()
+def method_list_thingClasses(vendorId = None):
+    things.list_thingClasses()
 
-def method_list_deviceClasses_by_vendor():
-    method_list_deviceClasses(devices.select_vendor())
+def method_list_thingClasses_by_vendor():
+    method_list_thingClasses(things.select_vendor())
 
-def method_printSupportedDevicesStructure():
-    nymea.printSupportedDevicesStructure()
+def method_printSupportedThingsStructure():
+    nymea.printSupportedThingsStructure()
 
 ######################################################################
 # Rules
@@ -602,8 +602,8 @@ def method_execute_rule_actions():
 def method_list_rules():
     rules.list_rules()
 
-def method_list_rules_containig_deviceId():
-    rules.list_rules_containig_deviceId()
+def method_list_rules_containig_thingId():
+    rules.list_rules_containig_thingId()
 
 ######################################################################
 # Logs
@@ -614,20 +614,20 @@ def method_list_log_entries():
     global nymeaPort
     logs.log_window(nymeaHost, nymeaPort)
 
-def method_device_logs():
+def method_thing_logs():
     global nymeaHost
     global nymeaPort
-    params = logs.create_device_logfilter()
+    params = logs.create_thing_logfilter()
     print "\nThe filter:\n"
     nymea.print_json_format(params)
     nymea.debug_stop()
     if params:
         logs.log_window(nymeaHost, nymeaPort, params)
 
-def method_device_state_logs():
+def method_thing_state_logs():
     global nymeaHost
     global nymeaPort
-    params = logs.create_device_state_logfilter()
+    params = logs.create_thing_state_logfilter()
     print "\nThe filter:\n"
     nymea.print_json_format(params)
     nymea.debug_stop()
@@ -746,8 +746,8 @@ def method_notification_sniffer():
 def method_list_server_info():
     nymea.print_server_version()
 
-def method_print_deviceClass():
-    devices.print_deviceClass()
+def method_print_thingClass():
+    things.print_thingClass()
 
 def method_print_actionType():
     actions.print_actionType()
@@ -835,8 +835,8 @@ def method_scan_wirelessaccesspoints():
 def method_show_network_status():
     settings.show_network_status()
 
-def method_list_network_devices():
-    settings.list_network_devices()
+def method_list_network_things():
+    settings.list_network_things()
 
 def method_connect_wifi():
     settings.connect_wifi()
@@ -847,8 +847,8 @@ def method_enable_networking():
 def method_enable_wirelessnetworking():
     settings.enable_wirelessnetworking()
 
-def method_disconnect_networkdevice():
-    settings.disconnect_networkdevice()
+def method_disconnect_networkthing():
+    settings.disconnect_networkthing()
 
 ######################################################################
 # Zigbee manager

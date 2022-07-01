@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -32,7 +32,7 @@ import time
 
 import nymea
 import states
-import devices
+import things
 import actions
 import events
 import rules
@@ -40,7 +40,7 @@ import rules
 global stateTypeIdCache
 global actionTypeIdCache
 global eventTypeIdCache
-global deviceIdCache
+global thingIdCache
 global ruleIdCache
 global logFilter
 
@@ -58,14 +58,14 @@ def log_window(nymeaHost, nymeaPort, params = None):
     global stateTypeIdCache
     global actionTypeIdCache
     global eventTypeIdCache
-    global deviceIdCache
+    global thingIdCache
     global ruleIdCache
     global logFilter
 
     stateTypeIdCache = {}
     actionTypeIdCache = {}
     eventTypeIdCache = {}
-    deviceIdCache = {}
+    thingIdCache = {}
     ruleIdCache = {}
     logFilter = params
     
@@ -258,7 +258,7 @@ def get_log_entry_line(entry, checkFilter = False):
     global stateTypeIdCache
     global actionTypeIdCache
     global eventTypeIdCache
-    global deviceIdCache
+    global thingIdCache
     global ruleIdCache
     
     global logFilter
@@ -274,7 +274,7 @@ def get_log_entry_line(entry, checkFilter = False):
         levelString = "(A)"
         error = entry['errorCode']
     if entry['source'] == "LoggingSourceSystem":
-        deviceName = "nymea server"
+        thingName = "nymea server"
         sourceType = "System"
         symbolString = "->"
         sourceName = "Active changed"
@@ -296,7 +296,7 @@ def get_log_entry_line(entry, checkFilter = False):
             else:
                 sourceName = typeId
         value = entry['value']
-        deviceName = get_device_name(entry)
+        thingName = get_thing_name(entry)
     if entry['source'] == "LoggingSourceActions":
         typeId = entry['typeId']
         sourceType = "Action executed"
@@ -311,7 +311,7 @@ def get_log_entry_line(entry, checkFilter = False):
                 sourceName = typeId
             actionTypeIdCache[typeId] = sourceName
         value = entry['value']
-        deviceName = get_device_name(entry)
+        thingName = get_thing_name(entry)
     if entry['source'] == "LoggingSourceEvents":
         typeId = entry['typeId']
         sourceType = "Event triggered"
@@ -323,7 +323,7 @@ def get_log_entry_line(entry, checkFilter = False):
             sourceName = eventType['displayName']
             eventTypeIdCache[typeId] = sourceName
         value = entry['value']
-        deviceName = get_device_name(entry)
+        thingName = get_thing_name(entry)
     if entry['source'] == "LoggingSourceRules":
         typeId = entry['typeId']
         if entry['eventType'] == "LoggingEventTypeTrigger":
@@ -360,44 +360,44 @@ def get_log_entry_line(entry, checkFilter = False):
                 value = "inactive"
         
         if typeId in ruleIdCache:
-            deviceName = ruleIdCache[typeId]
+            thingName = ruleIdCache[typeId]
         else:
             rule = rules.get_rule_description(typeId)
             if rule is not None and 'name' in rule:
-                deviceName = rule['name']
+                thingName = rule['name']
             else:
-                deviceName = typeId
-            ruleIdCache[typeId] = deviceName
+                thingName = typeId
+            ruleIdCache[typeId] = thingName
     timestamp = datetime.datetime.fromtimestamp(entry['timestamp']/1000)
-    line = "%s %s | %19s | %38s | %20s %3s %20s | %10s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), deviceName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
+    line = "%s %s | %19s | %38s | %20s %3s %20s | %10s" %(levelString.encode('utf-8'), timestamp, sourceType.encode('utf-8'), thingName.encode('utf-8'), sourceName.encode('utf-8'), symbolString.encode('utf-8'), value.encode('utf-8'), error.encode('utf-8'))
     return line
 
 
-def create_device_logfilter():
+def create_thing_logfilter():
     params = {}
-    deviceIds = []
-    deviceId = devices.select_configured_device()
-    if not deviceId:
+    thingIds = []
+    thingId = things.select_configured_thing()
+    if not thingId:
         return None
-    deviceIds.append(deviceId)
-    params['deviceIds'] = deviceIds
+    thingIds.append(thingId)
+    params['thingIds'] = thingIds
     return params
 
 
-def create_device_state_logfilter():
+def create_thing_state_logfilter():
     params = {}
-    deviceIds = []
+    thingIds = []
     typeIds = []
     loggingSources = []
     loggingSources.append("LoggingSourceStates")
     params['loggingSources'] = loggingSources
-    deviceId = devices.select_configured_device()
-    if not deviceId:
+    thingId = things.select_configured_thing()
+    if not thingId:
         return None
-    deviceIds.append(deviceId)
-    params['deviceIds'] = deviceIds
-    device = devices.get_device(deviceId)
-    stateType = states.select_stateType(device['deviceClassId'])
+    thingIds.append(thingId)
+    params['thingIds'] = thingIds
+    thing = things.get_thing(thingId)
+    stateType = states.select_stateType(thing['thingClassId'])
     if not stateType:
         return None
     typeIds.append(stateType['id'])
@@ -435,28 +435,28 @@ def create_logfilter():
     params = {}
     boolTypes = ["yes","no"]
     
-    # Devices
-    selection = nymea.get_selection("Do you want to filter for \"Devices\"? ", boolTypes)
+    # Things
+    selection = nymea.get_selection("Do you want to filter for \"Things\"? ", boolTypes)
     if boolTypes[selection] == "yes":
-        deviceIds = []
-        deviceId = devices.select_configured_device()
-        deviceIds.append(deviceId)
+        thingIds = []
+        thingId = things.select_configured_thing()
+        thingIds.append(thingId)
         
         
         finished = False
         while not finished:
-            selection = nymea.get_selection("Do you want to add an other \"Device\"? ", boolTypes)
+            selection = nymea.get_selection("Do you want to add an other \"Thing\"? ", boolTypes)
             if boolTypes[selection] == "no":
                 finished = True
                 break
-            deviceId = devices.select_configured_device()
-            if not deviceId:
-                params['deviceIds'] = deviceIds
+            thingId = things.select_configured_thing()
+            if not thingId:
+                params['thingIds'] = thingIds
                 return params
-            deviceIds.append(deviceId)
+            thingIds.append(thingId)
             
       
-        params['deviceIds'] = deviceIds
+        params['thingIds'] = thingIds
     
     # LoggingSources
     selection = nymea.get_selection("Do you want to filter for \"LoggingSource\"? ", boolTypes)
@@ -558,20 +558,20 @@ def create_time_filter():
     return timeFilter
         
 
-def get_device_name(entry):
-    global deviceIdCache
+def get_thing_name(entry):
+    global thingIdCache
     
-    deviceName = None
+    thingName = None
     name = None
     
-    if entry['deviceId'] in deviceIdCache:
-            deviceName = deviceIdCache[entry['deviceId']]
+    if entry['thingId'] in thingIdCache:
+            thingName = thingIdCache[entry['thingId']]
     else:
-        device = devices.get_device(entry['deviceId'])
-        deviceName = device['name']
-        deviceIdCache[entry['deviceId']] = deviceName
+        thing = things.get_thing(entry['thingId'])
+        thingName = thing['name']
+        thingIdCache[entry['thingId']] = thingName
     
-    return deviceName
+    return thingName
 
 
 def verify_filter(entry):
@@ -580,11 +580,11 @@ def verify_filter(entry):
     if not logFilter:
         return True
     
-    # check if we should filter for deviceIds
-    if 'deviceIds' in logFilter:
+    # check if we should filter for thingIds
+    if 'thingIds' in logFilter:
         found = False
-        for deviceId in logFilter['deviceIds']:
-            if deviceId == entry['deviceId']:
+        for thingId in logFilter['thingIds']:
+            if thingId == entry['thingId']:
                 found = True
                 break
         if not found:

@@ -4,7 +4,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2022 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -38,7 +38,7 @@ from nymea import mainmenu
 ###########################################################
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='The nymea-cli (command line interface) is an admin tool written in python to communicate with the nymea daemon JSON-RPC API and test functionality of nymea.')
+    parser = argparse.ArgumentParser(description='The nymea-cli (command line interface) is an admin tool written in python2 to communicate with the nymea daemon JSON-RPC API and test functionality of nymea.')
     parser.add_argument('-v','--version', action='version', version=__version__)
     parser.add_argument('--host', type=str, default='localhost', help='the location of the nymea daemon (default 127.0.0.1)')
     parser.add_argument('--port', type=int, default=2222, help='the port of the the nymea daemon (default 2222)')

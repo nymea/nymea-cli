@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -21,7 +21,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 import nymea
-import devices
+import things
 
 def get_stateType(stateTypeId):
     params = {}
@@ -32,22 +32,22 @@ def get_stateType(stateTypeId):
     return None
     
 
-def get_stateTypes(deviceClassId):
+def get_stateTypes(thingClassId):
     params = {}
-    params['deviceClassId'] = deviceClassId
-    response = nymea.send_command("Devices.GetStateTypes", params);
+    params['thingClassId'] = thingClassId
+    response = nymea.send_command("Integrations.GetStateTypes", params);
     if "stateTypes" in response['params']:
         return response['params']['stateTypes']
     else:
         return None
 
 
-def select_stateType(deviceClassId):
-    stateTypes = get_stateTypes(deviceClassId)
+def select_stateType(thingClassId):
+    stateTypes = get_stateTypes(thingClassId)
     if not stateTypes:
-        print "\n    This device has no states.\n"
+        print "\n    This thing has no states.\n"
         print "\n========================================================"
-        raw_input("-> Press \"enter\" to select an other device!  ")
+        raw_input("-> Press \"enter\" to select an other thing!  ")
         return None
     stateTypeList = []
     for i in range(len(stateTypes)):
@@ -59,11 +59,11 @@ def select_stateType(deviceClassId):
 
 def create_stateDescriptor():
     print "-> Creating a new stateDescriptor:\n"
-    deviceId = devices.select_configured_device()
-    device = devices.get_device(deviceId)
-    if device == None:
+    thingId = things.select_configured_thing()
+    thing = things.get_thing(thingId)
+    if thing == None:
         return None
-    stateType = select_stateType(device['deviceClassId']);
+    stateType = select_stateType(thing['thingClassId']);
     if stateType == None:
         return None
     valueOperator = nymea.select_valueOperator(stateType['displayName'])
@@ -100,7 +100,7 @@ def create_stateDescriptor():
         else:
             stateValue = raw_input("%s %s " % (stateType['displayName'], nymea.get_valueOperator_string(valueOperator))) 
 
-    stateDescriptor['deviceId'] = deviceId
+    stateDescriptor['thingId'] = thingId
     stateDescriptor['stateTypeId'] = stateType['id']
     stateDescriptor['value'] = stateValue
     stateDescriptor['operator'] = valueOperator
@@ -222,7 +222,7 @@ def getStateDescriptorString(stateDescriptor):
     if not stateDescriptor:
         return None
        
-    if not 'deviceId' in stateDescriptor:
+    if not 'thingId' in stateDescriptor:
         return stateDescriptorString
     
     if not 'operator' in stateDescriptor:
@@ -234,19 +234,19 @@ def getStateDescriptorString(stateDescriptor):
     if not 'value' in stateDescriptor:
         return stateDescriptorString
     
-    device = devices.get_device(stateDescriptor['deviceId'])
+    thing = things.get_thing(stateDescriptor['thingId'])
     stateType = get_stateType(stateDescriptor['stateTypeId'])
     operator = nymea.get_valueOperator_string(stateDescriptor['operator'])
     
-    return (" %s:%s %s %s " % (device['name'], stateType['displayName'], operator, stateDescriptor['value'] ))
+    return (" %s:%s %s %s " % (thing['name'], stateType['displayName'], operator, stateDescriptor['value'] ))
    
 
 def print_stateType():
-    deviceId = devices.select_configured_device()
-    device = devices.get_device(deviceId)
-    if device == None:
+    thingId = things.select_configured_thing()
+    thing = things.get_thing(thingId)
+    if thing == None:
         return None
-    stateType = select_stateType(device['deviceClassId']);
+    stateType = select_stateType(thing['thingClassId']);
     if stateType == None:
         return None
     nymea.print_json_format(stateType)

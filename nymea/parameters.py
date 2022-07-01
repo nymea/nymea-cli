@@ -2,7 +2,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -70,19 +70,19 @@ def read_params(paramTypes):
     return params
 
 
-def edit_params(currentDeviceParams, paramTypes):
+def edit_params(currentThingParams, paramTypes):
     params = []
     for paramType in paramTypes:
         print "\nThe ParamType looks like this:\n", nymea.print_json_format(paramType)
         if 'readOnly' in paramType and paramType['readOnly']:
             print "--------------------------------------------------------"
-            print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['displayName'], get_param_value(paramType['id'], currentDeviceParams))
+            print "\nThe param \"%s\" is not writable! (current = \"%s\")\n" %(paramType['displayName'], get_param_value(paramType['id'], currentThingParams))
             raw_input("\nPress \"enter\" to continue...\n")
             print "--------------------------------------------------------"
             continue
         param = {}
         if any("allowedValues" in item for item in paramType) and len(paramType['allowedValues']) != 0:
-            title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentDeviceParams))
+            title = "Please select one of following allowed values: (current = \"%s\")" % (get_param_value(paramType['id'], currentThingParams))
             selection = nymea.get_selection(title, paramType['allowedValues'])
             if selection == None:
                 return None
@@ -94,7 +94,7 @@ def edit_params(currentDeviceParams, paramTypes):
             # make bool selectable to make shore they are "true" or "false"
             if paramType['type'] == "Bool":
                 boolTypes = ["true","false"]
-                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['displayName'], paramType['type'])
+                selectionString = "Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentThingParams), paramType['displayName'], paramType['type'])
                 selection = nymea.get_selection(selectionString, boolTypes)
                 if selection == None:
                     return None
@@ -102,7 +102,7 @@ def edit_params(currentDeviceParams, paramTypes):
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
             else:
-                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentDeviceParams), paramType['displayName'], paramType['type']))
+                paramValue = raw_input("Please enter value (currently: \"%s\") for parameter \"%s\" (type: %s): " % (get_param_value(paramType['id'], currentThingParams), paramType['displayName'], paramType['type']))
                 param['paramTypeId'] = paramType['id']
                 param['value'] = paramValue
         params.append(param)

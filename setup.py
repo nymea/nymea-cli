@@ -4,7 +4,7 @@
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #                                                                         #
-#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@guh.io>           #
+#  Copyright (C) 2015 - 2018 Simon Stuerz <simon.stuerz@nymea.io>         #
 #                                                                         #
 #  This file is part of nymea-cli.                                        #
 #                                                                         #
@@ -27,19 +27,19 @@ from distutils.core import setup
 
 setup(name = "nymea-cli",
     author = "Simon Stuerz",
-    author_email = "simon.stuerz@guh.io",
+    author_email = "simon.stuerz@nymea.io",
     description = "nymea command line interface - python",
     long_description = """\
     The nymea-cli (command line interface) is an admin tool written in python to communicate 
     with the nymea JSON-RPC API and test functionality of nymea.
     """,
-    url = "https://github.com/guh/nymea-cli",
+    url = "https://github.com/nymea/nymea-cli",
     version = __version__,
     keywords = ["nymea", "cli", "command line interface"],
     scripts = ["nymea-cli"],
     py_modules = [
         "nymea.actions",
-        "nymea.devices",
+        "nymea.things",
         "nymea.events",
         "nymea.nymea",
         "nymea.logs",
