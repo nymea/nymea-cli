@@ -50,5 +50,5 @@ and the remaining file is JSON.
 ```bash
 ./scripts/generate_nymea_api.py \
   --api-json api/api.json \
-  --output src/generated/nymea_api_generated.h
+  --output src/generated/nymeaapigenerated.h
 ```

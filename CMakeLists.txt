@@ -20,7 +20,7 @@ qt_standard_project_setup()
 
 set(NYMEA_API_JSON "${CMAKE_SOURCE_DIR}/api/api.json" CACHE FILEPATH "Path to nymea api.json")
 set(NYMEA_API_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_nymea_api.py")
-set(NYMEA_API_OUTPUT "${CMAKE_SOURCE_DIR}/src/generated/nymea_api_generated.h")
+set(NYMEA_API_OUTPUT "${CMAKE_SOURCE_DIR}/src/generated/nymeaapigenerated.h")
 
 if (Python3_Interpreter_FOUND)
     add_custom_target(generate-nymea-api
@@ -34,9 +34,13 @@ endif()
 
 qt_add_executable(nymea-cli
     main.cpp
-    src/nymea_jsonrpc_client.cpp
-    src/nymea_jsonrpc_client.h
-    src/generated/nymea_api_generated.h
+    src/engine.cpp
+    src/engine.h
+    src/nymeajsonrpcclient.cpp
+    src/nymeajsonrpcclient.h
+    src/thingmanager.cpp
+    src/thingmanager.h
+    src/generated/nymeaapigenerated.h
 )
 
 if (TARGET generate-nymea-api)

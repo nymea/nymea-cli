@@ -175,7 +175,7 @@ def sanitize_identifier(raw: str, pascal_case: bool) -> str:
 
     identifier = "".join(normalized)
     if identifier in CPP_KEYWORDS:
-        identifier += "_"
+        identifier += "Value"
     return identifier
 
 
@@ -789,7 +789,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("src/generated/nymea_api_generated.h"),
+        default=Path("src/generated/nymeaapigenerated.h"),
         help="Output header path.",
     )
     return parser.parse_args()

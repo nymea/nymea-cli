@@ -1,4 +1,4 @@
-#include "nymea_jsonrpc_client.h"
+#include "nymeajsonrpcclient.h"
 
 #include <QElapsedTimer>
 #include <QJsonDocument>

@@ -4884,7 +4884,7 @@ struct ParamDescriptor {
     // wire: 'paramTypeId' (optional)
     std::optional<QUuid> paramTypeId;
     // wire: 'operator' (field)
-    ValueOperator operator_{};
+    ValueOperator operatorValue{};
     // wire: 'value' (field)
     QJsonValue value{};
 
@@ -5468,7 +5468,7 @@ struct StateDescriptor {
     // wire: 'valueThingId' (optional)
     std::optional<QUuid> valueThingId;
     // wire: 'operator' (field)
-    ValueOperator operator_{};
+    ValueOperator operatorValue{};
 
     static StateDescriptor fromJson(const QJsonObject &object);
     QJsonObject toJson() const;
@@ -5478,7 +5478,7 @@ struct StateEvaluator {
     // wire: 'childEvaluators' (optional)
     std::optional<StateEvaluators> childEvaluators;
     // wire: 'operator' (optional)
-    std::optional<StateOperator> operator_;
+    std::optional<StateOperator> operatorValue;
     // wire: 'stateDescriptor' (optional)
     std::optional<QSharedPointer<StateDescriptor>> stateDescriptor;
 
@@ -6408,7 +6408,7 @@ struct WirelessAccessPoint {
     // wire: 'macAddress' (required)
     QString macAddress{};
     // wire: 'protected' (required)
-    bool protected_{};
+    bool protectedValue{};
     // wire: 'signalStrength' (required)
     qint64 signalStrength{};
     // wire: 'ssid' (required)
@@ -11485,7 +11485,7 @@ inline ParamDescriptor ParamDescriptor::fromJson(const QJsonObject &object) {
         value.paramTypeId = QUuid((object.value(QStringLiteral("paramTypeId"))).toString());
     }
     if (object.contains(QStringLiteral("operator"))) {
-        value.operator_ = parseValueOperator(object.value(QStringLiteral("operator")));
+        value.operatorValue = parseValueOperator(object.value(QStringLiteral("operator")));
     }
     if (object.contains(QStringLiteral("value"))) {
         value.value = object.value(QStringLiteral("value"));
@@ -11501,7 +11501,7 @@ inline QJsonObject ParamDescriptor::toJson() const {
     if (paramTypeId.has_value()) {
         object.insert(QStringLiteral("paramTypeId"), QJsonValue((*paramTypeId).toString()));
     }
-    object.insert(QStringLiteral("operator"), QJsonValue(toString(operator_)));
+    object.insert(QStringLiteral("operator"), QJsonValue(toString(operatorValue)));
     object.insert(QStringLiteral("value"), value);
     return object;
 }
@@ -12656,7 +12656,7 @@ inline StateDescriptor StateDescriptor::fromJson(const QJsonObject &object) {
         value.valueThingId = QUuid((object.value(QStringLiteral("valueThingId"))).toString());
     }
     if (object.contains(QStringLiteral("operator"))) {
-        value.operator_ = parseValueOperator(object.value(QStringLiteral("operator")));
+        value.operatorValue = parseValueOperator(object.value(QStringLiteral("operator")));
     }
     return value;
 }
@@ -12684,7 +12684,7 @@ inline QJsonObject StateDescriptor::toJson() const {
     if (valueThingId.has_value()) {
         object.insert(QStringLiteral("valueThingId"), QJsonValue((*valueThingId).toString()));
     }
-    object.insert(QStringLiteral("operator"), QJsonValue(toString(operator_)));
+    object.insert(QStringLiteral("operator"), QJsonValue(toString(operatorValue)));
     return object;
 }
 
@@ -12694,7 +12694,7 @@ inline StateEvaluator StateEvaluator::fromJson(const QJsonObject &object) {
         value.childEvaluators = ([&]() { QList<QSharedPointer<StateEvaluator>> list; for (const QJsonValue &item : (object.value(QStringLiteral("childEvaluators"))).toArray()) { list.append(QSharedPointer<StateEvaluator>::create(StateEvaluator::fromJson((item).toObject()))); } return list; }());
     }
     if (object.contains(QStringLiteral("operator"))) {
-        value.operator_ = parseStateOperator(object.value(QStringLiteral("operator")));
+        value.operatorValue = parseStateOperator(object.value(QStringLiteral("operator")));
     }
     if (object.contains(QStringLiteral("stateDescriptor"))) {
         value.stateDescriptor = QSharedPointer<StateDescriptor>::create(StateDescriptor::fromJson((object.value(QStringLiteral("stateDescriptor"))).toObject()));
@@ -12707,8 +12707,8 @@ inline QJsonObject StateEvaluator::toJson() const {
     if (childEvaluators.has_value()) {
         object.insert(QStringLiteral("childEvaluators"), ([&]() { QJsonArray array; for (const auto &item : *childEvaluators) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
     }
-    if (operator_.has_value()) {
-        object.insert(QStringLiteral("operator"), QJsonValue(toString(*operator_)));
+    if (operatorValue.has_value()) {
+        object.insert(QStringLiteral("operator"), QJsonValue(toString(*operatorValue)));
     }
     if (stateDescriptor.has_value()) {
         object.insert(QStringLiteral("stateDescriptor"), ((*stateDescriptor) ? QJsonValue((*stateDescriptor)->toJson()) : QJsonValue(QJsonObject{})));
@@ -14471,7 +14471,7 @@ inline WirelessAccessPoint WirelessAccessPoint::fromJson(const QJsonObject &obje
         value.macAddress = (object.value(QStringLiteral("macAddress"))).toString();
     }
     if (object.contains(QStringLiteral("protected"))) {
-        value.protected_ = (object.value(QStringLiteral("protected"))).toBool();
+        value.protectedValue = (object.value(QStringLiteral("protected"))).toBool();
     }
     if (object.contains(QStringLiteral("signalStrength"))) {
         value.signalStrength = static_cast<qint64>((object.value(QStringLiteral("signalStrength"))).toInteger());
@@ -14486,7 +14486,7 @@ inline QJsonObject WirelessAccessPoint::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("frequency"), QJsonValue(frequency));
     object.insert(QStringLiteral("macAddress"), QJsonValue(macAddress));
-    object.insert(QStringLiteral("protected"), QJsonValue(protected_));
+    object.insert(QStringLiteral("protected"), QJsonValue(protectedValue));
     object.insert(QStringLiteral("signalStrength"), QJsonValue(static_cast<qint64>(signalStrength)));
     object.insert(QStringLiteral("ssid"), QJsonValue(ssid));
     return object;

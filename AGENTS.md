@@ -6,11 +6,13 @@
 
 ## Repository layout
 
-- `main.cpp`: terminal UI entry point and command-line handling.
-- `src/nymea_jsonrpc_client.*`: TCP JSON-RPC transport/client primitives.
+- `main.cpp`: thin CLI/bootstrap entry point and command-line parsing.
+- `src/engine.*`: orchestration layer for transport, auth flow, thing loading, and FTXUI UI loop.
+- `src/nymeajsonrpcclient.*`: TCP JSON-RPC transport/client primitives.
+- `src/thingmanager.*`: thing list parsing/state from nymead replies.
 - `scripts/generate_nymea_api.py`: generator for Qt/C++ API model types from nymea `api.json`.
 - `api/api.json`: pinned API schema snapshot (first line is nymea API version, followed by JSON).
-- `src/generated/nymea_api_generated.h`: generated API representation.
+- `src/generated/nymeaapigenerated.h`: generated API representation.
 
 ## Build
 
@@ -25,7 +27,7 @@ cmake --build build
 2. Regenerate API C++ model:
 
 ```bash
-./scripts/generate_nymea_api.py --api-json api/api.json --output src/generated/nymea_api_generated.h
+./scripts/generate_nymea_api.py --api-json api/api.json --output src/generated/nymeaapigenerated.h
 ```
 
 3. Rebuild and verify the generated header compiles.
@@ -42,6 +44,8 @@ If Python is available, CMake also exposes `generate-nymea-api` and runs it as a
 - Prefer adding generated output to `src/generated/` only through the generator script.
 - When API schema changes, regenerate instead of editing generated files manually.
 - Use CamelCase naming in C++ code (avoid snake_case identifiers except private member `m_` prefixes).
+- Use lowercase file names without underscores for class source/header pairs (for example `thingmanager.h/.cpp`).
+- Keep generated C++ API identifiers CamelCase/lowerCamelCase as well (avoid introducing underscore-based generated identifiers).
 - Name private class members with `m_` prefix.
 - Run formatting with repository `.clang-format` before finishing C++ changes:
 
