@@ -1,0 +1,3472 @@
+8.5
+{
+    "enums": {
+        "BasicType": [
+            "Uuid",
+            "String",
+            "StringList",
+            "Int",
+            "Uint",
+            "Double",
+            "Bool",
+            "Variant",
+            "Color",
+            "Time",
+            "Object"
+        ],
+        "BrowserIcon": [
+            "BrowserIconNone",
+            "BrowserIconFolder",
+            "BrowserIconFile",
+            "BrowserIconMusic",
+            "BrowserIconVideo",
+            "BrowserIconPictures",
+            "BrowserIconApplication",
+            "BrowserIconDocument",
+            "BrowserIconPackage",
+            "BrowserIconFavorites"
+        ],
+        "ConfigurationError": [
+            "ConfigurationErrorNoError",
+            "ConfigurationErrorInvalidTimeZone",
+            "ConfigurationErrorInvalidStationName",
+            "ConfigurationErrorInvalidId",
+            "ConfigurationErrorInvalidPort",
+            "ConfigurationErrorInvalidHostAddress",
+            "ConfigurationErrorBluetoothHardwareNotAvailable",
+            "ConfigurationErrorInvalidCertificate",
+            "ConfigurationErrorUnsupported"
+        ],
+        "CreateMethod": [
+            "CreateMethodUser",
+            "CreateMethodAuto",
+            "CreateMethodDiscovery"
+        ],
+        "DebugError": [
+            "DebugErrorNoError"
+        ],
+        "DiscoveryType": [
+            "DiscoveryTypePrecise",
+            "DiscoveryTypeWeak"
+        ],
+        "IOType": [
+            "IOTypeNone",
+            "IOTypeDigitalInput",
+            "IOTypeDigitalOutput",
+            "IOTypeAnalogInput",
+            "IOTypeAnalogOutput"
+        ],
+        "InputType": [
+            "InputTypeNone",
+            "InputTypeTextLine",
+            "InputTypeTextArea",
+            "InputTypePassword",
+            "InputTypeSearch",
+            "InputTypeMail",
+            "InputTypeIPv4Address",
+            "InputTypeIPv6Address",
+            "InputTypeUrl",
+            "InputTypeMacAddress"
+        ],
+        "LoggingCategoryType": [
+            "LoggingCategoryTypeSystem",
+            "LoggingCategoryTypePlugin",
+            "LoggingCategoryTypeCustom"
+        ],
+        "LoggingLevel": [
+            "LoggingLevelCritical",
+            "LoggingLevelWarning",
+            "LoggingLevelInfo",
+            "LoggingLevelDebug"
+        ],
+        "MediaBrowserIcon": [
+            "MediaBrowserIconNone",
+            "MediaBrowserIconPlaylist",
+            "MediaBrowserIconRecentlyPlayed",
+            "MediaBrowserIconLibrary",
+            "MediaBrowserIconMusicLibrary",
+            "MediaBrowserIconVideoLibrary",
+            "MediaBrowserIconPictureLibrary",
+            "MediaBrowserIconDisk",
+            "MediaBrowserIconUSB",
+            "MediaBrowserIconNetwork",
+            "MediaBrowserIconAux",
+            "MediaBrowserIconBluetooth",
+            "MediaBrowserIconSpotify",
+            "MediaBrowserIconAmazon",
+            "MediaBrowserIconTuneIn",
+            "MediaBrowserIconSiriusXM",
+            "MediaBrowserIconVTuner",
+            "MediaBrowserIconTidal",
+            "MediaBrowserIconAirable",
+            "MediaBrowserIconDeezer",
+            "MediaBrowserIconNapster",
+            "MediaBrowserIconSoundCloud",
+            "MediaBrowserIconRadioParadise"
+        ],
+        "ModbusRtuError": [
+            "ModbusRtuErrorNoError",
+            "ModbusRtuErrorNotAvailable",
+            "ModbusRtuErrorUuidNotFound",
+            "ModbusRtuErrorHardwareNotFound",
+            "ModbusRtuErrorResourceBusy",
+            "ModbusRtuErrorNotSupported",
+            "ModbusRtuErrorInvalidTimeoutValue",
+            "ModbusRtuErrorConnectionFailed"
+        ],
+        "NetworkDeviceState": [
+            "NetworkDeviceStateUnknown",
+            "NetworkDeviceStateUnmanaged",
+            "NetworkDeviceStateUnavailable",
+            "NetworkDeviceStateDisconnected",
+            "NetworkDeviceStatePrepare",
+            "NetworkDeviceStateConfig",
+            "NetworkDeviceStateNeedAuth",
+            "NetworkDeviceStateIpConfig",
+            "NetworkDeviceStateIpCheck",
+            "NetworkDeviceStateSecondaries",
+            "NetworkDeviceStateActivated",
+            "NetworkDeviceStateDeactivating",
+            "NetworkDeviceStateFailed"
+        ],
+        "NetworkManagerError": [
+            "NetworkManagerErrorNoError",
+            "NetworkManagerErrorUnknownError",
+            "NetworkManagerErrorWirelessNotAvailable",
+            "NetworkManagerErrorAccessPointNotFound",
+            "NetworkManagerErrorNetworkInterfaceNotFound",
+            "NetworkManagerErrorInvalidNetworkDeviceType",
+            "NetworkManagerErrorWirelessNetworkingDisabled",
+            "NetworkManagerErrorWirelessConnectionFailed",
+            "NetworkManagerErrorNetworkingDisabled",
+            "NetworkManagerErrorNetworkManagerNotAvailable",
+            "NetworkManagerErrorInvalidConfiguration",
+            "NetworkManagerErrorUnsupportedFeature"
+        ],
+        "NetworkManagerState": [
+            "NetworkManagerStateUnknown",
+            "NetworkManagerStateAsleep",
+            "NetworkManagerStateDisconnected",
+            "NetworkManagerStateDisconnecting",
+            "NetworkManagerStateConnecting",
+            "NetworkManagerStateConnectedLocal",
+            "NetworkManagerStateConnectedSite",
+            "NetworkManagerStateConnectedGlobal"
+        ],
+        "PermissionScope": [
+            "PermissionScopeNone",
+            "PermissionScopeControlThings",
+            "PermissionScopeConfigureThings",
+            "PermissionScopeAccessAllThings",
+            "PermissionScopeExecuteRules",
+            "PermissionScopeConfigureRules",
+            "PermissionScopeAdmin"
+        ],
+        "RepeatingMode": [
+            "RepeatingModeNone",
+            "RepeatingModeHourly",
+            "RepeatingModeDaily",
+            "RepeatingModeWeekly",
+            "RepeatingModeMonthly",
+            "RepeatingModeYearly"
+        ],
+        "RuleError": [
+            "RuleErrorNoError",
+            "RuleErrorInvalidRuleId",
+            "RuleErrorRuleNotFound",
+            "RuleErrorThingNotFound",
+            "RuleErrorEventTypeNotFound",
+            "RuleErrorStateTypeNotFound",
+            "RuleErrorActionTypeNotFound",
+            "RuleErrorInvalidParameter",
+            "RuleErrorInvalidRuleFormat",
+            "RuleErrorMissingParameter",
+            "RuleErrorInvalidRuleActionParameter",
+            "RuleErrorInvalidStateEvaluatorValue",
+            "RuleErrorTypesNotMatching",
+            "RuleErrorNotExecutable",
+            "RuleErrorInvalidTimeDescriptor",
+            "RuleErrorInvalidRepeatingOption",
+            "RuleErrorInvalidCalendarItem",
+            "RuleErrorInvalidTimeEventItem",
+            "RuleErrorContainsEventBasesAction",
+            "RuleErrorNoExitActions",
+            "RuleErrorInterfaceNotFound"
+        ],
+        "SampleRate": [
+            "SampleRateAny",
+            "SampleRate1Min",
+            "SampleRate15Mins",
+            "SampleRate1Hour",
+            "SampleRate3Hours",
+            "SampleRate1Day",
+            "SampleRate1Week",
+            "SampleRate1Month",
+            "SampleRate1Year"
+        ],
+        "ScriptError": [
+            "ScriptErrorNoError",
+            "ScriptErrorScriptNotFound",
+            "ScriptErrorInvalidScript",
+            "ScriptErrorHardwareFailure"
+        ],
+        "ScriptMessageType": [
+            "ScriptMessageTypeLog",
+            "ScriptMessageTypeWarning"
+        ],
+        "SerialPortDataBits": [
+            "SerialPortDataBitsData5",
+            "SerialPortDataBitsData6",
+            "SerialPortDataBitsData7",
+            "SerialPortDataBitsData8",
+            "SerialPortDataBitsUnknownDataBits"
+        ],
+        "SerialPortParity": [
+            "SerialPortParityNoParity",
+            "SerialPortParityEvenParity",
+            "SerialPortParityOddParity",
+            "SerialPortParitySpaceParity",
+            "SerialPortParityMarkParity",
+            "SerialPortParityUnknownParity"
+        ],
+        "SerialPortStopBits": [
+            "SerialPortStopBitsOneStop",
+            "SerialPortStopBitsOneAndHalfStop",
+            "SerialPortStopBitsTwoStop",
+            "SerialPortStopBitsUnknownStopBits"
+        ],
+        "SetupMethod": [
+            "SetupMethodJustAdd",
+            "SetupMethodDisplayPin",
+            "SetupMethodEnterPin",
+            "SetupMethodPushButton",
+            "SetupMethodUserAndPassword",
+            "SetupMethodOAuth"
+        ],
+        "SortOrder": [
+            "AscendingOrder",
+            "DescendingOrder"
+        ],
+        "StateOperator": [
+            "StateOperatorAnd",
+            "StateOperatorOr"
+        ],
+        "StateValueFilter": [
+            "StateValueFilterNone",
+            "StateValueFilterAdaptive"
+        ],
+        "TagError": [
+            "TagErrorNoError",
+            "TagErrorThingNotFound",
+            "TagErrorRuleNotFound",
+            "TagErrorTagNotFound"
+        ],
+        "ThingError": [
+            "ThingErrorNoError",
+            "ThingErrorPluginNotFound",
+            "ThingErrorVendorNotFound",
+            "ThingErrorThingNotFound",
+            "ThingErrorThingClassNotFound",
+            "ThingErrorActionTypeNotFound",
+            "ThingErrorStateTypeNotFound",
+            "ThingErrorEventTypeNotFound",
+            "ThingErrorThingDescriptorNotFound",
+            "ThingErrorMissingParameter",
+            "ThingErrorInvalidParameter",
+            "ThingErrorSetupFailed",
+            "ThingErrorDuplicateUuid",
+            "ThingErrorCreationMethodNotSupported",
+            "ThingErrorSetupMethodNotSupported",
+            "ThingErrorHardwareNotAvailable",
+            "ThingErrorHardwareFailure",
+            "ThingErrorAuthenticationFailure",
+            "ThingErrorThingInUse",
+            "ThingErrorThingInRule",
+            "ThingErrorThingIsChild",
+            "ThingErrorPairingTransactionIdNotFound",
+            "ThingErrorParameterNotWritable",
+            "ThingErrorItemNotFound",
+            "ThingErrorItemNotExecutable",
+            "ThingErrorUnsupportedFeature",
+            "ThingErrorTimeout"
+        ],
+        "ThingSetupStatus": [
+            "ThingSetupStatusNone",
+            "ThingSetupStatusInProgress",
+            "ThingSetupStatusComplete",
+            "ThingSetupStatusFailed"
+        ],
+        "Unit": [
+            "UnitNone",
+            "UnitMilliSeconds",
+            "UnitSeconds",
+            "UnitMinutes",
+            "UnitHours",
+            "UnitUnixTime",
+            "UnitMeterPerSecond",
+            "UnitKiloMeterPerHour",
+            "UnitDegree",
+            "UnitRadiant",
+            "UnitDegreeCelsius",
+            "UnitDegreeKelvin",
+            "UnitMired",
+            "UnitMilliBar",
+            "UnitBar",
+            "UnitPascal",
+            "UnitHectoPascal",
+            "UnitAtmosphere",
+            "UnitLumen",
+            "UnitLux",
+            "UnitCandela",
+            "UnitMilliMeter",
+            "UnitCentiMeter",
+            "UnitMeter",
+            "UnitKiloMeter",
+            "UnitGram",
+            "UnitKiloGram",
+            "UnitDezibel",
+            "UnitBpm",
+            "UnitKiloByte",
+            "UnitMegaByte",
+            "UnitGigaByte",
+            "UnitTeraByte",
+            "UnitMilliWatt",
+            "UnitWatt",
+            "UnitKiloWatt",
+            "UnitKiloWattHour",
+            "UnitEuroPerMegaWattHour",
+            "UnitEuroCentPerKiloWattHour",
+            "UnitPercentage",
+            "UnitPartsPerMillion",
+            "UnitPartsPerBillion",
+            "UnitEuro",
+            "UnitDollar",
+            "UnitHertz",
+            "UnitAmpere",
+            "UnitMilliAmpere",
+            "UnitVolt",
+            "UnitMilliVolt",
+            "UnitVoltAmpere",
+            "UnitVoltAmpereReactive",
+            "UnitAmpereHour",
+            "UnitOhm",
+            "UnitMicroSiemensPerCentimeter",
+            "UnitDuration",
+            "UnitNewton",
+            "UnitNewtonMeter",
+            "UnitRpm",
+            "UnitMilligramPerLiter",
+            "UnitLiter",
+            "UnitMicroGrammPerCubicalMeter"
+        ],
+        "UpdateType": [
+            "UpdateTypeNone",
+            "UpdateTypeSystem",
+            "UpdateTypePackageManager"
+        ],
+        "UserError": [
+            "UserErrorNoError",
+            "UserErrorBackendError",
+            "UserErrorInvalidUserId",
+            "UserErrorDuplicateUserId",
+            "UserErrorBadPassword",
+            "UserErrorTokenNotFound",
+            "UserErrorPermissionDenied",
+            "UserErrorInconsistantScopes"
+        ],
+        "ValueOperator": [
+            "ValueOperatorEquals",
+            "ValueOperatorNotEquals",
+            "ValueOperatorLess",
+            "ValueOperatorGreater",
+            "ValueOperatorLessOrEqual",
+            "ValueOperatorGreaterOrEqual"
+        ],
+        "WiredNetworkConnectionType": [
+            "WiredNetworkConnectionTypeDHCP",
+            "WiredNetworkConnectionTypeManual",
+            "WiredNetworkConnectionTypeShared"
+        ],
+        "WirelessCapability": [
+            "WirelessCapabilityNone",
+            "WirelessCapabilityCipherWEP40",
+            "WirelessCapabilityCipherWEP104",
+            "WirelessCapabilityCipherTKIP",
+            "WirelessCapabilityCipherCCMP",
+            "WirelessCapabilityWPA",
+            "WirelessCapabilityRSN",
+            "WirelessCapabilityAP",
+            "WirelessCapabilityAdHoc",
+            "WirelessCapabilityFreqValid",
+            "WirelessCapability2Ghz",
+            "WirelessCapability5Ghz"
+        ],
+        "WirelessMode": [
+            "WirelessModeUnknown",
+            "WirelessModeAdhoc",
+            "WirelessModeInfrastructure",
+            "WirelessModeAccessPoint"
+        ],
+        "ZWaveDeviceType": [
+            "ZWaveDeviceTypeUnknown",
+            "ZWaveDeviceTypeCentralController",
+            "ZWaveDeviceTypeDisplaySimple",
+            "ZWaveDeviceTypeDoorLockKeypad",
+            "ZWaveDeviceTypeFanSwitch",
+            "ZWaveDeviceTypeGateway",
+            "ZWaveDeviceTypeLightDimmerSwitch",
+            "ZWaveDeviceTypeOnOffPowerSwitch",
+            "ZWaveDeviceTypePowerStrip",
+            "ZWaveDeviceTypeRemoteControlAV",
+            "ZWaveDeviceTypeRemoteControlMultiPurpose",
+            "ZWaveDeviceTypeRemoteControlSimple",
+            "ZWaveDeviceTypeKeyFob",
+            "ZWaveDeviceTypeSensorNotification",
+            "ZWaveDeviceTypeSmokeAlarmSensor",
+            "ZWaveDeviceTypeCOAlarmSensor",
+            "ZWaveDeviceTypeCO2AlarmSensor",
+            "ZWaveDeviceTypeHeatAlarmSensor",
+            "ZWaveDeviceTypeWaterAlarmSensor",
+            "ZWaveDeviceTypeAccessControlSensor",
+            "ZWaveDeviceTypeHomeSecuritySensor",
+            "ZWaveDeviceTypePowerManagementSensor",
+            "ZWaveDeviceTypeSystemSensor",
+            "ZWaveDeviceTypeEmergencyAlarmSensor",
+            "ZWaveDeviceTypeClockSensor",
+            "ZWaveDeviceTypeMultiDeviceAlarmSensor",
+            "ZWaveDeviceTypeMultilevelSensor",
+            "ZWaveDeviceTypeAirTemperatureSensor",
+            "ZWaveDeviceTypeGeneralPurposeSensor",
+            "ZWaveDeviceTypeLuminanceSensor",
+            "ZWaveDeviceTypePowerSensor",
+            "ZWaveDeviceTypeHumiditySensor",
+            "ZWaveDeviceTypeVelocitySensor",
+            "ZWaveDeviceTypeDirectionSensor",
+            "ZWaveDeviceTypeAtmosphericPressureSensor",
+            "ZWaveDeviceTypeBarometricPressureSensor",
+            "ZWaveDeviceTypeSolarRadiationSensor",
+            "ZWaveDeviceTypeDewPointSensor",
+            "ZWaveDeviceTypeRainRateSensor",
+            "ZWaveDeviceTypeTideLevelSensor",
+            "ZWaveDeviceTypeWeightSensor",
+            "ZWaveDeviceTypeVoltageSensor",
+            "ZWaveDeviceTypeCurrentSensor",
+            "ZWaveDeviceTypeCO2LevelSensor",
+            "ZWaveDeviceTypeAirFlowSensor",
+            "ZWaveDeviceTypeTankCapacitySensor",
+            "ZWaveDeviceTypeDistanceSensor",
+            "ZWaveDeviceTypeAnglePositionSensor",
+            "ZWaveDeviceTypeRotationSensor",
+            "ZWaveDeviceTypeWaterTemperatureSensor",
+            "ZWaveDeviceTypeSoilTemperatureSensor",
+            "ZWaveDeviceTypeSeismicIntensitySensor",
+            "ZWaveDeviceTypeSeismicMagnitudeSensor",
+            "ZWaveDeviceTypeUltraVioletSensor",
+            "ZWaveDeviceTypeElectricalResistivitySensor",
+            "ZWaveDeviceTypeElectricalConductivitySensor",
+            "ZWaveDeviceTypeLoudnessSensor",
+            "ZWaveDeviceTypeMoistureSensor",
+            "ZWaveDeviceTypeFrequencySensor",
+            "ZWaveDeviceTypeTimeSensor",
+            "ZWaveDeviceTypeTargetTemperatureSensor",
+            "ZWaveDeviceTypeMultiDeviceSensor",
+            "ZWaveDeviceTypeSetTopBox",
+            "ZWaveDeviceTypeSiren",
+            "ZWaveDeviceTypeSubEnergyMeter",
+            "ZWaveDeviceTypeSubSystemController",
+            "ZWaveDeviceTypeThermostatHVAC",
+            "ZWaveDeviceTypeThermostatSetback",
+            "ZWaveDeviceTypeTV",
+            "ZWaveDeviceTypeValveOpenClose",
+            "ZWaveDeviceTypeWallController",
+            "ZWaveDeviceTypeWholeHomeMeterSimple",
+            "ZWaveDeviceTypeWindowCoveringNoPosEndpoint",
+            "ZWaveDeviceTypeWindowCoveringEndpointAware",
+            "ZWaveDeviceTypeWindowCoveringPositionEndpointAware"
+        ],
+        "ZWaveError": [
+            "ZWaveErrorNoError",
+            "ZWaveErrorInUse",
+            "ZWaveErrorNetworkUuidNotFound",
+            "ZWaveErrorNodeIdNotFound",
+            "ZWaveErrorTimeout",
+            "ZWaveErrorBackendError"
+        ],
+        "ZWaveNetworkState": [
+            "ZWaveNetworkStateOffline",
+            "ZWaveNetworkStateStarting",
+            "ZWaveNetworkStateOnline",
+            "ZWaveNetworkStateError"
+        ],
+        "ZWaveNodeRole": [
+            "ZWaveNodeRoleUnknown",
+            "ZWaveNodeRoleCentralController",
+            "ZWaveNodeRoleSubController",
+            "ZWaveNodeRolePortableController",
+            "ZWaveNodeRolePortableReportingController",
+            "ZWaveNodeRolePortableSlave",
+            "ZWaveNodeRoleAlwaysOnSlabe",
+            "ZWaveNodeRoleReportingSleepingSlave",
+            "ZWaveNodeRoleListeningSleepingSlave"
+        ],
+        "ZWaveNodeType": [
+            "ZWaveNodeTypeUnknown",
+            "ZWaveNodeTypeController",
+            "ZWaveNodeTypeStaticController",
+            "ZWaveNodeTypeSlave",
+            "ZWaveNodeTypeRoutingSlave"
+        ],
+        "ZigbeeClusterDirection": [
+            "ZigbeeClusterDirectionServer",
+            "ZigbeeClusterDirectionClient"
+        ],
+        "ZigbeeError": [
+            "ZigbeeErrorNoError",
+            "ZigbeeErrorAdapterNotAvailable",
+            "ZigbeeErrorAdapterAlreadyInUse",
+            "ZigbeeErrorNetworkUuidNotFound",
+            "ZigbeeErrorDurationOutOfRange",
+            "ZigbeeErrorNetworkOffline",
+            "ZigbeeErrorUnknownBackend",
+            "ZigbeeErrorNodeNotFound",
+            "ZigbeeErrorForbidden",
+            "ZigbeeErrorInvalidChannel",
+            "ZigbeeErrorNetworkError",
+            "ZigbeeErrorTimeoutError",
+            "ZigbeeErrorNotSupported"
+        ],
+        "ZigbeeNetworkState": [
+            "ZigbeeNetworkStateOffline",
+            "ZigbeeNetworkStateStarting",
+            "ZigbeeNetworkStateUpdating",
+            "ZigbeeNetworkStateOnline",
+            "ZigbeeNetworkStateError"
+        ],
+        "ZigbeeNodeRelationship": [
+            "ZigbeeNodeRelationshipParent",
+            "ZigbeeNodeRelationshipChild",
+            "ZigbeeNodeRelationshipSibling",
+            "ZigbeeNodeRelationshipNone",
+            "ZigbeeNodeRelationshipPreviousChild"
+        ],
+        "ZigbeeNodeRouteStatus": [
+            "ZigbeeNodeRouteStatusActive",
+            "ZigbeeNodeRouteStatusDiscoveryUnderway",
+            "ZigbeeNodeRouteStatusDiscoveryFailed",
+            "ZigbeeNodeRouteStatusInactive",
+            "ZigbeeNodeRouteStatusValidationUnderway"
+        ],
+        "ZigbeeNodeState": [
+            "ZigbeeNodeStateUninitialized",
+            "ZigbeeNodeStateInitializing",
+            "ZigbeeNodeStateInitialized",
+            "ZigbeeNodeStateHandled"
+        ],
+        "ZigbeeNodeType": [
+            "ZigbeeNodeTypeCoordinator",
+            "ZigbeeNodeTypeRouter",
+            "ZigbeeNodeTypeEndDevice"
+        ]
+    },
+    "flags": {
+        "CreateMethods": [
+            "$ref:CreateMethod"
+        ],
+        "PermissionScopes": [
+            "$ref:PermissionScope"
+        ],
+        "WirelessCapabilities": [
+            "$ref:WirelessCapability"
+        ]
+    },
+    "methods": {
+        "AppData.Load": {
+            "description": "Retrieve an app data storage value that has previously been set with Store(). If no value had been set for this appId/key combination before, an empty value will be returned.",
+            "params": {
+                "appId": "String",
+                "key": "String",
+                "o:group": "String"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "value": "String"
+            }
+        },
+        "AppData.Store": {
+            "description": "Store an app data entry to the server. App data can be used by the client application to store configuration values. The app data storage is a key-value pair storage. Each entry value is identified by an appId, a key and optionally a group. The value data is a bytearray and can contain arbitrary data, such as a JSON map or image data, however, be aware of the maximum packet size for the used transport.\nThis might be useful to a client application to sync settings across multiple instances of the same application.\nThe group parameter might be used to create groups for this application.\nIMPORTANT: Currently no verification of the appId is done. The appid is merely a mechanism to prevent different different client apps from colliding by using the same key for data entries. This implies that the app data storage may not be suited for sensitive data given that anyone with a valid server token can read it.\n ",
+            "params": {
+                "appId": "String",
+                "key": "String",
+                "o:group": "String",
+                "value": "String"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+            }
+        },
+        "Configuration.DeleteMqttPolicy": {
+            "description": "Delete a MQTT policy from the broker.",
+            "params": {
+                "clientId": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.DeleteMqttServerConfiguration": {
+            "description": "Delete a MQTT Server interface of the server.",
+            "params": {
+                "id": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.DeleteTcpServerConfiguration": {
+            "description": "Delete a TCP interface of the server. Note: if you are deleting the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "id": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.DeleteTunnelProxyServerConfiguration": {
+            "description": "Delete a Tunnel Proxy Server interface of the server. Note: if you are deleting the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "id": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.DeleteWebServerConfiguration": {
+            "description": "Delete a WebServer interface of the server.",
+            "params": {
+                "id": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.DeleteWebSocketServerConfiguration": {
+            "description": "Delete a WebSocket Server interface of the server. Note: if you are deleting the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "id": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.GetAvailableLanguages": {
+            "deprecated": "Use the locale property in the Handshake message instead.",
+            "description": "Returns a list of locale codes available for the server. i.e. en_US, de_AT",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "languages": [
+                    "String"
+                ]
+            }
+        },
+        "Configuration.GetConfigurations": {
+            "description": "Get all configuration parameters of the server.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "basicConfiguration": {
+                    "d:language": "String",
+                    "d:location": {
+                        "latitude": "Double",
+                        "longitude": "Double",
+                        "name": "String"
+                    },
+                    "d:serverTime": "Uint",
+                    "d:timeZone": "String",
+                    "debugServerEnabled": "Bool",
+                    "serverName": "String",
+                    "serverUuid": "Uuid"
+                },
+                "tcpServerConfigurations": [
+                    "$ref:ServerConfiguration"
+                ],
+                "tunnelProxyServerConfigurations": [
+                    "$ref:TunnelProxyServerConfiguration"
+                ],
+                "webServerConfigurations": [
+                    "$ref:WebServerConfiguration"
+                ],
+                "webSocketServerConfigurations": [
+                    "$ref:ServerConfiguration"
+                ]
+            }
+        },
+        "Configuration.GetMqttPolicies": {
+            "description": "Get all MQTT broker policies.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "mqttPolicies": [
+                    "$ref:MqttPolicy"
+                ]
+            }
+        },
+        "Configuration.GetMqttServerConfigurations": {
+            "description": "Get all MQTT Server configurations.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "mqttServerConfigurations": [
+                    "$ref:ServerConfiguration"
+                ]
+            }
+        },
+        "Configuration.GetTimeZones": {
+            "deprecated": "Use System.GetTimeZones instead.",
+            "description": "Get the list of available timezones.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "timeZones": [
+                    "String"
+                ]
+            }
+        },
+        "Configuration.SetDebugServerEnabled": {
+            "description": "Enable or disable the debug server.",
+            "params": {
+                "enabled": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetLanguage": {
+            "deprecated": "Use the locale property in the Handshake message instead.",
+            "description": "Sets the server language to the given language. See also: \"GetAvailableLanguages\"",
+            "params": {
+                "language": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetLocation": {
+            "description": "Sets the server location.",
+            "params": {
+                "location": {
+                    "latitude": "Double",
+                    "longitude": "Double",
+                    "name": "String"
+                }
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetMqttPolicy": {
+            "description": "Configure a MQTT broker policy. If the ID is an existing one, the existing policy will be modified, otherwise a new one will be added.",
+            "params": {
+                "policy": "$ref:MqttPolicy"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetMqttServerConfiguration": {
+            "description": "Configure a MQTT Server interface on the MQTT broker. If the ID is an existing one, the existing config will be modified, otherwise a new one will be added. Setting authenticationEnabled to true will require MQTT clients to use credentials set in the MQTT broker policies.",
+            "params": {
+                "configuration": "$ref:ServerConfiguration"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetServerName": {
+            "description": "Set the name of the server. Default is nymea.",
+            "params": {
+                "serverName": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetTcpServerConfiguration": {
+            "description": "Configure a TCP interface of the server. If the ID is an existing one, the existing config will be modified, otherwise a new one will be added. Note: if you are changing the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "configuration": "$ref:ServerConfiguration"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetTimeZone": {
+            "deprecated": "Use System.SetTimeZone instead.",
+            "description": "Set the time zone of the server. See also: \"GetTimeZones\"",
+            "params": {
+                "timeZone": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetTunnelProxyServerConfiguration": {
+            "description": "Configure a Tunnel Proxy Server interface of the server. If the ID is an existing one, the existing config will be modified, otherwise a new one will be added. Note: if you are changing the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "configuration": "$ref:TunnelProxyServerConfiguration"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetWebServerConfiguration": {
+            "description": "Configure a WebServer interface of the server. If the ID is an existing one, the existing config will be modified, otherwise a new one will be added.",
+            "params": {
+                "configuration": "$ref:WebServerConfiguration"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Configuration.SetWebSocketServerConfiguration": {
+            "description": "Configure a WebSocket Server interface of the server. If the ID is an existing one, the existing config will be modified, otherwise a new one will be added. Note: if you are changing the configuration for the interface you are currently connected to, the connection will be dropped.",
+            "params": {
+                "configuration": "$ref:ServerConfiguration"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "configurationError": "$ref:ConfigurationError"
+            }
+        },
+        "Debug.GetLoggingCategories": {
+            "description": "Get all available logging categories.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "loggingCategories": [
+                    "$ref:LoggingCategory"
+                ]
+            }
+        },
+        "Debug.SetLoggingCategoryLevel": {
+            "description": "Set the logging category with the given name to the given logging level.",
+            "params": {
+                "level": "$ref:LoggingLevel",
+                "name": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "debugError": "$ref:DebugError"
+            }
+        },
+        "Integrations.AddThing": {
+            "description": "Add a new thing to the system. Only things with a setupMethod of SetupMethodJustAdd can be added this way. For things with a setupMethod different than SetupMethodJustAdd, use PairThing. Things with CreateMethodJustAdd require all parameters to be supplied here. Things with CreateMethodDiscovery require the use of a thingDescriptorId. For discovered things, params are not required and will be taken from the ThingDescriptor, however, they may be overridden by supplying thingParams.",
+            "params": {
+                "name": "String",
+                "o:thingClassId": "Uuid",
+                "o:thingDescriptorId": "Uuid",
+                "o:thingParams": "$ref:ParamList"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:thingId": "Uuid",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.BrowseThing": {
+            "description": "Browse a thing. If a ThingClass indicates a thing is browsable, this method will return the BrowserItems. If no parameter besides the thingId is used, the root node of this thingwill be returned. Any returned item which is browsable can be passed as node. Results will be children of the given node.\nIn case of an error during browsing, the error will be indicated and the displayMessage may contain additional information for the user. The displayMessage will be translated. A client UI showing this message to the user should be prepared for empty, but also longer strings.",
+            "params": {
+                "o:itemId": "String",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:items": [
+                    "$ref:BrowserItem"
+                ],
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ConfirmPairing": {
+            "description": "Confirm an ongoing pairing. For SetupMethodUserAndPassword, provide the username in the \"username\" field and the password in the \"secret\" field. For SetupMethodEnterPin and provide the PIN in the \"secret\" field. In case of SetupMethodOAuth, the previously opened web view will eventually be redirected to http://128.0.0.1:8888 and the OAuth code as query parameters to this url. Provide the entire unmodified URL in the secret field.",
+            "params": {
+                "o:secret": "String",
+                "o:username": "String",
+                "pairingTransactionId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:thingId": "Uuid",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ConnectIO": {
+            "description": "Connect two generic IO states. Input and output need to be compatible, that is, either a digital input and a digital output, or an analog input and an analog output. If successful, the connectionId will be returned.",
+            "params": {
+                "inputStateTypeId": "Uuid",
+                "inputThingId": "Uuid",
+                "o:inverted": "Bool",
+                "outputStateTypeId": "Uuid",
+                "outputThingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:ioConnectionId": "Uuid",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.DisconnectIO": {
+            "description": "Disconnect an existing IO connection.",
+            "params": {
+                "ioConnectionId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.DiscoverThings": {
+            "description": "Performs a thing discovery for things of the given thingClassId and returns the results. This function may take a while to return. Note that this method will include all the found things, that is, including things that may already have been added. Those things will have thingId set to the id of the already added thing. Such results may be used to reconfigure existing things and might be filtered in cases where only unknown things are of interest.",
+            "params": {
+                "o:discoveryParams": "$ref:ParamList",
+                "thingClassId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:thingDescriptors": "$ref:ThingDescriptors",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.EditThing": {
+            "description": "Edit the name of a thing.",
+            "params": {
+                "name": "String",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ExecuteAction": {
+            "description": "Execute a single action.",
+            "params": {
+                "actionTypeId": "Uuid",
+                "o:params": "$ref:ParamList",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ExecuteBrowserItem": {
+            "description": "Execute the item identified by itemId on the given thing.\nIn case of an error during execution, the error will be indicated and the displayMessage may contain additional information for the user. The displayMessage will be translated. A client UI showing this message to the user should be prepared for empty, but also longer strings.",
+            "params": {
+                "itemId": "String",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ExecuteBrowserItemAction": {
+            "description": "Execute the action for the browser item identified by actionTypeId and the itemId on the given thing.\nIn case of an error during execution, the error will be indicated and the displayMessage may contain additional information for the user. The displayMessage will be translated. A client UI showing this message to the user should be prepared for empty, but also longer strings.",
+            "params": {
+                "actionTypeId": "Uuid",
+                "itemId": "String",
+                "o:params": "$ref:ParamList",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetActionTypes": {
+            "description": "Get action types for a specified thingClassId.",
+            "params": {
+                "thingClassId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "actionTypes": "$ref:ActionTypes"
+            }
+        },
+        "Integrations.GetBrowserItem": {
+            "description": "Get a single item from the browser. This won't give any more info on an item than a regular BrowseThing call, but it allows to fetch details of an item if only the ID is known.\nIn case of an error during browsing, the error will be indicated and the displayMessage may contain additional information for the user. The displayMessage will be translated. A client UI showing this message to the user should be prepared for empty, but also longer strings.",
+            "params": {
+                "o:itemId": "String",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:item": "$ref:BrowserItem",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetEventTypes": {
+            "description": "Get event types for a specified thingClassId.",
+            "params": {
+                "thingClassId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "eventTypes": "$ref:EventTypes"
+            }
+        },
+        "Integrations.GetIOConnections": {
+            "description": "Fetch IO connections. Optionally filtered by thingId and stateTypeId.",
+            "params": {
+                "o:thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:ioConnections": "$ref:IOConnections",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetPluginConfiguration": {
+            "description": "Get a plugin's params.",
+            "params": {
+                "pluginId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:configuration": "$ref:ParamList",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetPlugins": {
+            "description": "Returns a list of loaded plugins.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "plugins": "$ref:IntegrationPlugins"
+            }
+        },
+        "Integrations.GetStateTypes": {
+            "description": "Get state types for a specified thingClassId.",
+            "params": {
+                "thingClassId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "stateTypes": "$ref:StateTypes"
+            }
+        },
+        "Integrations.GetStateValue": {
+            "description": "Get the value of the given thing and the given stateType",
+            "params": {
+                "stateTypeId": "Uuid",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:value": "Variant",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetStateValues": {
+            "description": "Get all the state values of the given thing.",
+            "params": {
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:values": "$ref:States",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetThingClasses": {
+            "description": "Returns a list of supported thing classes, optionally filtered by vendorId or by a list of thing class ids.",
+            "params": {
+                "o:thingClassIds": [
+                    "Uuid"
+                ],
+                "o:vendorId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:thingClasses": "$ref:ThingClasses",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetThings": {
+            "description": "Returns a list of configured things, optionally filtered by thingId.",
+            "params": {
+                "o:thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:things": "$ref:Things",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.GetVendors": {
+            "description": "Returns a list of supported Vendors.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "vendors": "$ref:Vendors"
+            }
+        },
+        "Integrations.PairThing": {
+            "description": "Pair a new thing. Use this to set up or reconfigure things for ThingClasses with a setupMethod different than SetupMethodJustAdd. Depending on the CreateMethod and whether a new thing is set up or an existing one is reconfigured, different parameters are required:\nCreateMethodJustAdd takes the thingClassId and the parameters you want to have with that thing. If an existing thing should be reconfigured, the thingId of said thing should be given additionally.\nCreateMethodDiscovery requires the use of a thingDescriptorId, previously obtained with DiscoverThings. Optionally, parameters can be overridden with the give thingParams. ThingDescriptors containing a thingId will reconfigure an existing thing, descriptors without a thingId will add a new thing to the system.\nIf success is true, the return values will contain a pairingTransactionId, a displayMessage and the setupMethod. Depending on the setupMethod, the application should present the use an appropriate login mask, that is, For SetupMethodDisplayPin the user should enter a pin that is displayed on the device or online service, for SetupMethodEnterPin the application should present the given PIN so the user can enter it on the device or online service. For SetupMethodPushButton, the displayMessage shall be presented to the user as informational hints to press a button on the device. For SetupMethodUserAndPassword a login mask for a user and password login should be presented to the user. In case of SetupMethodOAuth, an OAuth URL will be returned which shall be opened in a web view to allow the user logging in.\nOnce the login procedure has completed, the application shall proceed with ConfirmPairing, providing the results of the pairing procedure.",
+            "params": {
+                "o:name": "String",
+                "o:thingClassId": "Uuid",
+                "o:thingDescriptorId": "Uuid",
+                "o:thingId": "Uuid",
+                "o:thingParams": "$ref:ParamList"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "o:oAuthUrl": "String",
+                "o:pairingTransactionId": "Uuid",
+                "o:pin": "String",
+                "o:setupMethod": "$ref:SetupMethod",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.ReconfigureThing": {
+            "description": "Reconfigure a thing. This comes down to removing and recreating a thing with new parameters but keeping its thing id the same (and with that keeping rules, tags etc). For things with create method CreateMethodDiscovery, a discovery (DiscoverThings) shall be performed first and this method is to be called with a thingDescriptorId of the re-discovered thing instead of the thingId directly. Thing parameters will be taken from the discovery, but can be overridden individually here by providing them in the thingParams parameter. Only writable parameters can be changed.",
+            "params": {
+                "o:thingDescriptorId": "Uuid",
+                "o:thingId": "Uuid",
+                "o:thingParams": "$ref:ParamList"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "o:displayMessage": "String",
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.RemoveThing": {
+            "description": "Remove a thing and all its childs from the system. RemovePolicy is deprecated and has no effect any more.",
+            "params": {
+                "d:o:removePolicy": "String",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetActionLogging": {
+            "description": "Enable/disable logging for the given action type on the given thing.",
+            "params": {
+                "actionTypeId": "Uuid",
+                "enabled": "Bool",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetEventLogging": {
+            "description": "Enable/disable logging for the given event type on the given thing.",
+            "params": {
+                "enabled": "Bool",
+                "eventTypeId": "Uuid",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetPluginConfiguration": {
+            "description": "Set a plugin's params.",
+            "params": {
+                "configuration": "$ref:ParamList",
+                "pluginId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetStateFilter": {
+            "description": "Set the filter for the given state on the given thing.",
+            "params": {
+                "filter": "$ref:StateValueFilter",
+                "stateTypeId": "Uuid",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetStateLogging": {
+            "description": "Enable/disable logging for the given state type on the given thing.",
+            "params": {
+                "enabled": "Bool",
+                "stateTypeId": "Uuid",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "Integrations.SetThingSettings": {
+            "description": "Change the settings of a thing.",
+            "params": {
+                "settings": "$ref:ParamList",
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureThings",
+            "returns": {
+                "thingError": "$ref:ThingError"
+            }
+        },
+        "JSONRPC.Authenticate": {
+            "description": "Authenticate a client to the api via user & password challenge. Provide a device name which allows the user to identify the client and revoke the token in case the device is lost or stolen. This will return a new token to be used to authorize a client at the API.",
+            "params": {
+                "deviceName": "String",
+                "password": "String",
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "o:scopes": "$ref:PermissionScopes",
+                "o:token": "String",
+                "o:username": "String",
+                "success": "Bool"
+            }
+        },
+        "JSONRPC.CreateUser": {
+            "description": "Create a new user in the API. This is only allowed to be called when the initial setup is required. To create additional users, use Users.CreateUser instead. Call Authenticate after this to obtain a device token for the newly created user.",
+            "params": {
+                "o:displayName": "String",
+                "o:email": "String",
+                "password": "String",
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "JSONRPC.Hello": {
+            "description": "Initiates a connection. Use this method to perform an initial handshake of the connection. Optionally, a parameter \"locale\" is can be passed to set up the used locale for this connection. Strings such as ThingClass displayNames etc will be localized to this locale. If this parameter is omitted, the default system locale (depending on the configuration) is used. The reply of this method contains information about this core instance such as version information, uuid and its name. The locale valueindicates the locale used for this connection. Note: This method can be called multiple times. The locale used in the last call for this connection will be used. Other values, like initialSetupRequired might change if the setup has been performed in the meantime.\n The field cacheHashes may contain a map of methods and MD5 hashes. As long as the hash for a method does not change, a client may use a previously cached copy of the call instead of fetching the content again. While the Hello call doesn't necessarily require a token, this can be called with a token. If a token is provided, it will be verified and the reply contains information about the tokens validity and the user and permissions for the given token.",
+            "params": {
+                "o:locale": "String"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "authenticationRequired": "Bool",
+                "initialSetupRequired": "Bool",
+                "language": "String",
+                "locale": "String",
+                "name": "String",
+                "o:authenticated": "Bool",
+                "o:cacheHashes": [
+                    "$ref:CacheHash"
+                ],
+                "o:experiences": [
+                    "$ref:Experience"
+                ],
+                "o:permissionScopes": "$ref:PermissionScopes",
+                "o:username": "String",
+                "protocol version": "String",
+                "pushButtonAuthAvailable": "Bool",
+                "server": "String",
+                "uuid": "Uuid",
+                "version": "String"
+            }
+        },
+        "JSONRPC.Introspect": {
+            "description": "Introspect this API.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "methods": "Object",
+                "notifications": "Object",
+                "types": "Object"
+            }
+        },
+        "JSONRPC.KeepAlive": {
+            "description": "This is basically a Ping/Pong mechanism a client app may use to check server connectivity. Currently, the server does not actually do anything with this information and will return the call providing the given sessionId back to the caller. It is up to the client whether to use this or not and not required by the server to keep the connection alive.",
+            "params": {
+                "sessionId": "String"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "sessionId": "String",
+                "success": "Bool"
+            }
+        },
+        "JSONRPC.RequestPushButtonAuth": {
+            "description": "Authenticate a client to the api via Push Button method. Provide a device name which allows the user to identify the client and revoke the token in case the device is lost or stolen. If push button hardware is available, this will return with success and start listening for push button presses. When the push button is pressed, the PushButtonAuthFinished notification will be sent to the requesting client. The procedure will be cancelled when the connection is interrupted. If another client requests push button authentication while a procedure is still going on, the second call will take over and the first one will be notified by the PushButtonAuthFinished signal about the error. The application should make it clear to the user to not press the button when the procedure fails as this can happen for 2 reasons: a) a second user is trying to auth at the same time and only the currently active user should press the button or b) it might indicate an attacker trying to take over and snooping in for tokens.",
+            "params": {
+                "deviceName": "String"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "success": "Bool",
+                "transactionId": "Int"
+            }
+        },
+        "JSONRPC.SetNotificationStatus": {
+            "description": "Enable/Disable notifications for this connections. Either \"enabled\" or \"namespaces\" needs to be given but not both of them. The boolean based \"enabled\" parameter will enable/disable all notifications at once. If instead the list-based \"namespaces\" parameter is provided, all given namespaceswill be enabled, the others will be disabled. The return value of \"success\" will indicate success of the operation. The \"enabled\" property in the return value is deprecated and used for legacy compatibilty only. It will be set to true if at least one namespace has been enabled.",
+            "params": {
+                "d:o:enabled": "Bool",
+                "o:namespaces": "StringList"
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "d:enabled": "Bool",
+                "namespaces": "StringList"
+            }
+        },
+        "JSONRPC.Version": {
+            "description": "Version of this nymea/JSONRPC interface.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "protocol version": "String",
+                "qtBuildVersion": "String",
+                "qtVersion": "String",
+                "version": "String"
+            }
+        },
+        "Logging.GetLogEntries": {
+            "description": "Get the LogEntries matching the given filter. \n\"sources\": Builtin sources are: \"core\", \"rules\", \"scripts\", \"integrations\". May be extended by experience plugins.\n\"columns\": Columns to be returned.\n\"filter\": A map of column:value entries. Only = is supported currently.\n\"startTime\": The datetime of the oldest entry, in ms.\n\"endTime\": The datetime of the newest entry, in ms.\n\"sampleRate\": If given, returns a sampled series of the values, filling in gaps with the previous value.\n\"sortOrder\": Sort order of results. Note that this impacts the filling of gaps when resampling.\n\"limit\": Maximum amount of entries to be returned.\n\"offset\": Offset to be skipped before returning entries.",
+            "params": {
+                "o:columns": [
+                    "String"
+                ],
+                "o:endTime": "Uint",
+                "o:filter": "Variant",
+                "o:limit": "Int",
+                "o:offset": "Int",
+                "o:sampleRate": "$ref:SampleRate",
+                "o:sortOrder": "$ref:SortOrder",
+                "o:startTime": "Uint",
+                "sources": [
+                    "String"
+                ]
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "count": "Int",
+                "o:logEntries": "$ref:LogEntries",
+                "offset": "Int"
+            }
+        },
+        "ModbusRtu.AddModbusRtuMaster": {
+            "description": "Add a new modbus RTU master with the given configuration. The timeout value is in milli seconds and the minimum value is 10 ms.",
+            "params": {
+                "baudrate": "Uint",
+                "dataBits": "$ref:SerialPortDataBits",
+                "numberOfRetries": "Uint",
+                "parity": "$ref:SerialPortParity",
+                "serialPort": "String",
+                "stopBits": "$ref:SerialPortStopBits",
+                "timeout": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "modbusError": "$ref:ModbusRtuError",
+                "o:modbusUuid": "Uuid"
+            }
+        },
+        "ModbusRtu.GetModbusRtuMasters": {
+            "description": "Get the list of configured modbus RTU masters.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "modbusError": "$ref:ModbusRtuError",
+                "o:modbusRtuMasters": [
+                    "$ref:ModbusRtuMaster"
+                ]
+            }
+        },
+        "ModbusRtu.GetSerialPorts": {
+            "description": "Get the list of available serial ports from the host system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "serialPorts": "$ref:SerialPorts"
+            }
+        },
+        "ModbusRtu.ReconfigureModbusRtuMaster": {
+            "description": "Reconfigure the modbus RTU master with the given UUID and configuration.",
+            "params": {
+                "baudrate": "Uint",
+                "dataBits": "$ref:SerialPortDataBits",
+                "modbusUuid": "Uuid",
+                "numberOfRetries": "Uint",
+                "parity": "$ref:SerialPortParity",
+                "serialPort": "String",
+                "stopBits": "$ref:SerialPortStopBits",
+                "timeout": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "modbusError": "$ref:ModbusRtuError"
+            }
+        },
+        "ModbusRtu.RemoveModbusRtuMaster": {
+            "description": "Remove the modbus RTU master with the given modbus UUID.",
+            "params": {
+                "modbusUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "modbusError": "$ref:ModbusRtuError"
+            }
+        },
+        "NetworkManager.ConnectWifiNetwork": {
+            "description": "Connect to the wifi network with the given ssid and password.",
+            "params": {
+                "interface": "String",
+                "o:password": "String",
+                "ssid": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.CreateWiredConnection": {
+            "description": "Create a wired connection.",
+            "params": {
+                "interface": "String",
+                "o:dns": "String",
+                "o:gateway": "String",
+                "o:ip": "String",
+                "o:prefix": "Uint",
+                "type": "$ref:WiredNetworkConnectionType"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.DisconnectInterface": {
+            "description": "Disconnect the given network interface. The interface will remain disconnected until the user connect it again.",
+            "params": {
+                "interface": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.EnableNetworking": {
+            "description": "Enable or disable networking in the NetworkManager.",
+            "params": {
+                "enable": "Bool"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.EnableWirelessNetworking": {
+            "description": "Enable or disable wireless networking in the NetworkManager.",
+            "params": {
+                "enable": "Bool"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.GetNetworkDevices": {
+            "description": "Get the list of current network devices.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError",
+                "o:wiredNetworkDevices": [
+                    "$ref:WiredNetworkDevice"
+                ],
+                "o:wirelessNetworkDevices": [
+                    "$ref:WirelessNetworkDevice"
+                ]
+            }
+        },
+        "NetworkManager.GetNetworkStatus": {
+            "description": "Get the current network manager status.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError",
+                "o:status": {
+                    "networkingEnabled": "Bool",
+                    "state": "$ref:NetworkManagerState",
+                    "wirelessNetworkingEnabled": "Bool"
+                }
+            }
+        },
+        "NetworkManager.GetWirelessAccessPoints": {
+            "description": "Get the current list of wireless network access points for the given interface. The interface has to be a WirelessNetworkDevice.",
+            "params": {
+                "interface": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError",
+                "o:wirelessAccessPoints": [
+                    "$ref:WirelessAccessPoint"
+                ]
+            }
+        },
+        "NetworkManager.ScanWifiNetworks": {
+            "description": "Start a wifi scan for searching new networks.",
+            "params": {
+                "interface": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "NetworkManager.StartAccessPoint": {
+            "description": "Start a WiFi Access point on the given interface with the given SSID and password. Use DisconnectInterface to stop it again.",
+            "params": {
+                "interface": "String",
+                "password": "String",
+                "ssid": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networkManagerError": "$ref:NetworkManagerError"
+            }
+        },
+        "Rules.AddRule": {
+            "description": "Add a rule. You can describe rules by one or many EventDesciptors and a StateEvaluator. Note that only one of either eventDescriptor or eventDescriptorList may be passed at a time. A rule can be created but left disabled, meaning it won't actually be executed until set to enabled. If not given, enabled defaults to true. A rule can have a list of actions and exitActions. It must have at least one Action. For state based rules, actions will be executed when the system enters a state matching the stateDescriptor. The exitActions will be executed when the system leaves the described state again. For event based rules, actions will be executed when a matching event happens and if the stateEvaluator matches the system's state. ExitActions for such rules will be executed when a matching event happens and the stateEvaluator is not matching the system's state. A rule marked as executable can be executed via the API using Rules.ExecuteRule, that means, its actions will be executed regardless of the eventDescriptor and stateEvaluators.",
+            "params": {
+                "actions": [
+                    "$ref:RuleAction"
+                ],
+                "name": "String",
+                "o:enabled": "Bool",
+                "o:eventDescriptors": [
+                    "$ref:EventDescriptor"
+                ],
+                "o:executable": "Bool",
+                "o:exitActions": [
+                    "$ref:RuleAction"
+                ],
+                "o:stateEvaluator": "$ref:StateEvaluator",
+                "o:timeDescriptor": "$ref:TimeDescriptor"
+            },
+            "permissionScope": "PermissionScopeConfigureRules",
+            "returns": {
+                "o:ruleId": "Uuid",
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.DisableRule": {
+            "description": "Disable a rule. The rule won't be triggered by it's events or state changes while it is disabled. If successful, the notification \"Rule.RuleConfigurationChanged\" will be emitted.",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureRules",
+            "returns": {
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.EditRule": {
+            "description": "Edit the parameters of a rule. The configuration of the rule with the given ruleId will be replaced with the new given configuration. In ordert to enable or disable a Rule, please use the methods \"Rules.EnableRule\" and \"Rules.DisableRule\". If successful, the notification \"Rule.RuleConfigurationChanged\" will be emitted.",
+            "params": {
+                "actions": [
+                    "$ref:RuleAction"
+                ],
+                "name": "String",
+                "o:enabled": "Bool",
+                "o:eventDescriptors": [
+                    "$ref:EventDescriptor"
+                ],
+                "o:executable": "Bool",
+                "o:exitActions": [
+                    "$ref:RuleAction"
+                ],
+                "o:stateEvaluator": "$ref:StateEvaluator",
+                "o:timeDescriptor": "$ref:TimeDescriptor",
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureRules",
+            "returns": {
+                "o:rule": "$ref:Rule",
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.EnableRule": {
+            "description": "Enabled a rule that has previously been disabled.If successful, the notification \"Rule.RuleConfigurationChanged\" will be emitted.",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureRules",
+            "returns": {
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.ExecuteActions": {
+            "description": "Execute the action list of the rule with the given ruleId.",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeExecuteRules",
+            "returns": {
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.ExecuteExitActions": {
+            "description": "Execute the exit action list of the rule with the given ruleId.",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeExecuteRules",
+            "returns": {
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.FindRules": {
+            "description": "Find a list of rules containing any of the given parameters.",
+            "params": {
+                "thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeExecuteRules",
+            "returns": {
+                "ruleIds": [
+                    "Uuid"
+                ]
+            }
+        },
+        "Rules.GetRuleDetails": {
+            "description": "Get details for the rule identified by ruleId",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeExecuteRules",
+            "returns": {
+                "o:rule": "$ref:Rule",
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Rules.GetRules": {
+            "description": "Get the descriptions of all configured rules. If you need more information about a specific rule use the method Rules.GetRuleDetails.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeExecuteRules",
+            "returns": {
+                "ruleDescriptions": [
+                    "$ref:RuleDescription"
+                ]
+            }
+        },
+        "Rules.RemoveRule": {
+            "description": "Remove a rule",
+            "params": {
+                "ruleId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeConfigureRules",
+            "returns": {
+                "ruleError": "$ref:RuleError"
+            }
+        },
+        "Scripts.AddScript": {
+            "description": "Add a script",
+            "params": {
+                "content": "String",
+                "name": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:errors": "StringList",
+                "o:script": "$ref:Script",
+                "scriptError": "$ref:ScriptError"
+            }
+        },
+        "Scripts.EditScript": {
+            "description": "Edit a script",
+            "params": {
+                "id": "Uuid",
+                "o:content": "String",
+                "o:name": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:errors": "StringList",
+                "scriptError": "$ref:ScriptError"
+            }
+        },
+        "Scripts.GetScriptContent": {
+            "description": "Get a scripts content.",
+            "params": {
+                "id": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:content": "String",
+                "scriptError": "$ref:ScriptError"
+            }
+        },
+        "Scripts.GetScripts": {
+            "description": "Get all script, that is, their names and properties, but no content.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "scripts": "$ref:Scripts"
+            }
+        },
+        "Scripts.RemoveScript": {
+            "description": "remove a script",
+            "params": {
+                "id": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "scriptError": "$ref:ScriptError"
+            }
+        },
+        "System.CheckForUpdates": {
+            "description": "Instruct the system to poll the server for updates. Normally the system should automatically do this in regular intervals, however, if the client wants to allow the user to manually check for new updates now, this can be called. Returns true if the operation has been started successfully and the update manager will become busy. In order to know whether there are updates available, clients should walk through the list of packages retrieved from GetPackages and check whether there are packages with the updateAvailable flag set to true.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.EnableRepository": {
+            "description": "Enable or disable a repository.",
+            "params": {
+                "enabled": "Bool",
+                "repositoryId": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.GetCapabilities": {
+            "description": "Get the list of capabilites on this system. The property \"powerManagement\" indicates whether restarting nymea and rebooting or shutting down is supported on this system. The property \"updateManagement\" indicates whether system update features are available in this system. The \"updateManagementType\" indicates which kind of update is supported on this platform. The property \"timeManagement\" indicates whether the system time can be configured on this system. Note that GetTime will be available in any case.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "powerManagement": "Bool",
+                "timeManagement": "Bool",
+                "updateManagement": "Bool",
+                "updateManagementType": "$ref:UpdateType"
+            }
+        },
+        "System.GetPackages": {
+            "description": "Get the list of packages currently available to the system. This might include installed available but not installed packages. Installed packages will have the installedVersion set to a non-empty value.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "packages": "$ref:Packages"
+            }
+        },
+        "System.GetRepositories": {
+            "description": "Get the list of repositories currently available to the system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "repositories": "$ref:Repositories"
+            }
+        },
+        "System.GetSystemInfo": {
+            "description": "Returns information about the system nymea is running on.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "deviceSerialNumber": "String"
+            }
+        },
+        "System.GetTime": {
+            "description": "Get the system time and configuraton. The \"time\" and \"timeZone\" properties give the current server time and time zone. \"automaticTimeAvailable\" indicates whether this system supports automatically setting the clock (e.g. using NTP). \"automaticTime\" will be true if the system is configured to automatically update the clock.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "automaticTime": "Bool",
+                "automaticTimeAvailable": "Bool",
+                "time": "Uint",
+                "timeZone": "String"
+            }
+        },
+        "System.GetTimeZones": {
+            "description": "Returns the list of IANA specified time zone IDs which can be used to select a time zone. It is not required to use this method if the client toolkit already provides means to obtain a list of IANA time zone ids.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "timeZones": "StringList"
+            }
+        },
+        "System.GetUpdateStatus": {
+            "description": "Get the current status of the update system. \"busy\" indicates that the system is current busy with an operation regarding updates. This does not necessarily mean an actual update is running. When this is true, update related functions on the client should be marked as busy and no interaction with update components shall be allowed. An example for such a state is when the system queries the server if there are updates available, typically after a call to CheckForUpdates. \"updateRunning\" on the other hand indicates an actual update process is ongoing. The user should be informed about it, the system also might restart at any point while an update is running. The \"updateProgress\" property is optional, if the backend supports it, a progress >= 0 indicated the update progress in percentage.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "busy": "Bool",
+                "o:updateProgress": "Int",
+                "updateRunning": "Bool"
+            }
+        },
+        "System.Reboot": {
+            "description": "Initiate a reboot of the system. The return value will indicate whether the procedure has been initiated successfully.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.RemovePackages": {
+            "description": "Starts removing a package. Returns true if the removal has been started successfully. Before calling this method, clients should check whether the package can be removed (canRemove set to true).",
+            "params": {
+                "packageIds": [
+                    "String"
+                ]
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.Restart": {
+            "description": "Initiate a restart of the nymea service. The return value will indicate whether the procedure has been initiated successfully.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.RollbackPackages": {
+            "description": "Starts a rollback. Returns true if the rollback has been started successfully. Before calling this method, clients should check whether the package can be rolled back (canRollback set to true).",
+            "params": {
+                "packageIds": [
+                    "String"
+                ]
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.SetTime": {
+            "description": "Set the system time configuraton. The system can be configured to update the time automatically by setting \"automaticTime\" to true. This will only work if the \"timeManagement\" capability is available on this system and \"GetTime\" indicates the availability of automatic time settings. If any of those requirements are not met, this method will return \"false\" in the \"success\" property. In order to manually configure the time, \"automaticTime\" should be set to false and \"time\" should be set. Note that if \"automaticTime\" is set to true and a manual \"time\" is still passed, the system will attempt to configure automatic time updates and only set the manual time if automatic mode fails. A time zone can always be passed optionally to change the system time zone and should be a IANA time zone id.",
+            "params": {
+                "o:automaticTime": "Bool",
+                "o:time": "Uint",
+                "o:timeZone": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.Shutdown": {
+            "description": "Initiate a shutdown of the system. The return value will indicate whether the procedure has been initiated successfully.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "System.UpdatePackages": {
+            "description": "Starts updating/installing packages with the given ids. Returns true if the upgrade has been started successfully. Note that it might still fail later. Before calling this method, clients should check the packages whether they are in a state where they can either be installed (no installedVersion set) or upgraded (updateAvailable set to true).",
+            "params": {
+                "o:packageIds": [
+                    "String"
+                ]
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "success": "Bool"
+            }
+        },
+        "Tags.AddTag": {
+            "description": "Add a Tag. A Tag must have a thingId OR a ruleId (call this method twice if you want to attach the same tag to a thing and a rule), an appId (Use the appId of your app), a tagId (e.g. \"favorites\") and a value. Upon success, a TagAdded notification will be emitted. Calling this method twice for the same ids (thing/rule, appId and tagId) but with a different value will update the tag's value and the TagValueChanged notification will be emitted.",
+            "params": {
+                "tag": "$ref:Tag"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "tagError": "$ref:TagError"
+            }
+        },
+        "Tags.GetTags": {
+            "description": "Get the Tags matching the given filter. Tags can be filtered by a thingID, a ruleId, an appId, a tagId or a combination of any (however, combining thingId and ruleId will return an empty result set).",
+            "params": {
+                "o:appId": "String",
+                "o:ruleId": "Uuid",
+                "o:tagId": "String",
+                "o:thingId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "o:tags": "$ref:Tags",
+                "tagError": "$ref:TagError"
+            }
+        },
+        "Tags.RemoveTag": {
+            "description": "Remove a Tag. Tag value is optional and will be disregarded. If the ids match, the tag will be deleted and a TagRemoved notification will be emitted.",
+            "params": {
+                "tag": "$ref:Tag"
+            },
+            "permissionScope": "PermissionScopeControlThings",
+            "returns": {
+                "tagError": "$ref:TagError"
+            }
+        },
+        "Users.ChangePassword": {
+            "description": "Change the password for the currently logged in user.",
+            "params": {
+                "newPassword": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.ChangeUserPassword": {
+            "description": "Change the password for the given user. All tokens for this user will be removed in order to force all clients to log in again.",
+            "params": {
+                "newPassword": "String",
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.CreateUser": {
+            "description": "Create a new user in the API with the given username and password. Use scopes to define the permissions for the new user. If the user has not the permission \"PermissionScopeAccessAllThings\", the list of things this user has access to can be defined in the \"allowedThingIds\" property. If no scopes are given, this user will be an admin user. Call Authenticate after this to obtain a device token for this user.",
+            "params": {
+                "o:allowedThingIds": [
+                    "Uuid"
+                ],
+                "o:displayName": "String",
+                "o:email": "String",
+                "o:scopes": "$ref:PermissionScopes",
+                "password": "String",
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.GetTokens": {
+            "description": "Get all the tokens for the current user.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError",
+                "o:tokenInfoList": "$ref:TokenInfoList"
+            }
+        },
+        "Users.GetUserInfo": {
+            "description": "Get info about the current token (the currently logged in user).",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeNone",
+            "returns": {
+                "error": "$ref:UserError",
+                "o:userInfo": "$ref:UserInfo"
+            }
+        },
+        "Users.GetUserTokens": {
+            "description": "Get all the tokens for the given username.",
+            "params": {
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError",
+                "o:tokenInfoList": "$ref:TokenInfoList"
+            }
+        },
+        "Users.GetUsers": {
+            "description": "Return a list of all users in the system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "users": "$ref:UserInfoList"
+            }
+        },
+        "Users.RemoveToken": {
+            "description": "Revoke access for a given token. Depending on the logged in user only the own tokens can be removed. If you are logged in as admin, any token can be removed.",
+            "params": {
+                "tokenId": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.RemoveUser": {
+            "description": "Remove a user from the system.",
+            "params": {
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.SetUserInfo": {
+            "description": "Change user info. If username is given, info for the respective user is changed, otherwise the current user info is edited. Requires admin permissions to edit user info other than the own.",
+            "params": {
+                "o:displayName": "String",
+                "o:email": "String",
+                "o:username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "Users.SetUserScopes": {
+            "description": "Set the permissions (scopes) for a given user. If the user has not the permission \"PermissionScopeAccessAllThings\" the list of thing IDs this user has access to can be defined in the \"allowedThingIds\" property.",
+            "params": {
+                "o:allowedThingIds": [
+                    "Uuid"
+                ],
+                "scopes": "$ref:PermissionScopes",
+                "username": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "error": "$ref:UserError"
+            }
+        },
+        "ZWave.AddNetwork": {
+            "description": "Add a new Z-Wave network with the given serial port.",
+            "params": {
+                "serialPort": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:networkUuid": "Uuid",
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.AddNode": {
+            "description": "Start the node inclusion procedure for the given Z-Wave network.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.CancelPendingOperation": {
+            "description": "Cancel any running node inclusion or removal procedure for the given Z-Wave network.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.FactoryResetNetwork": {
+            "description": "Factory reset the controller for the given Z-Wave network.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.GetNetworks": {
+            "description": "Get all the Z-Wave networks in the system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "networks": [
+                    "$ref:ZWaveNetwork"
+                ]
+            }
+        },
+        "ZWave.GetNodes": {
+            "description": "Get the list of nodes in a network",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:nodes": [
+                    "$ref:ZWaveNode"
+                ],
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.GetSerialPorts": {
+            "description": "Get the list of available serial ports from the host system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "serialPorts": "$ref:SerialPorts"
+            }
+        },
+        "ZWave.IsZWaveAvailable": {
+            "description": "Query if the Z-Wave subsystem is available at all.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "available": "Bool"
+            }
+        },
+        "ZWave.RemoveFailedNode": {
+            "description": "Remove the given failed node from the given Z-Wave network. This will not work if node is not marked as failed.",
+            "params": {
+                "networkUuid": "Uuid",
+                "nodeId": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.RemoveNetwork": {
+            "description": "Remove the given Z-Wave network from the system.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "ZWave.RemoveNode": {
+            "description": "Start the node removal procedure for the given Z-Wave network.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zwaveError": "$ref:ZWaveError"
+            }
+        },
+        "Zigbee.AddNetwork": {
+            "description": "Create a new ZigBee network for the given 'serialPort', 'baudRate' and 'backend'. The serial ports can be fetched from the available adapters. See 'GetAdapters' for more information. The available backends can be fetched using the 'GetAvailableBackends' method.",
+            "params": {
+                "backend": "String",
+                "baudRate": "Uint",
+                "o:channelMask": "Uint",
+                "serialPort": "String"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:networkUuid": "Uuid",
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.CreateBinding": {
+            "description": "Create a binding. Use destinationAddress and destinationEndpointId to create a node to node binding, or use destinationGroupAddress to create a group binding.",
+            "params": {
+                "clusterId": "Uint",
+                "networkUuid": "Uuid",
+                "o:destinationAddress": "String",
+                "o:destinationEndpointId": "Uint",
+                "o:destinationGroupAddress": "Uint",
+                "sourceAddress": "String",
+                "sourceEndpointId": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.FactoryResetNetwork": {
+            "description": "Factory reset the network with the given 'networkUuid'. The network does not have to be online for this procedure, and all associated nodes and things will be removed permanently.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.GetAdapters": {
+            "description": "Get the list of available ZigBee adapters and serial ports in order to set up the ZigBee network on the desired interface. The 'serialPort' property can be used as unique identifier for an adapter. If an adapter hardware has been recognized as a well known ZigBee adapter, the 'hardwareRecognized' property will be true and the 'baudRate' and 'backend' configurations can be used as they where given, otherwise the user might set the backend and baud rate manually. The available backends can be fetched using the GetAvailableBackends method.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "adapters": "$ref:ZigbeeAdapters"
+            }
+        },
+        "Zigbee.GetAvailableBackends": {
+            "description": "Get the list of available ZigBee backends.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "backends": [
+                    "String"
+                ]
+            }
+        },
+        "Zigbee.GetNetworks": {
+            "description": "Returns the list of configured ZigBee networks in the system.",
+            "params": {
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeNetworks": [
+                    "$ref:ZigbeeNetwork"
+                ]
+            }
+        },
+        "Zigbee.GetNodes": {
+            "description": "Returns the list of ZigBee nodes from the network the given 'networkUuid' in the system.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "o:zigbeeNodes": [
+                    "$ref:ZigbeeNode"
+                ],
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.RefreshBindings": {
+            "description": "Refresh the binding table for the given node.",
+            "params": {
+                "ieeeAddress": "String",
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.RefreshNeighborTables": {
+            "description": "Refresh the neighbor table for all nodes. Note that calling this may cause a lot of traffic in the ZigBee network.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.RemoveBinding": {
+            "description": "Remove a binding.",
+            "params": {
+                "clusterId": "Uint",
+                "networkUuid": "Uuid",
+                "o:destinationAddress": "String",
+                "o:destinationEndpointId": "Uint",
+                "o:destinationGroupAddress": "Uint",
+                "sourceAddress": "String",
+                "sourceEndpointId": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.RemoveNetwork": {
+            "description": "Remove the ZigBee network with the given network uuid.",
+            "params": {
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.RemoveNode": {
+            "description": "Remove a ZigBee node with the given 'ieeeAddress' from the network with the given 'networkUuid'. If there is a thing configured for this node, also the thing will be removed from the system. The coordinator node cannot be removed.",
+            "params": {
+                "ieeeAddress": "String",
+                "networkUuid": "Uuid"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        },
+        "Zigbee.SetPermitJoin": {
+            "description": "Allow or deny nodes to join the network with the given 'networkUuid' for a specific 'duration' in seconds. The duration value has to be between 0 and 255 seconds. The 'permitJoinDuration' property of ZigBee network object indicates how long permit has been enabled and the 'permitJoiningRemaining' indicates the rest of the time. Those values can be used to show a countdown or progressbar. This method can be recalled for resetting the timeout. If the duration is set to 0 seconds, joining will be disabled immediatly for the entire network. The 'shortAddress' is optional and defaults to the broadcast address 0xfffc for all routers in the network. If the short address matches the address of a router node in the network, only that specific router will be able to allow new nodes to join the network. A new node will join to the router with the best link quality index (LQI).",
+            "params": {
+                "duration": "Uint",
+                "networkUuid": "Uuid",
+                "o:shortAddress": "Uint"
+            },
+            "permissionScope": "PermissionScopeAdmin",
+            "returns": {
+                "zigbeeError": "$ref:ZigbeeError"
+            }
+        }
+    },
+    "notifications": {
+        "AppData.Changed": {
+            "description": "Emitted whenever the app data is changed on the server.",
+            "params": {
+                "appId": "String",
+                "key": "String",
+                "o:group": "String",
+                "value": "String"
+            }
+        },
+        "Configuration.BasicConfigurationChanged": {
+            "description": "Emitted whenever the basic configuration of this server changes.",
+            "params": {
+                "basicConfiguration": {
+                    "d:language": "String",
+                    "d:location": {
+                        "latitude": "Double",
+                        "longitude": "Double",
+                        "name": "String"
+                    },
+                    "d:serverTime": "Uint",
+                    "d:timeZone": "String",
+                    "debugServerEnabled": "Bool",
+                    "serverName": "String",
+                    "serverUuid": "Uuid"
+                }
+            }
+        },
+        "Configuration.LanguageChanged": {
+            "description": "Emitted whenever the language of the server changed. The Plugins, Vendors and ThingClasses have to be reloaded to get the translated data.",
+            "params": {
+                "language": "String"
+            }
+        },
+        "Configuration.MqttPolicyChanged": {
+            "description": "Emitted whenever a MQTT broker policy is changed.",
+            "params": {
+                "policy": "$ref:MqttPolicy"
+            }
+        },
+        "Configuration.MqttPolicyRemoved": {
+            "description": "Emitted whenever a MQTT broker policy is removed.",
+            "params": {
+                "clientId": "String"
+            }
+        },
+        "Configuration.MqttServerConfigurationChanged": {
+            "description": "Emitted whenever the MQTT broker configuration is changed.",
+            "params": {
+                "mqttServerConfiguration": "$ref:ServerConfiguration"
+            }
+        },
+        "Configuration.MqttServerConfigurationRemoved": {
+            "description": "Emitted whenever a MQTT server configuration is removed.",
+            "params": {
+                "id": "String"
+            }
+        },
+        "Configuration.TcpServerConfigurationChanged": {
+            "description": "Emitted whenever the TCP server configuration changes.",
+            "params": {
+                "tcpServerConfiguration": "$ref:ServerConfiguration"
+            }
+        },
+        "Configuration.TcpServerConfigurationRemoved": {
+            "description": "Emitted whenever a TCP server configuration is removed.",
+            "params": {
+                "id": "String"
+            }
+        },
+        "Configuration.TunnelProxyServerConfigurationChanged": {
+            "description": "Emitted whenever the tunnel proxy server configuration changes.",
+            "params": {
+                "tunnelProxyServerConfiguration": "$ref:TunnelProxyServerConfiguration"
+            }
+        },
+        "Configuration.TunnelProxyServerConfigurationRemoved": {
+            "description": "Emitted whenever a tunnel proxy server configuration is removed.",
+            "params": {
+                "id": "String"
+            }
+        },
+        "Configuration.WebServerConfigurationChanged": {
+            "description": "Emitted whenever the web server configuration changes.",
+            "params": {
+                "webServerConfiguration": "$ref:WebServerConfiguration"
+            }
+        },
+        "Configuration.WebServerConfigurationRemoved": {
+            "description": "Emitted whenever a Web server configuration is removed.",
+            "params": {
+                "id": "String"
+            }
+        },
+        "Configuration.WebSocketServerConfigurationChanged": {
+            "description": "Emitted whenever the web socket server configuration changes.",
+            "params": {
+                "webSocketServerConfiguration": "$ref:ServerConfiguration"
+            }
+        },
+        "Configuration.WebSocketServerConfigurationRemoved": {
+            "description": "Emitted whenever a WebSocket server configuration is removed.",
+            "params": {
+                "id": "String"
+            }
+        },
+        "Debug.LoggingCategoryLevelChanged": {
+            "description": "Emitted whenever a logging category has changed the logging level.",
+            "params": {
+                "level": "$ref:LoggingLevel",
+                "name": "String"
+            }
+        },
+        "Integrations.EventTriggered": {
+            "description": "Emitted whenever an Event is triggered.",
+            "params": {
+                "event": "$ref:Event"
+            }
+        },
+        "Integrations.IOConnectionAdded": {
+            "description": "Emitted whenever an IO connection has been added.",
+            "params": {
+                "ioConnection": "$ref:IOConnection"
+            }
+        },
+        "Integrations.IOConnectionRemoved": {
+            "description": "Emitted whenever an IO connection has been removed.",
+            "params": {
+                "ioConnectionId": "Uuid"
+            }
+        },
+        "Integrations.PluginConfigurationChanged": {
+            "description": "Emitted whenever a plugin's configuration is changed.",
+            "params": {
+                "configuration": "$ref:ParamList",
+                "pluginId": "Uuid"
+            }
+        },
+        "Integrations.StateChanged": {
+            "description": "Emitted whenever a state of a thing changes.",
+            "params": {
+                "maxValue": "Variant",
+                "minValue": "Variant",
+                "possibleValues": [
+                    "Variant"
+                ],
+                "stateTypeId": "Uuid",
+                "thingId": "Uuid",
+                "value": "Variant"
+            }
+        },
+        "Integrations.ThingAdded": {
+            "description": "Emitted whenever a thing was added.",
+            "params": {
+                "thing": "$ref:Thing"
+            }
+        },
+        "Integrations.ThingChanged": {
+            "description": "Emitted whenever the params or name of a thing are changed (by EditThing or ReconfigureThing).",
+            "params": {
+                "thing": "$ref:Thing"
+            }
+        },
+        "Integrations.ThingRemoved": {
+            "description": "Emitted whenever a thing was removed.",
+            "params": {
+                "thingId": "Uuid"
+            }
+        },
+        "Integrations.ThingSettingChanged": {
+            "description": "Emitted whenever the setting of a thing is changed.",
+            "params": {
+                "paramTypeId": "Uuid",
+                "thingId": "Uuid",
+                "value": "Variant"
+            }
+        },
+        "JSONRPC.PushButtonAuthFinished": {
+            "description": "Emitted when a push button authentication reaches final state. NOTE: This notification is special. It will only be emitted to connections that did actively request a push button authentication, but also it will be emitted regardless of the notification settings. ",
+            "params": {
+                "o:token": "String",
+                "success": "Bool",
+                "transactionId": "Int"
+            }
+        },
+        "Logging.LogEntryAdded": {
+            "description": "Emitted when a log entry is added. This will only be emitted for discrete series, not for resampled entries",
+            "params": {
+                "logEntry": "$ref:LogEntry"
+            }
+        },
+        "ModbusRtu.ModbusRtuMasterAdded": {
+            "description": "Emitted whenever a new modbus RTU master has been added to the system.",
+            "params": {
+                "modbusRtuMaster": "$ref:ModbusRtuMaster"
+            }
+        },
+        "ModbusRtu.ModbusRtuMasterChanged": {
+            "description": "Emitted whenever a modbus RTU master has been changed in the system.",
+            "params": {
+                "modbusRtuMaster": "$ref:ModbusRtuMaster"
+            }
+        },
+        "ModbusRtu.ModbusRtuMasterRemoved": {
+            "description": "Emitted whenever a modbus RTU master has been removed from the system.",
+            "params": {
+                "modbusUuid": "Uuid"
+            }
+        },
+        "ModbusRtu.SerialPortAdded": {
+            "description": "Emitted whenever a serial port has been added to the system.",
+            "params": {
+                "serialPort": "$ref:SerialPort"
+            }
+        },
+        "ModbusRtu.SerialPortRemoved": {
+            "description": "Emitted whenever a serial port has been removed from the system.",
+            "params": {
+                "serialPort": "$ref:SerialPort"
+            }
+        },
+        "NetworkManager.NetworkStatusChanged": {
+            "description": "Emitted whenever a status of a NetworkManager changes.",
+            "params": {
+                "status": {
+                    "networkingEnabled": "Bool",
+                    "state": "$ref:NetworkManagerState",
+                    "wirelessNetworkingEnabled": "Bool"
+                }
+            }
+        },
+        "NetworkManager.WiredNetworkDeviceAdded": {
+            "description": "Emitted whenever a new WiredNetworkDevice was added.",
+            "params": {
+                "wiredNetworkDevice": "$ref:WiredNetworkDevice"
+            }
+        },
+        "NetworkManager.WiredNetworkDeviceChanged": {
+            "description": "Emitted whenever the given WiredNetworkDevice has changed.",
+            "params": {
+                "wiredNetworkDevice": "$ref:WiredNetworkDevice"
+            }
+        },
+        "NetworkManager.WiredNetworkDeviceRemoved": {
+            "description": "Emitted whenever a WiredNetworkDevice was removed.",
+            "params": {
+                "interface": "String"
+            }
+        },
+        "NetworkManager.WirelessNetworkDeviceAdded": {
+            "description": "Emitted whenever a new WirelessNetworkDevice was added.",
+            "params": {
+                "wirelessNetworkDevice": "$ref:WirelessNetworkDevice"
+            }
+        },
+        "NetworkManager.WirelessNetworkDeviceChanged": {
+            "description": "Emitted whenever the given WirelessNetworkDevice has changed.",
+            "params": {
+                "wirelessNetworkDevice": "$ref:WirelessNetworkDevice"
+            }
+        },
+        "NetworkManager.WirelessNetworkDeviceRemoved": {
+            "description": "Emitted whenever a WirelessNetworkDevice was removed.",
+            "params": {
+                "interface": "String"
+            }
+        },
+        "Rules.RuleActiveChanged": {
+            "description": "Emitted whenever the active state of a Rule changed.",
+            "params": {
+                "active": "Bool",
+                "ruleId": "Uuid"
+            }
+        },
+        "Rules.RuleAdded": {
+            "description": "Emitted whenever a Rule was added.",
+            "params": {
+                "rule": "$ref:Rule"
+            }
+        },
+        "Rules.RuleConfigurationChanged": {
+            "description": "Emitted whenever the configuration of a Rule changed.",
+            "params": {
+                "rule": "$ref:Rule"
+            }
+        },
+        "Rules.RuleRemoved": {
+            "description": "Emitted whenever a Rule was removed.",
+            "params": {
+                "ruleId": "Uuid"
+            }
+        },
+        "Scripts.ScriptAdded": {
+            "description": "Emitted when a script has been added to the system.",
+            "params": {
+                "script": "$ref:Script"
+            }
+        },
+        "Scripts.ScriptChanged": {
+            "description": "Emitted when a script has been changed in the system (e.g. renamed).",
+            "params": {
+                "name": "String",
+                "scriptId": "Uuid"
+            }
+        },
+        "Scripts.ScriptContentChanged": {
+            "description": "Emitted when a script's content has been changed in the system.",
+            "params": {
+                "scriptId": "Uuid"
+            }
+        },
+        "Scripts.ScriptLogMessage": {
+            "description": "Emitted when a script produces a console message.",
+            "params": {
+                "message": "String",
+                "scriptId": "Uuid",
+                "type": "$ref:ScriptMessageType"
+            }
+        },
+        "Scripts.ScriptRemoved": {
+            "description": "Emitted when a script has been removed from the system.",
+            "params": {
+                "id": "Uuid"
+            }
+        },
+        "System.CapabilitiesChanged": {
+            "description": "Emitted whenever the system capabilities change.",
+            "params": {
+                "powerManagement": "Bool",
+                "updateManagement": "Bool",
+                "updateManagementType": "$ref:UpdateType"
+            }
+        },
+        "System.PackageAdded": {
+            "description": "Emitted whenever a package is added to the list of packages.",
+            "params": {
+                "package": "$ref:Package"
+            }
+        },
+        "System.PackageChanged": {
+            "description": "Emitted whenever a package in the list of packages changes.",
+            "params": {
+                "package": "$ref:Package"
+            }
+        },
+        "System.PackageRemoved": {
+            "description": "Emitted whenever a package is removed from the list of packages.",
+            "params": {
+                "packageId": "String"
+            }
+        },
+        "System.RepositoryAdded": {
+            "description": "Emitted whenever a repository is added to the list of repositories.",
+            "params": {
+                "repository": "$ref:Repository"
+            }
+        },
+        "System.RepositoryChanged": {
+            "description": "Emitted whenever a repository in the list of repositories changes.",
+            "params": {
+                "repository": "$ref:Repository"
+            }
+        },
+        "System.RepositoryRemoved": {
+            "description": "Emitted whenever a repository is removed from the list of repositories.",
+            "params": {
+                "repositoryId": "String"
+            }
+        },
+        "System.TimeConfigurationChanged": {
+            "description": "Emitted whenever the time configuration is changed",
+            "params": {
+                "automaticTime": "Bool",
+                "automaticTimeAvailable": "Bool",
+                "time": "Uint",
+                "timeZone": "String"
+            }
+        },
+        "System.UpdateStatusChanged": {
+            "description": "Emitted whenever the update status changes.",
+            "params": {
+                "busy": "Bool",
+                "o:updateProgress": "Int",
+                "updateRunning": "Bool"
+            }
+        },
+        "Tags.TagAdded": {
+            "description": "Emitted whenever a tag is added to the system. ",
+            "params": {
+                "tag": "$ref:Tag"
+            }
+        },
+        "Tags.TagRemoved": {
+            "description": "Emitted whenever a tag is removed from the system. ",
+            "params": {
+                "tag": "$ref:Tag"
+            }
+        },
+        "Tags.TagValueChanged": {
+            "description": "Emitted whenever a tag's value is changed in the system. ",
+            "params": {
+                "tag": "$ref:Tag"
+            }
+        },
+        "Users.PushButtonAuthFinished": {
+            "description": "Emitted when a push button authentication reaches final state. NOTE: This notification is special. It will only be emitted to connections that did actively request a push button authentication, but also it will be emitted regardless of the notification settings.",
+            "params": {
+                "o:token": "String",
+                "success": "Bool",
+                "transactionId": "Int"
+            }
+        },
+        "Users.UserAdded": {
+            "description": "Emitted when a user is added to the system.",
+            "params": {
+                "userInfo": "$ref:UserInfo"
+            }
+        },
+        "Users.UserChanged": {
+            "description": "Emitted whenever a user is changed.",
+            "params": {
+                "userInfo": "$ref:UserInfo"
+            }
+        },
+        "Users.UserRemoved": {
+            "description": "Emitted when a user is removed from the system.",
+            "params": {
+                "username": "String"
+            }
+        },
+        "ZWave.NetworkAdded": {
+            "description": "Emitted whenever a new Z-Wave network has been added to the system.",
+            "params": {
+                "network": "$ref:ZWaveNetwork"
+            }
+        },
+        "ZWave.NetworkChanged": {
+            "description": "Emitted whenever a Z-Wave network changes.",
+            "params": {
+                "network": "$ref:ZWaveNetwork"
+            }
+        },
+        "ZWave.NetworkRemoved": {
+            "description": "Emitted whenever a Z-Wave network has been removed from the system.",
+            "params": {
+                "networkUuid": "Uuid"
+            }
+        },
+        "ZWave.NodeAdded": {
+            "description": "Emitted whenever a Z-Wave node is added.",
+            "params": {
+                "networkUuid": "Uuid",
+                "node": "$ref:ZWaveNode"
+            }
+        },
+        "ZWave.NodeChanged": {
+            "description": "Emitted whenever a Z-Wave node has changed.",
+            "params": {
+                "networkUuid": "Uuid",
+                "node": "$ref:ZWaveNode"
+            }
+        },
+        "ZWave.NodeRemoved": {
+            "description": "Emitted whenever a Z-Wave node is removed.",
+            "params": {
+                "networkUuid": "Uuid",
+                "nodeId": "Uint"
+            }
+        },
+        "Zigbee.AdapterAdded": {
+            "description": "Emitted whenever a new ZigBee adapter or serial port has been detected in the system.",
+            "params": {
+                "adapter": "$ref:ZigbeeAdapter"
+            }
+        },
+        "Zigbee.AdapterRemoved": {
+            "description": "Emitted whenever a ZigBee adapter or serial port has been removed from the system (i.e. unplugged).",
+            "params": {
+                "adapter": "$ref:ZigbeeAdapter"
+            }
+        },
+        "Zigbee.NetworkAdded": {
+            "description": "Emitted whenever a new ZigBee network has been added.",
+            "params": {
+                "zigbeeNetwork": "$ref:ZigbeeNetwork"
+            }
+        },
+        "Zigbee.NetworkChanged": {
+            "description": "Emitted whenever a new ZigBee network has changed.",
+            "params": {
+                "zigbeeNetwork": "$ref:ZigbeeNetwork"
+            }
+        },
+        "Zigbee.NetworkRemoved": {
+            "description": "Emitted whenever a new ZigBee network has been removed.",
+            "params": {
+                "networkUuid": "Uuid"
+            }
+        },
+        "Zigbee.NodeAdded": {
+            "description": "Emitted whenever a new ZigBee node has joined the network with the given 'networkUuid'.",
+            "params": {
+                "networkUuid": "Uuid",
+                "zigbeeNode": "$ref:ZigbeeNode"
+            }
+        },
+        "Zigbee.NodeChanged": {
+            "description": "Emitted whenever a ZigBee node has changed.",
+            "params": {
+                "networkUuid": "Uuid",
+                "zigbeeNode": "$ref:ZigbeeNode"
+            }
+        },
+        "Zigbee.NodeRemoved": {
+            "description": "Emitted whenever a ZigBee node has removed from the network with the given 'networkUuid'.",
+            "params": {
+                "networkUuid": "Uuid",
+                "zigbeeNode": "$ref:ZigbeeNode"
+            }
+        }
+    },
+    "types": {
+        "Action": {
+            "actionTypeId": "Uuid",
+            "o:params": "$ref:ParamList",
+            "thingId": "Uuid"
+        },
+        "ActionType": {
+            "displayName": "String",
+            "index": "Int",
+            "name": "String",
+            "paramTypes": "$ref:ParamTypes",
+            "r:id": "Uuid"
+        },
+        "ActionTypes": [
+            "$ref:ActionType"
+        ],
+        "BrowserItem": {
+            "actionTypeIds": [
+                "Uuid"
+            ],
+            "browsable": "Bool",
+            "description": "String",
+            "disabled": "Bool",
+            "displayName": "String",
+            "executable": "Bool",
+            "icon": "$ref:BrowserIcon",
+            "id": "String",
+            "o:mediaIcon": "$ref:MediaBrowserIcon",
+            "thumbnail": "String"
+        },
+        "CacheHash": {
+            "hash": "String",
+            "method": "String"
+        },
+        "CalendarItem": {
+            "duration": "Uint",
+            "o:datetime": "Uint",
+            "o:repeating": "$ref:RepeatingOption",
+            "o:startTime": "Time"
+        },
+        "CalendarItems": [
+            "$ref:CalendarItem"
+        ],
+        "Event": {
+            "r:eventTypeId": "Uuid",
+            "r:params": "$ref:ParamList",
+            "r:thingId": "Uuid"
+        },
+        "EventDescriptor": {
+            "o:eventTypeId": "Uuid",
+            "o:interface": "String",
+            "o:interfaceEvent": "String",
+            "o:paramDescriptors": "$ref:ParamDescriptors",
+            "o:thingId": "Uuid"
+        },
+        "EventDescriptors": [
+            "$ref:EventDescriptor"
+        ],
+        "EventType": {
+            "displayName": "String",
+            "name": "String",
+            "paramTypes": "$ref:ParamTypes",
+            "r:id": "Uuid",
+            "r:index": "Int"
+        },
+        "EventTypes": [
+            "$ref:EventType"
+        ],
+        "Experience": {
+            "name": "String",
+            "version": "String"
+        },
+        "IOConnection": {
+            "r:id": "Uuid",
+            "r:inputStateTypeId": "Uuid",
+            "r:inputThingId": "Uuid",
+            "r:inverted": "Bool",
+            "r:outputStateTypeId": "Uuid",
+            "r:outputThingId": "Uuid"
+        },
+        "IOConnections": [
+            "$ref:IOConnection"
+        ],
+        "IntegrationPlugin": {
+            "r:displayName": "String",
+            "r:id": "Uuid",
+            "r:name": "String",
+            "r:paramTypes": "$ref:ParamTypes"
+        },
+        "IntegrationPlugins": [
+            "$ref:IntegrationPlugin"
+        ],
+        "LogEntries": [
+            "$ref:LogEntry"
+        ],
+        "LogEntry": {
+            "r:source": "String",
+            "r:timestamp": "Uint",
+            "r:values": "Object"
+        },
+        "LoggingCategory": {
+            "level": "$ref:LoggingLevel",
+            "name": "String",
+            "type": "$ref:LoggingCategoryType"
+        },
+        "ModbusRtuMaster": {
+            "baudrate": "Uint",
+            "connected": "Bool",
+            "dataBits": "$ref:SerialPortDataBits",
+            "modbusUuid": "Uuid",
+            "numberOfRetries": "Uint",
+            "parity": "$ref:SerialPortParity",
+            "serialPort": "String",
+            "stopBits": "$ref:SerialPortStopBits",
+            "timeout": "Uint"
+        },
+        "MqttPolicy": {
+            "allowedPublishTopicFilters": "StringList",
+            "allowedSubscribeTopicFilters": "StringList",
+            "clientId": "String",
+            "password": "String",
+            "username": "String"
+        },
+        "Package": {
+            "r:canRemove": "Bool",
+            "r:candidateVersion": "String",
+            "r:changelog": "String",
+            "r:displayName": "String",
+            "r:id": "String",
+            "r:installedVersion": "String",
+            "r:rollbackAvailable": "Bool",
+            "r:summary": "String",
+            "r:updateAvailable": "Bool"
+        },
+        "Packages": [
+            "$ref:Package"
+        ],
+        "Param": {
+            "o:paramTypeId": "Uuid",
+            "value": "Variant"
+        },
+        "ParamDescriptor": {
+            "o:paramName": "String",
+            "o:paramTypeId": "Uuid",
+            "operator": "$ref:ValueOperator",
+            "value": "Variant"
+        },
+        "ParamDescriptors": [
+            "$ref:ParamDescriptor"
+        ],
+        "ParamList": [
+            "$ref:Param"
+        ],
+        "ParamType": {
+            "displayName": "String",
+            "index": "Int",
+            "name": "String",
+            "o:allowedValues": [
+                "Variant"
+            ],
+            "o:defaultValue": "Variant",
+            "o:inputType": "$ref:InputType",
+            "o:maxValue": "Variant",
+            "o:minValue": "Variant",
+            "o:readOnly": "Bool",
+            "o:stepSize": "Double",
+            "o:unit": "$ref:Unit",
+            "r:id": "Uuid",
+            "type": "$ref:BasicType"
+        },
+        "ParamTypes": [
+            "$ref:ParamType"
+        ],
+        "RepeatingOption": {
+            "mode": "$ref:RepeatingMode",
+            "o:monthDays": [
+                "Int"
+            ],
+            "o:weekDays": [
+                "Int"
+            ]
+        },
+        "Repositories": [
+            "$ref:Repository"
+        ],
+        "Repository": {
+            "enabled": "Bool",
+            "r:displayName": "String",
+            "r:id": "String"
+        },
+        "Rule": {
+            "actions": "$ref:RuleActions",
+            "name": "String",
+            "o:enabled": "Bool",
+            "o:eventDescriptors": "$ref:EventDescriptors",
+            "o:executable": "Bool",
+            "o:exitActions": "$ref:RuleActions",
+            "o:stateEvaluator": "$ref:StateEvaluator",
+            "o:timeDescriptor": "$ref:TimeDescriptor",
+            "r:active": "Bool",
+            "r:id": "Uuid"
+        },
+        "RuleAction": {
+            "o:actionTypeId": "Uuid",
+            "o:browserItemId": "String",
+            "o:interface": "String",
+            "o:interfaceAction": "String",
+            "o:ruleActionParams": "$ref:RuleActionParams",
+            "o:thingId": "Uuid"
+        },
+        "RuleActionParam": {
+            "o:eventParamTypeId": "Uuid",
+            "o:eventTypeId": "Uuid",
+            "o:paramName": "String",
+            "o:paramTypeId": "Uuid",
+            "o:stateThingId": "Uuid",
+            "o:stateTypeId": "Uuid",
+            "o:value": "Variant"
+        },
+        "RuleActionParams": [
+            "$ref:RuleActionParam"
+        ],
+        "RuleActions": [
+            "$ref:RuleAction"
+        ],
+        "RuleDescription": {
+            "active": "Bool",
+            "enabled": "Bool",
+            "executable": "Bool",
+            "id": "Uuid",
+            "name": "String"
+        },
+        "Rules": [
+            "$ref:Rule"
+        ],
+        "Script": {
+            "name": "String",
+            "r:id": "Uuid"
+        },
+        "Scripts": [
+            "$ref:Script"
+        ],
+        "SerialPort": {
+            "r:description": "String",
+            "r:manufacturer": "String",
+            "r:serialNumber": "String",
+            "r:systemLocation": "String"
+        },
+        "SerialPorts": [
+            "$ref:SerialPort"
+        ],
+        "ServerConfiguration": {
+            "address": "String",
+            "authenticationEnabled": "Bool",
+            "id": "String",
+            "port": "Uint",
+            "sslEnabled": "Bool"
+        },
+        "State": {
+            "r:filter": "$ref:StateValueFilter",
+            "r:o:maxValue": "Variant",
+            "r:o:minValue": "Variant",
+            "r:o:possibleValues": [
+                "Variant"
+            ],
+            "r:stateTypeId": "Uuid",
+            "r:value": "Variant"
+        },
+        "StateDescriptor": {
+            "o:interface": "String",
+            "o:interfaceState": "String",
+            "o:stateTypeId": "Uuid",
+            "o:thingId": "Uuid",
+            "o:value": "Variant",
+            "o:valueStateTypeId": "Uuid",
+            "o:valueThingId": "Uuid",
+            "operator": "$ref:ValueOperator"
+        },
+        "StateEvaluator": {
+            "o:childEvaluators": "$ref:StateEvaluators",
+            "o:operator": "$ref:StateOperator",
+            "o:stateDescriptor": "$ref:StateDescriptor"
+        },
+        "StateEvaluators": [
+            "$ref:StateEvaluator"
+        ],
+        "StateType": {
+            "defaultValue": "Variant",
+            "displayName": "String",
+            "index": "Int",
+            "name": "String",
+            "o:ioType": "$ref:IOType",
+            "o:maxValue": "Variant",
+            "o:minValue": "Variant",
+            "o:possibleValues": [
+                "Variant"
+            ],
+            "o:possibleValuesDisplayNames": "StringList",
+            "o:stepSize": "Double",
+            "o:unit": "$ref:Unit",
+            "r:id": "Uuid",
+            "type": "$ref:BasicType"
+        },
+        "StateTypes": [
+            "$ref:StateType"
+        ],
+        "States": [
+            "$ref:State"
+        ],
+        "Tag": {
+            "appId": "String",
+            "o:ruleId": "Uuid",
+            "o:thingId": "Uuid",
+            "o:value": "String",
+            "tagId": "String"
+        },
+        "Tags": [
+            "$ref:Tag"
+        ],
+        "Thing": {
+            "d:r:setupComplete": "Bool",
+            "o:name": "String",
+            "o:settings": "$ref:ParamList",
+            "r:id": "Uuid",
+            "r:o:loggedActionTypeIds": [
+                "Uuid"
+            ],
+            "r:o:loggedEventTypeIds": [
+                "Uuid"
+            ],
+            "r:o:loggedStateTypeIds": [
+                "Uuid"
+            ],
+            "r:o:parentId": "Uuid",
+            "r:o:setupDisplayMessage": "String",
+            "r:params": "$ref:ParamList",
+            "r:setupError": "$ref:ThingError",
+            "r:setupStatus": "$ref:ThingSetupStatus",
+            "r:states": "$ref:States",
+            "r:thingClassId": "Uuid"
+        },
+        "ThingClass": {
+            "r:actionTypes": "$ref:ActionTypes",
+            "r:browsable": "Bool",
+            "r:browserItemActionTypes": "$ref:ActionTypes",
+            "r:createMethods": "$ref:CreateMethods",
+            "r:discoveryParamTypes": "$ref:ParamTypes",
+            "r:discoveryType": "$ref:DiscoveryType",
+            "r:displayName": "String",
+            "r:eventTypes": "$ref:EventTypes",
+            "r:id": "Uuid",
+            "r:interfaces": "StringList",
+            "r:name": "String",
+            "r:paramTypes": "$ref:ParamTypes",
+            "r:pluginId": "Uuid",
+            "r:providedInterfaces": "StringList",
+            "r:settingsTypes": "$ref:ParamTypes",
+            "r:setupMethod": "$ref:SetupMethod",
+            "r:stateTypes": "$ref:StateTypes",
+            "r:vendorId": "Uuid"
+        },
+        "ThingClasses": [
+            "$ref:ThingClass"
+        ],
+        "ThingDescriptor": {
+            "r:description": "String",
+            "r:id": "Uuid",
+            "r:o:thingId": "Uuid",
+            "r:params": "$ref:ParamList",
+            "r:thingClassId": "Uuid",
+            "r:title": "String"
+        },
+        "ThingDescriptors": [
+            "$ref:ThingDescriptor"
+        ],
+        "Things": [
+            "$ref:Thing"
+        ],
+        "TimeDescriptor": {
+            "o:calendarItems": "$ref:CalendarItems",
+            "o:timeEventItems": "$ref:TimeEventItems"
+        },
+        "TimeEventItem": {
+            "o:datetime": "Uint",
+            "o:repeating": "$ref:RepeatingOption",
+            "o:time": "Time"
+        },
+        "TimeEventItems": [
+            "$ref:TimeEventItem"
+        ],
+        "TokenInfo": {
+            "r:creationTime": "Uint",
+            "r:deviceName": "String",
+            "r:id": "Uuid",
+            "r:username": "String"
+        },
+        "TokenInfoList": [
+            "$ref:TokenInfo"
+        ],
+        "TunnelProxyServerConfiguration": {
+            "address": "String",
+            "authenticationEnabled": "Bool",
+            "id": "String",
+            "ignoreSslErrors": "Bool",
+            "port": "Uint",
+            "sslEnabled": "Bool"
+        },
+        "UserInfo": {
+            "r:allowedThingIds": [
+                "Uuid"
+            ],
+            "r:displayName": "String",
+            "r:email": "String",
+            "r:scopes": "$ref:PermissionScopes",
+            "r:username": "String"
+        },
+        "UserInfoList": [
+            "$ref:UserInfo"
+        ],
+        "Vendor": {
+            "displayName": "String",
+            "id": "Uuid",
+            "name": "String"
+        },
+        "Vendors": [
+            "$ref:Vendor"
+        ],
+        "WebServerConfiguration": {
+            "address": "String",
+            "authenticationEnabled": "Bool",
+            "id": "String",
+            "port": "Uint",
+            "publicFolder": "String",
+            "sslEnabled": "Bool"
+        },
+        "WiredNetworkDevice": {
+            "r:bitRate": "String",
+            "r:interface": "String",
+            "r:ipv4Addresses": "StringList",
+            "r:ipv6Addresses": "StringList",
+            "r:macAddress": "String",
+            "r:pluggedIn": "Bool",
+            "r:state": "$ref:NetworkDeviceState"
+        },
+        "WirelessAccessPoint": {
+            "r:frequency": "Double",
+            "r:macAddress": "String",
+            "r:protected": "Bool",
+            "r:signalStrength": "Int",
+            "r:ssid": "String"
+        },
+        "WirelessNetworkDevice": {
+            "r:bitRate": "String",
+            "r:capabilities": "$ref:WirelessCapabilities",
+            "r:interface": "String",
+            "r:ipv4Addresses": "StringList",
+            "r:ipv6Addresses": "StringList",
+            "r:macAddress": "String",
+            "r:mode": "$ref:WirelessMode",
+            "r:o:currentAccessPoint": "$ref:WirelessAccessPoint",
+            "r:state": "$ref:NetworkDeviceState"
+        },
+        "ZWaveNetwork": {
+            "homeId": "Uint",
+            "isBridgeController": "Bool",
+            "isPrimaryController": "Bool",
+            "isStaticUpdateController": "Bool",
+            "isZWavePlus": "Bool",
+            "networkState": "$ref:ZWaveNetworkState",
+            "networkUuid": "Uuid",
+            "serialPort": "String",
+            "waitingForNodeAddition": "Bool",
+            "waitingForNodeRemoval": "Bool"
+        },
+        "ZWaveNode": {
+            "deviceType": "$ref:ZWaveDeviceType",
+            "failed": "Bool",
+            "initialized": "Bool",
+            "isBeamingDevice": "Bool",
+            "isSecurityDevice": "Bool",
+            "isZWavePlusDevice": "Bool",
+            "linkQuality": "Uint",
+            "manufacturerId": "Uint",
+            "manufacturerName": "String",
+            "networkUuid": "Uuid",
+            "nodeId": "Uint",
+            "nodeType": "$ref:ZWaveNodeType",
+            "productId": "Uint",
+            "productName": "String",
+            "productType": "Uint",
+            "reachable": "Bool",
+            "role": "$ref:ZWaveNodeRole",
+            "securityMode": "Uint",
+            "sleeping": "Bool",
+            "version": "String"
+        },
+        "ZigbeeAdapter": {
+            "r:backend": "String",
+            "r:baudRate": "Int",
+            "r:description": "String",
+            "r:hardwareRecognized": "Bool",
+            "r:name": "String",
+            "r:serialNumber": "String",
+            "r:serialPort": "String"
+        },
+        "ZigbeeAdapters": [
+            "$ref:ZigbeeAdapter"
+        ],
+        "ZigbeeBindingTableRecord": {
+            "clusterId": "Uint",
+            "o:destinationAddress": "String",
+            "o:destinationEndpointId": "Uint",
+            "o:destinationGroupAddress": "Uint",
+            "sourceAddress": "String",
+            "sourceEndpointId": "Uint"
+        },
+        "ZigbeeCluster": {
+            "clusterId": "Uint",
+            "direction": "$ref:ZigbeeClusterDirection"
+        },
+        "ZigbeeNeighborTableRecord": {
+            "depth": "Uint",
+            "lqi": "Uint",
+            "networkAddress": "Uint",
+            "permitJoining": "Bool",
+            "relationship": "$ref:ZigbeeNodeRelationship"
+        },
+        "ZigbeeNetwork": {
+            "backend": "String",
+            "baudRate": "Uint",
+            "channel": "Uint",
+            "channelMask": "Uint",
+            "enabled": "Bool",
+            "firmwareVersion": "String",
+            "macAddress": "String",
+            "networkState": "$ref:ZigbeeNetworkState",
+            "networkUuid": "Uuid",
+            "panId": "Uint",
+            "permitJoiningDuration": "Uint",
+            "permitJoiningEnabled": "Bool",
+            "permitJoiningRemaining": "Uint",
+            "serialPort": "String"
+        },
+        "ZigbeeNode": {
+            "bindingTableRecords": [
+                "$ref:ZigbeeBindingTableRecord"
+            ],
+            "endpoints": [
+                "$ref:ZigbeeNodeEndpoint"
+            ],
+            "ieeeAddress": "String",
+            "lastSeen": "Uint",
+            "lqi": "Uint",
+            "manufacturer": "String",
+            "model": "String",
+            "neighborTableRecords": [
+                "$ref:ZigbeeNeighborTableRecord"
+            ],
+            "networkAddress": "Uint",
+            "networkUuid": "Uuid",
+            "reachable": "Bool",
+            "receiverOnWhileIdle": "Bool",
+            "routingTableRecords": [
+                "$ref:ZigbeeRoutingTableRecord"
+            ],
+            "state": "$ref:ZigbeeNodeState",
+            "type": "$ref:ZigbeeNodeType",
+            "version": "String"
+        },
+        "ZigbeeNodeEndpoint": {
+            "endpointId": "Uint",
+            "inputClusters": [
+                "$ref:ZigbeeCluster"
+            ],
+            "outputClusters": [
+                "$ref:ZigbeeCluster"
+            ]
+        },
+        "ZigbeeRoutingTableRecord": {
+            "destinationAddress": "Uint",
+            "manyToOne": "Bool",
+            "memoryConstrained": "Bool",
+            "nextHopAddress": "Uint",
+            "status": "$ref:ZigbeeNodeRouteStatus"
+        }
+    }
+}

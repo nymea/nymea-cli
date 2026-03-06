@@ -1,15 +1,22 @@
 # nymea-cli
 
-Minimal CMake-based C++ console application that uses Qt6 Core for app/CLI
-handling and FTXUI for terminal UI rendering.
+`nymea-cli` is a CMake-based C++ terminal client for `nymead`, using:
+
+- Qt6 Core + Network for CLI and TCP transport
+- FTXUI for fullscreen terminal UI
+- JSON-RPC over TCP
+- generated Qt/C++ API representation classes from nymea `api.json`
 
 ## Features
 
-- Qt6 `QCoreApplication` (no GUI dependencies)
+- Qt6 `QCoreApplication` + `QTcpSocket` / `QSslSocket` (no GUI dependencies)
 - FTXUI fullscreen terminal UI
-- Top headline rectangle rendered in the terminal
-- Application version shown inside the headline bar
-- Built-in `--help` / `-h` and `--version` / `-v`
+- Connects to nymead via TCP (`--host`, `--port`) or SSL/TLS (`--ssl`)
+- Processes `JSONRPC.Hello` and shows server/API versions
+- Loads and displays thing list via `Integrations.GetThings`
+- Supports login when authentication is required (interactive form or CLI credentials)
+- Built-in `--help` and `--version`
+- API model generation script: `scripts/generate_nymea_api.py`
 
 ## Build
 
@@ -29,4 +36,19 @@ cmake --build build
 ```bash
 ./build/nymea-cli --help
 ./build/nymea-cli --version
+./build/nymea-cli --host 127.0.0.1 --timeout 5000          # plain TCP, default port 2223
+./build/nymea-cli --ssl --host 127.0.0.1 --timeout 5000    # SSL/TLS, default port 2222
+./build/nymea-cli --ssl --port 2222
+./build/nymea-cli --username admin --password secret
+```
+
+## Generate API model
+
+The generator expects the nymea API schema format where line 1 is the API version
+and the remaining file is JSON.
+
+```bash
+./scripts/generate_nymea_api.py \
+  --api-json api/api.json \
+  --output src/generated/nymea_api_generated.h
 ```

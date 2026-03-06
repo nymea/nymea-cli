@@ -1,0 +1,820 @@
+#!/usr/bin/env python3
+"""Generate Qt6/C++ API representation classes from nymea api.json."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from urllib.request import urlopen
+
+MARKER_TOKENS = {"o", "r", "d"}
+
+CPP_KEYWORDS = {
+    "alignas",
+    "alignof",
+    "and",
+    "and_eq",
+    "asm",
+    "auto",
+    "bitand",
+    "bitor",
+    "bool",
+    "break",
+    "case",
+    "catch",
+    "char",
+    "char8_t",
+    "char16_t",
+    "char32_t",
+    "class",
+    "compl",
+    "concept",
+    "const",
+    "consteval",
+    "constexpr",
+    "constinit",
+    "const_cast",
+    "continue",
+    "co_await",
+    "co_return",
+    "co_yield",
+    "decltype",
+    "default",
+    "delete",
+    "do",
+    "double",
+    "dynamic_cast",
+    "else",
+    "enum",
+    "explicit",
+    "export",
+    "extern",
+    "false",
+    "float",
+    "for",
+    "friend",
+    "goto",
+    "if",
+    "inline",
+    "int",
+    "long",
+    "mutable",
+    "namespace",
+    "new",
+    "noexcept",
+    "not",
+    "not_eq",
+    "nullptr",
+    "operator",
+    "or",
+    "or_eq",
+    "private",
+    "protected",
+    "public",
+    "register",
+    "reinterpret_cast",
+    "requires",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "static_assert",
+    "static_cast",
+    "struct",
+    "switch",
+    "template",
+    "this",
+    "thread_local",
+    "throw",
+    "true",
+    "try",
+    "typedef",
+    "typeid",
+    "typename",
+    "union",
+    "unsigned",
+    "using",
+    "virtual",
+    "void",
+    "volatile",
+    "wchar_t",
+    "while",
+    "xor",
+    "xor_eq",
+}
+
+PRIMITIVE_CPP_TYPES = {
+    "Bool": "bool",
+    "Double": "double",
+    "Int": "qint64",
+    "Object": "QJsonObject",
+    "String": "QString",
+    "StringList": "QStringList",
+    "Time": "qint64",
+    "Uint": "quint64",
+    "Uuid": "QUuid",
+    "Variant": "QJsonValue",
+    "Color": "QString",
+}
+
+
+@dataclass
+class Schema:
+    kind: str
+    name: Optional[str] = None
+    element: Optional["Schema"] = None
+
+
+@dataclass
+class FieldDef:
+    wire_name: str
+    cpp_name: str
+    schema: Schema
+    markers: Set[str] = field(default_factory=set)
+
+    @property
+    def optional(self) -> bool:
+        return "o" in self.markers
+
+
+@dataclass
+class MethodDef:
+    wire_name: str
+    cpp_name: str
+    params_type: str
+    response_type: str
+    permission_scope: str
+
+
+@dataclass
+class NotificationDef:
+    wire_name: str
+    cpp_name: str
+    params_type: str
+
+
+def sanitize_identifier(raw: str, pascal_case: bool) -> str:
+    parts = re.findall(r"[A-Za-z0-9]+", raw)
+    if not parts:
+        parts = ["value"]
+
+    normalized: List[str] = []
+    for index, part in enumerate(parts):
+        if part[0].isdigit():
+            part = f"N{part}"
+        if pascal_case or index > 0:
+            normalized.append(part[0].upper() + part[1:])
+        else:
+            normalized.append(part[0].lower() + part[1:])
+
+    identifier = "".join(normalized)
+    if identifier in CPP_KEYWORDS:
+        identifier += "_"
+    return identifier
+
+
+def parse_wire_key(raw_key: str) -> Tuple[Set[str], str]:
+    parts = raw_key.split(":")
+    markers: Set[str] = set()
+    while parts and parts[0] in MARKER_TOKENS:
+        markers.add(parts.pop(0))
+    wire_name = ":".join(parts) if parts else raw_key
+    return markers, wire_name
+
+
+def indent(lines: Iterable[str], prefix: str = "    ") -> List[str]:
+    return [f"{prefix}{line}" if line else "" for line in lines]
+
+
+class ApiGenerator:
+    def __init__(self, api_version: str, api: Dict[str, Any]):
+        self.api_version = api_version
+        self.api = api
+
+        self.enums_raw: Dict[str, List[str]] = {
+            key: api["enums"][key] for key in sorted(api["enums"].keys())
+        }
+        self.flags_raw: Dict[str, Any] = {
+            key: api["flags"][key] for key in sorted(api["flags"].keys())
+        }
+        self.types_raw: Dict[str, Any] = {
+            key: api["types"][key] for key in sorted(api["types"].keys())
+        }
+        self.methods_raw: Dict[str, Any] = {
+            key: api["methods"][key] for key in sorted(api["methods"].keys())
+        }
+        self.notifications_raw: Dict[str, Any] = {
+            key: api["notifications"][key]
+            for key in sorted(api["notifications"].keys())
+        }
+
+        self.used_type_names: Set[str] = set()
+        self.enum_cpp_names: Dict[str, str] = {}
+        self.flag_cpp_names: Dict[str, str] = {}
+        self.type_cpp_names: Dict[str, str] = {}
+
+        self.ref_to_cpp: Dict[str, str] = {}
+
+        self.object_types: Dict[str, List[FieldDef]] = {}
+        self.alias_types: Dict[str, Schema] = {}
+
+        self.enum_values: Dict[str, List[Tuple[str, str]]] = {}
+        self.enum_default_value: Dict[str, str] = {}
+
+        self.method_defs: List[MethodDef] = []
+        self.notification_defs: List[NotificationDef] = []
+
+        self._reserve_top_level_names()
+        self._parse_enums()
+        self._parse_flags()
+        self._parse_types()
+        self._parse_methods()
+        self._parse_notifications()
+
+    def _reserve_type_name(self, raw_name: str) -> str:
+        base = sanitize_identifier(raw_name, pascal_case=True)
+        if not base:
+            base = "GeneratedType"
+
+        candidate = base
+        suffix = 2
+        while candidate in self.used_type_names:
+            candidate = f"{base}{suffix}"
+            suffix += 1
+
+        self.used_type_names.add(candidate)
+        return candidate
+
+    def _reserve_top_level_names(self) -> None:
+        for enum_name in sorted(self.enums_raw.keys()):
+            cpp_name = self._reserve_type_name(enum_name)
+            self.enum_cpp_names[enum_name] = cpp_name
+            self.ref_to_cpp[enum_name] = cpp_name
+
+        for flag_name in sorted(self.flags_raw.keys()):
+            cpp_name = self._reserve_type_name(flag_name)
+            self.flag_cpp_names[flag_name] = cpp_name
+            self.ref_to_cpp[flag_name] = cpp_name
+
+        for type_name in sorted(self.types_raw.keys()):
+            cpp_name = self._reserve_type_name(type_name)
+            self.type_cpp_names[type_name] = cpp_name
+            self.ref_to_cpp[type_name] = cpp_name
+
+    def _parse_enums(self) -> None:
+        for api_name, values in self.enums_raw.items():
+            cpp_enum = self.enum_cpp_names[api_name]
+            cpp_values: List[Tuple[str, str]] = []
+            used_value_names: Set[str] = set()
+
+            for wire_value in values:
+                base = sanitize_identifier(wire_value, pascal_case=True)
+                candidate = base
+                suffix = 2
+                while candidate in used_value_names:
+                    candidate = f"{base}{suffix}"
+                    suffix += 1
+                used_value_names.add(candidate)
+                cpp_values.append((wire_value, candidate))
+
+            self.enum_values[cpp_enum] = cpp_values
+            self.enum_default_value[cpp_enum] = cpp_values[0][1] if cpp_values else ""
+
+    def _parse_flags(self) -> None:
+        for api_name, value in self.flags_raw.items():
+            cpp_name = self.flag_cpp_names[api_name]
+            self.alias_types[cpp_name] = self._parse_schema(value, f"{cpp_name}Value")
+
+    def _parse_types(self) -> None:
+        for api_name, value in self.types_raw.items():
+            cpp_name = self.type_cpp_names[api_name]
+            if isinstance(value, dict):
+                self._register_object_type(cpp_name, value)
+            else:
+                self.alias_types[cpp_name] = self._parse_schema(value, f"{cpp_name}Value")
+
+    def _parse_methods(self) -> None:
+        for wire_name, definition in self.methods_raw.items():
+            base = sanitize_identifier(wire_name.replace(".", " "), pascal_case=True)
+            params_name = self._reserve_type_name(f"{base}Params")
+            response_name = self._reserve_type_name(f"{base}Response")
+            method_name = self._reserve_type_name(f"{base}Method")
+
+            self._register_object_type(params_name, definition.get("params", {}))
+            self._register_object_type(response_name, definition.get("returns", {}))
+
+            self.method_defs.append(
+                MethodDef(
+                    wire_name=wire_name,
+                    cpp_name=method_name,
+                    params_type=params_name,
+                    response_type=response_name,
+                    permission_scope=definition.get("permissionScope", ""),
+                )
+            )
+
+    def _parse_notifications(self) -> None:
+        for wire_name, definition in self.notifications_raw.items():
+            base = sanitize_identifier(wire_name.replace(".", " "), pascal_case=True)
+            params_name = self._reserve_type_name(f"{base}NotificationParams")
+            notification_name = self._reserve_type_name(f"{base}Notification")
+
+            self._register_object_type(params_name, definition.get("params", {}))
+            self.notification_defs.append(
+                NotificationDef(
+                    wire_name=wire_name,
+                    cpp_name=notification_name,
+                    params_type=params_name,
+                )
+            )
+
+    def _register_object_type(self, cpp_name: str, value: Dict[str, Any]) -> None:
+        if cpp_name in self.object_types:
+            return
+
+        fields: List[FieldDef] = []
+        used_member_names: Set[str] = set()
+
+        for raw_key, raw_value in value.items():
+            markers, wire_name = parse_wire_key(raw_key)
+            base_name = sanitize_identifier(wire_name, pascal_case=False)
+            member_name = base_name
+            suffix = 2
+            while member_name in used_member_names:
+                member_name = f"{base_name}{suffix}"
+                suffix += 1
+            used_member_names.add(member_name)
+
+            nested_context = f"{cpp_name}{sanitize_identifier(wire_name, pascal_case=True)}"
+            field_schema = self._parse_schema(raw_value, nested_context)
+            fields.append(
+                FieldDef(
+                    wire_name=wire_name,
+                    cpp_name=member_name,
+                    schema=field_schema,
+                    markers=markers,
+                )
+            )
+
+        self.object_types[cpp_name] = fields
+
+    def _parse_schema(self, value: Any, context_name: str) -> Schema:
+        if isinstance(value, str):
+            if value.startswith("$ref:"):
+                ref_name = value[5:]
+                if ref_name not in self.ref_to_cpp:
+                    raise ValueError(f"Unknown reference: {ref_name}")
+                return Schema(kind="ref", name=self.ref_to_cpp[ref_name])
+            return Schema(kind="primitive", name=value)
+
+        if isinstance(value, list):
+            if len(value) != 1:
+                raise ValueError(f"Expected single-element array schema, got: {value}")
+            return Schema(
+                kind="list",
+                element=self._parse_schema(value[0], f"{context_name}Item"),
+            )
+
+        if isinstance(value, dict):
+            inline_name = self._reserve_type_name(context_name)
+            self._register_object_type(inline_name, value)
+            return Schema(kind="ref", name=inline_name)
+
+        raise ValueError(f"Unsupported schema value: {value!r}")
+
+    def _collect_alias_dependencies(self, schema: Schema, dependencies: Set[str]) -> None:
+        if schema.kind == "ref":
+            name = schema.name
+            if name is None:
+                return
+            if name in self.alias_types:
+                dependencies.add(name)
+            return
+
+        if schema.kind == "list" and schema.element is not None:
+            self._collect_alias_dependencies(schema.element, dependencies)
+
+    def _sorted_alias_types(self) -> List[str]:
+        graph: Dict[str, Set[str]] = {}
+
+        for name in self.alias_types:
+            deps: Set[str] = set()
+            self._collect_alias_dependencies(self.alias_types[name], deps)
+            deps.discard(name)
+            graph[name] = deps
+
+        ordered: List[str] = []
+        temporary: Set[str] = set()
+        permanent: Set[str] = set()
+
+        def visit(node: str) -> None:
+            if node in permanent:
+                return
+            if node in temporary:
+                raise ValueError(f"Cyclic alias dependency detected for type {node}")
+            temporary.add(node)
+            for dependency in sorted(graph[node]):
+                visit(dependency)
+            temporary.remove(node)
+            permanent.add(node)
+            ordered.append(node)
+
+        for node in sorted(graph.keys()):
+            visit(node)
+
+        return ordered
+
+    def _cpp_type(self, schema: Schema) -> str:
+        if schema.kind == "primitive":
+            return PRIMITIVE_CPP_TYPES.get(schema.name or "", "QJsonValue")
+
+        if schema.kind == "ref":
+            if schema.name is None:
+                return "QJsonValue"
+            if schema.name in self.object_types:
+                return f"QSharedPointer<{schema.name}>"
+            return schema.name
+
+        if schema.kind == "list" and schema.element is not None:
+            return f"QList<{self._cpp_type(schema.element)}>"
+
+        return "QJsonValue"
+
+    def _decode_schema(self, schema: Schema, expr: str, seen_aliases: Optional[Set[str]] = None) -> str:
+        if seen_aliases is None:
+            seen_aliases = set()
+
+        if schema.kind == "primitive":
+            primitive = schema.name
+            if primitive == "String":
+                return f"({expr}).toString()"
+            if primitive == "Uuid":
+                return f"QUuid(({expr}).toString())"
+            if primitive == "StringList":
+                return (
+                    "([&]() { QStringList list; "
+                    f"for (const QJsonValue &item : ({expr}).toArray()) {{ list.append(item.toString()); }} "
+                    "return list; }())"
+                )
+            if primitive == "Int":
+                return f"static_cast<qint64>(({expr}).toInteger())"
+            if primitive == "Uint":
+                return f"static_cast<quint64>(({expr}).toInteger())"
+            if primitive == "Double":
+                return f"({expr}).toDouble()"
+            if primitive == "Bool":
+                return f"({expr}).toBool()"
+            if primitive == "Variant":
+                return expr
+            if primitive == "Object":
+                return f"({expr}).toObject()"
+            if primitive == "Color":
+                return f"({expr}).toString()"
+            if primitive == "Time":
+                return f"static_cast<qint64>(({expr}).toInteger())"
+            return expr
+
+        if schema.kind == "list" and schema.element is not None:
+            element_type = self._cpp_type(schema.element)
+            element_decode = self._decode_schema(schema.element, "item", seen_aliases)
+            return (
+                "([&]() { "
+                f"QList<{element_type}> list; "
+                f"for (const QJsonValue &item : ({expr}).toArray()) {{ list.append({element_decode}); }} "
+                "return list; }())"
+            )
+
+        if schema.kind == "ref" and schema.name is not None:
+            ref_name = schema.name
+            if ref_name in self.enum_values:
+                return f"parse{ref_name}({expr})"
+            if ref_name in self.object_types:
+                return f"QSharedPointer<{ref_name}>::create({ref_name}::fromJson(({expr}).toObject()))"
+            if ref_name in self.alias_types:
+                if ref_name in seen_aliases:
+                    return "{}"
+                return self._decode_schema(
+                    self.alias_types[ref_name],
+                    expr,
+                    seen_aliases | {ref_name},
+                )
+
+        return expr
+
+    def _encode_schema(self, schema: Schema, expr: str, seen_aliases: Optional[Set[str]] = None) -> str:
+        if seen_aliases is None:
+            seen_aliases = set()
+
+        if schema.kind == "primitive":
+            primitive = schema.name
+            if primitive in {"String", "Color"}:
+                return f"QJsonValue({expr})"
+            if primitive == "Uuid":
+                return f"QJsonValue(({expr}).toString())"
+            if primitive == "StringList":
+                return (
+                    "([&]() { QJsonArray array; "
+                    f"for (const QString &item : {expr}) {{ array.append(item); }} "
+                    "return QJsonValue(array); }())"
+                )
+            if primitive in {"Int", "Uint", "Time"}:
+                return f"QJsonValue(static_cast<qint64>({expr}))"
+            if primitive in {"Double", "Bool"}:
+                return f"QJsonValue({expr})"
+            if primitive == "Variant":
+                return expr
+            if primitive == "Object":
+                return f"QJsonValue({expr})"
+            return f"QJsonValue({expr})"
+
+        if schema.kind == "list" and schema.element is not None:
+            element_encode = self._encode_schema(schema.element, "item", seen_aliases)
+            return (
+                "([&]() { "
+                "QJsonArray array; "
+                f"for (const auto &item : {expr}) {{ array.append({element_encode}); }} "
+                "return QJsonValue(array); }())"
+            )
+
+        if schema.kind == "ref" and schema.name is not None:
+            ref_name = schema.name
+            if ref_name in self.enum_values:
+                return f"QJsonValue(toString({expr}))"
+            if ref_name in self.object_types:
+                return f"(({expr}) ? QJsonValue(({expr})->toJson()) : QJsonValue(QJsonObject{{}}))"
+            if ref_name in self.alias_types:
+                if ref_name in seen_aliases:
+                    return "QJsonValue()"
+                return self._encode_schema(
+                    self.alias_types[ref_name],
+                    expr,
+                    seen_aliases | {ref_name},
+                )
+
+        return f"QJsonValue({expr})"
+
+    def _render_enum(self, enum_name: str) -> List[str]:
+        values = self.enum_values[enum_name]
+        lines: List[str] = [f"enum class {enum_name} {{"]
+        for _, cpp_value in values:
+            lines.append(f"    {cpp_value},")
+        lines.append("};")
+        lines.append("")
+
+        lines.append(f"inline QString toString({enum_name} value) {{")
+        lines.append("    switch (value) {")
+        for wire, cpp_value in values:
+            lines.append(
+                f"    case {enum_name}::{cpp_value}: return QStringLiteral(\"{wire}\");"
+            )
+        default_wire = values[0][0] if values else ""
+        lines.append("    }")
+        lines.append(f"    return QStringLiteral(\"{default_wire}\");")
+        lines.append("}")
+        lines.append("")
+
+        lines.append(f"inline {enum_name} parse{enum_name}(const QJsonValue &value) {{")
+        lines.append("    const QString token = value.toString();")
+        for wire, cpp_value in values:
+            lines.append(
+                f"    if (token == QStringLiteral(\"{wire}\")) return {enum_name}::{cpp_value};"
+            )
+        default_cpp = self.enum_default_value.get(enum_name, values[0][1] if values else "")
+        lines.append(f"    return {enum_name}::{default_cpp};")
+        lines.append("}")
+        lines.append("")
+
+        return lines
+
+    def _render_struct_declaration(self, struct_name: str, fields: List[FieldDef]) -> List[str]:
+        lines: List[str] = [f"struct {struct_name} {{"]
+        for field in fields:
+            field_type = self._cpp_type(field.schema)
+            if field.optional:
+                declaration = f"std::optional<{field_type}> {field.cpp_name};"
+            else:
+                declaration = f"{field_type} {field.cpp_name}{{}};"
+
+            markers = []
+            if "o" in field.markers:
+                markers.append("optional")
+            if "r" in field.markers:
+                markers.append("required")
+            if "d" in field.markers:
+                markers.append("deprecated")
+
+            marker_comment = ", ".join(markers) if markers else "field"
+            lines.append(
+                f"    // wire: '{field.wire_name}' ({marker_comment})"
+            )
+            lines.append(f"    {declaration}")
+
+        lines.append("")
+        lines.append(f"    static {struct_name} fromJson(const QJsonObject &object);")
+        lines.append("    QJsonObject toJson() const;")
+        lines.append("};")
+        lines.append("")
+        return lines
+
+    def _render_struct_definition(self, struct_name: str, fields: List[FieldDef]) -> List[str]:
+        lines: List[str] = [
+            f"inline {struct_name} {struct_name}::fromJson(const QJsonObject &object) {{",
+            f"    {struct_name} value;",
+        ]
+
+        for field in fields:
+            decode_expr = self._decode_schema(field.schema, f'object.value(QStringLiteral("{field.wire_name}"))')
+            lines.append(f"    if (object.contains(QStringLiteral(\"{field.wire_name}\"))) {{")
+            if field.optional:
+                lines.append(f"        value.{field.cpp_name} = {decode_expr};")
+            else:
+                lines.append(f"        value.{field.cpp_name} = {decode_expr};")
+            lines.append("    }")
+
+        lines.append("    return value;")
+        lines.append("}")
+        lines.append("")
+
+        lines.append(f"inline QJsonObject {struct_name}::toJson() const {{")
+        lines.append("    QJsonObject object;")
+
+        for field in fields:
+            if field.optional:
+                encode_expr = self._encode_schema(field.schema, f"*{field.cpp_name}")
+                lines.append(f"    if ({field.cpp_name}.has_value()) {{")
+                lines.append(
+                    f"        object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});"
+                )
+                lines.append("    }")
+            else:
+                encode_expr = self._encode_schema(field.schema, field.cpp_name)
+                lines.append(
+                    f"    object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});"
+                )
+
+        lines.append("    return object;")
+        lines.append("}")
+        lines.append("")
+        return lines
+
+    def _render_alias(self, alias_name: str, schema: Schema) -> List[str]:
+        return [f"using {alias_name} = {self._cpp_type(schema)};", ""]
+
+    def _render_method_descriptor(self, method: MethodDef) -> List[str]:
+        return [
+            f"struct {method.cpp_name} {{",
+            f"    static QString methodName() {{ return QStringLiteral(\"{method.wire_name}\"); }}",
+            f"    static QString permissionScope() {{ return QStringLiteral(\"{method.permission_scope}\"); }}",
+            f"    using Request = {method.params_type};",
+            f"    using Response = {method.response_type};",
+            "};",
+            "",
+        ]
+
+    def _render_notification_descriptor(self, notification: NotificationDef) -> List[str]:
+        return [
+            f"struct {notification.cpp_name} {{",
+            f"    static QString notificationName() {{ return QStringLiteral(\"{notification.wire_name}\"); }}",
+            f"    using Params = {notification.params_type};",
+            "};",
+            "",
+        ]
+
+    def render_header(self) -> str:
+        lines: List[str] = [
+            "// This file is auto-generated by scripts/generate_nymea_api.py",
+            "// Do not edit manually.",
+            "",
+            "#pragma once",
+            "",
+            "#include <QJsonArray>",
+            "#include <QJsonObject>",
+            "#include <QJsonValue>",
+            "#include <QString>",
+            "#include <QStringList>",
+            "#include <QList>",
+            "#include <QSharedPointer>",
+            "#include <QUuid>",
+            "#include <QtGlobal>",
+            "",
+            "#include <optional>",
+            "",
+            "namespace nymea::api {",
+            "",
+            f"inline constexpr auto kNymeaApiVersion = \"{self.api_version}\";",
+            "",
+        ]
+
+        for enum_name in sorted(self.enum_values.keys()):
+            lines.extend(self._render_enum(enum_name))
+
+        lines.append("// Forward declarations for generated object types.")
+        for object_name in sorted(self.object_types.keys()):
+            lines.append(f"struct {object_name};")
+        lines.append("")
+
+        for alias_name in self._sorted_alias_types():
+            lines.extend(self._render_alias(alias_name, self.alias_types[alias_name]))
+
+        for object_name in sorted(self.object_types.keys()):
+            lines.extend(self._render_struct_declaration(object_name, self.object_types[object_name]))
+
+        for object_name in sorted(self.object_types.keys()):
+            lines.extend(self._render_struct_definition(object_name, self.object_types[object_name]))
+
+        for method in self.method_defs:
+            lines.extend(self._render_method_descriptor(method))
+
+        for notification in self.notification_defs:
+            lines.extend(self._render_notification_descriptor(notification))
+
+        lines.extend([
+            "} // namespace nymea::api",
+            "",
+        ])
+        return "\n".join(lines)
+
+
+def read_api(api_json: Optional[Path], api_url: Optional[str]) -> Tuple[str, Dict[str, Any]]:
+    if api_json is None and api_url is None:
+        raise ValueError("Either --api-json or --api-url must be provided")
+
+    raw_content: str
+    if api_json is not None:
+        raw_content = api_json.read_text(encoding="utf-8")
+    else:
+        assert api_url is not None
+        with urlopen(api_url) as response:  # nosec - trusted nymea source provided by user
+            raw_content = response.read().decode("utf-8")
+
+    lines = raw_content.splitlines()
+    if not lines:
+        raise ValueError("API input is empty")
+
+    version = lines[0].strip()
+    json_payload = "\n".join(lines[1:]).strip()
+    if not json_payload:
+        raise ValueError("API input does not contain JSON payload")
+
+    api = json.loads(json_payload)
+    required_keys = {"enums", "flags", "types", "methods", "notifications"}
+    missing = required_keys - set(api.keys())
+    if missing:
+        raise ValueError(f"API payload is missing keys: {sorted(missing)}")
+
+    return version, api
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate nymea Qt/C++ API representation classes from api.json."
+    )
+    parser.add_argument(
+        "--api-json",
+        type=Path,
+        default=Path("api/api.json"),
+        help="Path to nymea api.json file (with version header in first line).",
+    )
+    parser.add_argument(
+        "--api-url",
+        default=None,
+        help="Optional URL to download the API file instead of reading --api-json.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path("src/generated/nymea_api_generated.h"),
+        help="Output header path.",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+
+    api_json = args.api_json if args.api_url is None else None
+    version, api = read_api(api_json=api_json, api_url=args.api_url)
+
+    generator = ApiGenerator(api_version=version, api=api)
+    output = generator.render_header()
+
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(output, encoding="utf-8")
+
+    print(
+        f"Generated {args.output} (version {version}, "
+        f"enums={len(api['enums'])}, flags={len(api['flags'])}, "
+        f"types={len(api['types'])}, methods={len(api['methods'])}, "
+        f"notifications={len(api['notifications'])})."
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
