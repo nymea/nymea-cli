@@ -35,6 +35,22 @@ public:
     int run();
 
 private:
+    enum class MainView {
+        Things,
+        Settings,
+    };
+
+    enum class SettingsView {
+        General,
+        About,
+    };
+
+    enum class FocusArea {
+        MainMenu,
+        SettingsMenu,
+        LoginForm,
+    };
+
     std::string endpoint() const;
     std::string connectionDisplayName() const;
     SavedConnection currentConnection(bool allowFingerprintUpdate) const;
@@ -49,6 +65,9 @@ private:
     void saveCurrentConnection(bool allowFingerprintUpdate);
     void runHandshakeAndLoadThings();
 
+    ftxui::Element renderMainMenu() const;
+    ftxui::Element renderSettingsMenu() const;
+    ftxui::Element renderSettingsDetails() const;
     ftxui::Element renderThings() const;
     ftxui::Element renderUi() const;
     bool handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen);
@@ -74,6 +93,9 @@ private:
     std::string m_username;
     std::string m_password;
     std::optional<SavedConnection> m_savedConnection;
+    MainView m_mainView = MainView::Things;
+    SettingsView m_settingsView = SettingsView::General;
+    FocusArea m_focusArea = FocusArea::MainMenu;
 
     ftxui::InputOption m_passwordInputOption;
     ftxui::Component m_usernameInput;

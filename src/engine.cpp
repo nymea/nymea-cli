@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QLocale>
 
+#include <array>
 #include <utility>
 
 namespace nymea {
@@ -131,6 +132,7 @@ bool Engine::sendHello()
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
         m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Stored token was rejected. Please login.";
         m_thingManager.setStatus("JSONRPC.Hello unauthorized (request id " + std::to_string(requestId) + ").");
         return false;
@@ -259,6 +261,7 @@ bool Engine::authenticate(const std::string& username, const std::string& passwo
     m_isAuthenticated = true;
     m_isAuthenticationRequired = false;
     m_showLoginForm = false;
+    m_focusArea = FocusArea::MainMenu;
     m_authStatus = "Authenticated as " + username + ".";
     saveCurrentConnection(true);
     m_thingManager.setStatus("Authentication succeeded (request id " + std::to_string(requestId) + ").");
@@ -277,6 +280,7 @@ bool Engine::fetchThings()
     if (m_isAuthenticationRequired && !m_isAuthenticated) {
         m_thingManager.setStatus("Authentication required before fetching things.");
         m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
         return false;
     }
 
@@ -299,6 +303,7 @@ bool Engine::fetchThings()
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
         m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_thingManager.setStatus("Integrations.GetThings unauthorized.");
         return false;
@@ -401,12 +406,80 @@ void Engine::runHandshakeAndLoadThings()
             }
         } else {
             m_showLoginForm = true;
+            m_focusArea = FocusArea::LoginForm;
             m_authStatus = "Authentication required. Enter username/password and press Enter.";
             return;
         }
     }
 
     fetchThings();
+}
+
+ftxui::Element Engine::renderMainMenu() const
+{
+    constexpr std::array<const char*, 2> menuItems = {"Things", "Settings"};
+
+    ftxui::Elements entries;
+    for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
+        const bool selected = (m_mainView == MainView::Things && index == 0) || (m_mainView == MainView::Settings && index == 1);
+        auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
+        if (selected) {
+            entry = entry | ftxui::bold | ftxui::inverted;
+        }
+        if (m_focusArea == FocusArea::MainMenu && selected) {
+            entry = entry | ftxui::color(ftxui::Color::CyanLight);
+        }
+        entries.push_back(entry);
+    }
+
+    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)));
+}
+
+ftxui::Element Engine::renderSettingsMenu() const
+{
+    constexpr std::array<const char*, 2> menuItems = {"General", "About"};
+
+    ftxui::Elements entries;
+    for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
+        const bool selected = (m_settingsView == SettingsView::General && index == 0) || (m_settingsView == SettingsView::About && index == 1);
+        auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
+        if (selected) {
+            entry = entry | ftxui::bold | ftxui::inverted;
+        }
+        if (m_focusArea == FocusArea::SettingsMenu && selected) {
+            entry = entry | ftxui::color(ftxui::Color::CyanLight);
+        }
+        entries.push_back(entry);
+    }
+
+    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)));
+}
+
+ftxui::Element Engine::renderSettingsDetails() const
+{
+    ftxui::Elements lines;
+
+    if (m_settingsView == SettingsView::General) {
+        const QString fingerprint = m_client.peerCertificateFingerprint();
+        lines.push_back(ftxui::text("Connection: " + endpoint()));
+        lines.push_back(ftxui::text("Display name: " + connectionDisplayName()));
+        lines.push_back(ftxui::text("Settings path: " + m_connectionSettings.settingsPath().toStdString()));
+        lines.push_back(ftxui::text("Transport: " + std::string(m_options.useSsl ? "SSL/TLS" : "Plain TCP")));
+        lines.push_back(ftxui::text("Server uuid: " + m_serverUuid.toString(QUuid::WithoutBraces).toStdString()));
+        lines.push_back(ftxui::text("Authentication: " + m_authStatus));
+        lines.push_back(ftxui::text("Stored token: " + std::string(m_savedConnection.has_value() && !m_savedConnection->token.isEmpty() ? "available" : "none")));
+        lines.push_back(ftxui::text("TLS fingerprint: " + (fingerprint.isEmpty() ? std::string("n/a") : fingerprint.toStdString())));
+    } else {
+        lines.push_back(ftxui::text("nymea-cli"));
+        lines.push_back(ftxui::separator());
+        lines.push_back(ftxui::text("Application version: " + m_options.appVersion));
+        lines.push_back(ftxui::text("Server version: " + m_serverVersion));
+        lines.push_back(ftxui::text("Server API version: " + m_serverApiVersion));
+        lines.push_back(ftxui::text("Purpose: terminal client for nymead"));
+        lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
+    }
+
+    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)));
 }
 
 ftxui::Element Engine::renderThings() const
@@ -449,18 +522,28 @@ ftxui::Element Engine::renderUi() const
                            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
-    // sections.push_back(ftxui::hbox({
-    //                        ftxui::text(endpoint()),
-    //                        ftxui::filler(),
-    //                        ftxui::text(m_connectionStatus),
-    //                    })
-    //                    | ftxui::border);
-    sections.push_back(ftxui::text("Keys: c reconnect, h hello, t refresh things, Enter login, q/Esc quit") | ftxui::dim);
+    sections.push_back(ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, c reconnect, h hello, t refresh things, Enter login, q/Esc quit") | ftxui::dim);
     if (!m_settingsWarning.empty()) {
         sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
     }
     sections.push_back(ftxui::separator());
-    sections.push_back(ftxui::window(ftxui::text("Things from server"), renderThings()) | ftxui::flex);
+
+    ftxui::Element rightPanel;
+    if (m_mainView == MainView::Things) {
+        rightPanel = ftxui::window(ftxui::text("Things from server"), renderThings()) | ftxui::flex;
+    } else {
+        rightPanel = ftxui::vbox({
+                         renderSettingsMenu(),
+                         renderSettingsDetails() | ftxui::flex,
+                     })
+                     | ftxui::flex;
+    }
+
+    sections.push_back(ftxui::hbox({
+                           renderMainMenu() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 24),
+                           rightPanel | ftxui::flex,
+                       })
+                       | ftxui::flex);
 
     if (m_showLoginForm) {
         sections.push_back(ftxui::separator());
@@ -490,6 +573,20 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (event == ftxui::Event::ArrowLeft) {
+        m_focusArea = FocusArea::MainMenu;
+        return true;
+    }
+
+    if (event == ftxui::Event::ArrowRight) {
+        if (m_showLoginForm) {
+            m_focusArea = FocusArea::LoginForm;
+        } else if (m_mainView == MainView::Settings) {
+            m_focusArea = FocusArea::SettingsMenu;
+        }
+        return true;
+    }
+
     if (m_showLoginForm) {
         if (event == ftxui::Event::Return) {
             if (authenticate(m_username, m_password)) {
@@ -498,6 +595,30 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         if (m_loginForm->OnEvent(event)) {
+            return true;
+        }
+    }
+
+    if (event == ftxui::Event::ArrowUp) {
+        if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
+            m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::MainMenu) {
+            m_mainView = m_mainView == MainView::Things ? MainView::Settings : MainView::Things;
+            return true;
+        }
+    }
+
+    if (event == ftxui::Event::ArrowDown) {
+        if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
+            m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::MainMenu) {
+            m_mainView = m_mainView == MainView::Things ? MainView::Settings : MainView::Things;
             return true;
         }
     }
