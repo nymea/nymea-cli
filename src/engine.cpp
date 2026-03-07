@@ -17,6 +17,36 @@ namespace nymea {
 
 namespace {
 
+struct ThingDetailEntry
+{
+    enum class Type {
+        Param,
+        State,
+        None,
+    };
+
+    Type type = Type::None;
+    int index = -1;
+};
+
+std::vector<ThingDetailEntry> buildThingDetailEntries(const api::Thing* thing)
+{
+    std::vector<ThingDetailEntry> entries;
+    if (thing == nullptr) {
+        return entries;
+    }
+
+    entries.reserve(thing->params.size() + thing->states.size());
+    for (int index = 0; index < thing->params.size(); ++index) {
+        entries.push_back({ThingDetailEntry::Type::Param, index});
+    }
+    for (int index = 0; index < thing->states.size(); ++index) {
+        entries.push_back({ThingDetailEntry::Type::State, index});
+    }
+
+    return entries;
+}
+
 std::string firstNonEmpty(std::initializer_list<std::string_view> candidates)
 {
     for (const std::string_view candidate : candidates) {
@@ -108,6 +138,262 @@ std::string joinFields(const std::vector<std::string>& fields)
     return result;
 }
 
+std::string optionalBoolToString(const std::optional<bool>& value)
+{
+    if (!value.has_value()) {
+        return {};
+    }
+
+    return *value ? "true" : "false";
+}
+
+std::string optionalDoubleToString(const std::optional<double>& value)
+{
+    return value.has_value() ? QString::number(*value).toStdString() : std::string();
+}
+
+std::string optionalStringListToString(const std::optional<QStringList>& value)
+{
+    if (!value.has_value()) {
+        return {};
+    }
+
+    return "[" + value->join(QStringLiteral(", ")).toStdString() + "]";
+}
+
+std::string prettyUnit(api::Unit unit)
+{
+    switch (unit) {
+    case api::Unit::UnitMilliSeconds:
+        return "ms";
+    case api::Unit::UnitSeconds:
+        return "s";
+    case api::Unit::UnitMinutes:
+        return "min";
+    case api::Unit::UnitHours:
+        return "h";
+    case api::Unit::UnitUnixTime:
+        return "unix";
+    case api::Unit::UnitMeterPerSecond:
+        return "m/s";
+    case api::Unit::UnitKiloMeterPerHour:
+        return "km/h";
+    case api::Unit::UnitDegree:
+        return "\u00b0";
+    case api::Unit::UnitRadiant:
+        return "rad";
+    case api::Unit::UnitDegreeCelsius:
+        return "\u00b0C";
+    case api::Unit::UnitDegreeKelvin:
+        return "K";
+    case api::Unit::UnitMired:
+        return "mired";
+    case api::Unit::UnitMilliBar:
+        return "mbar";
+    case api::Unit::UnitBar:
+        return "bar";
+    case api::Unit::UnitPascal:
+        return "Pa";
+    case api::Unit::UnitHectoPascal:
+        return "hPa";
+    case api::Unit::UnitAtmosphere:
+        return "atm";
+    case api::Unit::UnitLumen:
+        return "lm";
+    case api::Unit::UnitLux:
+        return "lx";
+    case api::Unit::UnitCandela:
+        return "cd";
+    case api::Unit::UnitMilliMeter:
+        return "mm";
+    case api::Unit::UnitCentiMeter:
+        return "cm";
+    case api::Unit::UnitMeter:
+        return "m";
+    case api::Unit::UnitKiloMeter:
+        return "km";
+    case api::Unit::UnitGram:
+        return "g";
+    case api::Unit::UnitKiloGram:
+        return "kg";
+    case api::Unit::UnitDezibel:
+        return "dB";
+    case api::Unit::UnitBpm:
+        return "bpm";
+    case api::Unit::UnitKiloByte:
+        return "kB";
+    case api::Unit::UnitMegaByte:
+        return "MB";
+    case api::Unit::UnitGigaByte:
+        return "GB";
+    case api::Unit::UnitTeraByte:
+        return "TB";
+    case api::Unit::UnitMilliWatt:
+        return "mW";
+    case api::Unit::UnitWatt:
+        return "W";
+    case api::Unit::UnitKiloWatt:
+        return "kW";
+    case api::Unit::UnitKiloWattHour:
+        return "kWh";
+    case api::Unit::UnitEuroPerMegaWattHour:
+        return "\u20ac/MWh";
+    case api::Unit::UnitEuroCentPerKiloWattHour:
+        return "ct/kWh";
+    case api::Unit::UnitPercentage:
+        return "%";
+    case api::Unit::UnitPartsPerMillion:
+        return "ppm";
+    case api::Unit::UnitPartsPerBillion:
+        return "ppb";
+    case api::Unit::UnitEuro:
+        return "\u20ac";
+    case api::Unit::UnitDollar:
+        return "$";
+    case api::Unit::UnitHertz:
+        return "Hz";
+    case api::Unit::UnitAmpere:
+        return "A";
+    case api::Unit::UnitMilliAmpere:
+        return "mA";
+    case api::Unit::UnitVolt:
+        return "V";
+    case api::Unit::UnitMilliVolt:
+        return "mV";
+    case api::Unit::UnitVoltAmpere:
+        return "VA";
+    case api::Unit::UnitVoltAmpereReactive:
+        return "var";
+    case api::Unit::UnitAmpereHour:
+        return "Ah";
+    case api::Unit::UnitOhm:
+        return "Ohm";
+    case api::Unit::UnitMicroSiemensPerCentimeter:
+        return "uS/cm";
+    case api::Unit::UnitDuration:
+        return "duration";
+    case api::Unit::UnitNewton:
+        return "N";
+    case api::Unit::UnitNewtonMeter:
+        return "Nm";
+    case api::Unit::UnitRpm:
+        return "rpm";
+    case api::Unit::UnitMilligramPerLiter:
+        return "mg/L";
+    case api::Unit::UnitLiter:
+        return "L";
+    case api::Unit::UnitMicroGrammPerCubicalMeter:
+        return "ug/m3";
+    case api::Unit::UnitNone:
+        return {};
+    }
+
+    return api::toString(unit).toStdString();
+}
+
+std::optional<ftxui::Color> parseHexColor(const std::string& value)
+{
+    if (value.empty()) {
+        return std::nullopt;
+    }
+
+    std::string hex = value;
+    if (hex.front() == '#') {
+        hex.erase(hex.begin());
+    }
+
+    if (hex.size() == 8) {
+        hex = hex.substr(2);
+    }
+
+    if (hex.size() != 6) {
+        return std::nullopt;
+    }
+
+    auto parseComponent = [&](int offset) -> std::optional<int> {
+        bool ok = false;
+        const int component = QString::fromStdString(hex.substr(offset, 2)).toInt(&ok, 16);
+        if (!ok) {
+            return std::nullopt;
+        }
+        return component;
+    };
+
+    const std::optional<int> red = parseComponent(0);
+    const std::optional<int> green = parseComponent(2);
+    const std::optional<int> blue = parseComponent(4);
+    if (!red.has_value() || !green.has_value() || !blue.has_value()) {
+        return std::nullopt;
+    }
+
+    return ftxui::Color::RGB(*red, *green, *blue);
+}
+
+ftxui::Element renderBoolValue(bool value)
+{
+    const ftxui::Color color = value ? ftxui::Color::GreenLight : ftxui::Color::RedLight;
+    return ftxui::hbox({
+        ftxui::text("\u25cf") | ftxui::color(color),
+        ftxui::text(std::string(" ") + (value ? "true" : "false")),
+    });
+}
+
+ftxui::Element renderColorValue(const std::string& colorString)
+{
+    auto swatch = ftxui::text("    ");
+    if (const std::optional<ftxui::Color> parsedColor = parseHexColor(colorString); parsedColor.has_value()) {
+        swatch = swatch | ftxui::bgcolor(*parsedColor);
+    }
+
+    return ftxui::hbox({
+        ftxui::text(colorString.empty() ? std::string("<empty>") : colorString),
+        ftxui::text(" "),
+        swatch,
+    });
+}
+
+ftxui::Element renderValueCell(const QJsonValue& value, std::optional<api::BasicType> basicType, std::optional<api::Unit> unit)
+{
+    if ((basicType.has_value() && *basicType == api::BasicType::Bool) || value.isBool()) {
+        return renderBoolValue(value.toBool());
+    }
+
+    if (basicType.has_value() && *basicType == api::BasicType::Color && value.isString()) {
+        return renderColorValue(value.toString().toStdString());
+    }
+
+    std::string renderedValue = jsonValueToString(value);
+    if (unit.has_value()) {
+        const std::string renderedUnit = prettyUnit(*unit);
+        if (!renderedUnit.empty() && !renderedValue.empty()) {
+            renderedValue += " " + renderedUnit;
+        }
+    }
+
+    return ftxui::text(renderedValue);
+}
+
+ftxui::Element renderTwoColumnRow(const std::string& name, ftxui::Element value, bool selected, bool focused)
+{
+    auto row = ftxui::hbox({
+        ftxui::text(name) | ftxui::xflex,
+        ftxui::text(" "),
+        std::move(value),
+    });
+
+    if (selected) {
+        row = row | ftxui::inverted | ftxui::bold;
+    }
+    if (selected && focused) {
+        row = row | ftxui::color(ftxui::Color::CyanLight);
+    }
+    if (selected) {
+        row = row | ftxui::focus;
+    }
+
+    return row;
+}
+
 } // namespace
 
 Engine::Engine(EngineOptions options)
@@ -175,6 +461,35 @@ SavedConnection Engine::currentConnection(bool allowFingerprintUpdate) const
     }
 
     return connection;
+}
+
+int Engine::thingDetailEntryCount() const
+{
+    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    return static_cast<int>(buildThingDetailEntries(thing).size());
+}
+
+void Engine::clampThingDetailSelection()
+{
+    const int entryCount = thingDetailEntryCount();
+    if (entryCount <= 0) {
+        m_selectedThingDetailIndex = 0;
+        m_showThingDetailInspector = false;
+        return;
+    }
+
+    if (m_selectedThingDetailIndex < 0) {
+        m_selectedThingDetailIndex = 0;
+    } else if (m_selectedThingDetailIndex >= entryCount) {
+        m_selectedThingDetailIndex = entryCount - 1;
+    }
+}
+
+void Engine::resetThingDetailSelection()
+{
+    m_selectedThingDetailIndex = 0;
+    m_showThingDetailInspector = false;
+    clampThingDetailSelection();
 }
 
 bool Engine::connectToServer()
@@ -433,6 +748,7 @@ bool Engine::fetchThings()
     } else if (m_selectedThingIndex < 0) {
         m_selectedThingIndex = 0;
     }
+    clampThingDetailSelection();
 
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
     return true;
@@ -644,6 +960,10 @@ ftxui::Element Engine::renderThingDetails() const
     }
 
     const api::ThingClass* thingClass = m_thingManager.thingClassForThing(*thing);
+    const std::vector<ThingDetailEntry> detailEntries = buildThingDetailEntries(thing);
+    const ThingDetailEntry* selectedEntry = detailEntries.empty() || m_selectedThingDetailIndex < 0 || m_selectedThingDetailIndex >= static_cast<int>(detailEntries.size())
+                                                ? nullptr
+                                                : &detailEntries.at(m_selectedThingDetailIndex);
     const std::string thingClassLabel = [&] {
         if (thingClass == nullptr) {
             return firstNonEmpty({uuidToStd(thing->thingClassId), "<unknown thing class>"});
@@ -674,11 +994,16 @@ ftxui::Element Engine::renderThingDetails() const
         metadata.push_back(ftxui::paragraph("Setup message: " + thing->setupDisplayMessage->toStdString()));
     }
 
-    ftxui::Elements params;
+    ftxui::Elements browserRows;
+    browserRows.push_back(ftxui::text("Press Right to browse params/states. Press Space for metadata.") | ftxui::dim);
+    browserRows.push_back(ftxui::separator());
+
+    browserRows.push_back(ftxui::text("Params") | ftxui::bold);
     if (thing->params.empty()) {
-        params.push_back(ftxui::text("No params."));
+        browserRows.push_back(ftxui::text("No params."));
     } else {
-        for (const api::Param& param : thing->params) {
+        for (int index = 0; index < thing->params.size(); ++index) {
+            const api::Param& param = thing->params.at(index);
             const api::ParamType* paramType = m_thingManager.paramTypeForThing(*thing, param);
             const std::string label = [&] {
                 if (paramType != nullptr) {
@@ -689,29 +1014,20 @@ ftxui::Element Engine::renderThingDetails() const
                 }
                 return std::string("<unknown param>");
             }();
-            std::vector<std::string> fields;
-            appendField(fields, "value", jsonValueToString(param.value));
-            if (paramType != nullptr) {
-                appendField(fields, "type", api::toString(paramType->type).toStdString());
-                appendField(fields, "unit", paramType->unit.has_value() ? api::toString(*paramType->unit).toStdString() : std::string());
-                appendField(fields, "input", paramType->inputType.has_value() ? api::toString(*paramType->inputType).toStdString() : std::string());
-                appendField(fields, "min", optionalJsonValueToString(paramType->minValue));
-                appendField(fields, "max", optionalJsonValueToString(paramType->maxValue));
-                appendField(fields, "allowed", optionalJsonValuesToString(paramType->allowedValues));
-            }
-
-            params.push_back(ftxui::paragraph(label + ": " + joinFields(fields)));
-            if (param.paramTypeId.has_value()) {
-                params.push_back(ftxui::text("  id: " + uuidToStd(*param.paramTypeId)) | ftxui::dim);
-            }
+            const bool isSelected = selectedEntry != nullptr && selectedEntry->type == ThingDetailEntry::Type::Param && selectedEntry->index == index;
+            const std::optional<api::BasicType> basicType = paramType != nullptr ? std::optional<api::BasicType>(paramType->type) : std::nullopt;
+            const std::optional<api::Unit> unit = paramType != nullptr ? paramType->unit : std::nullopt;
+            browserRows.push_back(renderTwoColumnRow(label, renderValueCell(param.value, basicType, unit), isSelected, m_focusArea == FocusArea::ThingDetails));
         }
     }
 
-    ftxui::Elements states;
+    browserRows.push_back(ftxui::separator());
+    browserRows.push_back(ftxui::text("States") | ftxui::bold);
     if (thing->states.empty()) {
-        states.push_back(ftxui::text("No states."));
+        browserRows.push_back(ftxui::text("No states."));
     } else {
-        for (const api::State& state : thing->states) {
+        for (int index = 0; index < thing->states.size(); ++index) {
+            const api::State& state = thing->states.at(index);
             const api::StateType* stateType = m_thingManager.stateTypeForThing(*thing, state);
             const std::string label = [&] {
                 if (stateType != nullptr) {
@@ -719,37 +1035,89 @@ ftxui::Element Engine::renderThingDetails() const
                 }
                 return firstNonEmpty({uuidToStd(state.stateTypeId), "<unknown state>"});
             }();
-            std::vector<std::string> fields;
-            appendField(fields, "value", jsonValueToString(state.value));
-            if (stateType != nullptr) {
-                appendField(fields, "type", api::toString(stateType->type).toStdString());
-                appendField(fields, "unit", stateType->unit.has_value() ? api::toString(*stateType->unit).toStdString() : std::string());
-                appendField(fields, "io", stateType->ioType.has_value() ? api::toString(*stateType->ioType).toStdString() : std::string());
-            }
-            appendField(fields, "filter", api::toString(state.filter).toStdString());
-            appendField(fields,
-                        "min",
-                        firstNonEmpty({optionalJsonValueToString(state.minValue), stateType != nullptr ? optionalJsonValueToString(stateType->minValue) : std::string()}));
-            appendField(fields,
-                        "max",
-                        firstNonEmpty({optionalJsonValueToString(state.maxValue), stateType != nullptr ? optionalJsonValueToString(stateType->maxValue) : std::string()}));
-            appendField(fields,
-                        "allowed",
-                        firstNonEmpty(
-                            {optionalJsonValuesToString(state.possibleValues), stateType != nullptr ? optionalJsonValuesToString(stateType->possibleValues) : std::string()}));
-
-            states.push_back(ftxui::paragraph(label + ": " + joinFields(fields)));
-            states.push_back(ftxui::text("  id: " + uuidToStd(state.stateTypeId)) | ftxui::dim);
+            const bool isSelected = selectedEntry != nullptr && selectedEntry->type == ThingDetailEntry::Type::State && selectedEntry->index == index;
+            const std::optional<api::BasicType> basicType = stateType != nullptr ? std::optional<api::BasicType>(stateType->type) : std::nullopt;
+            const std::optional<api::Unit> unit = stateType != nullptr ? stateType->unit : std::nullopt;
+            browserRows.push_back(renderTwoColumnRow(label, renderValueCell(state.value, basicType, unit), isSelected, m_focusArea == FocusArea::ThingDetails));
         }
     }
 
-    return ftxui::window(ftxui::text("Thing details"),
-                         ftxui::vbox({
-                             ftxui::window(ftxui::text("Overview"), ftxui::vbox(std::move(metadata))),
-                             ftxui::window(ftxui::text("Params"), ftxui::vbox(std::move(params))),
-                             ftxui::window(ftxui::text("States"), ftxui::vbox(std::move(states))) | ftxui::flex,
-                         }) | ftxui::vscroll_indicator
-                             | ftxui::frame);
+    auto detailBrowser = ftxui::window(ftxui::text("Values"), ftxui::vbox(std::move(browserRows)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::flex;
+
+    ftxui::Element inspector = ftxui::text("");
+    if (m_showThingDetailInspector && selectedEntry != nullptr) {
+        ftxui::Elements lines;
+        if (selectedEntry->type == ThingDetailEntry::Type::Param) {
+            const api::Param& param = thing->params.at(selectedEntry->index);
+            const api::ParamType* paramType = m_thingManager.paramTypeForThing(*thing, param);
+            lines.push_back(ftxui::text("Kind: Param"));
+            if (paramType != nullptr) {
+                lines.push_back(ftxui::text("Name: " + paramType->name.toStdString()));
+                lines.push_back(ftxui::text("Display name: " + paramType->displayName.toStdString()));
+                lines.push_back(ftxui::text("Data type: " + api::toString(paramType->type).toStdString()));
+                lines.push_back(ftxui::text("Param type id: " + uuidToStd(paramType->id)));
+                lines.push_back(ftxui::text("Unit: " + firstNonEmpty({paramType->unit.has_value() ? prettyUnit(*paramType->unit) : std::string(), "n/a"})));
+                lines.push_back(ftxui::text("Input type: " + (paramType->inputType.has_value() ? api::toString(*paramType->inputType).toStdString() : std::string("n/a"))));
+                lines.push_back(ftxui::text("Read only: " + firstNonEmpty({optionalBoolToString(paramType->readOnly), "n/a"})));
+                lines.push_back(ftxui::text("Default value: " + optionalJsonValueToString(paramType->defaultValue)));
+                lines.push_back(ftxui::text("Min value: " + optionalJsonValueToString(paramType->minValue)));
+                lines.push_back(ftxui::text("Max value: " + optionalJsonValueToString(paramType->maxValue)));
+                lines.push_back(ftxui::text("Step size: " + firstNonEmpty({optionalDoubleToString(paramType->stepSize), "n/a"})));
+                lines.push_back(ftxui::paragraph("Allowed values: " + firstNonEmpty({optionalJsonValuesToString(paramType->allowedValues), "n/a"})));
+            } else if (param.paramTypeId.has_value()) {
+                lines.push_back(ftxui::text("Param type id: " + uuidToStd(*param.paramTypeId)));
+            }
+            lines.push_back(ftxui::separator());
+            lines.push_back(ftxui::text("Current value:"));
+            lines.push_back(renderValueCell(param.value,
+                                            paramType != nullptr ? std::optional<api::BasicType>(paramType->type) : std::nullopt,
+                                            paramType != nullptr ? paramType->unit : std::nullopt));
+        } else if (selectedEntry->type == ThingDetailEntry::Type::State) {
+            const api::State& state = thing->states.at(selectedEntry->index);
+            const api::StateType* stateType = m_thingManager.stateTypeForThing(*thing, state);
+            lines.push_back(ftxui::text("Kind: State"));
+            if (stateType != nullptr) {
+                lines.push_back(ftxui::text("Name: " + stateType->name.toStdString()));
+                lines.push_back(ftxui::text("Display name: " + stateType->displayName.toStdString()));
+                lines.push_back(ftxui::text("Data type: " + api::toString(stateType->type).toStdString()));
+                lines.push_back(ftxui::text("State type id: " + uuidToStd(stateType->id)));
+                lines.push_back(ftxui::text("Unit: " + firstNonEmpty({stateType->unit.has_value() ? prettyUnit(*stateType->unit) : std::string(), "n/a"})));
+                lines.push_back(ftxui::text("IO type: " + (stateType->ioType.has_value() ? api::toString(*stateType->ioType).toStdString() : std::string("n/a"))));
+                lines.push_back(ftxui::text("Default value: " + jsonValueToString(stateType->defaultValue)));
+                lines.push_back(ftxui::text("Min value: " + optionalJsonValueToString(stateType->minValue)));
+                lines.push_back(ftxui::text("Max value: " + optionalJsonValueToString(stateType->maxValue)));
+                lines.push_back(ftxui::text("Step size: " + firstNonEmpty({optionalDoubleToString(stateType->stepSize), "n/a"})));
+                lines.push_back(ftxui::paragraph("Possible values: " + firstNonEmpty({optionalJsonValuesToString(stateType->possibleValues), "n/a"})));
+                lines.push_back(ftxui::paragraph("Possible value names: " + firstNonEmpty({optionalStringListToString(stateType->possibleValuesDisplayNames), "n/a"})));
+            }
+            lines.push_back(ftxui::text("Filter: " + api::toString(state.filter).toStdString()));
+            lines.push_back(ftxui::text("Runtime min: " + firstNonEmpty({optionalJsonValueToString(state.minValue), "n/a"})));
+            lines.push_back(ftxui::text("Runtime max: " + firstNonEmpty({optionalJsonValueToString(state.maxValue), "n/a"})));
+            lines.push_back(ftxui::paragraph("Runtime values: " + firstNonEmpty({optionalJsonValuesToString(state.possibleValues), "n/a"})));
+            lines.push_back(ftxui::separator());
+            lines.push_back(ftxui::text("Current value:"));
+            lines.push_back(renderValueCell(state.value,
+                                            stateType != nullptr ? std::optional<api::BasicType>(stateType->type) : std::nullopt,
+                                            stateType != nullptr ? stateType->unit : std::nullopt));
+        }
+        lines.push_back(ftxui::separator());
+        lines.push_back(ftxui::text("Space closes inspector") | ftxui::dim);
+        inspector = ftxui::window(ftxui::text("Inspector"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 42);
+    }
+
+    ftxui::Elements detailContent;
+    detailContent.push_back(ftxui::window(ftxui::text("Overview"), ftxui::vbox(std::move(metadata))));
+    if (m_showThingDetailInspector && selectedEntry != nullptr) {
+        detailContent.push_back(ftxui::hbox({
+                                    detailBrowser,
+                                    inspector,
+                                })
+                                | ftxui::flex);
+    } else {
+        detailContent.push_back(detailBrowser);
+    }
+
+    return ftxui::window(ftxui::text("Thing details"), ftxui::vbox(std::move(detailContent)) | ftxui::flex);
 }
 
 ftxui::Element Engine::renderSettingsMenu() const
@@ -830,7 +1198,8 @@ ftxui::Element Engine::renderUi() const
                            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
-    sections.push_back(ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, c reconnect, h hello, t refresh things, Enter login, q/Esc quit") | ftxui::dim);
+    sections.push_back(ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, Space inspector, c reconnect, h hello, t refresh things, Enter login, q/Esc quit")
+                       | ftxui::dim);
     if (!m_settingsWarning.empty()) {
         sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
     }
@@ -882,6 +1251,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::ArrowLeft) {
+        if (m_focusArea == FocusArea::ThingDetails) {
+            m_focusArea = FocusArea::ThingList;
+            m_showThingDetailInspector = false;
+            return true;
+        }
         m_focusArea = FocusArea::MainMenu;
         return true;
     }
@@ -890,7 +1264,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (m_showLoginForm) {
             m_focusArea = FocusArea::LoginForm;
         } else if (m_mainView == MainView::Things) {
-            m_focusArea = FocusArea::ThingList;
+            if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
+                m_focusArea = FocusArea::ThingDetails;
+            } else {
+                m_focusArea = FocusArea::ThingList;
+            }
         } else if (m_mainView == MainView::Settings) {
             m_focusArea = FocusArea::SettingsMenu;
         }
@@ -910,8 +1288,14 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::ArrowUp) {
+        if (m_focusArea == FocusArea::ThingDetails && thingDetailEntryCount() > 0) {
+            m_selectedThingDetailIndex = (m_selectedThingDetailIndex + thingDetailEntryCount() - 1) % thingDetailEntryCount();
+            return true;
+        }
+
         if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
             m_selectedThingIndex = (m_selectedThingIndex + static_cast<int>(m_thingManager.things().size()) - 1) % static_cast<int>(m_thingManager.things().size());
+            resetThingDetailSelection();
             return true;
         }
 
@@ -927,8 +1311,14 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::ArrowDown) {
+        if (m_focusArea == FocusArea::ThingDetails && thingDetailEntryCount() > 0) {
+            m_selectedThingDetailIndex = (m_selectedThingDetailIndex + 1) % thingDetailEntryCount();
+            return true;
+        }
+
         if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
             m_selectedThingIndex = (m_selectedThingIndex + 1) % static_cast<int>(m_thingManager.things().size());
+            resetThingDetailSelection();
             return true;
         }
 
@@ -939,6 +1329,13 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
         if (m_focusArea == FocusArea::MainMenu) {
             m_mainView = m_mainView == MainView::Things ? MainView::Settings : MainView::Things;
+            return true;
+        }
+    }
+
+    if (event == ftxui::Event::Character(" ")) {
+        if (m_focusArea == FocusArea::ThingDetails && thingDetailEntryCount() > 0) {
+            m_showThingDetailInspector = !m_showThingDetailInspector;
             return true;
         }
     }

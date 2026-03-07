@@ -48,6 +48,7 @@ private:
     enum class FocusArea {
         MainMenu,
         ThingList,
+        ThingDetails,
         SettingsMenu,
         LoginForm,
     };
@@ -55,6 +56,9 @@ private:
     std::string endpoint() const;
     std::string connectionDisplayName() const;
     SavedConnection currentConnection(bool allowFingerprintUpdate) const;
+    int thingDetailEntryCount() const;
+    void clampThingDetailSelection();
+    void resetThingDetailSelection();
 
     bool connectToServer();
     bool sendHello();
@@ -98,6 +102,8 @@ private:
     std::string m_password;
     std::optional<SavedConnection> m_savedConnection;
     int m_selectedThingIndex = 0;
+    int m_selectedThingDetailIndex = 0;
+    bool m_showThingDetailInspector = false;
     MainView m_mainView = MainView::Things;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;
