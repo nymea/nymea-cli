@@ -15,6 +15,7 @@
 - Processes `JSONRPC.Hello` and shows server/API versions
 - Loads and displays thing list via `Integrations.GetThings`
 - Supports login when authentication is required (interactive form or CLI credentials)
+- Persists per-host tokens in `/var/lib/nymea/nymea-cli.conf` when run as root, otherwise in `~/.config/nymea/nymea-cli.conf`, and warns on TLS fingerprint changes
 - Built-in `--help` and `--version`
 - API model generation script: `scripts/generate_nymea_api.py`
 

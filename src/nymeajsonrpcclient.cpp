@@ -1,5 +1,6 @@
 #include "nymeajsonrpcclient.h"
 
+#include <QCryptographicHash>
 #include <QElapsedTimer>
 #include <QJsonDocument>
 #include <QJsonParseError>
@@ -54,6 +55,20 @@ bool NymeaJsonRpcClient::isConnected() const
 bool NymeaJsonRpcClient::isEncrypted() const
 {
     return m_socket.isEncrypted();
+}
+
+QString NymeaJsonRpcClient::peerCertificateFingerprint() const
+{
+    if (!m_socket.isEncrypted()) {
+        return QString();
+    }
+
+    const QSslCertificate certificate = m_socket.peerCertificate();
+    if (certificate.isNull()) {
+        return QString();
+    }
+
+    return certificate.digest(QCryptographicHash::Sha256).toHex(':').toUpper();
 }
 
 QString NymeaJsonRpcClient::lastError() const

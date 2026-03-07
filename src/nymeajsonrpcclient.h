@@ -22,6 +22,7 @@ public:
 
     bool isConnected() const;
     bool isEncrypted() const;
+    QString peerCertificateFingerprint() const;
     QString lastError() const;
 
     void setAuthToken(const QString& token);

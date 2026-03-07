@@ -7,6 +7,7 @@
 ## Repository layout
 
 - `main.cpp`: thin CLI/bootstrap entry point and command-line parsing.
+- `src/connectionsettings.*`: persistent INI-backed connection/token storage.
 - `src/engine.*`: orchestration layer for transport, auth flow, thing loading, and FTXUI UI loop.
 - `src/nymeajsonrpcclient.*`: TCP JSON-RPC transport/client primitives.
 - `src/thingmanager.*`: thing list parsing/state from nymead replies.
@@ -39,6 +40,7 @@ If Python is available, CMake also exposes `generate-nymea-api` and runs it as a
 - Keep the app terminal-only: no Qt Widgets/GUI dependencies.
 - Keep JSON-RPC transport newline-delimited compact JSON (`...\\n`) as in nymea app/client behavior.
 - Keep nymea default ports consistent: `2222` for SSL/TLS and `2223` for plain TCP.
+- Store settings in `/var/lib/nymea/nymea-cli.conf` when running as root, otherwise in `~/.config/nymea/nymea-cli.conf`.
 - Process `JSONRPC.Hello` replies and expose server version + server API version in UI header.
 - If hello indicates authentication is required, support both interactive login form and `--username` / `--password` CLI flow.
 - Prefer adding generated output to `src/generated/` only through the generator script.

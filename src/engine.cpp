@@ -38,18 +38,61 @@ std::string Engine::endpoint() const
     return std::string(m_options.useSsl ? "ssl://" : "tcp://") + m_options.host.toStdString() + ":" + std::to_string(static_cast<unsigned>(m_options.port));
 }
 
+std::string Engine::connectionDisplayName() const
+{
+    if (!m_serverName.isEmpty()) {
+        return m_serverName.toStdString();
+    }
+
+    if (m_savedConnection.has_value() && !m_savedConnection->name.isEmpty()) {
+        return m_savedConnection->name.toStdString();
+    }
+
+    return endpoint();
+}
+
+SavedConnection Engine::currentConnection(bool allowFingerprintUpdate) const
+{
+    SavedConnection connection;
+    connection.hostUuid = m_serverUuid;
+    connection.name = m_serverName;
+    connection.host = m_options.host;
+    connection.port = m_options.port;
+    connection.useSsl = m_options.useSsl;
+    connection.certificateFingerprint = m_client.peerCertificateFingerprint();
+    connection.token = m_client.authToken();
+
+    if (!allowFingerprintUpdate && m_savedConnection.has_value() && m_savedConnection->hostUuid == m_serverUuid && !m_savedConnection->certificateFingerprint.isEmpty()
+        && m_savedConnection->certificateFingerprint != connection.certificateFingerprint) {
+        connection.certificateFingerprint = m_savedConnection->certificateFingerprint;
+    }
+
+    if (connection.token.isEmpty() && m_savedConnection.has_value() && m_savedConnection->hostUuid == m_serverUuid) {
+        connection.token = m_savedConnection->token;
+    }
+
+    return connection;
+}
+
 bool Engine::connectToServer()
 {
     m_client.clearAuthToken();
+    loadSavedConnection();
+    m_securityWarning.clear();
+    m_settingsWarning.clear();
+    m_serverVersion = "n/a";
+    m_serverApiVersion = "n/a";
+    m_serverUuid = QUuid();
+    m_serverName.clear();
+
     const NymeaJsonRpcClient::TransportSecurity security = m_options.useSsl ? NymeaJsonRpcClient::TransportSecurity::SslTls : NymeaJsonRpcClient::TransportSecurity::PlainTcp;
     if (m_client.connectToHost(m_options.host, static_cast<quint16>(m_options.port), security, m_options.timeoutMs)) {
         m_connectionStatus = std::string(m_client.isEncrypted() ? "SSL connected to " : "TCP connected to ") + endpoint();
+        updateCertificateWarning();
         return true;
     }
 
     m_connectionStatus = "Connection failed: " + m_client.lastError().toStdString();
-    m_serverVersion = "n/a";
-    m_serverApiVersion = "n/a";
     m_isAuthenticationRequired = false;
     m_isAuthenticated = false;
     m_showLoginForm = false;
@@ -83,6 +126,7 @@ bool Engine::sendHello()
 
     const QString status = message->value(QStringLiteral("status")).toString();
     if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
         m_client.clearAuthToken();
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
@@ -98,6 +142,16 @@ bool Engine::sendHello()
     }
 
     const QJsonObject helloParams = message->value(QStringLiteral("params")).toObject();
+    const QString serverNameValue = helloParams.value(QStringLiteral("name")).toString();
+    if (!serverNameValue.isEmpty()) {
+        m_serverName = serverNameValue;
+    }
+
+    const QUuid serverUuidValue = QUuid(helloParams.value(QStringLiteral("uuid")).toString());
+    if (!serverUuidValue.isNull()) {
+        m_serverUuid = serverUuidValue;
+    }
+
     const QString serverVersionValue = helloParams.value(QStringLiteral("version")).toString();
     if (!serverVersionValue.isEmpty()) {
         m_serverVersion = serverVersionValue.toStdString();
@@ -114,6 +168,16 @@ bool Engine::sendHello()
         m_serverApiVersion = serverApiVersionValue.toStdString();
     }
 
+    if (!m_serverUuid.isNull()) {
+        if (const auto savedConnection = m_connectionSettings.loadConnectionByUuid(m_serverUuid); savedConnection.has_value()) {
+            m_savedConnection = savedConnection;
+        } else if (!m_savedConnection.has_value() || m_savedConnection->hostUuid != m_serverUuid) {
+            m_savedConnection.reset();
+        }
+    }
+
+    updateCertificateWarning();
+
     m_isAuthenticationRequired = helloParams.value(QStringLiteral("authenticationRequired")).toBool();
     const bool helloAuthenticated = helloParams.value(QStringLiteral("authenticated")).toBool();
     m_isAuthenticated = helloAuthenticated || !m_isAuthenticationRequired;
@@ -122,11 +186,12 @@ bool Engine::sendHello()
     if (!m_isAuthenticationRequired) {
         m_authStatus = "Server does not require authentication.";
     } else if (m_isAuthenticated) {
-        m_authStatus = "Authenticated.";
+        m_authStatus = m_client.authToken().isEmpty() ? "Authenticated." : "Authenticated using stored token.";
     } else {
         m_authStatus = "Authentication required.";
     }
 
+    saveCurrentConnection(false);
     m_thingManager.setStatus("JSONRPC.Hello succeeded (request id " + std::to_string(requestId) + ").");
     return true;
 }
@@ -195,6 +260,7 @@ bool Engine::authenticate(const std::string& username, const std::string& passwo
     m_isAuthenticationRequired = false;
     m_showLoginForm = false;
     m_authStatus = "Authenticated as " + username + ".";
+    saveCurrentConnection(true);
     m_thingManager.setStatus("Authentication succeeded (request id " + std::to_string(requestId) + ").");
     return true;
 }
@@ -228,6 +294,7 @@ bool Engine::fetchThings()
 
     const QString status = message->value(QStringLiteral("status")).toString();
     if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
         m_client.clearAuthToken();
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
@@ -250,6 +317,75 @@ bool Engine::fetchThings()
 
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
     return true;
+}
+
+void Engine::loadSavedConnection()
+{
+    m_savedConnection = m_connectionSettings.loadConnectionByEndpoint(m_options.host, m_options.port, m_options.useSsl);
+    if (!m_savedConnection.has_value()) {
+        return;
+    }
+
+    if (!m_savedConnection->token.isEmpty()) {
+        m_client.setAuthToken(m_savedConnection->token);
+        m_authStatus = "Using stored token for " + connectionDisplayName() + ".";
+    }
+}
+
+void Engine::updateCertificateWarning()
+{
+    m_securityWarning.clear();
+
+    if (!m_options.useSsl || !m_savedConnection.has_value()) {
+        return;
+    }
+
+    if (m_savedConnection->certificateFingerprint.isEmpty()) {
+        return;
+    }
+
+    const QString currentFingerprint = m_client.peerCertificateFingerprint();
+    if (currentFingerprint.isEmpty() || currentFingerprint == m_savedConnection->certificateFingerprint) {
+        return;
+    }
+
+    m_securityWarning = "TLS certificate fingerprint changed for " + connectionDisplayName() + ". Stored: " + m_savedConnection->certificateFingerprint.toStdString()
+                        + " Current: " + currentFingerprint.toStdString() + ".";
+}
+
+void Engine::clearStoredToken()
+{
+    QUuid hostUuid = m_serverUuid;
+    if (hostUuid.isNull() && m_savedConnection.has_value()) {
+        hostUuid = m_savedConnection->hostUuid;
+    }
+
+    QString errorMessage;
+    if (!m_connectionSettings.clearToken(hostUuid, errorMessage)) {
+        m_settingsWarning = "Settings warning: " + errorMessage.toStdString();
+        return;
+    }
+
+    if (m_savedConnection.has_value() && m_savedConnection->hostUuid == hostUuid) {
+        m_savedConnection->token.clear();
+    }
+}
+
+void Engine::saveCurrentConnection(bool allowFingerprintUpdate)
+{
+    if (m_serverUuid.isNull()) {
+        return;
+    }
+
+    const SavedConnection connection = currentConnection(allowFingerprintUpdate);
+    QString errorMessage;
+    if (!m_connectionSettings.saveConnection(connection, errorMessage)) {
+        m_settingsWarning = "Settings warning: " + errorMessage.toStdString();
+        return;
+    }
+
+    m_savedConnection = connection;
+    m_settingsWarning.clear();
 }
 
 void Engine::runHandshakeAndLoadThings()
@@ -297,19 +433,32 @@ ftxui::Element Engine::renderThings() const
 ftxui::Element Engine::renderUi() const
 {
     ftxui::Elements sections;
+    if (!m_securityWarning.empty()) {
+        sections.push_back(ftxui::window(ftxui::text("INSECURE WARNING"),
+                                         ftxui::vbox({
+                                             ftxui::text("TLS certificate fingerprint changed") | ftxui::bold | ftxui::color(ftxui::Color::Red),
+                                             ftxui::separator(),
+                                             ftxui::paragraph(m_securityWarning),
+                                         }))
+                           | ftxui::color(ftxui::Color::Red));
+    }
+
     sections.push_back(ftxui::hbox({
                            ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
                            ftxui::filler(),
-                           ftxui::text("server " + m_serverVersion + " | api " + m_serverApiVersion),
+                           ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
-    sections.push_back(ftxui::hbox({
-                           ftxui::text(endpoint()),
-                           ftxui::filler(),
-                           ftxui::text(m_connectionStatus),
-                       })
-                       | ftxui::border);
+    // sections.push_back(ftxui::hbox({
+    //                        ftxui::text(endpoint()),
+    //                        ftxui::filler(),
+    //                        ftxui::text(m_connectionStatus),
+    //                    })
+    //                    | ftxui::border);
     sections.push_back(ftxui::text("Keys: c reconnect, h hello, t refresh things, Enter login, q/Esc quit") | ftxui::dim);
+    if (!m_settingsWarning.empty()) {
+        sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
+    }
     sections.push_back(ftxui::separator());
     sections.push_back(ftxui::window(ftxui::text("Things from server"), renderThings()) | ftxui::flex);
 

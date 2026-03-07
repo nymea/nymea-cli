@@ -34,6 +34,8 @@ endif()
 
 qt_add_executable(nymea-cli
     main.cpp
+    src/connectionsettings.cpp
+    src/connectionsettings.h
     src/engine.cpp
     src/engine.h
     src/nymeajsonrpcclient.cpp

@@ -1,14 +1,17 @@
 #pragma once
 
+#include "connectionsettings.h"
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
 #include <QString>
+#include <QUuid>
 
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 
+#include <optional>
 #include <string>
 
 namespace nymea {
@@ -33,11 +36,17 @@ public:
 
 private:
     std::string endpoint() const;
+    std::string connectionDisplayName() const;
+    SavedConnection currentConnection(bool allowFingerprintUpdate) const;
 
     bool connectToServer();
     bool sendHello();
     bool authenticate(const std::string& username, const std::string& password);
     bool fetchThings();
+    void loadSavedConnection();
+    void updateCertificateWarning();
+    void clearStoredToken();
+    void saveCurrentConnection(bool allowFingerprintUpdate);
     void runHandshakeAndLoadThings();
 
     ftxui::Element renderThings() const;
@@ -45,20 +54,26 @@ private:
     bool handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen);
 
     EngineOptions m_options;
+    ConnectionSettings m_connectionSettings;
     NymeaJsonRpcClient m_client;
     ThingManager m_thingManager;
 
     std::string m_connectionStatus = "Disconnected";
     std::string m_serverVersion = "n/a";
     std::string m_serverApiVersion = "n/a";
+    QUuid m_serverUuid;
+    QString m_serverName;
 
     bool m_isAuthenticationRequired = false;
     bool m_isAuthenticated = false;
     bool m_showLoginForm = false;
     std::string m_authStatus = "Not authenticated.";
+    std::string m_securityWarning;
+    std::string m_settingsWarning;
 
     std::string m_username;
     std::string m_password;
+    std::optional<SavedConnection> m_savedConnection;
 
     ftxui::InputOption m_passwordInputOption;
     ftxui::Component m_usernameInput;
