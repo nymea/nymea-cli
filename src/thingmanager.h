@@ -21,6 +21,8 @@ public:
     const api::ThingClass* thingClassForThing(const api::Thing& thing) const;
     const api::ParamType* paramTypeForThing(const api::Thing& thing, const api::Param& param) const;
     const api::StateType* stateTypeForThing(const api::Thing& thing, const api::State& state) const;
+    const api::ActionType* actionTypeForThing(const api::Thing& thing, int actionIndex) const;
+    const api::ParamType* paramTypeForAction(const api::ActionType& actionType, int paramIndex) const;
     std::vector<std::string> thingClassIds() const;
 
     bool updateFromReply(const QJsonObject& reply, std::string& errorMessage);

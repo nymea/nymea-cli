@@ -49,6 +49,7 @@ private:
         MainMenu,
         ThingList,
         ThingDetails,
+        ActionDialog,
         SettingsMenu,
         LoginForm,
     };
@@ -59,6 +60,9 @@ private:
     int thingDetailEntryCount() const;
     void clampThingDetailSelection();
     void resetThingDetailSelection();
+    bool openSelectedActionDialog();
+    void closeActionDialog();
+    bool executeCurrentAction();
 
     bool connectToServer();
     bool sendHello();
@@ -104,6 +108,13 @@ private:
     int m_selectedThingIndex = 0;
     int m_selectedThingDetailIndex = 0;
     bool m_showThingDetailInspector = false;
+    bool m_showActionDialog = false;
+    std::string m_actionDialogStatus;
+    std::string m_actionDialogActionName;
+    int m_actionDialogActionIndex = -1;
+    int m_actionDialogSelectedParamIndex = 0;
+    std::vector<api::ParamType> m_actionDialogParamTypes;
+    std::vector<std::string> m_actionDialogParamValues;
     MainView m_mainView = MainView::Things;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;

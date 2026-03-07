@@ -96,6 +96,25 @@ const api::StateType* ThingManager::stateTypeForThing(const api::Thing& thing, c
     return nullptr;
 }
 
+const api::ActionType* ThingManager::actionTypeForThing(const api::Thing& thing, int actionIndex) const
+{
+    const api::ThingClass* thingClass = thingClassForThing(thing);
+    if (thingClass == nullptr || actionIndex < 0 || actionIndex >= thingClass->actionTypes.size()) {
+        return nullptr;
+    }
+
+    return &thingClass->actionTypes.at(actionIndex);
+}
+
+const api::ParamType* ThingManager::paramTypeForAction(const api::ActionType& actionType, int paramIndex) const
+{
+    if (paramIndex < 0 || paramIndex >= actionType.paramTypes.size()) {
+        return nullptr;
+    }
+
+    return &actionType.paramTypes.at(paramIndex);
+}
+
 std::vector<std::string> ThingManager::thingClassIds() const
 {
     std::set<std::string> uniqueIds;

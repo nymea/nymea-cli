@@ -22,6 +22,7 @@ struct ThingDetailEntry
     enum class Type {
         Param,
         State,
+        Action,
         None,
     };
 
@@ -29,7 +30,7 @@ struct ThingDetailEntry
     int index = -1;
 };
 
-std::vector<ThingDetailEntry> buildThingDetailEntries(const api::Thing* thing)
+std::vector<ThingDetailEntry> buildThingDetailEntries(const api::Thing* thing, const api::ThingClass* thingClass)
 {
     std::vector<ThingDetailEntry> entries;
     if (thing == nullptr) {
@@ -42,6 +43,11 @@ std::vector<ThingDetailEntry> buildThingDetailEntries(const api::Thing* thing)
     }
     for (int index = 0; index < thing->states.size(); ++index) {
         entries.push_back({ThingDetailEntry::Type::State, index});
+    }
+    if (thingClass != nullptr) {
+        for (int index = 0; index < thingClass->actionTypes.size(); ++index) {
+            entries.push_back({ThingDetailEntry::Type::Action, index});
+        }
     }
 
     return entries;
@@ -394,6 +400,148 @@ ftxui::Element renderTwoColumnRow(const std::string& name, ftxui::Element value,
     return row;
 }
 
+std::optional<QJsonValue> parseActionInputValue(const std::string& input, api::BasicType type)
+{
+    const QString trimmed = QString::fromStdString(input).trimmed();
+
+    switch (type) {
+    case api::BasicType::Bool:
+        if (trimmed.compare(QStringLiteral("true"), Qt::CaseInsensitive) == 0 || trimmed == QStringLiteral("1") || trimmed.compare(QStringLiteral("yes"), Qt::CaseInsensitive) == 0
+            || trimmed.compare(QStringLiteral("on"), Qt::CaseInsensitive) == 0) {
+            return QJsonValue(true);
+        }
+        if (trimmed.compare(QStringLiteral("false"), Qt::CaseInsensitive) == 0 || trimmed == QStringLiteral("0") || trimmed.compare(QStringLiteral("no"), Qt::CaseInsensitive) == 0
+            || trimmed.compare(QStringLiteral("off"), Qt::CaseInsensitive) == 0) {
+            return QJsonValue(false);
+        }
+        return std::nullopt;
+    case api::BasicType::Int:
+    case api::BasicType::Time: {
+        bool ok = false;
+        const qint64 value = trimmed.toLongLong(&ok);
+        return ok ? std::optional<QJsonValue>(QJsonValue(value)) : std::nullopt;
+    }
+    case api::BasicType::Uint: {
+        bool ok = false;
+        const quint64 value = trimmed.toULongLong(&ok);
+        return ok ? std::optional<QJsonValue>(QJsonValue(static_cast<qint64>(value))) : std::nullopt;
+    }
+    case api::BasicType::Double: {
+        bool ok = false;
+        const double value = trimmed.toDouble(&ok);
+        return ok ? std::optional<QJsonValue>(QJsonValue(value)) : std::nullopt;
+    }
+    case api::BasicType::String:
+    case api::BasicType::Color:
+    case api::BasicType::Uuid:
+        return QJsonValue(trimmed);
+    case api::BasicType::StringList: {
+        QJsonArray array;
+        for (const QString& item : trimmed.split(',', Qt::SkipEmptyParts)) {
+            array.append(item.trimmed());
+        }
+        return QJsonValue(array);
+    }
+    case api::BasicType::Object:
+    case api::BasicType::Variant: {
+        QJsonParseError error;
+        const QJsonDocument document = QJsonDocument::fromJson(trimmed.toUtf8(), &error);
+        if (error.error == QJsonParseError::NoError) {
+            if (document.isObject()) {
+                return QJsonValue(document.object());
+            }
+            if (document.isArray()) {
+                return QJsonValue(document.array());
+            }
+        }
+        return QJsonValue(trimmed);
+    }
+    }
+
+    return QJsonValue(trimmed);
+}
+
+std::vector<QJsonValue> selectableValuesForParamType(const api::ParamType& paramType)
+{
+    if (paramType.allowedValues.has_value() && !paramType.allowedValues->empty()) {
+        return {paramType.allowedValues->begin(), paramType.allowedValues->end()};
+    }
+
+    if (paramType.type == api::BasicType::Bool) {
+        return {QJsonValue(false), QJsonValue(true)};
+    }
+
+    return {};
+}
+
+std::string normalizedActionDialogValue(const api::ParamType& paramType, const std::string& rawValue)
+{
+    if (!rawValue.empty()) {
+        return rawValue;
+    }
+
+    if (paramType.defaultValue.has_value()) {
+        return jsonValueToString(*paramType.defaultValue);
+    }
+
+    const std::vector<QJsonValue> selectableValues = selectableValuesForParamType(paramType);
+    if (!selectableValues.empty()) {
+        return jsonValueToString(selectableValues.front());
+    }
+
+    return {};
+}
+
+std::optional<int> selectableValueIndex(const api::ParamType& paramType, const std::string& rawValue)
+{
+    const std::vector<QJsonValue> selectableValues = selectableValuesForParamType(paramType);
+    if (selectableValues.empty()) {
+        return std::nullopt;
+    }
+
+    const std::string normalizedValue = normalizedActionDialogValue(paramType, rawValue);
+    for (int index = 0; index < static_cast<int>(selectableValues.size()); ++index) {
+        if (jsonValueToString(selectableValues.at(index)) == normalizedValue) {
+            return index;
+        }
+    }
+
+    return 0;
+}
+
+bool actionParamUsesSelector(const api::ParamType& paramType)
+{
+    return !selectableValuesForParamType(paramType).empty();
+}
+
+std::string cycleSelectableValue(const api::ParamType& paramType, const std::string& rawValue, int delta)
+{
+    const std::vector<QJsonValue> selectableValues = selectableValuesForParamType(paramType);
+    if (selectableValues.empty()) {
+        return rawValue;
+    }
+
+    const int currentIndex = selectableValueIndex(paramType, rawValue).value_or(0);
+    const int nextIndex = (currentIndex + delta + static_cast<int>(selectableValues.size())) % static_cast<int>(selectableValues.size());
+    return jsonValueToString(selectableValues.at(nextIndex));
+}
+
+ftxui::Element renderActionDialogValueCell(const api::ParamType& paramType, const std::string& rawValue)
+{
+    const std::string normalizedValue = normalizedActionDialogValue(paramType, rawValue);
+
+    if (paramType.type == api::BasicType::Bool) {
+        const std::optional<QJsonValue> parsedValue = parseActionInputValue(normalizedValue, api::BasicType::Bool);
+        return renderBoolValue(parsedValue.has_value() ? parsedValue->toBool() : false);
+    }
+
+    if (actionParamUsesSelector(paramType)) {
+        return ftxui::text("< " + normalizedValue + " >");
+    }
+
+    return ftxui::text(normalizedValue.empty() ? std::string("<empty>") : normalizedValue);
+}
+
 } // namespace
 
 Engine::Engine(EngineOptions options)
@@ -466,7 +614,8 @@ SavedConnection Engine::currentConnection(bool allowFingerprintUpdate) const
 int Engine::thingDetailEntryCount() const
 {
     const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
-    return static_cast<int>(buildThingDetailEntries(thing).size());
+    const api::ThingClass* thingClass = thing != nullptr ? m_thingManager.thingClassForThing(*thing) : nullptr;
+    return static_cast<int>(buildThingDetailEntries(thing, thingClass).size());
 }
 
 void Engine::clampThingDetailSelection()
@@ -489,7 +638,142 @@ void Engine::resetThingDetailSelection()
 {
     m_selectedThingDetailIndex = 0;
     m_showThingDetailInspector = false;
+    closeActionDialog();
     clampThingDetailSelection();
+}
+
+bool Engine::openSelectedActionDialog()
+{
+    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    if (thing == nullptr) {
+        return false;
+    }
+
+    const api::ThingClass* thingClass = m_thingManager.thingClassForThing(*thing);
+    const std::vector<ThingDetailEntry> detailEntries = buildThingDetailEntries(thing, thingClass);
+    if (m_selectedThingDetailIndex < 0 || m_selectedThingDetailIndex >= static_cast<int>(detailEntries.size())) {
+        return false;
+    }
+
+    const ThingDetailEntry& selectedEntry = detailEntries.at(m_selectedThingDetailIndex);
+    if (selectedEntry.type != ThingDetailEntry::Type::Action) {
+        return false;
+    }
+
+    const api::ActionType* actionType = m_thingManager.actionTypeForThing(*thing, selectedEntry.index);
+    if (actionType == nullptr) {
+        return false;
+    }
+
+    m_showThingDetailInspector = false;
+    m_showActionDialog = true;
+    m_focusArea = FocusArea::ActionDialog;
+    m_actionDialogActionIndex = selectedEntry.index;
+    m_actionDialogSelectedParamIndex = 0;
+    m_actionDialogActionName = firstNonEmpty({actionType->displayName.toStdString(), actionType->name.toStdString(), "Action"});
+    m_actionDialogParamTypes.assign(actionType->paramTypes.begin(), actionType->paramTypes.end());
+    m_actionDialogParamValues.clear();
+    m_actionDialogParamValues.reserve(m_actionDialogParamTypes.size());
+    for (const api::ParamType& paramType : m_actionDialogParamTypes) {
+        m_actionDialogParamValues.push_back(normalizedActionDialogValue(paramType, {}));
+    }
+    m_actionDialogStatus = "Edit action params and press Enter to execute.";
+    return true;
+}
+
+void Engine::closeActionDialog()
+{
+    m_showActionDialog = false;
+    m_actionDialogStatus.clear();
+    m_actionDialogActionName.clear();
+    m_actionDialogActionIndex = -1;
+    m_actionDialogSelectedParamIndex = 0;
+    m_actionDialogParamTypes.clear();
+    m_actionDialogParamValues.clear();
+    if (m_focusArea == FocusArea::ActionDialog) {
+        m_focusArea = FocusArea::ThingDetails;
+    }
+}
+
+bool Engine::executeCurrentAction()
+{
+    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    if (!m_showActionDialog || thing == nullptr || m_actionDialogActionIndex < 0) {
+        return false;
+    }
+
+    const api::ActionType* actionType = m_thingManager.actionTypeForThing(*thing, m_actionDialogActionIndex);
+    if (actionType == nullptr) {
+        m_actionDialogStatus = "Selected action is no longer available.";
+        return false;
+    }
+
+    api::ParamList params;
+    for (int index = 0; index < static_cast<int>(m_actionDialogParamTypes.size()); ++index) {
+        const api::ParamType& paramType = m_actionDialogParamTypes.at(index);
+        const std::string rawValue = normalizedActionDialogValue(paramType, m_actionDialogParamValues.at(index));
+        std::optional<QJsonValue> parsedValue = parseActionInputValue(rawValue, paramType.type);
+        if (!parsedValue.has_value()) {
+            m_actionDialogStatus = "Invalid value for " + firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "param"}) + ".";
+            return false;
+        }
+
+        api::Param param;
+        param.paramTypeId = paramType.id;
+        param.value = *parsedValue;
+        params.append(param);
+    }
+
+    api::IntegrationsExecuteActionParams request;
+    request.thingId = thing->id;
+    request.actionTypeId = actionType->id;
+    if (!params.empty()) {
+        request.params = params;
+    }
+
+    const int requestId = m_client.sendRequest(QStringLiteral("Integrations.ExecuteAction"), request.toJson());
+    if (requestId < 0) {
+        m_actionDialogStatus = "Failed to send action request: " + m_client.lastError().toStdString();
+        return false;
+    }
+
+    auto message = m_client.waitForMessage(m_options.timeoutMs);
+    if (!message.has_value()) {
+        m_actionDialogStatus = "No reply for action request: " + m_client.lastError().toStdString();
+        return false;
+    }
+
+    const QString status = message->value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_actionDialogStatus = "Action execution unauthorized.";
+        return false;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_actionDialogStatus = "Action execution returned transport error.";
+        return false;
+    }
+
+    const api::IntegrationsExecuteActionResponse response = api::IntegrationsExecuteActionResponse::fromJson(message->value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        m_actionDialogStatus = "Action failed: " + api::toString(response.thingError).toStdString();
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            m_actionDialogStatus += " - " + response.displayMessage->toStdString();
+        }
+        return false;
+    }
+
+    m_thingManager.setStatus("Executed action " + m_actionDialogActionName + " (request id " + std::to_string(requestId) + ").");
+    closeActionDialog();
+    fetchThings();
+    return true;
 }
 
 bool Engine::connectToServer()
@@ -960,7 +1244,7 @@ ftxui::Element Engine::renderThingDetails() const
     }
 
     const api::ThingClass* thingClass = m_thingManager.thingClassForThing(*thing);
-    const std::vector<ThingDetailEntry> detailEntries = buildThingDetailEntries(thing);
+    const std::vector<ThingDetailEntry> detailEntries = buildThingDetailEntries(thing, thingClass);
     const ThingDetailEntry* selectedEntry = detailEntries.empty() || m_selectedThingDetailIndex < 0 || m_selectedThingDetailIndex >= static_cast<int>(detailEntries.size())
                                                 ? nullptr
                                                 : &detailEntries.at(m_selectedThingDetailIndex);
@@ -995,7 +1279,7 @@ ftxui::Element Engine::renderThingDetails() const
     }
 
     ftxui::Elements browserRows;
-    browserRows.push_back(ftxui::text("Press Right to browse params/states. Press Space for metadata.") | ftxui::dim);
+    browserRows.push_back(ftxui::text("Press Right to browse values/actions. Space shows metadata. Enter executes actions.") | ftxui::dim);
     browserRows.push_back(ftxui::separator());
 
     browserRows.push_back(ftxui::text("Params") | ftxui::bold);
@@ -1039,6 +1323,20 @@ ftxui::Element Engine::renderThingDetails() const
             const std::optional<api::BasicType> basicType = stateType != nullptr ? std::optional<api::BasicType>(stateType->type) : std::nullopt;
             const std::optional<api::Unit> unit = stateType != nullptr ? stateType->unit : std::nullopt;
             browserRows.push_back(renderTwoColumnRow(label, renderValueCell(state.value, basicType, unit), isSelected, m_focusArea == FocusArea::ThingDetails));
+        }
+    }
+
+    browserRows.push_back(ftxui::separator());
+    browserRows.push_back(ftxui::text("Actions") | ftxui::bold);
+    if (thingClass == nullptr || thingClass->actionTypes.empty()) {
+        browserRows.push_back(ftxui::text("No actions."));
+    } else {
+        for (int index = 0; index < thingClass->actionTypes.size(); ++index) {
+            const api::ActionType& actionType = thingClass->actionTypes.at(index);
+            const std::string label = firstNonEmpty({actionType.displayName.toStdString(), actionType.name.toStdString(), "<unnamed action>"});
+            const bool isSelected = selectedEntry != nullptr && selectedEntry->type == ThingDetailEntry::Type::Action && selectedEntry->index == index;
+            browserRows.push_back(
+                renderTwoColumnRow(label, ftxui::text(std::to_string(actionType.paramTypes.size()) + " param(s)"), isSelected, m_focusArea == FocusArea::ThingDetails));
         }
     }
 
@@ -1099,6 +1397,37 @@ ftxui::Element Engine::renderThingDetails() const
             lines.push_back(renderValueCell(state.value,
                                             stateType != nullptr ? std::optional<api::BasicType>(stateType->type) : std::nullopt,
                                             stateType != nullptr ? stateType->unit : std::nullopt));
+        } else if (selectedEntry->type == ThingDetailEntry::Type::Action) {
+            const api::ActionType* actionType = thingClass != nullptr ? m_thingManager.actionTypeForThing(*thing, selectedEntry->index) : nullptr;
+            lines.push_back(ftxui::text("Kind: Action"));
+            if (actionType != nullptr) {
+                lines.push_back(ftxui::text("Name: " + actionType->name.toStdString()));
+                lines.push_back(ftxui::text("Display name: " + actionType->displayName.toStdString()));
+                lines.push_back(ftxui::text("Action type id: " + uuidToStd(actionType->id)));
+                lines.push_back(ftxui::text("Param count: " + std::to_string(actionType->paramTypes.size())));
+                lines.push_back(ftxui::separator());
+                for (int index = 0; index < actionType->paramTypes.size(); ++index) {
+                    const api::ParamType* paramType = m_thingManager.paramTypeForAction(*actionType, index);
+                    if (paramType == nullptr) {
+                        continue;
+                    }
+                    lines.push_back(ftxui::text(firstNonEmpty({paramType->displayName.toStdString(), paramType->name.toStdString(), "<param>"}) + ": "
+                                                + api::toString(paramType->type).toStdString()));
+                    lines.push_back(ftxui::text("  id: " + uuidToStd(paramType->id)) | ftxui::dim);
+                    std::vector<std::string> paramFields;
+                    appendField(paramFields, "unit", paramType->unit.has_value() ? prettyUnit(*paramType->unit) : std::string());
+                    appendField(paramFields, "input", paramType->inputType.has_value() ? api::toString(*paramType->inputType).toStdString() : std::string());
+                    appendField(paramFields, "default", optionalJsonValueToString(paramType->defaultValue));
+                    appendField(paramFields, "min", optionalJsonValueToString(paramType->minValue));
+                    appendField(paramFields, "max", optionalJsonValueToString(paramType->maxValue));
+                    appendField(paramFields, "allowed", optionalJsonValuesToString(paramType->allowedValues));
+                    if (!paramFields.empty()) {
+                        lines.push_back(ftxui::paragraph("  " + joinFields(paramFields)) | ftxui::dim);
+                    }
+                }
+            }
+            lines.push_back(ftxui::separator());
+            lines.push_back(ftxui::text("Enter opens execution dialog") | ftxui::dim);
         }
         lines.push_back(ftxui::separator());
         lines.push_back(ftxui::text("Space closes inspector") | ftxui::dim);
@@ -1222,6 +1551,42 @@ ftxui::Element Engine::renderUi() const
                        })
                        | ftxui::flex);
 
+    if (m_showActionDialog) {
+        ftxui::Elements dialogRows;
+        dialogRows.push_back(ftxui::text("Action: " + m_actionDialogActionName));
+        dialogRows.push_back(ftxui::separator());
+
+        if (m_actionDialogParamTypes.empty()) {
+            dialogRows.push_back(ftxui::text("This action has no params."));
+        } else {
+            for (int index = 0; index < static_cast<int>(m_actionDialogParamTypes.size()); ++index) {
+                const api::ParamType& paramType = m_actionDialogParamTypes.at(index);
+                const std::string label = firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "<param>"});
+                dialogRows.push_back(renderTwoColumnRow(label,
+                                                        renderActionDialogValueCell(paramType, m_actionDialogParamValues.at(index)),
+                                                        index == m_actionDialogSelectedParamIndex,
+                                                        m_focusArea == FocusArea::ActionDialog));
+            }
+        }
+
+        dialogRows.push_back(ftxui::separator());
+        dialogRows.push_back(ftxui::text(m_actionDialogStatus));
+        if (!m_actionDialogParamTypes.empty() && m_actionDialogSelectedParamIndex >= 0 && m_actionDialogSelectedParamIndex < static_cast<int>(m_actionDialogParamTypes.size())) {
+            const api::ParamType& selectedParamType = m_actionDialogParamTypes.at(m_actionDialogSelectedParamIndex);
+            if (actionParamUsesSelector(selectedParamType)) {
+                dialogRows.push_back(ftxui::text("Up/Down select param, Left/Right/Space choose value, Enter execute, Esc close.") | ftxui::dim);
+            } else {
+                dialogRows.push_back(ftxui::text("Type to edit, Up/Down select param, Enter execute, Esc close.") | ftxui::dim);
+            }
+        } else {
+            dialogRows.push_back(ftxui::text("Enter executes, Esc closes.") | ftxui::dim);
+        }
+
+        sections.push_back(ftxui::separator());
+        sections.push_back(ftxui::window(ftxui::text("Execute action"), ftxui::vbox(std::move(dialogRows)) | ftxui::vscroll_indicator | ftxui::frame)
+                           | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
+    }
+
     if (m_showLoginForm) {
         sections.push_back(ftxui::separator());
         sections.push_back(ftxui::window(ftxui::text("Authentication required"),
@@ -1244,6 +1609,47 @@ ftxui::Element Engine::renderUi() const
 
 bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen)
 {
+    if (m_showActionDialog) {
+        if (event == ftxui::Event::Escape) {
+            closeActionDialog();
+            return true;
+        }
+        if (event == ftxui::Event::Return) {
+            return executeCurrentAction();
+        }
+        if (event == ftxui::Event::ArrowUp && !m_actionDialogParamTypes.empty()) {
+            m_actionDialogSelectedParamIndex = (m_actionDialogSelectedParamIndex + static_cast<int>(m_actionDialogParamTypes.size()) - 1)
+                                               % static_cast<int>(m_actionDialogParamTypes.size());
+            return true;
+        }
+        if (event == ftxui::Event::ArrowDown && !m_actionDialogParamTypes.empty()) {
+            m_actionDialogSelectedParamIndex = (m_actionDialogSelectedParamIndex + 1) % static_cast<int>(m_actionDialogParamTypes.size());
+            return true;
+        }
+        if (!m_actionDialogParamTypes.empty() && m_actionDialogSelectedParamIndex >= 0 && m_actionDialogSelectedParamIndex < static_cast<int>(m_actionDialogParamValues.size())) {
+            const api::ParamType& currentParamType = m_actionDialogParamTypes.at(m_actionDialogSelectedParamIndex);
+            std::string& currentValue = m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex);
+            if (actionParamUsesSelector(currentParamType)) {
+                if (event == ftxui::Event::ArrowLeft) {
+                    currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
+                    return true;
+                }
+                if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+                    currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
+                    return true;
+                }
+            }
+            if (!actionParamUsesSelector(currentParamType) && event == ftxui::Event::Backspace && !currentValue.empty()) {
+                currentValue.pop_back();
+                return true;
+            }
+            if (!actionParamUsesSelector(currentParamType) && event.is_character()) {
+                currentValue += event.character();
+                return true;
+            }
+        }
+    }
+
     if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
         m_client.disconnectFromHost();
         screen.ExitLoopClosure()();
@@ -1337,6 +1743,12 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (m_focusArea == FocusArea::ThingDetails && thingDetailEntryCount() > 0) {
             m_showThingDetailInspector = !m_showThingDetailInspector;
             return true;
+        }
+    }
+
+    if (event == ftxui::Event::Return) {
+        if (m_focusArea == FocusArea::ThingDetails) {
+            return openSelectedActionDialog();
         }
     }
 
