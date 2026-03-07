@@ -47,6 +47,7 @@ private:
 
     enum class FocusArea {
         MainMenu,
+        ThingList,
         SettingsMenu,
         LoginForm,
     };
@@ -58,6 +59,7 @@ private:
     bool connectToServer();
     bool sendHello();
     bool authenticate(const std::string& username, const std::string& password);
+    bool fetchThingClasses();
     bool fetchThings();
     void loadSavedConnection();
     void updateCertificateWarning();
@@ -66,6 +68,8 @@ private:
     void runHandshakeAndLoadThings();
 
     ftxui::Element renderMainMenu() const;
+    ftxui::Element renderThingList() const;
+    ftxui::Element renderThingDetails() const;
     ftxui::Element renderSettingsMenu() const;
     ftxui::Element renderSettingsDetails() const;
     ftxui::Element renderThings() const;
@@ -93,6 +97,7 @@ private:
     std::string m_username;
     std::string m_password;
     std::optional<SavedConnection> m_savedConnection;
+    int m_selectedThingIndex = 0;
     MainView m_mainView = MainView::Things;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;

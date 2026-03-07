@@ -48,6 +48,8 @@ If Python is available, CMake also exposes `generate-nymea-api` and runs it as a
 - Use CamelCase naming in C++ code (avoid snake_case identifiers except private member `m_` prefixes).
 - Use lowercase file names without underscores for class source/header pairs (for example `thingmanager.h/.cpp`).
 - Keep generated C++ API identifiers CamelCase/lowerCamelCase as well (avoid introducing underscore-based generated identifiers).
+- Generate the exact nymea API object model: use the declared object/alias/enum names from `api.json` instead of introducing mirrored convenience structs in app code.
+- Prefer value semantics for generated API object references and collections; keep `QSharedPointer` only where recursive schema references require indirection to compile.
 - Name private class members with `m_` prefix.
 - Run formatting with repository `.clang-format` before finishing C++ changes:
 

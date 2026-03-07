@@ -6,10 +6,10 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
-#include <QString>
-#include <QStringList>
 #include <QList>
 #include <QSharedPointer>
+#include <QString>
+#include <QStringList>
 #include <QUuid>
 #include <QtGlobal>
 
@@ -2117,542 +2117,11 @@ inline ZigbeeNodeType parseZigbeeNodeType(const QJsonValue &value) {
     return ZigbeeNodeType::ZigbeeNodeTypeCoordinator;
 }
 
-// Forward declarations for generated object types.
-struct Action;
-struct ActionType;
-struct AppDataChangedNotificationParams;
-struct AppDataLoadParams;
-struct AppDataLoadResponse;
-struct AppDataStoreParams;
-struct AppDataStoreResponse;
-struct BrowserItem;
-struct CacheHash;
-struct CalendarItem;
-struct ConfigurationBasicConfigurationChangedNotificationParams;
-struct ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration;
-struct ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation;
-struct ConfigurationDeleteMqttPolicyParams;
-struct ConfigurationDeleteMqttPolicyResponse;
-struct ConfigurationDeleteMqttServerConfigurationParams;
-struct ConfigurationDeleteMqttServerConfigurationResponse;
-struct ConfigurationDeleteTcpServerConfigurationParams;
-struct ConfigurationDeleteTcpServerConfigurationResponse;
-struct ConfigurationDeleteTunnelProxyServerConfigurationParams;
-struct ConfigurationDeleteTunnelProxyServerConfigurationResponse;
-struct ConfigurationDeleteWebServerConfigurationParams;
-struct ConfigurationDeleteWebServerConfigurationResponse;
-struct ConfigurationDeleteWebSocketServerConfigurationParams;
-struct ConfigurationDeleteWebSocketServerConfigurationResponse;
-struct ConfigurationGetAvailableLanguagesParams;
-struct ConfigurationGetAvailableLanguagesResponse;
-struct ConfigurationGetConfigurationsParams;
-struct ConfigurationGetConfigurationsResponse;
-struct ConfigurationGetConfigurationsResponseBasicConfiguration;
-struct ConfigurationGetConfigurationsResponseBasicConfigurationLocation;
-struct ConfigurationGetMqttPoliciesParams;
-struct ConfigurationGetMqttPoliciesResponse;
-struct ConfigurationGetMqttServerConfigurationsParams;
-struct ConfigurationGetMqttServerConfigurationsResponse;
-struct ConfigurationGetTimeZonesParams;
-struct ConfigurationGetTimeZonesResponse;
-struct ConfigurationLanguageChangedNotificationParams;
-struct ConfigurationMqttPolicyChangedNotificationParams;
-struct ConfigurationMqttPolicyRemovedNotificationParams;
-struct ConfigurationMqttServerConfigurationChangedNotificationParams;
-struct ConfigurationMqttServerConfigurationRemovedNotificationParams;
-struct ConfigurationSetDebugServerEnabledParams;
-struct ConfigurationSetDebugServerEnabledResponse;
-struct ConfigurationSetLanguageParams;
-struct ConfigurationSetLanguageResponse;
-struct ConfigurationSetLocationParams;
-struct ConfigurationSetLocationParamsLocation;
-struct ConfigurationSetLocationResponse;
-struct ConfigurationSetMqttPolicyParams;
-struct ConfigurationSetMqttPolicyResponse;
-struct ConfigurationSetMqttServerConfigurationParams;
-struct ConfigurationSetMqttServerConfigurationResponse;
-struct ConfigurationSetServerNameParams;
-struct ConfigurationSetServerNameResponse;
-struct ConfigurationSetTcpServerConfigurationParams;
-struct ConfigurationSetTcpServerConfigurationResponse;
-struct ConfigurationSetTimeZoneParams;
-struct ConfigurationSetTimeZoneResponse;
-struct ConfigurationSetTunnelProxyServerConfigurationParams;
-struct ConfigurationSetTunnelProxyServerConfigurationResponse;
-struct ConfigurationSetWebServerConfigurationParams;
-struct ConfigurationSetWebServerConfigurationResponse;
-struct ConfigurationSetWebSocketServerConfigurationParams;
-struct ConfigurationSetWebSocketServerConfigurationResponse;
-struct ConfigurationTcpServerConfigurationChangedNotificationParams;
-struct ConfigurationTcpServerConfigurationRemovedNotificationParams;
-struct ConfigurationTunnelProxyServerConfigurationChangedNotificationParams;
-struct ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams;
-struct ConfigurationWebServerConfigurationChangedNotificationParams;
-struct ConfigurationWebServerConfigurationRemovedNotificationParams;
-struct ConfigurationWebSocketServerConfigurationChangedNotificationParams;
-struct ConfigurationWebSocketServerConfigurationRemovedNotificationParams;
-struct DebugGetLoggingCategoriesParams;
-struct DebugGetLoggingCategoriesResponse;
-struct DebugLoggingCategoryLevelChangedNotificationParams;
-struct DebugSetLoggingCategoryLevelParams;
-struct DebugSetLoggingCategoryLevelResponse;
-struct Event;
-struct EventDescriptor;
-struct EventType;
-struct Experience;
-struct IOConnection;
-struct IntegrationPlugin;
-struct IntegrationsAddThingParams;
-struct IntegrationsAddThingResponse;
-struct IntegrationsBrowseThingParams;
-struct IntegrationsBrowseThingResponse;
-struct IntegrationsConfirmPairingParams;
-struct IntegrationsConfirmPairingResponse;
-struct IntegrationsConnectIOParams;
-struct IntegrationsConnectIOResponse;
-struct IntegrationsDisconnectIOParams;
-struct IntegrationsDisconnectIOResponse;
-struct IntegrationsDiscoverThingsParams;
-struct IntegrationsDiscoverThingsResponse;
-struct IntegrationsEditThingParams;
-struct IntegrationsEditThingResponse;
-struct IntegrationsEventTriggeredNotificationParams;
-struct IntegrationsExecuteActionParams;
-struct IntegrationsExecuteActionResponse;
-struct IntegrationsExecuteBrowserItemActionParams;
-struct IntegrationsExecuteBrowserItemActionResponse;
-struct IntegrationsExecuteBrowserItemParams;
-struct IntegrationsExecuteBrowserItemResponse;
-struct IntegrationsGetActionTypesParams;
-struct IntegrationsGetActionTypesResponse;
-struct IntegrationsGetBrowserItemParams;
-struct IntegrationsGetBrowserItemResponse;
-struct IntegrationsGetEventTypesParams;
-struct IntegrationsGetEventTypesResponse;
-struct IntegrationsGetIOConnectionsParams;
-struct IntegrationsGetIOConnectionsResponse;
-struct IntegrationsGetPluginConfigurationParams;
-struct IntegrationsGetPluginConfigurationResponse;
-struct IntegrationsGetPluginsParams;
-struct IntegrationsGetPluginsResponse;
-struct IntegrationsGetStateTypesParams;
-struct IntegrationsGetStateTypesResponse;
-struct IntegrationsGetStateValueParams;
-struct IntegrationsGetStateValueResponse;
-struct IntegrationsGetStateValuesParams;
-struct IntegrationsGetStateValuesResponse;
-struct IntegrationsGetThingClassesParams;
-struct IntegrationsGetThingClassesResponse;
-struct IntegrationsGetThingsParams;
-struct IntegrationsGetThingsResponse;
-struct IntegrationsGetVendorsParams;
-struct IntegrationsGetVendorsResponse;
-struct IntegrationsIOConnectionAddedNotificationParams;
-struct IntegrationsIOConnectionRemovedNotificationParams;
-struct IntegrationsPairThingParams;
-struct IntegrationsPairThingResponse;
-struct IntegrationsPluginConfigurationChangedNotificationParams;
-struct IntegrationsReconfigureThingParams;
-struct IntegrationsReconfigureThingResponse;
-struct IntegrationsRemoveThingParams;
-struct IntegrationsRemoveThingResponse;
-struct IntegrationsSetActionLoggingParams;
-struct IntegrationsSetActionLoggingResponse;
-struct IntegrationsSetEventLoggingParams;
-struct IntegrationsSetEventLoggingResponse;
-struct IntegrationsSetPluginConfigurationParams;
-struct IntegrationsSetPluginConfigurationResponse;
-struct IntegrationsSetStateFilterParams;
-struct IntegrationsSetStateFilterResponse;
-struct IntegrationsSetStateLoggingParams;
-struct IntegrationsSetStateLoggingResponse;
-struct IntegrationsSetThingSettingsParams;
-struct IntegrationsSetThingSettingsResponse;
-struct IntegrationsStateChangedNotificationParams;
-struct IntegrationsThingAddedNotificationParams;
-struct IntegrationsThingChangedNotificationParams;
-struct IntegrationsThingRemovedNotificationParams;
-struct IntegrationsThingSettingChangedNotificationParams;
-struct JSONRPCAuthenticateParams;
-struct JSONRPCAuthenticateResponse;
-struct JSONRPCCreateUserParams;
-struct JSONRPCCreateUserResponse;
-struct JSONRPCHelloParams;
-struct JSONRPCHelloResponse;
-struct JSONRPCIntrospectParams;
-struct JSONRPCIntrospectResponse;
-struct JSONRPCKeepAliveParams;
-struct JSONRPCKeepAliveResponse;
-struct JSONRPCPushButtonAuthFinishedNotificationParams;
-struct JSONRPCRequestPushButtonAuthParams;
-struct JSONRPCRequestPushButtonAuthResponse;
-struct JSONRPCSetNotificationStatusParams;
-struct JSONRPCSetNotificationStatusResponse;
-struct JSONRPCVersionParams;
-struct JSONRPCVersionResponse;
-struct LogEntry;
-struct LoggingCategory;
-struct LoggingGetLogEntriesParams;
-struct LoggingGetLogEntriesResponse;
-struct LoggingLogEntryAddedNotificationParams;
-struct ModbusRtuAddModbusRtuMasterParams;
-struct ModbusRtuAddModbusRtuMasterResponse;
-struct ModbusRtuGetModbusRtuMastersParams;
-struct ModbusRtuGetModbusRtuMastersResponse;
-struct ModbusRtuGetSerialPortsParams;
-struct ModbusRtuGetSerialPortsResponse;
-struct ModbusRtuMaster;
-struct ModbusRtuModbusRtuMasterAddedNotificationParams;
-struct ModbusRtuModbusRtuMasterChangedNotificationParams;
-struct ModbusRtuModbusRtuMasterRemovedNotificationParams;
-struct ModbusRtuReconfigureModbusRtuMasterParams;
-struct ModbusRtuReconfigureModbusRtuMasterResponse;
-struct ModbusRtuRemoveModbusRtuMasterParams;
-struct ModbusRtuRemoveModbusRtuMasterResponse;
-struct ModbusRtuSerialPortAddedNotificationParams;
-struct ModbusRtuSerialPortRemovedNotificationParams;
-struct MqttPolicy;
-struct NetworkManagerConnectWifiNetworkParams;
-struct NetworkManagerConnectWifiNetworkResponse;
-struct NetworkManagerCreateWiredConnectionParams;
-struct NetworkManagerCreateWiredConnectionResponse;
-struct NetworkManagerDisconnectInterfaceParams;
-struct NetworkManagerDisconnectInterfaceResponse;
-struct NetworkManagerEnableNetworkingParams;
-struct NetworkManagerEnableNetworkingResponse;
-struct NetworkManagerEnableWirelessNetworkingParams;
-struct NetworkManagerEnableWirelessNetworkingResponse;
-struct NetworkManagerGetNetworkDevicesParams;
-struct NetworkManagerGetNetworkDevicesResponse;
-struct NetworkManagerGetNetworkStatusParams;
-struct NetworkManagerGetNetworkStatusResponse;
-struct NetworkManagerGetNetworkStatusResponseStatus;
-struct NetworkManagerGetWirelessAccessPointsParams;
-struct NetworkManagerGetWirelessAccessPointsResponse;
-struct NetworkManagerNetworkStatusChangedNotificationParams;
-struct NetworkManagerNetworkStatusChangedNotificationParamsStatus;
-struct NetworkManagerScanWifiNetworksParams;
-struct NetworkManagerScanWifiNetworksResponse;
-struct NetworkManagerStartAccessPointParams;
-struct NetworkManagerStartAccessPointResponse;
-struct NetworkManagerWiredNetworkDeviceAddedNotificationParams;
-struct NetworkManagerWiredNetworkDeviceChangedNotificationParams;
-struct NetworkManagerWiredNetworkDeviceRemovedNotificationParams;
-struct NetworkManagerWirelessNetworkDeviceAddedNotificationParams;
-struct NetworkManagerWirelessNetworkDeviceChangedNotificationParams;
-struct NetworkManagerWirelessNetworkDeviceRemovedNotificationParams;
-struct Package;
-struct Param;
-struct ParamDescriptor;
-struct ParamType;
-struct RepeatingOption;
-struct Repository;
-struct Rule;
-struct RuleAction;
-struct RuleActionParam;
-struct RuleDescription;
-struct RulesAddRuleParams;
-struct RulesAddRuleResponse;
-struct RulesDisableRuleParams;
-struct RulesDisableRuleResponse;
-struct RulesEditRuleParams;
-struct RulesEditRuleResponse;
-struct RulesEnableRuleParams;
-struct RulesEnableRuleResponse;
-struct RulesExecuteActionsParams;
-struct RulesExecuteActionsResponse;
-struct RulesExecuteExitActionsParams;
-struct RulesExecuteExitActionsResponse;
-struct RulesFindRulesParams;
-struct RulesFindRulesResponse;
-struct RulesGetRuleDetailsParams;
-struct RulesGetRuleDetailsResponse;
-struct RulesGetRulesParams;
-struct RulesGetRulesResponse;
-struct RulesRemoveRuleParams;
-struct RulesRemoveRuleResponse;
-struct RulesRuleActiveChangedNotificationParams;
-struct RulesRuleAddedNotificationParams;
-struct RulesRuleConfigurationChangedNotificationParams;
-struct RulesRuleRemovedNotificationParams;
-struct Script;
-struct ScriptsAddScriptParams;
-struct ScriptsAddScriptResponse;
-struct ScriptsEditScriptParams;
-struct ScriptsEditScriptResponse;
-struct ScriptsGetScriptContentParams;
-struct ScriptsGetScriptContentResponse;
-struct ScriptsGetScriptsParams;
-struct ScriptsGetScriptsResponse;
-struct ScriptsRemoveScriptParams;
-struct ScriptsRemoveScriptResponse;
-struct ScriptsScriptAddedNotificationParams;
-struct ScriptsScriptChangedNotificationParams;
-struct ScriptsScriptContentChangedNotificationParams;
-struct ScriptsScriptLogMessageNotificationParams;
-struct ScriptsScriptRemovedNotificationParams;
-struct SerialPort;
-struct ServerConfiguration;
-struct State;
-struct StateDescriptor;
-struct StateEvaluator;
-struct StateType;
-struct SystemCapabilitiesChangedNotificationParams;
-struct SystemCheckForUpdatesParams;
-struct SystemCheckForUpdatesResponse;
-struct SystemEnableRepositoryParams;
-struct SystemEnableRepositoryResponse;
-struct SystemGetCapabilitiesParams;
-struct SystemGetCapabilitiesResponse;
-struct SystemGetPackagesParams;
-struct SystemGetPackagesResponse;
-struct SystemGetRepositoriesParams;
-struct SystemGetRepositoriesResponse;
-struct SystemGetSystemInfoParams;
-struct SystemGetSystemInfoResponse;
-struct SystemGetTimeParams;
-struct SystemGetTimeResponse;
-struct SystemGetTimeZonesParams;
-struct SystemGetTimeZonesResponse;
-struct SystemGetUpdateStatusParams;
-struct SystemGetUpdateStatusResponse;
-struct SystemPackageAddedNotificationParams;
-struct SystemPackageChangedNotificationParams;
-struct SystemPackageRemovedNotificationParams;
-struct SystemRebootParams;
-struct SystemRebootResponse;
-struct SystemRemovePackagesParams;
-struct SystemRemovePackagesResponse;
-struct SystemRepositoryAddedNotificationParams;
-struct SystemRepositoryChangedNotificationParams;
-struct SystemRepositoryRemovedNotificationParams;
-struct SystemRestartParams;
-struct SystemRestartResponse;
-struct SystemRollbackPackagesParams;
-struct SystemRollbackPackagesResponse;
-struct SystemSetTimeParams;
-struct SystemSetTimeResponse;
-struct SystemShutdownParams;
-struct SystemShutdownResponse;
-struct SystemTimeConfigurationChangedNotificationParams;
-struct SystemUpdatePackagesParams;
-struct SystemUpdatePackagesResponse;
-struct SystemUpdateStatusChangedNotificationParams;
-struct Tag;
-struct TagsAddTagParams;
-struct TagsAddTagResponse;
-struct TagsGetTagsParams;
-struct TagsGetTagsResponse;
-struct TagsRemoveTagParams;
-struct TagsRemoveTagResponse;
-struct TagsTagAddedNotificationParams;
-struct TagsTagRemovedNotificationParams;
-struct TagsTagValueChangedNotificationParams;
-struct Thing;
-struct ThingClass;
-struct ThingDescriptor;
-struct TimeDescriptor;
-struct TimeEventItem;
-struct TokenInfo;
-struct TunnelProxyServerConfiguration;
-struct UserInfo;
-struct UsersChangePasswordParams;
-struct UsersChangePasswordResponse;
-struct UsersChangeUserPasswordParams;
-struct UsersChangeUserPasswordResponse;
-struct UsersCreateUserParams;
-struct UsersCreateUserResponse;
-struct UsersGetTokensParams;
-struct UsersGetTokensResponse;
-struct UsersGetUserInfoParams;
-struct UsersGetUserInfoResponse;
-struct UsersGetUserTokensParams;
-struct UsersGetUserTokensResponse;
-struct UsersGetUsersParams;
-struct UsersGetUsersResponse;
-struct UsersPushButtonAuthFinishedNotificationParams;
-struct UsersRemoveTokenParams;
-struct UsersRemoveTokenResponse;
-struct UsersRemoveUserParams;
-struct UsersRemoveUserResponse;
-struct UsersSetUserInfoParams;
-struct UsersSetUserInfoResponse;
-struct UsersSetUserScopesParams;
-struct UsersSetUserScopesResponse;
-struct UsersUserAddedNotificationParams;
-struct UsersUserChangedNotificationParams;
-struct UsersUserRemovedNotificationParams;
-struct Vendor;
-struct WebServerConfiguration;
-struct WiredNetworkDevice;
-struct WirelessAccessPoint;
-struct WirelessNetworkDevice;
-struct ZWaveAddNetworkParams;
-struct ZWaveAddNetworkResponse;
-struct ZWaveAddNodeParams;
-struct ZWaveAddNodeResponse;
-struct ZWaveCancelPendingOperationParams;
-struct ZWaveCancelPendingOperationResponse;
-struct ZWaveFactoryResetNetworkParams;
-struct ZWaveFactoryResetNetworkResponse;
-struct ZWaveGetNetworksParams;
-struct ZWaveGetNetworksResponse;
-struct ZWaveGetNodesParams;
-struct ZWaveGetNodesResponse;
-struct ZWaveGetSerialPortsParams;
-struct ZWaveGetSerialPortsResponse;
-struct ZWaveIsZWaveAvailableParams;
-struct ZWaveIsZWaveAvailableResponse;
-struct ZWaveNetwork;
-struct ZWaveNetworkAddedNotificationParams;
-struct ZWaveNetworkChangedNotificationParams;
-struct ZWaveNetworkRemovedNotificationParams;
-struct ZWaveNode;
-struct ZWaveNodeAddedNotificationParams;
-struct ZWaveNodeChangedNotificationParams;
-struct ZWaveNodeRemovedNotificationParams;
-struct ZWaveRemoveFailedNodeParams;
-struct ZWaveRemoveFailedNodeResponse;
-struct ZWaveRemoveNetworkParams;
-struct ZWaveRemoveNetworkResponse;
-struct ZWaveRemoveNodeParams;
-struct ZWaveRemoveNodeResponse;
-struct ZigbeeAdapter;
-struct ZigbeeAdapterAddedNotificationParams;
-struct ZigbeeAdapterRemovedNotificationParams;
-struct ZigbeeAddNetworkParams;
-struct ZigbeeAddNetworkResponse;
-struct ZigbeeBindingTableRecord;
-struct ZigbeeCluster;
-struct ZigbeeCreateBindingParams;
-struct ZigbeeCreateBindingResponse;
-struct ZigbeeFactoryResetNetworkParams;
-struct ZigbeeFactoryResetNetworkResponse;
-struct ZigbeeGetAdaptersParams;
-struct ZigbeeGetAdaptersResponse;
-struct ZigbeeGetAvailableBackendsParams;
-struct ZigbeeGetAvailableBackendsResponse;
-struct ZigbeeGetNetworksParams;
-struct ZigbeeGetNetworksResponse;
-struct ZigbeeGetNodesParams;
-struct ZigbeeGetNodesResponse;
-struct ZigbeeNeighborTableRecord;
-struct ZigbeeNetwork;
-struct ZigbeeNetworkAddedNotificationParams;
-struct ZigbeeNetworkChangedNotificationParams;
-struct ZigbeeNetworkRemovedNotificationParams;
-struct ZigbeeNode;
-struct ZigbeeNodeAddedNotificationParams;
-struct ZigbeeNodeChangedNotificationParams;
-struct ZigbeeNodeEndpoint;
-struct ZigbeeNodeRemovedNotificationParams;
-struct ZigbeeRefreshBindingsParams;
-struct ZigbeeRefreshBindingsResponse;
-struct ZigbeeRefreshNeighborTablesParams;
-struct ZigbeeRefreshNeighborTablesResponse;
-struct ZigbeeRemoveBindingParams;
-struct ZigbeeRemoveBindingResponse;
-struct ZigbeeRemoveNetworkParams;
-struct ZigbeeRemoveNetworkResponse;
-struct ZigbeeRemoveNodeParams;
-struct ZigbeeRemoveNodeResponse;
-struct ZigbeeRoutingTableRecord;
-struct ZigbeeSetPermitJoinParams;
-struct ZigbeeSetPermitJoinResponse;
+// Forward declarations for recursive object types.
+class StateEvaluator;
 
-using ActionTypes = QList<QSharedPointer<ActionType>>;
-
-using CalendarItems = QList<QSharedPointer<CalendarItem>>;
-
-using CreateMethods = QList<CreateMethod>;
-
-using EventDescriptors = QList<QSharedPointer<EventDescriptor>>;
-
-using EventTypes = QList<QSharedPointer<EventType>>;
-
-using IOConnections = QList<QSharedPointer<IOConnection>>;
-
-using IntegrationPlugins = QList<QSharedPointer<IntegrationPlugin>>;
-
-using LogEntries = QList<QSharedPointer<LogEntry>>;
-
-using Packages = QList<QSharedPointer<Package>>;
-
-using ParamDescriptors = QList<QSharedPointer<ParamDescriptor>>;
-
-using ParamList = QList<QSharedPointer<Param>>;
-
-using ParamTypes = QList<QSharedPointer<ParamType>>;
-
-using PermissionScopes = QList<PermissionScope>;
-
-using Repositories = QList<QSharedPointer<Repository>>;
-
-using RuleActionParams = QList<QSharedPointer<RuleActionParam>>;
-
-using RuleActions = QList<QSharedPointer<RuleAction>>;
-
-using Rules = QList<QSharedPointer<Rule>>;
-
-using Scripts = QList<QSharedPointer<Script>>;
-
-using SerialPorts = QList<QSharedPointer<SerialPort>>;
-
-using StateEvaluators = QList<QSharedPointer<StateEvaluator>>;
-
-using StateTypes = QList<QSharedPointer<StateType>>;
-
-using States = QList<QSharedPointer<State>>;
-
-using Tags = QList<QSharedPointer<Tag>>;
-
-using ThingClasses = QList<QSharedPointer<ThingClass>>;
-
-using ThingDescriptors = QList<QSharedPointer<ThingDescriptor>>;
-
-using Things = QList<QSharedPointer<Thing>>;
-
-using TimeEventItems = QList<QSharedPointer<TimeEventItem>>;
-
-using TokenInfoList = QList<QSharedPointer<TokenInfo>>;
-
-using UserInfoList = QList<QSharedPointer<UserInfo>>;
-
-using Vendors = QList<QSharedPointer<Vendor>>;
-
-using WirelessCapabilities = QList<WirelessCapability>;
-
-using ZigbeeAdapters = QList<QSharedPointer<ZigbeeAdapter>>;
-
-struct Action {
-    // wire: 'actionTypeId' (field)
-    QUuid actionTypeId{};
-    // wire: 'params' (optional)
-    std::optional<ParamList> params;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static Action fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ActionType {
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'index' (field)
-    qint64 index{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'paramTypes' (field)
-    ParamTypes paramTypes{};
-    // wire: 'id' (required)
-    QUuid id{};
-
-    static ActionType fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct AppDataChangedNotificationParams {
+class AppDataChangedNotificationParams {
+public:
     // wire: 'appId' (field)
     QString appId{};
     // wire: 'key' (field)
@@ -2665,4616 +2134,6 @@ struct AppDataChangedNotificationParams {
     static AppDataChangedNotificationParams fromJson(const QJsonObject &object);
     QJsonObject toJson() const;
 };
-
-struct AppDataLoadParams {
-    // wire: 'appId' (field)
-    QString appId{};
-    // wire: 'key' (field)
-    QString key{};
-    // wire: 'group' (optional)
-    std::optional<QString> group;
-
-    static AppDataLoadParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct AppDataLoadResponse {
-    // wire: 'value' (field)
-    QString value{};
-
-    static AppDataLoadResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct AppDataStoreParams {
-    // wire: 'appId' (field)
-    QString appId{};
-    // wire: 'key' (field)
-    QString key{};
-    // wire: 'group' (optional)
-    std::optional<QString> group;
-    // wire: 'value' (field)
-    QString value{};
-
-    static AppDataStoreParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct AppDataStoreResponse {
-
-    static AppDataStoreResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct BrowserItem {
-    // wire: 'actionTypeIds' (field)
-    QList<QUuid> actionTypeIds{};
-    // wire: 'browsable' (field)
-    bool browsable{};
-    // wire: 'description' (field)
-    QString description{};
-    // wire: 'disabled' (field)
-    bool disabled{};
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'executable' (field)
-    bool executable{};
-    // wire: 'icon' (field)
-    BrowserIcon icon{};
-    // wire: 'id' (field)
-    QString id{};
-    // wire: 'mediaIcon' (optional)
-    std::optional<MediaBrowserIcon> mediaIcon;
-    // wire: 'thumbnail' (field)
-    QString thumbnail{};
-
-    static BrowserItem fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct CacheHash {
-    // wire: 'hash' (field)
-    QString hash{};
-    // wire: 'method' (field)
-    QString method{};
-
-    static CacheHash fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct CalendarItem {
-    // wire: 'duration' (field)
-    quint64 duration{};
-    // wire: 'datetime' (optional)
-    std::optional<quint64> datetime;
-    // wire: 'repeating' (optional)
-    std::optional<QSharedPointer<RepeatingOption>> repeating;
-    // wire: 'startTime' (optional)
-    std::optional<qint64> startTime;
-
-    static CalendarItem fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationBasicConfigurationChangedNotificationParams {
-    // wire: 'basicConfiguration' (field)
-    QSharedPointer<ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration> basicConfiguration{};
-
-    static ConfigurationBasicConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration {
-    // wire: 'language' (deprecated)
-    QString language{};
-    // wire: 'location' (deprecated)
-    QSharedPointer<ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation> location{};
-    // wire: 'serverTime' (deprecated)
-    quint64 serverTime{};
-    // wire: 'timeZone' (deprecated)
-    QString timeZone{};
-    // wire: 'debugServerEnabled' (field)
-    bool debugServerEnabled{};
-    // wire: 'serverName' (field)
-    QString serverName{};
-    // wire: 'serverUuid' (field)
-    QUuid serverUuid{};
-
-    static ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation {
-    // wire: 'latitude' (field)
-    double latitude{};
-    // wire: 'longitude' (field)
-    double longitude{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteMqttPolicyParams {
-    // wire: 'clientId' (field)
-    QString clientId{};
-
-    static ConfigurationDeleteMqttPolicyParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteMqttPolicyResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteMqttPolicyResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteMqttServerConfigurationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationDeleteMqttServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteMqttServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteMqttServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteTcpServerConfigurationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationDeleteTcpServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteTcpServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteTcpServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteTunnelProxyServerConfigurationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationDeleteTunnelProxyServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteTunnelProxyServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteTunnelProxyServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteWebServerConfigurationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationDeleteWebServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteWebServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteWebServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteWebSocketServerConfigurationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationDeleteWebSocketServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationDeleteWebSocketServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationDeleteWebSocketServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetAvailableLanguagesParams {
-
-    static ConfigurationGetAvailableLanguagesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetAvailableLanguagesResponse {
-    // wire: 'languages' (field)
-    QList<QString> languages{};
-
-    static ConfigurationGetAvailableLanguagesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetConfigurationsParams {
-
-    static ConfigurationGetConfigurationsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetConfigurationsResponse {
-    // wire: 'basicConfiguration' (field)
-    QSharedPointer<ConfigurationGetConfigurationsResponseBasicConfiguration> basicConfiguration{};
-    // wire: 'tcpServerConfigurations' (field)
-    QList<QSharedPointer<ServerConfiguration>> tcpServerConfigurations{};
-    // wire: 'tunnelProxyServerConfigurations' (field)
-    QList<QSharedPointer<TunnelProxyServerConfiguration>> tunnelProxyServerConfigurations{};
-    // wire: 'webServerConfigurations' (field)
-    QList<QSharedPointer<WebServerConfiguration>> webServerConfigurations{};
-    // wire: 'webSocketServerConfigurations' (field)
-    QList<QSharedPointer<ServerConfiguration>> webSocketServerConfigurations{};
-
-    static ConfigurationGetConfigurationsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetConfigurationsResponseBasicConfiguration {
-    // wire: 'language' (deprecated)
-    QString language{};
-    // wire: 'location' (deprecated)
-    QSharedPointer<ConfigurationGetConfigurationsResponseBasicConfigurationLocation> location{};
-    // wire: 'serverTime' (deprecated)
-    quint64 serverTime{};
-    // wire: 'timeZone' (deprecated)
-    QString timeZone{};
-    // wire: 'debugServerEnabled' (field)
-    bool debugServerEnabled{};
-    // wire: 'serverName' (field)
-    QString serverName{};
-    // wire: 'serverUuid' (field)
-    QUuid serverUuid{};
-
-    static ConfigurationGetConfigurationsResponseBasicConfiguration fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetConfigurationsResponseBasicConfigurationLocation {
-    // wire: 'latitude' (field)
-    double latitude{};
-    // wire: 'longitude' (field)
-    double longitude{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static ConfigurationGetConfigurationsResponseBasicConfigurationLocation fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetMqttPoliciesParams {
-
-    static ConfigurationGetMqttPoliciesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetMqttPoliciesResponse {
-    // wire: 'mqttPolicies' (field)
-    QList<QSharedPointer<MqttPolicy>> mqttPolicies{};
-
-    static ConfigurationGetMqttPoliciesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetMqttServerConfigurationsParams {
-
-    static ConfigurationGetMqttServerConfigurationsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetMqttServerConfigurationsResponse {
-    // wire: 'mqttServerConfigurations' (field)
-    QList<QSharedPointer<ServerConfiguration>> mqttServerConfigurations{};
-
-    static ConfigurationGetMqttServerConfigurationsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetTimeZonesParams {
-
-    static ConfigurationGetTimeZonesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationGetTimeZonesResponse {
-    // wire: 'timeZones' (field)
-    QList<QString> timeZones{};
-
-    static ConfigurationGetTimeZonesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationLanguageChangedNotificationParams {
-    // wire: 'language' (field)
-    QString language{};
-
-    static ConfigurationLanguageChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationMqttPolicyChangedNotificationParams {
-    // wire: 'policy' (field)
-    QSharedPointer<MqttPolicy> policy{};
-
-    static ConfigurationMqttPolicyChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationMqttPolicyRemovedNotificationParams {
-    // wire: 'clientId' (field)
-    QString clientId{};
-
-    static ConfigurationMqttPolicyRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationMqttServerConfigurationChangedNotificationParams {
-    // wire: 'mqttServerConfiguration' (field)
-    QSharedPointer<ServerConfiguration> mqttServerConfiguration{};
-
-    static ConfigurationMqttServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationMqttServerConfigurationRemovedNotificationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationMqttServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetDebugServerEnabledParams {
-    // wire: 'enabled' (field)
-    QString enabled{};
-
-    static ConfigurationSetDebugServerEnabledParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetDebugServerEnabledResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetDebugServerEnabledResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetLanguageParams {
-    // wire: 'language' (field)
-    QString language{};
-
-    static ConfigurationSetLanguageParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetLanguageResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetLanguageResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetLocationParams {
-    // wire: 'location' (field)
-    QSharedPointer<ConfigurationSetLocationParamsLocation> location{};
-
-    static ConfigurationSetLocationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetLocationParamsLocation {
-    // wire: 'latitude' (field)
-    double latitude{};
-    // wire: 'longitude' (field)
-    double longitude{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static ConfigurationSetLocationParamsLocation fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetLocationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetLocationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetMqttPolicyParams {
-    // wire: 'policy' (field)
-    QSharedPointer<MqttPolicy> policy{};
-
-    static ConfigurationSetMqttPolicyParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetMqttPolicyResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetMqttPolicyResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetMqttServerConfigurationParams {
-    // wire: 'configuration' (field)
-    QSharedPointer<ServerConfiguration> configuration{};
-
-    static ConfigurationSetMqttServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetMqttServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetMqttServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetServerNameParams {
-    // wire: 'serverName' (field)
-    QString serverName{};
-
-    static ConfigurationSetServerNameParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetServerNameResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetServerNameResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTcpServerConfigurationParams {
-    // wire: 'configuration' (field)
-    QSharedPointer<ServerConfiguration> configuration{};
-
-    static ConfigurationSetTcpServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTcpServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetTcpServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTimeZoneParams {
-    // wire: 'timeZone' (field)
-    QString timeZone{};
-
-    static ConfigurationSetTimeZoneParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTimeZoneResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetTimeZoneResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTunnelProxyServerConfigurationParams {
-    // wire: 'configuration' (field)
-    QSharedPointer<TunnelProxyServerConfiguration> configuration{};
-
-    static ConfigurationSetTunnelProxyServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetTunnelProxyServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetTunnelProxyServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetWebServerConfigurationParams {
-    // wire: 'configuration' (field)
-    QSharedPointer<WebServerConfiguration> configuration{};
-
-    static ConfigurationSetWebServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetWebServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetWebServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetWebSocketServerConfigurationParams {
-    // wire: 'configuration' (field)
-    QSharedPointer<ServerConfiguration> configuration{};
-
-    static ConfigurationSetWebSocketServerConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationSetWebSocketServerConfigurationResponse {
-    // wire: 'configurationError' (field)
-    ConfigurationError configurationError{};
-
-    static ConfigurationSetWebSocketServerConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationTcpServerConfigurationChangedNotificationParams {
-    // wire: 'tcpServerConfiguration' (field)
-    QSharedPointer<ServerConfiguration> tcpServerConfiguration{};
-
-    static ConfigurationTcpServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationTcpServerConfigurationRemovedNotificationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationTcpServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationTunnelProxyServerConfigurationChangedNotificationParams {
-    // wire: 'tunnelProxyServerConfiguration' (field)
-    QSharedPointer<TunnelProxyServerConfiguration> tunnelProxyServerConfiguration{};
-
-    static ConfigurationTunnelProxyServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationWebServerConfigurationChangedNotificationParams {
-    // wire: 'webServerConfiguration' (field)
-    QSharedPointer<WebServerConfiguration> webServerConfiguration{};
-
-    static ConfigurationWebServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationWebServerConfigurationRemovedNotificationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationWebServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationWebSocketServerConfigurationChangedNotificationParams {
-    // wire: 'webSocketServerConfiguration' (field)
-    QSharedPointer<ServerConfiguration> webSocketServerConfiguration{};
-
-    static ConfigurationWebSocketServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ConfigurationWebSocketServerConfigurationRemovedNotificationParams {
-    // wire: 'id' (field)
-    QString id{};
-
-    static ConfigurationWebSocketServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct DebugGetLoggingCategoriesParams {
-
-    static DebugGetLoggingCategoriesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct DebugGetLoggingCategoriesResponse {
-    // wire: 'loggingCategories' (field)
-    QList<QSharedPointer<LoggingCategory>> loggingCategories{};
-
-    static DebugGetLoggingCategoriesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct DebugLoggingCategoryLevelChangedNotificationParams {
-    // wire: 'level' (field)
-    LoggingLevel level{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static DebugLoggingCategoryLevelChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct DebugSetLoggingCategoryLevelParams {
-    // wire: 'level' (field)
-    LoggingLevel level{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static DebugSetLoggingCategoryLevelParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct DebugSetLoggingCategoryLevelResponse {
-    // wire: 'debugError' (field)
-    DebugError debugError{};
-
-    static DebugSetLoggingCategoryLevelResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Event {
-    // wire: 'eventTypeId' (required)
-    QUuid eventTypeId{};
-    // wire: 'params' (required)
-    ParamList params{};
-    // wire: 'thingId' (required)
-    QUuid thingId{};
-
-    static Event fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct EventDescriptor {
-    // wire: 'eventTypeId' (optional)
-    std::optional<QUuid> eventTypeId;
-    // wire: 'interface' (optional)
-    std::optional<QString> interface;
-    // wire: 'interfaceEvent' (optional)
-    std::optional<QString> interfaceEvent;
-    // wire: 'paramDescriptors' (optional)
-    std::optional<ParamDescriptors> paramDescriptors;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-
-    static EventDescriptor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct EventType {
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'paramTypes' (field)
-    ParamTypes paramTypes{};
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'index' (required)
-    qint64 index{};
-
-    static EventType fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Experience {
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'version' (field)
-    QString version{};
-
-    static Experience fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IOConnection {
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'inputStateTypeId' (required)
-    QUuid inputStateTypeId{};
-    // wire: 'inputThingId' (required)
-    QUuid inputThingId{};
-    // wire: 'inverted' (required)
-    bool inverted{};
-    // wire: 'outputStateTypeId' (required)
-    QUuid outputStateTypeId{};
-    // wire: 'outputThingId' (required)
-    QUuid outputThingId{};
-
-    static IOConnection fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationPlugin {
-    // wire: 'displayName' (required)
-    QString displayName{};
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'name' (required)
-    QString name{};
-    // wire: 'paramTypes' (required)
-    ParamTypes paramTypes{};
-
-    static IntegrationPlugin fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsAddThingParams {
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'thingClassId' (optional)
-    std::optional<QUuid> thingClassId;
-    // wire: 'thingDescriptorId' (optional)
-    std::optional<QUuid> thingDescriptorId;
-    // wire: 'thingParams' (optional)
-    std::optional<ParamList> thingParams;
-
-    static IntegrationsAddThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsAddThingResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsAddThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsBrowseThingParams {
-    // wire: 'itemId' (optional)
-    std::optional<QString> itemId;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsBrowseThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsBrowseThingResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'items' (optional)
-    std::optional<QList<QSharedPointer<BrowserItem>>> items;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsBrowseThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsConfirmPairingParams {
-    // wire: 'secret' (optional)
-    std::optional<QString> secret;
-    // wire: 'username' (optional)
-    std::optional<QString> username;
-    // wire: 'pairingTransactionId' (field)
-    QUuid pairingTransactionId{};
-
-    static IntegrationsConfirmPairingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsConfirmPairingResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsConfirmPairingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsConnectIOParams {
-    // wire: 'inputStateTypeId' (field)
-    QUuid inputStateTypeId{};
-    // wire: 'inputThingId' (field)
-    QUuid inputThingId{};
-    // wire: 'inverted' (optional)
-    std::optional<bool> inverted;
-    // wire: 'outputStateTypeId' (field)
-    QUuid outputStateTypeId{};
-    // wire: 'outputThingId' (field)
-    QUuid outputThingId{};
-
-    static IntegrationsConnectIOParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsConnectIOResponse {
-    // wire: 'ioConnectionId' (optional)
-    std::optional<QUuid> ioConnectionId;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsConnectIOResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsDisconnectIOParams {
-    // wire: 'ioConnectionId' (field)
-    QUuid ioConnectionId{};
-
-    static IntegrationsDisconnectIOParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsDisconnectIOResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsDisconnectIOResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsDiscoverThingsParams {
-    // wire: 'discoveryParams' (optional)
-    std::optional<ParamList> discoveryParams;
-    // wire: 'thingClassId' (field)
-    QUuid thingClassId{};
-
-    static IntegrationsDiscoverThingsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsDiscoverThingsResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingDescriptors' (optional)
-    std::optional<ThingDescriptors> thingDescriptors;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsDiscoverThingsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsEditThingParams {
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsEditThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsEditThingResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsEditThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsEventTriggeredNotificationParams {
-    // wire: 'event' (field)
-    QSharedPointer<Event> event{};
-
-    static IntegrationsEventTriggeredNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteActionParams {
-    // wire: 'actionTypeId' (field)
-    QUuid actionTypeId{};
-    // wire: 'params' (optional)
-    std::optional<ParamList> params;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsExecuteActionParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteActionResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsExecuteActionResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteBrowserItemActionParams {
-    // wire: 'actionTypeId' (field)
-    QUuid actionTypeId{};
-    // wire: 'itemId' (field)
-    QString itemId{};
-    // wire: 'params' (optional)
-    std::optional<ParamList> params;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsExecuteBrowserItemActionParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteBrowserItemActionResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsExecuteBrowserItemActionResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteBrowserItemParams {
-    // wire: 'itemId' (field)
-    QString itemId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsExecuteBrowserItemParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsExecuteBrowserItemResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsExecuteBrowserItemResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetActionTypesParams {
-    // wire: 'thingClassId' (field)
-    QUuid thingClassId{};
-
-    static IntegrationsGetActionTypesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetActionTypesResponse {
-    // wire: 'actionTypes' (field)
-    ActionTypes actionTypes{};
-
-    static IntegrationsGetActionTypesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetBrowserItemParams {
-    // wire: 'itemId' (optional)
-    std::optional<QString> itemId;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsGetBrowserItemParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetBrowserItemResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'item' (optional)
-    std::optional<QSharedPointer<BrowserItem>> item;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetBrowserItemResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetEventTypesParams {
-    // wire: 'thingClassId' (field)
-    QUuid thingClassId{};
-
-    static IntegrationsGetEventTypesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetEventTypesResponse {
-    // wire: 'eventTypes' (field)
-    EventTypes eventTypes{};
-
-    static IntegrationsGetEventTypesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetIOConnectionsParams {
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-
-    static IntegrationsGetIOConnectionsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetIOConnectionsResponse {
-    // wire: 'ioConnections' (optional)
-    std::optional<IOConnections> ioConnections;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetIOConnectionsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetPluginConfigurationParams {
-    // wire: 'pluginId' (field)
-    QUuid pluginId{};
-
-    static IntegrationsGetPluginConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetPluginConfigurationResponse {
-    // wire: 'configuration' (optional)
-    std::optional<ParamList> configuration;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetPluginConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetPluginsParams {
-
-    static IntegrationsGetPluginsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetPluginsResponse {
-    // wire: 'plugins' (field)
-    IntegrationPlugins plugins{};
-
-    static IntegrationsGetPluginsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateTypesParams {
-    // wire: 'thingClassId' (field)
-    QUuid thingClassId{};
-
-    static IntegrationsGetStateTypesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateTypesResponse {
-    // wire: 'stateTypes' (field)
-    StateTypes stateTypes{};
-
-    static IntegrationsGetStateTypesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateValueParams {
-    // wire: 'stateTypeId' (field)
-    QUuid stateTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsGetStateValueParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateValueResponse {
-    // wire: 'value' (optional)
-    std::optional<QJsonValue> value;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetStateValueResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateValuesParams {
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsGetStateValuesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetStateValuesResponse {
-    // wire: 'values' (optional)
-    std::optional<States> values;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetStateValuesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetThingClassesParams {
-    // wire: 'thingClassIds' (optional)
-    std::optional<QList<QUuid>> thingClassIds;
-    // wire: 'vendorId' (optional)
-    std::optional<QUuid> vendorId;
-
-    static IntegrationsGetThingClassesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetThingClassesResponse {
-    // wire: 'thingClasses' (optional)
-    std::optional<ThingClasses> thingClasses;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetThingClassesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetThingsParams {
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-
-    static IntegrationsGetThingsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetThingsResponse {
-    // wire: 'things' (optional)
-    std::optional<Things> things;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsGetThingsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetVendorsParams {
-
-    static IntegrationsGetVendorsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsGetVendorsResponse {
-    // wire: 'vendors' (field)
-    Vendors vendors{};
-
-    static IntegrationsGetVendorsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsIOConnectionAddedNotificationParams {
-    // wire: 'ioConnection' (field)
-    QSharedPointer<IOConnection> ioConnection{};
-
-    static IntegrationsIOConnectionAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsIOConnectionRemovedNotificationParams {
-    // wire: 'ioConnectionId' (field)
-    QUuid ioConnectionId{};
-
-    static IntegrationsIOConnectionRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsPairThingParams {
-    // wire: 'name' (optional)
-    std::optional<QString> name;
-    // wire: 'thingClassId' (optional)
-    std::optional<QUuid> thingClassId;
-    // wire: 'thingDescriptorId' (optional)
-    std::optional<QUuid> thingDescriptorId;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'thingParams' (optional)
-    std::optional<ParamList> thingParams;
-
-    static IntegrationsPairThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsPairThingResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'oAuthUrl' (optional)
-    std::optional<QString> oAuthUrl;
-    // wire: 'pairingTransactionId' (optional)
-    std::optional<QUuid> pairingTransactionId;
-    // wire: 'pin' (optional)
-    std::optional<QString> pin;
-    // wire: 'setupMethod' (optional)
-    std::optional<SetupMethod> setupMethod;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsPairThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsPluginConfigurationChangedNotificationParams {
-    // wire: 'configuration' (field)
-    ParamList configuration{};
-    // wire: 'pluginId' (field)
-    QUuid pluginId{};
-
-    static IntegrationsPluginConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsReconfigureThingParams {
-    // wire: 'thingDescriptorId' (optional)
-    std::optional<QUuid> thingDescriptorId;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'thingParams' (optional)
-    std::optional<ParamList> thingParams;
-
-    static IntegrationsReconfigureThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsReconfigureThingResponse {
-    // wire: 'displayMessage' (optional)
-    std::optional<QString> displayMessage;
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsReconfigureThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsRemoveThingParams {
-    // wire: 'removePolicy' (optional, deprecated)
-    std::optional<QString> removePolicy;
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsRemoveThingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsRemoveThingResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsRemoveThingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetActionLoggingParams {
-    // wire: 'actionTypeId' (field)
-    QUuid actionTypeId{};
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsSetActionLoggingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetActionLoggingResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetActionLoggingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetEventLoggingParams {
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'eventTypeId' (field)
-    QUuid eventTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsSetEventLoggingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetEventLoggingResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetEventLoggingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetPluginConfigurationParams {
-    // wire: 'configuration' (field)
-    ParamList configuration{};
-    // wire: 'pluginId' (field)
-    QUuid pluginId{};
-
-    static IntegrationsSetPluginConfigurationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetPluginConfigurationResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetPluginConfigurationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetStateFilterParams {
-    // wire: 'filter' (field)
-    StateValueFilter filter{};
-    // wire: 'stateTypeId' (field)
-    QUuid stateTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsSetStateFilterParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetStateFilterResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetStateFilterResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetStateLoggingParams {
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'stateTypeId' (field)
-    QUuid stateTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsSetStateLoggingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetStateLoggingResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetStateLoggingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetThingSettingsParams {
-    // wire: 'settings' (field)
-    ParamList settings{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsSetThingSettingsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsSetThingSettingsResponse {
-    // wire: 'thingError' (field)
-    ThingError thingError{};
-
-    static IntegrationsSetThingSettingsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsStateChangedNotificationParams {
-    // wire: 'maxValue' (field)
-    QJsonValue maxValue{};
-    // wire: 'minValue' (field)
-    QJsonValue minValue{};
-    // wire: 'possibleValues' (field)
-    QList<QJsonValue> possibleValues{};
-    // wire: 'stateTypeId' (field)
-    QUuid stateTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-    // wire: 'value' (field)
-    QJsonValue value{};
-
-    static IntegrationsStateChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsThingAddedNotificationParams {
-    // wire: 'thing' (field)
-    QSharedPointer<Thing> thing{};
-
-    static IntegrationsThingAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsThingChangedNotificationParams {
-    // wire: 'thing' (field)
-    QSharedPointer<Thing> thing{};
-
-    static IntegrationsThingChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsThingRemovedNotificationParams {
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static IntegrationsThingRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct IntegrationsThingSettingChangedNotificationParams {
-    // wire: 'paramTypeId' (field)
-    QUuid paramTypeId{};
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-    // wire: 'value' (field)
-    QJsonValue value{};
-
-    static IntegrationsThingSettingChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCAuthenticateParams {
-    // wire: 'deviceName' (field)
-    QString deviceName{};
-    // wire: 'password' (field)
-    QString password{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static JSONRPCAuthenticateParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCAuthenticateResponse {
-    // wire: 'scopes' (optional)
-    std::optional<PermissionScopes> scopes;
-    // wire: 'token' (optional)
-    std::optional<QString> token;
-    // wire: 'username' (optional)
-    std::optional<QString> username;
-    // wire: 'success' (field)
-    bool success{};
-
-    static JSONRPCAuthenticateResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCCreateUserParams {
-    // wire: 'displayName' (optional)
-    std::optional<QString> displayName;
-    // wire: 'email' (optional)
-    std::optional<QString> email;
-    // wire: 'password' (field)
-    QString password{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static JSONRPCCreateUserParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCCreateUserResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static JSONRPCCreateUserResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCHelloParams {
-    // wire: 'locale' (optional)
-    std::optional<QString> locale;
-
-    static JSONRPCHelloParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCHelloResponse {
-    // wire: 'authenticationRequired' (field)
-    bool authenticationRequired{};
-    // wire: 'initialSetupRequired' (field)
-    bool initialSetupRequired{};
-    // wire: 'language' (field)
-    QString language{};
-    // wire: 'locale' (field)
-    QString locale{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'authenticated' (optional)
-    std::optional<bool> authenticated;
-    // wire: 'cacheHashes' (optional)
-    std::optional<QList<QSharedPointer<CacheHash>>> cacheHashes;
-    // wire: 'experiences' (optional)
-    std::optional<QList<QSharedPointer<Experience>>> experiences;
-    // wire: 'permissionScopes' (optional)
-    std::optional<PermissionScopes> permissionScopes;
-    // wire: 'username' (optional)
-    std::optional<QString> username;
-    // wire: 'protocol version' (field)
-    QString protocolVersion{};
-    // wire: 'pushButtonAuthAvailable' (field)
-    bool pushButtonAuthAvailable{};
-    // wire: 'server' (field)
-    QString server{};
-    // wire: 'uuid' (field)
-    QUuid uuid{};
-    // wire: 'version' (field)
-    QString version{};
-
-    static JSONRPCHelloResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCIntrospectParams {
-
-    static JSONRPCIntrospectParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCIntrospectResponse {
-    // wire: 'methods' (field)
-    QJsonObject methods{};
-    // wire: 'notifications' (field)
-    QJsonObject notifications{};
-    // wire: 'types' (field)
-    QJsonObject types{};
-
-    static JSONRPCIntrospectResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCKeepAliveParams {
-    // wire: 'sessionId' (field)
-    QString sessionId{};
-
-    static JSONRPCKeepAliveParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCKeepAliveResponse {
-    // wire: 'sessionId' (field)
-    QString sessionId{};
-    // wire: 'success' (field)
-    bool success{};
-
-    static JSONRPCKeepAliveResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCPushButtonAuthFinishedNotificationParams {
-    // wire: 'token' (optional)
-    std::optional<QString> token;
-    // wire: 'success' (field)
-    bool success{};
-    // wire: 'transactionId' (field)
-    qint64 transactionId{};
-
-    static JSONRPCPushButtonAuthFinishedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCRequestPushButtonAuthParams {
-    // wire: 'deviceName' (field)
-    QString deviceName{};
-
-    static JSONRPCRequestPushButtonAuthParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCRequestPushButtonAuthResponse {
-    // wire: 'success' (field)
-    bool success{};
-    // wire: 'transactionId' (field)
-    qint64 transactionId{};
-
-    static JSONRPCRequestPushButtonAuthResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCSetNotificationStatusParams {
-    // wire: 'enabled' (optional, deprecated)
-    std::optional<bool> enabled;
-    // wire: 'namespaces' (optional)
-    std::optional<QStringList> namespaces;
-
-    static JSONRPCSetNotificationStatusParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCSetNotificationStatusResponse {
-    // wire: 'enabled' (deprecated)
-    bool enabled{};
-    // wire: 'namespaces' (field)
-    QStringList namespaces{};
-
-    static JSONRPCSetNotificationStatusResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCVersionParams {
-
-    static JSONRPCVersionParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct JSONRPCVersionResponse {
-    // wire: 'protocol version' (field)
-    QString protocolVersion{};
-    // wire: 'qtBuildVersion' (field)
-    QString qtBuildVersion{};
-    // wire: 'qtVersion' (field)
-    QString qtVersion{};
-    // wire: 'version' (field)
-    QString version{};
-
-    static JSONRPCVersionResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct LogEntry {
-    // wire: 'source' (required)
-    QString source{};
-    // wire: 'timestamp' (required)
-    quint64 timestamp{};
-    // wire: 'values' (required)
-    QJsonObject values{};
-
-    static LogEntry fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct LoggingCategory {
-    // wire: 'level' (field)
-    LoggingLevel level{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'type' (field)
-    LoggingCategoryType type{};
-
-    static LoggingCategory fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct LoggingGetLogEntriesParams {
-    // wire: 'columns' (optional)
-    std::optional<QList<QString>> columns;
-    // wire: 'endTime' (optional)
-    std::optional<quint64> endTime;
-    // wire: 'filter' (optional)
-    std::optional<QJsonValue> filter;
-    // wire: 'limit' (optional)
-    std::optional<qint64> limit;
-    // wire: 'offset' (optional)
-    std::optional<qint64> offset;
-    // wire: 'sampleRate' (optional)
-    std::optional<SampleRate> sampleRate;
-    // wire: 'sortOrder' (optional)
-    std::optional<SortOrder> sortOrder;
-    // wire: 'startTime' (optional)
-    std::optional<quint64> startTime;
-    // wire: 'sources' (field)
-    QList<QString> sources{};
-
-    static LoggingGetLogEntriesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct LoggingGetLogEntriesResponse {
-    // wire: 'count' (field)
-    qint64 count{};
-    // wire: 'logEntries' (optional)
-    std::optional<LogEntries> logEntries;
-    // wire: 'offset' (field)
-    qint64 offset{};
-
-    static LoggingGetLogEntriesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct LoggingLogEntryAddedNotificationParams {
-    // wire: 'logEntry' (field)
-    QSharedPointer<LogEntry> logEntry{};
-
-    static LoggingLogEntryAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuAddModbusRtuMasterParams {
-    // wire: 'baudrate' (field)
-    quint64 baudrate{};
-    // wire: 'dataBits' (field)
-    SerialPortDataBits dataBits{};
-    // wire: 'numberOfRetries' (field)
-    quint64 numberOfRetries{};
-    // wire: 'parity' (field)
-    SerialPortParity parity{};
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-    // wire: 'stopBits' (field)
-    SerialPortStopBits stopBits{};
-    // wire: 'timeout' (field)
-    quint64 timeout{};
-
-    static ModbusRtuAddModbusRtuMasterParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuAddModbusRtuMasterResponse {
-    // wire: 'modbusError' (field)
-    ModbusRtuError modbusError{};
-    // wire: 'modbusUuid' (optional)
-    std::optional<QUuid> modbusUuid;
-
-    static ModbusRtuAddModbusRtuMasterResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuGetModbusRtuMastersParams {
-
-    static ModbusRtuGetModbusRtuMastersParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuGetModbusRtuMastersResponse {
-    // wire: 'modbusError' (field)
-    ModbusRtuError modbusError{};
-    // wire: 'modbusRtuMasters' (optional)
-    std::optional<QList<QSharedPointer<ModbusRtuMaster>>> modbusRtuMasters;
-
-    static ModbusRtuGetModbusRtuMastersResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuGetSerialPortsParams {
-
-    static ModbusRtuGetSerialPortsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuGetSerialPortsResponse {
-    // wire: 'serialPorts' (field)
-    SerialPorts serialPorts{};
-
-    static ModbusRtuGetSerialPortsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuMaster {
-    // wire: 'baudrate' (field)
-    quint64 baudrate{};
-    // wire: 'connected' (field)
-    bool connected{};
-    // wire: 'dataBits' (field)
-    SerialPortDataBits dataBits{};
-    // wire: 'modbusUuid' (field)
-    QUuid modbusUuid{};
-    // wire: 'numberOfRetries' (field)
-    quint64 numberOfRetries{};
-    // wire: 'parity' (field)
-    SerialPortParity parity{};
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-    // wire: 'stopBits' (field)
-    SerialPortStopBits stopBits{};
-    // wire: 'timeout' (field)
-    quint64 timeout{};
-
-    static ModbusRtuMaster fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuModbusRtuMasterAddedNotificationParams {
-    // wire: 'modbusRtuMaster' (field)
-    QSharedPointer<ModbusRtuMaster> modbusRtuMaster{};
-
-    static ModbusRtuModbusRtuMasterAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuModbusRtuMasterChangedNotificationParams {
-    // wire: 'modbusRtuMaster' (field)
-    QSharedPointer<ModbusRtuMaster> modbusRtuMaster{};
-
-    static ModbusRtuModbusRtuMasterChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuModbusRtuMasterRemovedNotificationParams {
-    // wire: 'modbusUuid' (field)
-    QUuid modbusUuid{};
-
-    static ModbusRtuModbusRtuMasterRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuReconfigureModbusRtuMasterParams {
-    // wire: 'baudrate' (field)
-    quint64 baudrate{};
-    // wire: 'dataBits' (field)
-    SerialPortDataBits dataBits{};
-    // wire: 'modbusUuid' (field)
-    QUuid modbusUuid{};
-    // wire: 'numberOfRetries' (field)
-    quint64 numberOfRetries{};
-    // wire: 'parity' (field)
-    SerialPortParity parity{};
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-    // wire: 'stopBits' (field)
-    SerialPortStopBits stopBits{};
-    // wire: 'timeout' (field)
-    quint64 timeout{};
-
-    static ModbusRtuReconfigureModbusRtuMasterParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuReconfigureModbusRtuMasterResponse {
-    // wire: 'modbusError' (field)
-    ModbusRtuError modbusError{};
-
-    static ModbusRtuReconfigureModbusRtuMasterResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuRemoveModbusRtuMasterParams {
-    // wire: 'modbusUuid' (field)
-    QUuid modbusUuid{};
-
-    static ModbusRtuRemoveModbusRtuMasterParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuRemoveModbusRtuMasterResponse {
-    // wire: 'modbusError' (field)
-    ModbusRtuError modbusError{};
-
-    static ModbusRtuRemoveModbusRtuMasterResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuSerialPortAddedNotificationParams {
-    // wire: 'serialPort' (field)
-    QSharedPointer<SerialPort> serialPort{};
-
-    static ModbusRtuSerialPortAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ModbusRtuSerialPortRemovedNotificationParams {
-    // wire: 'serialPort' (field)
-    QSharedPointer<SerialPort> serialPort{};
-
-    static ModbusRtuSerialPortRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct MqttPolicy {
-    // wire: 'allowedPublishTopicFilters' (field)
-    QStringList allowedPublishTopicFilters{};
-    // wire: 'allowedSubscribeTopicFilters' (field)
-    QStringList allowedSubscribeTopicFilters{};
-    // wire: 'clientId' (field)
-    QString clientId{};
-    // wire: 'password' (field)
-    QString password{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static MqttPolicy fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerConnectWifiNetworkParams {
-    // wire: 'interface' (field)
-    QString interface{};
-    // wire: 'password' (optional)
-    std::optional<QString> password;
-    // wire: 'ssid' (field)
-    QString ssid{};
-
-    static NetworkManagerConnectWifiNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerConnectWifiNetworkResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerConnectWifiNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerCreateWiredConnectionParams {
-    // wire: 'interface' (field)
-    QString interface{};
-    // wire: 'dns' (optional)
-    std::optional<QString> dns;
-    // wire: 'gateway' (optional)
-    std::optional<QString> gateway;
-    // wire: 'ip' (optional)
-    std::optional<QString> ip;
-    // wire: 'prefix' (optional)
-    std::optional<quint64> prefix;
-    // wire: 'type' (field)
-    WiredNetworkConnectionType type{};
-
-    static NetworkManagerCreateWiredConnectionParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerCreateWiredConnectionResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerCreateWiredConnectionResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerDisconnectInterfaceParams {
-    // wire: 'interface' (field)
-    QString interface{};
-
-    static NetworkManagerDisconnectInterfaceParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerDisconnectInterfaceResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerDisconnectInterfaceResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerEnableNetworkingParams {
-    // wire: 'enable' (field)
-    bool enable{};
-
-    static NetworkManagerEnableNetworkingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerEnableNetworkingResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerEnableNetworkingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerEnableWirelessNetworkingParams {
-    // wire: 'enable' (field)
-    bool enable{};
-
-    static NetworkManagerEnableWirelessNetworkingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerEnableWirelessNetworkingResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerEnableWirelessNetworkingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetNetworkDevicesParams {
-
-    static NetworkManagerGetNetworkDevicesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetNetworkDevicesResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-    // wire: 'wiredNetworkDevices' (optional)
-    std::optional<QList<QSharedPointer<WiredNetworkDevice>>> wiredNetworkDevices;
-    // wire: 'wirelessNetworkDevices' (optional)
-    std::optional<QList<QSharedPointer<WirelessNetworkDevice>>> wirelessNetworkDevices;
-
-    static NetworkManagerGetNetworkDevicesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetNetworkStatusParams {
-
-    static NetworkManagerGetNetworkStatusParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetNetworkStatusResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-    // wire: 'status' (optional)
-    std::optional<QSharedPointer<NetworkManagerGetNetworkStatusResponseStatus>> status;
-
-    static NetworkManagerGetNetworkStatusResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetNetworkStatusResponseStatus {
-    // wire: 'networkingEnabled' (field)
-    bool networkingEnabled{};
-    // wire: 'state' (field)
-    NetworkManagerState state{};
-    // wire: 'wirelessNetworkingEnabled' (field)
-    bool wirelessNetworkingEnabled{};
-
-    static NetworkManagerGetNetworkStatusResponseStatus fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetWirelessAccessPointsParams {
-    // wire: 'interface' (field)
-    QString interface{};
-
-    static NetworkManagerGetWirelessAccessPointsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerGetWirelessAccessPointsResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-    // wire: 'wirelessAccessPoints' (optional)
-    std::optional<QList<QSharedPointer<WirelessAccessPoint>>> wirelessAccessPoints;
-
-    static NetworkManagerGetWirelessAccessPointsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerNetworkStatusChangedNotificationParams {
-    // wire: 'status' (field)
-    QSharedPointer<NetworkManagerNetworkStatusChangedNotificationParamsStatus> status{};
-
-    static NetworkManagerNetworkStatusChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerNetworkStatusChangedNotificationParamsStatus {
-    // wire: 'networkingEnabled' (field)
-    bool networkingEnabled{};
-    // wire: 'state' (field)
-    NetworkManagerState state{};
-    // wire: 'wirelessNetworkingEnabled' (field)
-    bool wirelessNetworkingEnabled{};
-
-    static NetworkManagerNetworkStatusChangedNotificationParamsStatus fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerScanWifiNetworksParams {
-    // wire: 'interface' (field)
-    QString interface{};
-
-    static NetworkManagerScanWifiNetworksParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerScanWifiNetworksResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerScanWifiNetworksResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerStartAccessPointParams {
-    // wire: 'interface' (field)
-    QString interface{};
-    // wire: 'password' (field)
-    QString password{};
-    // wire: 'ssid' (field)
-    QString ssid{};
-
-    static NetworkManagerStartAccessPointParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerStartAccessPointResponse {
-    // wire: 'networkManagerError' (field)
-    NetworkManagerError networkManagerError{};
-
-    static NetworkManagerStartAccessPointResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWiredNetworkDeviceAddedNotificationParams {
-    // wire: 'wiredNetworkDevice' (field)
-    QSharedPointer<WiredNetworkDevice> wiredNetworkDevice{};
-
-    static NetworkManagerWiredNetworkDeviceAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWiredNetworkDeviceChangedNotificationParams {
-    // wire: 'wiredNetworkDevice' (field)
-    QSharedPointer<WiredNetworkDevice> wiredNetworkDevice{};
-
-    static NetworkManagerWiredNetworkDeviceChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWiredNetworkDeviceRemovedNotificationParams {
-    // wire: 'interface' (field)
-    QString interface{};
-
-    static NetworkManagerWiredNetworkDeviceRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWirelessNetworkDeviceAddedNotificationParams {
-    // wire: 'wirelessNetworkDevice' (field)
-    QSharedPointer<WirelessNetworkDevice> wirelessNetworkDevice{};
-
-    static NetworkManagerWirelessNetworkDeviceAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWirelessNetworkDeviceChangedNotificationParams {
-    // wire: 'wirelessNetworkDevice' (field)
-    QSharedPointer<WirelessNetworkDevice> wirelessNetworkDevice{};
-
-    static NetworkManagerWirelessNetworkDeviceChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct NetworkManagerWirelessNetworkDeviceRemovedNotificationParams {
-    // wire: 'interface' (field)
-    QString interface{};
-
-    static NetworkManagerWirelessNetworkDeviceRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Package {
-    // wire: 'canRemove' (required)
-    bool canRemove{};
-    // wire: 'candidateVersion' (required)
-    QString candidateVersion{};
-    // wire: 'changelog' (required)
-    QString changelog{};
-    // wire: 'displayName' (required)
-    QString displayName{};
-    // wire: 'id' (required)
-    QString id{};
-    // wire: 'installedVersion' (required)
-    QString installedVersion{};
-    // wire: 'rollbackAvailable' (required)
-    bool rollbackAvailable{};
-    // wire: 'summary' (required)
-    QString summary{};
-    // wire: 'updateAvailable' (required)
-    bool updateAvailable{};
-
-    static Package fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Param {
-    // wire: 'paramTypeId' (optional)
-    std::optional<QUuid> paramTypeId;
-    // wire: 'value' (field)
-    QJsonValue value{};
-
-    static Param fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ParamDescriptor {
-    // wire: 'paramName' (optional)
-    std::optional<QString> paramName;
-    // wire: 'paramTypeId' (optional)
-    std::optional<QUuid> paramTypeId;
-    // wire: 'operator' (field)
-    ValueOperator operatorValue{};
-    // wire: 'value' (field)
-    QJsonValue value{};
-
-    static ParamDescriptor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ParamType {
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'index' (field)
-    qint64 index{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'allowedValues' (optional)
-    std::optional<QList<QJsonValue>> allowedValues;
-    // wire: 'defaultValue' (optional)
-    std::optional<QJsonValue> defaultValue;
-    // wire: 'inputType' (optional)
-    std::optional<InputType> inputType;
-    // wire: 'maxValue' (optional)
-    std::optional<QJsonValue> maxValue;
-    // wire: 'minValue' (optional)
-    std::optional<QJsonValue> minValue;
-    // wire: 'readOnly' (optional)
-    std::optional<bool> readOnly;
-    // wire: 'stepSize' (optional)
-    std::optional<double> stepSize;
-    // wire: 'unit' (optional)
-    std::optional<Unit> unit;
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'type' (field)
-    BasicType type{};
-
-    static ParamType fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RepeatingOption {
-    // wire: 'mode' (field)
-    RepeatingMode mode{};
-    // wire: 'monthDays' (optional)
-    std::optional<QList<qint64>> monthDays;
-    // wire: 'weekDays' (optional)
-    std::optional<QList<qint64>> weekDays;
-
-    static RepeatingOption fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Repository {
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'displayName' (required)
-    QString displayName{};
-    // wire: 'id' (required)
-    QString id{};
-
-    static Repository fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Rule {
-    // wire: 'actions' (field)
-    RuleActions actions{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'enabled' (optional)
-    std::optional<bool> enabled;
-    // wire: 'eventDescriptors' (optional)
-    std::optional<EventDescriptors> eventDescriptors;
-    // wire: 'executable' (optional)
-    std::optional<bool> executable;
-    // wire: 'exitActions' (optional)
-    std::optional<RuleActions> exitActions;
-    // wire: 'stateEvaluator' (optional)
-    std::optional<QSharedPointer<StateEvaluator>> stateEvaluator;
-    // wire: 'timeDescriptor' (optional)
-    std::optional<QSharedPointer<TimeDescriptor>> timeDescriptor;
-    // wire: 'active' (required)
-    bool active{};
-    // wire: 'id' (required)
-    QUuid id{};
-
-    static Rule fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RuleAction {
-    // wire: 'actionTypeId' (optional)
-    std::optional<QUuid> actionTypeId;
-    // wire: 'browserItemId' (optional)
-    std::optional<QString> browserItemId;
-    // wire: 'interface' (optional)
-    std::optional<QString> interface;
-    // wire: 'interfaceAction' (optional)
-    std::optional<QString> interfaceAction;
-    // wire: 'ruleActionParams' (optional)
-    std::optional<RuleActionParams> ruleActionParams;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-
-    static RuleAction fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RuleActionParam {
-    // wire: 'eventParamTypeId' (optional)
-    std::optional<QUuid> eventParamTypeId;
-    // wire: 'eventTypeId' (optional)
-    std::optional<QUuid> eventTypeId;
-    // wire: 'paramName' (optional)
-    std::optional<QString> paramName;
-    // wire: 'paramTypeId' (optional)
-    std::optional<QUuid> paramTypeId;
-    // wire: 'stateThingId' (optional)
-    std::optional<QUuid> stateThingId;
-    // wire: 'stateTypeId' (optional)
-    std::optional<QUuid> stateTypeId;
-    // wire: 'value' (optional)
-    std::optional<QJsonValue> value;
-
-    static RuleActionParam fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RuleDescription {
-    // wire: 'active' (field)
-    bool active{};
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'executable' (field)
-    bool executable{};
-    // wire: 'id' (field)
-    QUuid id{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static RuleDescription fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesAddRuleParams {
-    // wire: 'actions' (field)
-    QList<QSharedPointer<RuleAction>> actions{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'enabled' (optional)
-    std::optional<bool> enabled;
-    // wire: 'eventDescriptors' (optional)
-    std::optional<QList<QSharedPointer<EventDescriptor>>> eventDescriptors;
-    // wire: 'executable' (optional)
-    std::optional<bool> executable;
-    // wire: 'exitActions' (optional)
-    std::optional<QList<QSharedPointer<RuleAction>>> exitActions;
-    // wire: 'stateEvaluator' (optional)
-    std::optional<QSharedPointer<StateEvaluator>> stateEvaluator;
-    // wire: 'timeDescriptor' (optional)
-    std::optional<QSharedPointer<TimeDescriptor>> timeDescriptor;
-
-    static RulesAddRuleParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesAddRuleResponse {
-    // wire: 'ruleId' (optional)
-    std::optional<QUuid> ruleId;
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesAddRuleResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesDisableRuleParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesDisableRuleParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesDisableRuleResponse {
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesDisableRuleResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesEditRuleParams {
-    // wire: 'actions' (field)
-    QList<QSharedPointer<RuleAction>> actions{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'enabled' (optional)
-    std::optional<bool> enabled;
-    // wire: 'eventDescriptors' (optional)
-    std::optional<QList<QSharedPointer<EventDescriptor>>> eventDescriptors;
-    // wire: 'executable' (optional)
-    std::optional<bool> executable;
-    // wire: 'exitActions' (optional)
-    std::optional<QList<QSharedPointer<RuleAction>>> exitActions;
-    // wire: 'stateEvaluator' (optional)
-    std::optional<QSharedPointer<StateEvaluator>> stateEvaluator;
-    // wire: 'timeDescriptor' (optional)
-    std::optional<QSharedPointer<TimeDescriptor>> timeDescriptor;
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesEditRuleParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesEditRuleResponse {
-    // wire: 'rule' (optional)
-    std::optional<QSharedPointer<Rule>> rule;
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesEditRuleResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesEnableRuleParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesEnableRuleParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesEnableRuleResponse {
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesEnableRuleResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesExecuteActionsParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesExecuteActionsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesExecuteActionsResponse {
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesExecuteActionsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesExecuteExitActionsParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesExecuteExitActionsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesExecuteExitActionsResponse {
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesExecuteExitActionsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesFindRulesParams {
-    // wire: 'thingId' (field)
-    QUuid thingId{};
-
-    static RulesFindRulesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesFindRulesResponse {
-    // wire: 'ruleIds' (field)
-    QList<QUuid> ruleIds{};
-
-    static RulesFindRulesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesGetRuleDetailsParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesGetRuleDetailsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesGetRuleDetailsResponse {
-    // wire: 'rule' (optional)
-    std::optional<QSharedPointer<Rule>> rule;
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesGetRuleDetailsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesGetRulesParams {
-
-    static RulesGetRulesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesGetRulesResponse {
-    // wire: 'ruleDescriptions' (field)
-    QList<QSharedPointer<RuleDescription>> ruleDescriptions{};
-
-    static RulesGetRulesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRemoveRuleParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesRemoveRuleParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRemoveRuleResponse {
-    // wire: 'ruleError' (field)
-    RuleError ruleError{};
-
-    static RulesRemoveRuleResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRuleActiveChangedNotificationParams {
-    // wire: 'active' (field)
-    bool active{};
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesRuleActiveChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRuleAddedNotificationParams {
-    // wire: 'rule' (field)
-    QSharedPointer<Rule> rule{};
-
-    static RulesRuleAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRuleConfigurationChangedNotificationParams {
-    // wire: 'rule' (field)
-    QSharedPointer<Rule> rule{};
-
-    static RulesRuleConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct RulesRuleRemovedNotificationParams {
-    // wire: 'ruleId' (field)
-    QUuid ruleId{};
-
-    static RulesRuleRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Script {
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'id' (required)
-    QUuid id{};
-
-    static Script fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsAddScriptParams {
-    // wire: 'content' (field)
-    QString content{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static ScriptsAddScriptParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsAddScriptResponse {
-    // wire: 'errors' (optional)
-    std::optional<QStringList> errors;
-    // wire: 'script' (optional)
-    std::optional<QSharedPointer<Script>> script;
-    // wire: 'scriptError' (field)
-    ScriptError scriptError{};
-
-    static ScriptsAddScriptResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsEditScriptParams {
-    // wire: 'id' (field)
-    QUuid id{};
-    // wire: 'content' (optional)
-    std::optional<QString> content;
-    // wire: 'name' (optional)
-    std::optional<QString> name;
-
-    static ScriptsEditScriptParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsEditScriptResponse {
-    // wire: 'errors' (optional)
-    std::optional<QStringList> errors;
-    // wire: 'scriptError' (field)
-    ScriptError scriptError{};
-
-    static ScriptsEditScriptResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsGetScriptContentParams {
-    // wire: 'id' (field)
-    QUuid id{};
-
-    static ScriptsGetScriptContentParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsGetScriptContentResponse {
-    // wire: 'content' (optional)
-    std::optional<QString> content;
-    // wire: 'scriptError' (field)
-    ScriptError scriptError{};
-
-    static ScriptsGetScriptContentResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsGetScriptsParams {
-
-    static ScriptsGetScriptsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsGetScriptsResponse {
-    // wire: 'scripts' (field)
-    Scripts scripts{};
-
-    static ScriptsGetScriptsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsRemoveScriptParams {
-    // wire: 'id' (field)
-    QUuid id{};
-
-    static ScriptsRemoveScriptParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsRemoveScriptResponse {
-    // wire: 'scriptError' (field)
-    ScriptError scriptError{};
-
-    static ScriptsRemoveScriptResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsScriptAddedNotificationParams {
-    // wire: 'script' (field)
-    QSharedPointer<Script> script{};
-
-    static ScriptsScriptAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsScriptChangedNotificationParams {
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'scriptId' (field)
-    QUuid scriptId{};
-
-    static ScriptsScriptChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsScriptContentChangedNotificationParams {
-    // wire: 'scriptId' (field)
-    QUuid scriptId{};
-
-    static ScriptsScriptContentChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsScriptLogMessageNotificationParams {
-    // wire: 'message' (field)
-    QString message{};
-    // wire: 'scriptId' (field)
-    QUuid scriptId{};
-    // wire: 'type' (field)
-    ScriptMessageType type{};
-
-    static ScriptsScriptLogMessageNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ScriptsScriptRemovedNotificationParams {
-    // wire: 'id' (field)
-    QUuid id{};
-
-    static ScriptsScriptRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SerialPort {
-    // wire: 'description' (required)
-    QString description{};
-    // wire: 'manufacturer' (required)
-    QString manufacturer{};
-    // wire: 'serialNumber' (required)
-    QString serialNumber{};
-    // wire: 'systemLocation' (required)
-    QString systemLocation{};
-
-    static SerialPort fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ServerConfiguration {
-    // wire: 'address' (field)
-    QString address{};
-    // wire: 'authenticationEnabled' (field)
-    bool authenticationEnabled{};
-    // wire: 'id' (field)
-    QString id{};
-    // wire: 'port' (field)
-    quint64 port{};
-    // wire: 'sslEnabled' (field)
-    bool sslEnabled{};
-
-    static ServerConfiguration fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct State {
-    // wire: 'filter' (required)
-    StateValueFilter filter{};
-    // wire: 'maxValue' (optional, required)
-    std::optional<QJsonValue> maxValue;
-    // wire: 'minValue' (optional, required)
-    std::optional<QJsonValue> minValue;
-    // wire: 'possibleValues' (optional, required)
-    std::optional<QList<QJsonValue>> possibleValues;
-    // wire: 'stateTypeId' (required)
-    QUuid stateTypeId{};
-    // wire: 'value' (required)
-    QJsonValue value{};
-
-    static State fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct StateDescriptor {
-    // wire: 'interface' (optional)
-    std::optional<QString> interface;
-    // wire: 'interfaceState' (optional)
-    std::optional<QString> interfaceState;
-    // wire: 'stateTypeId' (optional)
-    std::optional<QUuid> stateTypeId;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'value' (optional)
-    std::optional<QJsonValue> value;
-    // wire: 'valueStateTypeId' (optional)
-    std::optional<QUuid> valueStateTypeId;
-    // wire: 'valueThingId' (optional)
-    std::optional<QUuid> valueThingId;
-    // wire: 'operator' (field)
-    ValueOperator operatorValue{};
-
-    static StateDescriptor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct StateEvaluator {
-    // wire: 'childEvaluators' (optional)
-    std::optional<StateEvaluators> childEvaluators;
-    // wire: 'operator' (optional)
-    std::optional<StateOperator> operatorValue;
-    // wire: 'stateDescriptor' (optional)
-    std::optional<QSharedPointer<StateDescriptor>> stateDescriptor;
-
-    static StateEvaluator fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct StateType {
-    // wire: 'defaultValue' (field)
-    QJsonValue defaultValue{};
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'index' (field)
-    qint64 index{};
-    // wire: 'name' (field)
-    QString name{};
-    // wire: 'ioType' (optional)
-    std::optional<IOType> ioType;
-    // wire: 'maxValue' (optional)
-    std::optional<QJsonValue> maxValue;
-    // wire: 'minValue' (optional)
-    std::optional<QJsonValue> minValue;
-    // wire: 'possibleValues' (optional)
-    std::optional<QList<QJsonValue>> possibleValues;
-    // wire: 'possibleValuesDisplayNames' (optional)
-    std::optional<QStringList> possibleValuesDisplayNames;
-    // wire: 'stepSize' (optional)
-    std::optional<double> stepSize;
-    // wire: 'unit' (optional)
-    std::optional<Unit> unit;
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'type' (field)
-    BasicType type{};
-
-    static StateType fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemCapabilitiesChangedNotificationParams {
-    // wire: 'powerManagement' (field)
-    bool powerManagement{};
-    // wire: 'updateManagement' (field)
-    bool updateManagement{};
-    // wire: 'updateManagementType' (field)
-    UpdateType updateManagementType{};
-
-    static SystemCapabilitiesChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemCheckForUpdatesParams {
-
-    static SystemCheckForUpdatesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemCheckForUpdatesResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemCheckForUpdatesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemEnableRepositoryParams {
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'repositoryId' (field)
-    QString repositoryId{};
-
-    static SystemEnableRepositoryParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemEnableRepositoryResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemEnableRepositoryResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetCapabilitiesParams {
-
-    static SystemGetCapabilitiesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetCapabilitiesResponse {
-    // wire: 'powerManagement' (field)
-    bool powerManagement{};
-    // wire: 'timeManagement' (field)
-    bool timeManagement{};
-    // wire: 'updateManagement' (field)
-    bool updateManagement{};
-    // wire: 'updateManagementType' (field)
-    UpdateType updateManagementType{};
-
-    static SystemGetCapabilitiesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetPackagesParams {
-
-    static SystemGetPackagesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetPackagesResponse {
-    // wire: 'packages' (field)
-    Packages packages{};
-
-    static SystemGetPackagesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetRepositoriesParams {
-
-    static SystemGetRepositoriesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetRepositoriesResponse {
-    // wire: 'repositories' (field)
-    Repositories repositories{};
-
-    static SystemGetRepositoriesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetSystemInfoParams {
-
-    static SystemGetSystemInfoParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetSystemInfoResponse {
-    // wire: 'deviceSerialNumber' (field)
-    QString deviceSerialNumber{};
-
-    static SystemGetSystemInfoResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetTimeParams {
-
-    static SystemGetTimeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetTimeResponse {
-    // wire: 'automaticTime' (field)
-    bool automaticTime{};
-    // wire: 'automaticTimeAvailable' (field)
-    bool automaticTimeAvailable{};
-    // wire: 'time' (field)
-    quint64 time{};
-    // wire: 'timeZone' (field)
-    QString timeZone{};
-
-    static SystemGetTimeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetTimeZonesParams {
-
-    static SystemGetTimeZonesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetTimeZonesResponse {
-    // wire: 'timeZones' (field)
-    QStringList timeZones{};
-
-    static SystemGetTimeZonesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetUpdateStatusParams {
-
-    static SystemGetUpdateStatusParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemGetUpdateStatusResponse {
-    // wire: 'busy' (field)
-    bool busy{};
-    // wire: 'updateProgress' (optional)
-    std::optional<qint64> updateProgress;
-    // wire: 'updateRunning' (field)
-    bool updateRunning{};
-
-    static SystemGetUpdateStatusResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemPackageAddedNotificationParams {
-    // wire: 'package' (field)
-    QSharedPointer<Package> package{};
-
-    static SystemPackageAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemPackageChangedNotificationParams {
-    // wire: 'package' (field)
-    QSharedPointer<Package> package{};
-
-    static SystemPackageChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemPackageRemovedNotificationParams {
-    // wire: 'packageId' (field)
-    QString packageId{};
-
-    static SystemPackageRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRebootParams {
-
-    static SystemRebootParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRebootResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemRebootResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRemovePackagesParams {
-    // wire: 'packageIds' (field)
-    QList<QString> packageIds{};
-
-    static SystemRemovePackagesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRemovePackagesResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemRemovePackagesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRepositoryAddedNotificationParams {
-    // wire: 'repository' (field)
-    QSharedPointer<Repository> repository{};
-
-    static SystemRepositoryAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRepositoryChangedNotificationParams {
-    // wire: 'repository' (field)
-    QSharedPointer<Repository> repository{};
-
-    static SystemRepositoryChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRepositoryRemovedNotificationParams {
-    // wire: 'repositoryId' (field)
-    QString repositoryId{};
-
-    static SystemRepositoryRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRestartParams {
-
-    static SystemRestartParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRestartResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemRestartResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRollbackPackagesParams {
-    // wire: 'packageIds' (field)
-    QList<QString> packageIds{};
-
-    static SystemRollbackPackagesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemRollbackPackagesResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemRollbackPackagesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemSetTimeParams {
-    // wire: 'automaticTime' (optional)
-    std::optional<bool> automaticTime;
-    // wire: 'time' (optional)
-    std::optional<quint64> time;
-    // wire: 'timeZone' (optional)
-    std::optional<QString> timeZone;
-
-    static SystemSetTimeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemSetTimeResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemSetTimeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemShutdownParams {
-
-    static SystemShutdownParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemShutdownResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemShutdownResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemTimeConfigurationChangedNotificationParams {
-    // wire: 'automaticTime' (field)
-    bool automaticTime{};
-    // wire: 'automaticTimeAvailable' (field)
-    bool automaticTimeAvailable{};
-    // wire: 'time' (field)
-    quint64 time{};
-    // wire: 'timeZone' (field)
-    QString timeZone{};
-
-    static SystemTimeConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemUpdatePackagesParams {
-    // wire: 'packageIds' (optional)
-    std::optional<QList<QString>> packageIds;
-
-    static SystemUpdatePackagesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemUpdatePackagesResponse {
-    // wire: 'success' (field)
-    bool success{};
-
-    static SystemUpdatePackagesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct SystemUpdateStatusChangedNotificationParams {
-    // wire: 'busy' (field)
-    bool busy{};
-    // wire: 'updateProgress' (optional)
-    std::optional<qint64> updateProgress;
-    // wire: 'updateRunning' (field)
-    bool updateRunning{};
-
-    static SystemUpdateStatusChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Tag {
-    // wire: 'appId' (field)
-    QString appId{};
-    // wire: 'ruleId' (optional)
-    std::optional<QUuid> ruleId;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-    // wire: 'value' (optional)
-    std::optional<QString> value;
-    // wire: 'tagId' (field)
-    QString tagId{};
-
-    static Tag fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsAddTagParams {
-    // wire: 'tag' (field)
-    QSharedPointer<Tag> tag{};
-
-    static TagsAddTagParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsAddTagResponse {
-    // wire: 'tagError' (field)
-    TagError tagError{};
-
-    static TagsAddTagResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsGetTagsParams {
-    // wire: 'appId' (optional)
-    std::optional<QString> appId;
-    // wire: 'ruleId' (optional)
-    std::optional<QUuid> ruleId;
-    // wire: 'tagId' (optional)
-    std::optional<QString> tagId;
-    // wire: 'thingId' (optional)
-    std::optional<QUuid> thingId;
-
-    static TagsGetTagsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsGetTagsResponse {
-    // wire: 'tags' (optional)
-    std::optional<Tags> tags;
-    // wire: 'tagError' (field)
-    TagError tagError{};
-
-    static TagsGetTagsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsRemoveTagParams {
-    // wire: 'tag' (field)
-    QSharedPointer<Tag> tag{};
-
-    static TagsRemoveTagParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsRemoveTagResponse {
-    // wire: 'tagError' (field)
-    TagError tagError{};
-
-    static TagsRemoveTagResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsTagAddedNotificationParams {
-    // wire: 'tag' (field)
-    QSharedPointer<Tag> tag{};
-
-    static TagsTagAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsTagRemovedNotificationParams {
-    // wire: 'tag' (field)
-    QSharedPointer<Tag> tag{};
-
-    static TagsTagRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TagsTagValueChangedNotificationParams {
-    // wire: 'tag' (field)
-    QSharedPointer<Tag> tag{};
-
-    static TagsTagValueChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Thing {
-    // wire: 'setupComplete' (required, deprecated)
-    bool setupComplete{};
-    // wire: 'name' (optional)
-    std::optional<QString> name;
-    // wire: 'settings' (optional)
-    std::optional<ParamList> settings;
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'loggedActionTypeIds' (optional, required)
-    std::optional<QList<QUuid>> loggedActionTypeIds;
-    // wire: 'loggedEventTypeIds' (optional, required)
-    std::optional<QList<QUuid>> loggedEventTypeIds;
-    // wire: 'loggedStateTypeIds' (optional, required)
-    std::optional<QList<QUuid>> loggedStateTypeIds;
-    // wire: 'parentId' (optional, required)
-    std::optional<QUuid> parentId;
-    // wire: 'setupDisplayMessage' (optional, required)
-    std::optional<QString> setupDisplayMessage;
-    // wire: 'params' (required)
-    ParamList params{};
-    // wire: 'setupError' (required)
-    ThingError setupError{};
-    // wire: 'setupStatus' (required)
-    ThingSetupStatus setupStatus{};
-    // wire: 'states' (required)
-    States states{};
-    // wire: 'thingClassId' (required)
-    QUuid thingClassId{};
-
-    static Thing fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ThingClass {
-    // wire: 'actionTypes' (required)
-    ActionTypes actionTypes{};
-    // wire: 'browsable' (required)
-    bool browsable{};
-    // wire: 'browserItemActionTypes' (required)
-    ActionTypes browserItemActionTypes{};
-    // wire: 'createMethods' (required)
-    CreateMethods createMethods{};
-    // wire: 'discoveryParamTypes' (required)
-    ParamTypes discoveryParamTypes{};
-    // wire: 'discoveryType' (required)
-    DiscoveryType discoveryType{};
-    // wire: 'displayName' (required)
-    QString displayName{};
-    // wire: 'eventTypes' (required)
-    EventTypes eventTypes{};
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'interfaces' (required)
-    QStringList interfaces{};
-    // wire: 'name' (required)
-    QString name{};
-    // wire: 'paramTypes' (required)
-    ParamTypes paramTypes{};
-    // wire: 'pluginId' (required)
-    QUuid pluginId{};
-    // wire: 'providedInterfaces' (required)
-    QStringList providedInterfaces{};
-    // wire: 'settingsTypes' (required)
-    ParamTypes settingsTypes{};
-    // wire: 'setupMethod' (required)
-    SetupMethod setupMethod{};
-    // wire: 'stateTypes' (required)
-    StateTypes stateTypes{};
-    // wire: 'vendorId' (required)
-    QUuid vendorId{};
-
-    static ThingClass fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ThingDescriptor {
-    // wire: 'description' (required)
-    QString description{};
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'thingId' (optional, required)
-    std::optional<QUuid> thingId;
-    // wire: 'params' (required)
-    ParamList params{};
-    // wire: 'thingClassId' (required)
-    QUuid thingClassId{};
-    // wire: 'title' (required)
-    QString title{};
-
-    static ThingDescriptor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TimeDescriptor {
-    // wire: 'calendarItems' (optional)
-    std::optional<CalendarItems> calendarItems;
-    // wire: 'timeEventItems' (optional)
-    std::optional<TimeEventItems> timeEventItems;
-
-    static TimeDescriptor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TimeEventItem {
-    // wire: 'datetime' (optional)
-    std::optional<quint64> datetime;
-    // wire: 'repeating' (optional)
-    std::optional<QSharedPointer<RepeatingOption>> repeating;
-    // wire: 'time' (optional)
-    std::optional<qint64> time;
-
-    static TimeEventItem fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TokenInfo {
-    // wire: 'creationTime' (required)
-    quint64 creationTime{};
-    // wire: 'deviceName' (required)
-    QString deviceName{};
-    // wire: 'id' (required)
-    QUuid id{};
-    // wire: 'username' (required)
-    QString username{};
-
-    static TokenInfo fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct TunnelProxyServerConfiguration {
-    // wire: 'address' (field)
-    QString address{};
-    // wire: 'authenticationEnabled' (field)
-    bool authenticationEnabled{};
-    // wire: 'id' (field)
-    QString id{};
-    // wire: 'ignoreSslErrors' (field)
-    bool ignoreSslErrors{};
-    // wire: 'port' (field)
-    quint64 port{};
-    // wire: 'sslEnabled' (field)
-    bool sslEnabled{};
-
-    static TunnelProxyServerConfiguration fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UserInfo {
-    // wire: 'allowedThingIds' (required)
-    QList<QUuid> allowedThingIds{};
-    // wire: 'displayName' (required)
-    QString displayName{};
-    // wire: 'email' (required)
-    QString email{};
-    // wire: 'scopes' (required)
-    PermissionScopes scopes{};
-    // wire: 'username' (required)
-    QString username{};
-
-    static UserInfo fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersChangePasswordParams {
-    // wire: 'newPassword' (field)
-    QString newPassword{};
-
-    static UsersChangePasswordParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersChangePasswordResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersChangePasswordResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersChangeUserPasswordParams {
-    // wire: 'newPassword' (field)
-    QString newPassword{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersChangeUserPasswordParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersChangeUserPasswordResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersChangeUserPasswordResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersCreateUserParams {
-    // wire: 'allowedThingIds' (optional)
-    std::optional<QList<QUuid>> allowedThingIds;
-    // wire: 'displayName' (optional)
-    std::optional<QString> displayName;
-    // wire: 'email' (optional)
-    std::optional<QString> email;
-    // wire: 'scopes' (optional)
-    std::optional<PermissionScopes> scopes;
-    // wire: 'password' (field)
-    QString password{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersCreateUserParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersCreateUserResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersCreateUserResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetTokensParams {
-
-    static UsersGetTokensParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetTokensResponse {
-    // wire: 'error' (field)
-    UserError error{};
-    // wire: 'tokenInfoList' (optional)
-    std::optional<TokenInfoList> tokenInfoList;
-
-    static UsersGetTokensResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUserInfoParams {
-
-    static UsersGetUserInfoParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUserInfoResponse {
-    // wire: 'error' (field)
-    UserError error{};
-    // wire: 'userInfo' (optional)
-    std::optional<QSharedPointer<UserInfo>> userInfo;
-
-    static UsersGetUserInfoResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUserTokensParams {
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersGetUserTokensParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUserTokensResponse {
-    // wire: 'error' (field)
-    UserError error{};
-    // wire: 'tokenInfoList' (optional)
-    std::optional<TokenInfoList> tokenInfoList;
-
-    static UsersGetUserTokensResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUsersParams {
-
-    static UsersGetUsersParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersGetUsersResponse {
-    // wire: 'users' (field)
-    UserInfoList users{};
-
-    static UsersGetUsersResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersPushButtonAuthFinishedNotificationParams {
-    // wire: 'token' (optional)
-    std::optional<QString> token;
-    // wire: 'success' (field)
-    bool success{};
-    // wire: 'transactionId' (field)
-    qint64 transactionId{};
-
-    static UsersPushButtonAuthFinishedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersRemoveTokenParams {
-    // wire: 'tokenId' (field)
-    QUuid tokenId{};
-
-    static UsersRemoveTokenParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersRemoveTokenResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersRemoveTokenResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersRemoveUserParams {
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersRemoveUserParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersRemoveUserResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersRemoveUserResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersSetUserInfoParams {
-    // wire: 'displayName' (optional)
-    std::optional<QString> displayName;
-    // wire: 'email' (optional)
-    std::optional<QString> email;
-    // wire: 'username' (optional)
-    std::optional<QString> username;
-
-    static UsersSetUserInfoParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersSetUserInfoResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersSetUserInfoResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersSetUserScopesParams {
-    // wire: 'allowedThingIds' (optional)
-    std::optional<QList<QUuid>> allowedThingIds;
-    // wire: 'scopes' (field)
-    PermissionScopes scopes{};
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersSetUserScopesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersSetUserScopesResponse {
-    // wire: 'error' (field)
-    UserError error{};
-
-    static UsersSetUserScopesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersUserAddedNotificationParams {
-    // wire: 'userInfo' (field)
-    QSharedPointer<UserInfo> userInfo{};
-
-    static UsersUserAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersUserChangedNotificationParams {
-    // wire: 'userInfo' (field)
-    QSharedPointer<UserInfo> userInfo{};
-
-    static UsersUserChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct UsersUserRemovedNotificationParams {
-    // wire: 'username' (field)
-    QString username{};
-
-    static UsersUserRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct Vendor {
-    // wire: 'displayName' (field)
-    QString displayName{};
-    // wire: 'id' (field)
-    QUuid id{};
-    // wire: 'name' (field)
-    QString name{};
-
-    static Vendor fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct WebServerConfiguration {
-    // wire: 'address' (field)
-    QString address{};
-    // wire: 'authenticationEnabled' (field)
-    bool authenticationEnabled{};
-    // wire: 'id' (field)
-    QString id{};
-    // wire: 'port' (field)
-    quint64 port{};
-    // wire: 'publicFolder' (field)
-    QString publicFolder{};
-    // wire: 'sslEnabled' (field)
-    bool sslEnabled{};
-
-    static WebServerConfiguration fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct WiredNetworkDevice {
-    // wire: 'bitRate' (required)
-    QString bitRate{};
-    // wire: 'interface' (required)
-    QString interface{};
-    // wire: 'ipv4Addresses' (required)
-    QStringList ipv4Addresses{};
-    // wire: 'ipv6Addresses' (required)
-    QStringList ipv6Addresses{};
-    // wire: 'macAddress' (required)
-    QString macAddress{};
-    // wire: 'pluggedIn' (required)
-    bool pluggedIn{};
-    // wire: 'state' (required)
-    NetworkDeviceState state{};
-
-    static WiredNetworkDevice fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct WirelessAccessPoint {
-    // wire: 'frequency' (required)
-    double frequency{};
-    // wire: 'macAddress' (required)
-    QString macAddress{};
-    // wire: 'protected' (required)
-    bool protectedValue{};
-    // wire: 'signalStrength' (required)
-    qint64 signalStrength{};
-    // wire: 'ssid' (required)
-    QString ssid{};
-
-    static WirelessAccessPoint fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct WirelessNetworkDevice {
-    // wire: 'bitRate' (required)
-    QString bitRate{};
-    // wire: 'capabilities' (required)
-    WirelessCapabilities capabilities{};
-    // wire: 'interface' (required)
-    QString interface{};
-    // wire: 'ipv4Addresses' (required)
-    QStringList ipv4Addresses{};
-    // wire: 'ipv6Addresses' (required)
-    QStringList ipv6Addresses{};
-    // wire: 'macAddress' (required)
-    QString macAddress{};
-    // wire: 'mode' (required)
-    WirelessMode mode{};
-    // wire: 'currentAccessPoint' (optional, required)
-    std::optional<QSharedPointer<WirelessAccessPoint>> currentAccessPoint;
-    // wire: 'state' (required)
-    NetworkDeviceState state{};
-
-    static WirelessNetworkDevice fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveAddNetworkParams {
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-
-    static ZWaveAddNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveAddNetworkResponse {
-    // wire: 'networkUuid' (optional)
-    std::optional<QUuid> networkUuid;
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveAddNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveAddNodeParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveAddNodeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveAddNodeResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveAddNodeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveCancelPendingOperationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveCancelPendingOperationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveCancelPendingOperationResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveCancelPendingOperationResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveFactoryResetNetworkParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveFactoryResetNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveFactoryResetNetworkResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveFactoryResetNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetNetworksParams {
-
-    static ZWaveGetNetworksParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetNetworksResponse {
-    // wire: 'networks' (field)
-    QList<QSharedPointer<ZWaveNetwork>> networks{};
-
-    static ZWaveGetNetworksResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetNodesParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveGetNodesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetNodesResponse {
-    // wire: 'nodes' (optional)
-    std::optional<QList<QSharedPointer<ZWaveNode>>> nodes;
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveGetNodesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetSerialPortsParams {
-
-    static ZWaveGetSerialPortsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveGetSerialPortsResponse {
-    // wire: 'serialPorts' (field)
-    SerialPorts serialPorts{};
-
-    static ZWaveGetSerialPortsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveIsZWaveAvailableParams {
-
-    static ZWaveIsZWaveAvailableParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveIsZWaveAvailableResponse {
-    // wire: 'available' (field)
-    bool available{};
-
-    static ZWaveIsZWaveAvailableResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNetwork {
-    // wire: 'homeId' (field)
-    quint64 homeId{};
-    // wire: 'isBridgeController' (field)
-    bool isBridgeController{};
-    // wire: 'isPrimaryController' (field)
-    bool isPrimaryController{};
-    // wire: 'isStaticUpdateController' (field)
-    bool isStaticUpdateController{};
-    // wire: 'isZWavePlus' (field)
-    bool isZWavePlus{};
-    // wire: 'networkState' (field)
-    ZWaveNetworkState networkState{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-    // wire: 'waitingForNodeAddition' (field)
-    bool waitingForNodeAddition{};
-    // wire: 'waitingForNodeRemoval' (field)
-    bool waitingForNodeRemoval{};
-
-    static ZWaveNetwork fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNetworkAddedNotificationParams {
-    // wire: 'network' (field)
-    QSharedPointer<ZWaveNetwork> network{};
-
-    static ZWaveNetworkAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNetworkChangedNotificationParams {
-    // wire: 'network' (field)
-    QSharedPointer<ZWaveNetwork> network{};
-
-    static ZWaveNetworkChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNetworkRemovedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveNetworkRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNode {
-    // wire: 'deviceType' (field)
-    ZWaveDeviceType deviceType{};
-    // wire: 'failed' (field)
-    bool failed{};
-    // wire: 'initialized' (field)
-    bool initialized{};
-    // wire: 'isBeamingDevice' (field)
-    bool isBeamingDevice{};
-    // wire: 'isSecurityDevice' (field)
-    bool isSecurityDevice{};
-    // wire: 'isZWavePlusDevice' (field)
-    bool isZWavePlusDevice{};
-    // wire: 'linkQuality' (field)
-    quint64 linkQuality{};
-    // wire: 'manufacturerId' (field)
-    quint64 manufacturerId{};
-    // wire: 'manufacturerName' (field)
-    QString manufacturerName{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'nodeId' (field)
-    quint64 nodeId{};
-    // wire: 'nodeType' (field)
-    ZWaveNodeType nodeType{};
-    // wire: 'productId' (field)
-    quint64 productId{};
-    // wire: 'productName' (field)
-    QString productName{};
-    // wire: 'productType' (field)
-    quint64 productType{};
-    // wire: 'reachable' (field)
-    bool reachable{};
-    // wire: 'role' (field)
-    ZWaveNodeRole role{};
-    // wire: 'securityMode' (field)
-    quint64 securityMode{};
-    // wire: 'sleeping' (field)
-    bool sleeping{};
-    // wire: 'version' (field)
-    QString version{};
-
-    static ZWaveNode fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNodeAddedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'node' (field)
-    QSharedPointer<ZWaveNode> node{};
-
-    static ZWaveNodeAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNodeChangedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'node' (field)
-    QSharedPointer<ZWaveNode> node{};
-
-    static ZWaveNodeChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveNodeRemovedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'nodeId' (field)
-    quint64 nodeId{};
-
-    static ZWaveNodeRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveFailedNodeParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'nodeId' (field)
-    quint64 nodeId{};
-
-    static ZWaveRemoveFailedNodeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveFailedNodeResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveRemoveFailedNodeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveNetworkParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveRemoveNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveNetworkResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveRemoveNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveNodeParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZWaveRemoveNodeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZWaveRemoveNodeResponse {
-    // wire: 'zwaveError' (field)
-    ZWaveError zwaveError{};
-
-    static ZWaveRemoveNodeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeAdapter {
-    // wire: 'backend' (required)
-    QString backend{};
-    // wire: 'baudRate' (required)
-    qint64 baudRate{};
-    // wire: 'description' (required)
-    QString description{};
-    // wire: 'hardwareRecognized' (required)
-    bool hardwareRecognized{};
-    // wire: 'name' (required)
-    QString name{};
-    // wire: 'serialNumber' (required)
-    QString serialNumber{};
-    // wire: 'serialPort' (required)
-    QString serialPort{};
-
-    static ZigbeeAdapter fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeAdapterAddedNotificationParams {
-    // wire: 'adapter' (field)
-    QSharedPointer<ZigbeeAdapter> adapter{};
-
-    static ZigbeeAdapterAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeAdapterRemovedNotificationParams {
-    // wire: 'adapter' (field)
-    QSharedPointer<ZigbeeAdapter> adapter{};
-
-    static ZigbeeAdapterRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeAddNetworkParams {
-    // wire: 'backend' (field)
-    QString backend{};
-    // wire: 'baudRate' (field)
-    quint64 baudRate{};
-    // wire: 'channelMask' (optional)
-    std::optional<quint64> channelMask;
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-
-    static ZigbeeAddNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeAddNetworkResponse {
-    // wire: 'networkUuid' (optional)
-    std::optional<QUuid> networkUuid;
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeAddNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeBindingTableRecord {
-    // wire: 'clusterId' (field)
-    quint64 clusterId{};
-    // wire: 'destinationAddress' (optional)
-    std::optional<QString> destinationAddress;
-    // wire: 'destinationEndpointId' (optional)
-    std::optional<quint64> destinationEndpointId;
-    // wire: 'destinationGroupAddress' (optional)
-    std::optional<quint64> destinationGroupAddress;
-    // wire: 'sourceAddress' (field)
-    QString sourceAddress{};
-    // wire: 'sourceEndpointId' (field)
-    quint64 sourceEndpointId{};
-
-    static ZigbeeBindingTableRecord fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeCluster {
-    // wire: 'clusterId' (field)
-    quint64 clusterId{};
-    // wire: 'direction' (field)
-    ZigbeeClusterDirection direction{};
-
-    static ZigbeeCluster fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeCreateBindingParams {
-    // wire: 'clusterId' (field)
-    quint64 clusterId{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'destinationAddress' (optional)
-    std::optional<QString> destinationAddress;
-    // wire: 'destinationEndpointId' (optional)
-    std::optional<quint64> destinationEndpointId;
-    // wire: 'destinationGroupAddress' (optional)
-    std::optional<quint64> destinationGroupAddress;
-    // wire: 'sourceAddress' (field)
-    QString sourceAddress{};
-    // wire: 'sourceEndpointId' (field)
-    quint64 sourceEndpointId{};
-
-    static ZigbeeCreateBindingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeCreateBindingResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeCreateBindingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeFactoryResetNetworkParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeFactoryResetNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeFactoryResetNetworkResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeFactoryResetNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetAdaptersParams {
-
-    static ZigbeeGetAdaptersParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetAdaptersResponse {
-    // wire: 'adapters' (field)
-    ZigbeeAdapters adapters{};
-
-    static ZigbeeGetAdaptersResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetAvailableBackendsParams {
-
-    static ZigbeeGetAvailableBackendsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetAvailableBackendsResponse {
-    // wire: 'backends' (field)
-    QList<QString> backends{};
-
-    static ZigbeeGetAvailableBackendsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetNetworksParams {
-
-    static ZigbeeGetNetworksParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetNetworksResponse {
-    // wire: 'zigbeeNetworks' (field)
-    QList<QSharedPointer<ZigbeeNetwork>> zigbeeNetworks{};
-
-    static ZigbeeGetNetworksResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetNodesParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeGetNodesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeGetNodesResponse {
-    // wire: 'zigbeeNodes' (optional)
-    std::optional<QList<QSharedPointer<ZigbeeNode>>> zigbeeNodes;
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeGetNodesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNeighborTableRecord {
-    // wire: 'depth' (field)
-    quint64 depth{};
-    // wire: 'lqi' (field)
-    quint64 lqi{};
-    // wire: 'networkAddress' (field)
-    quint64 networkAddress{};
-    // wire: 'permitJoining' (field)
-    bool permitJoining{};
-    // wire: 'relationship' (field)
-    ZigbeeNodeRelationship relationship{};
-
-    static ZigbeeNeighborTableRecord fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNetwork {
-    // wire: 'backend' (field)
-    QString backend{};
-    // wire: 'baudRate' (field)
-    quint64 baudRate{};
-    // wire: 'channel' (field)
-    quint64 channel{};
-    // wire: 'channelMask' (field)
-    quint64 channelMask{};
-    // wire: 'enabled' (field)
-    bool enabled{};
-    // wire: 'firmwareVersion' (field)
-    QString firmwareVersion{};
-    // wire: 'macAddress' (field)
-    QString macAddress{};
-    // wire: 'networkState' (field)
-    ZigbeeNetworkState networkState{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'panId' (field)
-    quint64 panId{};
-    // wire: 'permitJoiningDuration' (field)
-    quint64 permitJoiningDuration{};
-    // wire: 'permitJoiningEnabled' (field)
-    bool permitJoiningEnabled{};
-    // wire: 'permitJoiningRemaining' (field)
-    quint64 permitJoiningRemaining{};
-    // wire: 'serialPort' (field)
-    QString serialPort{};
-
-    static ZigbeeNetwork fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNetworkAddedNotificationParams {
-    // wire: 'zigbeeNetwork' (field)
-    QSharedPointer<ZigbeeNetwork> zigbeeNetwork{};
-
-    static ZigbeeNetworkAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNetworkChangedNotificationParams {
-    // wire: 'zigbeeNetwork' (field)
-    QSharedPointer<ZigbeeNetwork> zigbeeNetwork{};
-
-    static ZigbeeNetworkChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNetworkRemovedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeNetworkRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNode {
-    // wire: 'bindingTableRecords' (field)
-    QList<QSharedPointer<ZigbeeBindingTableRecord>> bindingTableRecords{};
-    // wire: 'endpoints' (field)
-    QList<QSharedPointer<ZigbeeNodeEndpoint>> endpoints{};
-    // wire: 'ieeeAddress' (field)
-    QString ieeeAddress{};
-    // wire: 'lastSeen' (field)
-    quint64 lastSeen{};
-    // wire: 'lqi' (field)
-    quint64 lqi{};
-    // wire: 'manufacturer' (field)
-    QString manufacturer{};
-    // wire: 'model' (field)
-    QString model{};
-    // wire: 'neighborTableRecords' (field)
-    QList<QSharedPointer<ZigbeeNeighborTableRecord>> neighborTableRecords{};
-    // wire: 'networkAddress' (field)
-    quint64 networkAddress{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'reachable' (field)
-    bool reachable{};
-    // wire: 'receiverOnWhileIdle' (field)
-    bool receiverOnWhileIdle{};
-    // wire: 'routingTableRecords' (field)
-    QList<QSharedPointer<ZigbeeRoutingTableRecord>> routingTableRecords{};
-    // wire: 'state' (field)
-    ZigbeeNodeState state{};
-    // wire: 'type' (field)
-    ZigbeeNodeType type{};
-    // wire: 'version' (field)
-    QString version{};
-
-    static ZigbeeNode fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNodeAddedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'zigbeeNode' (field)
-    QSharedPointer<ZigbeeNode> zigbeeNode{};
-
-    static ZigbeeNodeAddedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNodeChangedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'zigbeeNode' (field)
-    QSharedPointer<ZigbeeNode> zigbeeNode{};
-
-    static ZigbeeNodeChangedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNodeEndpoint {
-    // wire: 'endpointId' (field)
-    quint64 endpointId{};
-    // wire: 'inputClusters' (field)
-    QList<QSharedPointer<ZigbeeCluster>> inputClusters{};
-    // wire: 'outputClusters' (field)
-    QList<QSharedPointer<ZigbeeCluster>> outputClusters{};
-
-    static ZigbeeNodeEndpoint fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeNodeRemovedNotificationParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'zigbeeNode' (field)
-    QSharedPointer<ZigbeeNode> zigbeeNode{};
-
-    static ZigbeeNodeRemovedNotificationParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRefreshBindingsParams {
-    // wire: 'ieeeAddress' (field)
-    QString ieeeAddress{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeRefreshBindingsParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRefreshBindingsResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeRefreshBindingsResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRefreshNeighborTablesParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeRefreshNeighborTablesParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRefreshNeighborTablesResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeRefreshNeighborTablesResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveBindingParams {
-    // wire: 'clusterId' (field)
-    quint64 clusterId{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'destinationAddress' (optional)
-    std::optional<QString> destinationAddress;
-    // wire: 'destinationEndpointId' (optional)
-    std::optional<quint64> destinationEndpointId;
-    // wire: 'destinationGroupAddress' (optional)
-    std::optional<quint64> destinationGroupAddress;
-    // wire: 'sourceAddress' (field)
-    QString sourceAddress{};
-    // wire: 'sourceEndpointId' (field)
-    quint64 sourceEndpointId{};
-
-    static ZigbeeRemoveBindingParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveBindingResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeRemoveBindingResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveNetworkParams {
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeRemoveNetworkParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveNetworkResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeRemoveNetworkResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveNodeParams {
-    // wire: 'ieeeAddress' (field)
-    QString ieeeAddress{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-
-    static ZigbeeRemoveNodeParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRemoveNodeResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeRemoveNodeResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeRoutingTableRecord {
-    // wire: 'destinationAddress' (field)
-    quint64 destinationAddress{};
-    // wire: 'manyToOne' (field)
-    bool manyToOne{};
-    // wire: 'memoryConstrained' (field)
-    bool memoryConstrained{};
-    // wire: 'nextHopAddress' (field)
-    quint64 nextHopAddress{};
-    // wire: 'status' (field)
-    ZigbeeNodeRouteStatus status{};
-
-    static ZigbeeRoutingTableRecord fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeSetPermitJoinParams {
-    // wire: 'duration' (field)
-    quint64 duration{};
-    // wire: 'networkUuid' (field)
-    QUuid networkUuid{};
-    // wire: 'shortAddress' (optional)
-    std::optional<quint64> shortAddress;
-
-    static ZigbeeSetPermitJoinParams fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-struct ZigbeeSetPermitJoinResponse {
-    // wire: 'zigbeeError' (field)
-    ZigbeeError zigbeeError{};
-
-    static ZigbeeSetPermitJoinResponse fromJson(const QJsonObject &object);
-    QJsonObject toJson() const;
-};
-
-inline Action Action::fromJson(const QJsonObject &object) {
-    Action value;
-    if (object.contains(QStringLiteral("actionTypeId"))) {
-        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject Action::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
-    if (params.has_value()) {
-        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
-    return object;
-}
-
-inline ActionType ActionType::fromJson(const QJsonObject &object) {
-    ActionType value;
-    if (object.contains(QStringLiteral("displayName"))) {
-        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
-    }
-    if (object.contains(QStringLiteral("index"))) {
-        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("paramTypes"))) {
-        value.paramTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject ActionType::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
-    object.insert(QStringLiteral("index"), QJsonValue(static_cast<qint64>(index)));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
-    return object;
-}
 
 inline AppDataChangedNotificationParams AppDataChangedNotificationParams::fromJson(const QJsonObject &object) {
     AppDataChangedNotificationParams value;
@@ -7304,6 +2163,19 @@ inline QJsonObject AppDataChangedNotificationParams::toJson() const {
     return object;
 }
 
+class AppDataLoadParams {
+public:
+    // wire: 'appId' (field)
+    QString appId{};
+    // wire: 'key' (field)
+    QString key{};
+    // wire: 'group' (optional)
+    std::optional<QString> group;
+
+    static AppDataLoadParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline AppDataLoadParams AppDataLoadParams::fromJson(const QJsonObject &object) {
     AppDataLoadParams value;
     if (object.contains(QStringLiteral("appId"))) {
@@ -7328,6 +2200,15 @@ inline QJsonObject AppDataLoadParams::toJson() const {
     return object;
 }
 
+class AppDataLoadResponse {
+public:
+    // wire: 'value' (field)
+    QString value{};
+
+    static AppDataLoadResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline AppDataLoadResponse AppDataLoadResponse::fromJson(const QJsonObject &object) {
     AppDataLoadResponse value;
     if (object.contains(QStringLiteral("value"))) {
@@ -7341,6 +2222,21 @@ inline QJsonObject AppDataLoadResponse::toJson() const {
     object.insert(QStringLiteral("value"), QJsonValue(value));
     return object;
 }
+
+class AppDataStoreParams {
+public:
+    // wire: 'appId' (field)
+    QString appId{};
+    // wire: 'key' (field)
+    QString key{};
+    // wire: 'group' (optional)
+    std::optional<QString> group;
+    // wire: 'value' (field)
+    QString value{};
+
+    static AppDataStoreParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline AppDataStoreParams AppDataStoreParams::fromJson(const QJsonObject &object) {
     AppDataStoreParams value;
@@ -7370,6 +2266,13 @@ inline QJsonObject AppDataStoreParams::toJson() const {
     return object;
 }
 
+class AppDataStoreResponse {
+public:
+
+    static AppDataStoreResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline AppDataStoreResponse AppDataStoreResponse::fromJson(const QJsonObject &object) {
     AppDataStoreResponse value;
     return value;
@@ -7379,6 +2282,33 @@ inline QJsonObject AppDataStoreResponse::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class BrowserItem {
+public:
+    // wire: 'actionTypeIds' (field)
+    QList<QUuid> actionTypeIds{};
+    // wire: 'browsable' (field)
+    bool browsable{};
+    // wire: 'description' (field)
+    QString description{};
+    // wire: 'disabled' (field)
+    bool disabled{};
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'executable' (field)
+    bool executable{};
+    // wire: 'icon' (field)
+    BrowserIcon icon{};
+    // wire: 'id' (field)
+    QString id{};
+    // wire: 'mediaIcon' (optional)
+    std::optional<MediaBrowserIcon> mediaIcon;
+    // wire: 'thumbnail' (field)
+    QString thumbnail{};
+
+    static BrowserItem fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline BrowserItem BrowserItem::fromJson(const QJsonObject &object) {
     BrowserItem value;
@@ -7432,6 +2362,17 @@ inline QJsonObject BrowserItem::toJson() const {
     return object;
 }
 
+class CacheHash {
+public:
+    // wire: 'hash' (field)
+    QString hash{};
+    // wire: 'method' (field)
+    QString method{};
+
+    static CacheHash fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline CacheHash CacheHash::fromJson(const QJsonObject &object) {
     CacheHash value;
     if (object.contains(QStringLiteral("hash"))) {
@@ -7450,89 +2391,18 @@ inline QJsonObject CacheHash::toJson() const {
     return object;
 }
 
-inline CalendarItem CalendarItem::fromJson(const QJsonObject &object) {
-    CalendarItem value;
-    if (object.contains(QStringLiteral("duration"))) {
-        value.duration = static_cast<quint64>((object.value(QStringLiteral("duration"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("datetime"))) {
-        value.datetime = static_cast<quint64>((object.value(QStringLiteral("datetime"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("repeating"))) {
-        value.repeating = QSharedPointer<RepeatingOption>::create(RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("startTime"))) {
-        value.startTime = static_cast<qint64>((object.value(QStringLiteral("startTime"))).toInteger());
-    }
-    return value;
-}
+class ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation {
+public:
+    // wire: 'latitude' (field)
+    double latitude{};
+    // wire: 'longitude' (field)
+    double longitude{};
+    // wire: 'name' (field)
+    QString name{};
 
-inline QJsonObject CalendarItem::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("duration"), QJsonValue(static_cast<qint64>(duration)));
-    if (datetime.has_value()) {
-        object.insert(QStringLiteral("datetime"), QJsonValue(static_cast<qint64>(*datetime)));
-    }
-    if (repeating.has_value()) {
-        object.insert(QStringLiteral("repeating"), ((*repeating) ? QJsonValue((*repeating)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    if (startTime.has_value()) {
-        object.insert(QStringLiteral("startTime"), QJsonValue(static_cast<qint64>(*startTime)));
-    }
-    return object;
-}
-
-inline ConfigurationBasicConfigurationChangedNotificationParams ConfigurationBasicConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationBasicConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("basicConfiguration"))) {
-        value.basicConfiguration = QSharedPointer<ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration>::create(ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::fromJson((object.value(QStringLiteral("basicConfiguration"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationBasicConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("basicConfiguration"), ((basicConfiguration) ? QJsonValue((basicConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::fromJson(const QJsonObject &object) {
-    ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration value;
-    if (object.contains(QStringLiteral("language"))) {
-        value.language = (object.value(QStringLiteral("language"))).toString();
-    }
-    if (object.contains(QStringLiteral("location"))) {
-        value.location = QSharedPointer<ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation>::create(ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation::fromJson((object.value(QStringLiteral("location"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("serverTime"))) {
-        value.serverTime = static_cast<quint64>((object.value(QStringLiteral("serverTime"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("timeZone"))) {
-        value.timeZone = (object.value(QStringLiteral("timeZone"))).toString();
-    }
-    if (object.contains(QStringLiteral("debugServerEnabled"))) {
-        value.debugServerEnabled = (object.value(QStringLiteral("debugServerEnabled"))).toBool();
-    }
-    if (object.contains(QStringLiteral("serverName"))) {
-        value.serverName = (object.value(QStringLiteral("serverName"))).toString();
-    }
-    if (object.contains(QStringLiteral("serverUuid"))) {
-        value.serverUuid = QUuid((object.value(QStringLiteral("serverUuid"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("language"), QJsonValue(language));
-    object.insert(QStringLiteral("location"), ((location) ? QJsonValue((location)->toJson()) : QJsonValue(QJsonObject{})));
-    object.insert(QStringLiteral("serverTime"), QJsonValue(static_cast<qint64>(serverTime)));
-    object.insert(QStringLiteral("timeZone"), QJsonValue(timeZone));
-    object.insert(QStringLiteral("debugServerEnabled"), QJsonValue(debugServerEnabled));
-    object.insert(QStringLiteral("serverName"), QJsonValue(serverName));
-    object.insert(QStringLiteral("serverUuid"), QJsonValue((serverUuid).toString()));
-    return object;
-}
+    static ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation::fromJson(const QJsonObject &object) {
     ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation value;
@@ -7556,245 +2426,34 @@ inline QJsonObject ConfigurationBasicConfigurationChangedNotificationParamsBasic
     return object;
 }
 
-inline ConfigurationDeleteMqttPolicyParams ConfigurationDeleteMqttPolicyParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteMqttPolicyParams value;
-    if (object.contains(QStringLiteral("clientId"))) {
-        value.clientId = (object.value(QStringLiteral("clientId"))).toString();
-    }
-    return value;
-}
+class ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration {
+public:
+    // wire: 'language' (deprecated)
+    QString language{};
+    // wire: 'location' (deprecated)
+    ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation location{};
+    // wire: 'serverTime' (deprecated)
+    quint64 serverTime{};
+    // wire: 'timeZone' (deprecated)
+    QString timeZone{};
+    // wire: 'debugServerEnabled' (field)
+    bool debugServerEnabled{};
+    // wire: 'serverName' (field)
+    QString serverName{};
+    // wire: 'serverUuid' (field)
+    QUuid serverUuid{};
 
-inline QJsonObject ConfigurationDeleteMqttPolicyParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("clientId"), QJsonValue(clientId));
-    return object;
-}
+    static ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
-inline ConfigurationDeleteMqttPolicyResponse ConfigurationDeleteMqttPolicyResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteMqttPolicyResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteMqttPolicyResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationDeleteMqttServerConfigurationParams ConfigurationDeleteMqttServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteMqttServerConfigurationParams value;
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = (object.value(QStringLiteral("id"))).toString();
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteMqttServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("id"), QJsonValue(id));
-    return object;
-}
-
-inline ConfigurationDeleteMqttServerConfigurationResponse ConfigurationDeleteMqttServerConfigurationResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteMqttServerConfigurationResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteMqttServerConfigurationResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationDeleteTcpServerConfigurationParams ConfigurationDeleteTcpServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteTcpServerConfigurationParams value;
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = (object.value(QStringLiteral("id"))).toString();
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteTcpServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("id"), QJsonValue(id));
-    return object;
-}
-
-inline ConfigurationDeleteTcpServerConfigurationResponse ConfigurationDeleteTcpServerConfigurationResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteTcpServerConfigurationResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteTcpServerConfigurationResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationDeleteTunnelProxyServerConfigurationParams ConfigurationDeleteTunnelProxyServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteTunnelProxyServerConfigurationParams value;
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = (object.value(QStringLiteral("id"))).toString();
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteTunnelProxyServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("id"), QJsonValue(id));
-    return object;
-}
-
-inline ConfigurationDeleteTunnelProxyServerConfigurationResponse ConfigurationDeleteTunnelProxyServerConfigurationResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteTunnelProxyServerConfigurationResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteTunnelProxyServerConfigurationResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationDeleteWebServerConfigurationParams ConfigurationDeleteWebServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteWebServerConfigurationParams value;
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = (object.value(QStringLiteral("id"))).toString();
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteWebServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("id"), QJsonValue(id));
-    return object;
-}
-
-inline ConfigurationDeleteWebServerConfigurationResponse ConfigurationDeleteWebServerConfigurationResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteWebServerConfigurationResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteWebServerConfigurationResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationDeleteWebSocketServerConfigurationParams ConfigurationDeleteWebSocketServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteWebSocketServerConfigurationParams value;
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = (object.value(QStringLiteral("id"))).toString();
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteWebSocketServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("id"), QJsonValue(id));
-    return object;
-}
-
-inline ConfigurationDeleteWebSocketServerConfigurationResponse ConfigurationDeleteWebSocketServerConfigurationResponse::fromJson(const QJsonObject &object) {
-    ConfigurationDeleteWebSocketServerConfigurationResponse value;
-    if (object.contains(QStringLiteral("configurationError"))) {
-        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationDeleteWebSocketServerConfigurationResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
-    return object;
-}
-
-inline ConfigurationGetAvailableLanguagesParams ConfigurationGetAvailableLanguagesParams::fromJson(const QJsonObject &object) {
-    ConfigurationGetAvailableLanguagesParams value;
-    return value;
-}
-
-inline QJsonObject ConfigurationGetAvailableLanguagesParams::toJson() const {
-    QJsonObject object;
-    return object;
-}
-
-inline ConfigurationGetAvailableLanguagesResponse ConfigurationGetAvailableLanguagesResponse::fromJson(const QJsonObject &object) {
-    ConfigurationGetAvailableLanguagesResponse value;
-    if (object.contains(QStringLiteral("languages"))) {
-        value.languages = ([&]() { QList<QString> list; for (const QJsonValue &item : (object.value(QStringLiteral("languages"))).toArray()) { list.append((item).toString()); } return list; }());
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationGetAvailableLanguagesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("languages"), ([&]() { QJsonArray array; for (const auto &item : languages) { array.append(QJsonValue(item)); } return QJsonValue(array); }()));
-    return object;
-}
-
-inline ConfigurationGetConfigurationsParams ConfigurationGetConfigurationsParams::fromJson(const QJsonObject &object) {
-    ConfigurationGetConfigurationsParams value;
-    return value;
-}
-
-inline QJsonObject ConfigurationGetConfigurationsParams::toJson() const {
-    QJsonObject object;
-    return object;
-}
-
-inline ConfigurationGetConfigurationsResponse ConfigurationGetConfigurationsResponse::fromJson(const QJsonObject &object) {
-    ConfigurationGetConfigurationsResponse value;
-    if (object.contains(QStringLiteral("basicConfiguration"))) {
-        value.basicConfiguration = QSharedPointer<ConfigurationGetConfigurationsResponseBasicConfiguration>::create(ConfigurationGetConfigurationsResponseBasicConfiguration::fromJson((object.value(QStringLiteral("basicConfiguration"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("tcpServerConfigurations"))) {
-        value.tcpServerConfigurations = ([&]() { QList<QSharedPointer<ServerConfiguration>> list; for (const QJsonValue &item : (object.value(QStringLiteral("tcpServerConfigurations"))).toArray()) { list.append(QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("tunnelProxyServerConfigurations"))) {
-        value.tunnelProxyServerConfigurations = ([&]() { QList<QSharedPointer<TunnelProxyServerConfiguration>> list; for (const QJsonValue &item : (object.value(QStringLiteral("tunnelProxyServerConfigurations"))).toArray()) { list.append(QSharedPointer<TunnelProxyServerConfiguration>::create(TunnelProxyServerConfiguration::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("webServerConfigurations"))) {
-        value.webServerConfigurations = ([&]() { QList<QSharedPointer<WebServerConfiguration>> list; for (const QJsonValue &item : (object.value(QStringLiteral("webServerConfigurations"))).toArray()) { list.append(QSharedPointer<WebServerConfiguration>::create(WebServerConfiguration::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("webSocketServerConfigurations"))) {
-        value.webSocketServerConfigurations = ([&]() { QList<QSharedPointer<ServerConfiguration>> list; for (const QJsonValue &item : (object.value(QStringLiteral("webSocketServerConfigurations"))).toArray()) { list.append(QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
-
-inline QJsonObject ConfigurationGetConfigurationsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("basicConfiguration"), ((basicConfiguration) ? QJsonValue((basicConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    object.insert(QStringLiteral("tcpServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tcpServerConfigurations) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("tunnelProxyServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tunnelProxyServerConfigurations) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("webServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : webServerConfigurations) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("webSocketServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : webSocketServerConfigurations) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
-
-inline ConfigurationGetConfigurationsResponseBasicConfiguration ConfigurationGetConfigurationsResponseBasicConfiguration::fromJson(const QJsonObject &object) {
-    ConfigurationGetConfigurationsResponseBasicConfiguration value;
+inline ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::fromJson(const QJsonObject &object) {
+    ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration value;
     if (object.contains(QStringLiteral("language"))) {
         value.language = (object.value(QStringLiteral("language"))).toString();
     }
     if (object.contains(QStringLiteral("location"))) {
-        value.location = QSharedPointer<ConfigurationGetConfigurationsResponseBasicConfigurationLocation>::create(ConfigurationGetConfigurationsResponseBasicConfigurationLocation::fromJson((object.value(QStringLiteral("location"))).toObject()));
+        value.location = ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation::fromJson((object.value(QStringLiteral("location"))).toObject());
     }
     if (object.contains(QStringLiteral("serverTime"))) {
         value.serverTime = static_cast<quint64>((object.value(QStringLiteral("serverTime"))).toInteger());
@@ -7814,10 +2473,10 @@ inline ConfigurationGetConfigurationsResponseBasicConfiguration ConfigurationGet
     return value;
 }
 
-inline QJsonObject ConfigurationGetConfigurationsResponseBasicConfiguration::toJson() const {
+inline QJsonObject ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("language"), QJsonValue(language));
-    object.insert(QStringLiteral("location"), ((location) ? QJsonValue((location)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("location"), QJsonValue((location).toJson()));
     object.insert(QStringLiteral("serverTime"), QJsonValue(static_cast<qint64>(serverTime)));
     object.insert(QStringLiteral("timeZone"), QJsonValue(timeZone));
     object.insert(QStringLiteral("debugServerEnabled"), QJsonValue(debugServerEnabled));
@@ -7825,6 +2484,375 @@ inline QJsonObject ConfigurationGetConfigurationsResponseBasicConfiguration::toJ
     object.insert(QStringLiteral("serverUuid"), QJsonValue((serverUuid).toString()));
     return object;
 }
+
+class ConfigurationBasicConfigurationChangedNotificationParams {
+public:
+    // wire: 'basicConfiguration' (field)
+    ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration basicConfiguration{};
+
+    static ConfigurationBasicConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationBasicConfigurationChangedNotificationParams ConfigurationBasicConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationBasicConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("basicConfiguration"))) {
+        value.basicConfiguration = ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration::fromJson((object.value(QStringLiteral("basicConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationBasicConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("basicConfiguration"), QJsonValue((basicConfiguration).toJson()));
+    return object;
+}
+
+class ConfigurationDeleteMqttPolicyParams {
+public:
+    // wire: 'clientId' (field)
+    QString clientId{};
+
+    static ConfigurationDeleteMqttPolicyParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteMqttPolicyParams ConfigurationDeleteMqttPolicyParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteMqttPolicyParams value;
+    if (object.contains(QStringLiteral("clientId"))) {
+        value.clientId = (object.value(QStringLiteral("clientId"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteMqttPolicyParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("clientId"), QJsonValue(clientId));
+    return object;
+}
+
+class ConfigurationDeleteMqttPolicyResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteMqttPolicyResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteMqttPolicyResponse ConfigurationDeleteMqttPolicyResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteMqttPolicyResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteMqttPolicyResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationDeleteMqttServerConfigurationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
+
+    static ConfigurationDeleteMqttServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteMqttServerConfigurationParams ConfigurationDeleteMqttServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteMqttServerConfigurationParams value;
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = (object.value(QStringLiteral("id"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteMqttServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("id"), QJsonValue(id));
+    return object;
+}
+
+class ConfigurationDeleteMqttServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteMqttServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteMqttServerConfigurationResponse ConfigurationDeleteMqttServerConfigurationResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteMqttServerConfigurationResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteMqttServerConfigurationResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationDeleteTcpServerConfigurationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
+
+    static ConfigurationDeleteTcpServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteTcpServerConfigurationParams ConfigurationDeleteTcpServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteTcpServerConfigurationParams value;
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = (object.value(QStringLiteral("id"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteTcpServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("id"), QJsonValue(id));
+    return object;
+}
+
+class ConfigurationDeleteTcpServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteTcpServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteTcpServerConfigurationResponse ConfigurationDeleteTcpServerConfigurationResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteTcpServerConfigurationResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteTcpServerConfigurationResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationDeleteTunnelProxyServerConfigurationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
+
+    static ConfigurationDeleteTunnelProxyServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteTunnelProxyServerConfigurationParams ConfigurationDeleteTunnelProxyServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteTunnelProxyServerConfigurationParams value;
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = (object.value(QStringLiteral("id"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteTunnelProxyServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("id"), QJsonValue(id));
+    return object;
+}
+
+class ConfigurationDeleteTunnelProxyServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteTunnelProxyServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteTunnelProxyServerConfigurationResponse ConfigurationDeleteTunnelProxyServerConfigurationResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteTunnelProxyServerConfigurationResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteTunnelProxyServerConfigurationResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationDeleteWebServerConfigurationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
+
+    static ConfigurationDeleteWebServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteWebServerConfigurationParams ConfigurationDeleteWebServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteWebServerConfigurationParams value;
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = (object.value(QStringLiteral("id"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteWebServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("id"), QJsonValue(id));
+    return object;
+}
+
+class ConfigurationDeleteWebServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteWebServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteWebServerConfigurationResponse ConfigurationDeleteWebServerConfigurationResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteWebServerConfigurationResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteWebServerConfigurationResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationDeleteWebSocketServerConfigurationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
+
+    static ConfigurationDeleteWebSocketServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteWebSocketServerConfigurationParams ConfigurationDeleteWebSocketServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteWebSocketServerConfigurationParams value;
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = (object.value(QStringLiteral("id"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteWebSocketServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("id"), QJsonValue(id));
+    return object;
+}
+
+class ConfigurationDeleteWebSocketServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationDeleteWebSocketServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationDeleteWebSocketServerConfigurationResponse ConfigurationDeleteWebSocketServerConfigurationResponse::fromJson(const QJsonObject &object) {
+    ConfigurationDeleteWebSocketServerConfigurationResponse value;
+    if (object.contains(QStringLiteral("configurationError"))) {
+        value.configurationError = parseConfigurationError(object.value(QStringLiteral("configurationError")));
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationDeleteWebSocketServerConfigurationResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configurationError"), QJsonValue(toString(configurationError)));
+    return object;
+}
+
+class ConfigurationGetAvailableLanguagesParams {
+public:
+
+    static ConfigurationGetAvailableLanguagesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetAvailableLanguagesParams ConfigurationGetAvailableLanguagesParams::fromJson(const QJsonObject &object) {
+    ConfigurationGetAvailableLanguagesParams value;
+    return value;
+}
+
+inline QJsonObject ConfigurationGetAvailableLanguagesParams::toJson() const {
+    QJsonObject object;
+    return object;
+}
+
+class ConfigurationGetAvailableLanguagesResponse {
+public:
+    // wire: 'languages' (field)
+    QList<QString> languages{};
+
+    static ConfigurationGetAvailableLanguagesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetAvailableLanguagesResponse ConfigurationGetAvailableLanguagesResponse::fromJson(const QJsonObject &object) {
+    ConfigurationGetAvailableLanguagesResponse value;
+    if (object.contains(QStringLiteral("languages"))) {
+        value.languages = ([&]() { QList<QString> list; for (const QJsonValue &item : (object.value(QStringLiteral("languages"))).toArray()) { list.append((item).toString()); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationGetAvailableLanguagesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("languages"), ([&]() { QJsonArray array; for (const auto &item : languages) { array.append(QJsonValue(item)); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ConfigurationGetConfigurationsParams {
+public:
+
+    static ConfigurationGetConfigurationsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetConfigurationsParams ConfigurationGetConfigurationsParams::fromJson(const QJsonObject &object) {
+    ConfigurationGetConfigurationsParams value;
+    return value;
+}
+
+inline QJsonObject ConfigurationGetConfigurationsParams::toJson() const {
+    QJsonObject object;
+    return object;
+}
+
+class ConfigurationGetConfigurationsResponseBasicConfigurationLocation {
+public:
+    // wire: 'latitude' (field)
+    double latitude{};
+    // wire: 'longitude' (field)
+    double longitude{};
+    // wire: 'name' (field)
+    QString name{};
+
+    static ConfigurationGetConfigurationsResponseBasicConfigurationLocation fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationGetConfigurationsResponseBasicConfigurationLocation ConfigurationGetConfigurationsResponseBasicConfigurationLocation::fromJson(const QJsonObject &object) {
     ConfigurationGetConfigurationsResponseBasicConfigurationLocation value;
@@ -7848,6 +2876,72 @@ inline QJsonObject ConfigurationGetConfigurationsResponseBasicConfigurationLocat
     return object;
 }
 
+class ConfigurationGetConfigurationsResponseBasicConfiguration {
+public:
+    // wire: 'language' (deprecated)
+    QString language{};
+    // wire: 'location' (deprecated)
+    ConfigurationGetConfigurationsResponseBasicConfigurationLocation location{};
+    // wire: 'serverTime' (deprecated)
+    quint64 serverTime{};
+    // wire: 'timeZone' (deprecated)
+    QString timeZone{};
+    // wire: 'debugServerEnabled' (field)
+    bool debugServerEnabled{};
+    // wire: 'serverName' (field)
+    QString serverName{};
+    // wire: 'serverUuid' (field)
+    QUuid serverUuid{};
+
+    static ConfigurationGetConfigurationsResponseBasicConfiguration fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetConfigurationsResponseBasicConfiguration ConfigurationGetConfigurationsResponseBasicConfiguration::fromJson(const QJsonObject &object) {
+    ConfigurationGetConfigurationsResponseBasicConfiguration value;
+    if (object.contains(QStringLiteral("language"))) {
+        value.language = (object.value(QStringLiteral("language"))).toString();
+    }
+    if (object.contains(QStringLiteral("location"))) {
+        value.location = ConfigurationGetConfigurationsResponseBasicConfigurationLocation::fromJson((object.value(QStringLiteral("location"))).toObject());
+    }
+    if (object.contains(QStringLiteral("serverTime"))) {
+        value.serverTime = static_cast<quint64>((object.value(QStringLiteral("serverTime"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("timeZone"))) {
+        value.timeZone = (object.value(QStringLiteral("timeZone"))).toString();
+    }
+    if (object.contains(QStringLiteral("debugServerEnabled"))) {
+        value.debugServerEnabled = (object.value(QStringLiteral("debugServerEnabled"))).toBool();
+    }
+    if (object.contains(QStringLiteral("serverName"))) {
+        value.serverName = (object.value(QStringLiteral("serverName"))).toString();
+    }
+    if (object.contains(QStringLiteral("serverUuid"))) {
+        value.serverUuid = QUuid((object.value(QStringLiteral("serverUuid"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationGetConfigurationsResponseBasicConfiguration::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("language"), QJsonValue(language));
+    object.insert(QStringLiteral("location"), QJsonValue((location).toJson()));
+    object.insert(QStringLiteral("serverTime"), QJsonValue(static_cast<qint64>(serverTime)));
+    object.insert(QStringLiteral("timeZone"), QJsonValue(timeZone));
+    object.insert(QStringLiteral("debugServerEnabled"), QJsonValue(debugServerEnabled));
+    object.insert(QStringLiteral("serverName"), QJsonValue(serverName));
+    object.insert(QStringLiteral("serverUuid"), QJsonValue((serverUuid).toString()));
+    return object;
+}
+
+class ConfigurationGetMqttPoliciesParams {
+public:
+
+    static ConfigurationGetMqttPoliciesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationGetMqttPoliciesParams ConfigurationGetMqttPoliciesParams::fromJson(const QJsonObject &object) {
     ConfigurationGetMqttPoliciesParams value;
     return value;
@@ -7858,19 +2952,12 @@ inline QJsonObject ConfigurationGetMqttPoliciesParams::toJson() const {
     return object;
 }
 
-inline ConfigurationGetMqttPoliciesResponse ConfigurationGetMqttPoliciesResponse::fromJson(const QJsonObject &object) {
-    ConfigurationGetMqttPoliciesResponse value;
-    if (object.contains(QStringLiteral("mqttPolicies"))) {
-        value.mqttPolicies = ([&]() { QList<QSharedPointer<MqttPolicy>> list; for (const QJsonValue &item : (object.value(QStringLiteral("mqttPolicies"))).toArray()) { list.append(QSharedPointer<MqttPolicy>::create(MqttPolicy::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ConfigurationGetMqttServerConfigurationsParams {
+public:
 
-inline QJsonObject ConfigurationGetMqttPoliciesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("mqttPolicies"), ([&]() { QJsonArray array; for (const auto &item : mqttPolicies) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static ConfigurationGetMqttServerConfigurationsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationGetMqttServerConfigurationsParams ConfigurationGetMqttServerConfigurationsParams::fromJson(const QJsonObject &object) {
     ConfigurationGetMqttServerConfigurationsParams value;
@@ -7882,19 +2969,12 @@ inline QJsonObject ConfigurationGetMqttServerConfigurationsParams::toJson() cons
     return object;
 }
 
-inline ConfigurationGetMqttServerConfigurationsResponse ConfigurationGetMqttServerConfigurationsResponse::fromJson(const QJsonObject &object) {
-    ConfigurationGetMqttServerConfigurationsResponse value;
-    if (object.contains(QStringLiteral("mqttServerConfigurations"))) {
-        value.mqttServerConfigurations = ([&]() { QList<QSharedPointer<ServerConfiguration>> list; for (const QJsonValue &item : (object.value(QStringLiteral("mqttServerConfigurations"))).toArray()) { list.append(QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ConfigurationGetTimeZonesParams {
+public:
 
-inline QJsonObject ConfigurationGetMqttServerConfigurationsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("mqttServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : mqttServerConfigurations) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static ConfigurationGetTimeZonesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationGetTimeZonesParams ConfigurationGetTimeZonesParams::fromJson(const QJsonObject &object) {
     ConfigurationGetTimeZonesParams value;
@@ -7905,6 +2985,15 @@ inline QJsonObject ConfigurationGetTimeZonesParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class ConfigurationGetTimeZonesResponse {
+public:
+    // wire: 'timeZones' (field)
+    QList<QString> timeZones{};
+
+    static ConfigurationGetTimeZonesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationGetTimeZonesResponse ConfigurationGetTimeZonesResponse::fromJson(const QJsonObject &object) {
     ConfigurationGetTimeZonesResponse value;
@@ -7920,6 +3009,15 @@ inline QJsonObject ConfigurationGetTimeZonesResponse::toJson() const {
     return object;
 }
 
+class ConfigurationLanguageChangedNotificationParams {
+public:
+    // wire: 'language' (field)
+    QString language{};
+
+    static ConfigurationLanguageChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationLanguageChangedNotificationParams ConfigurationLanguageChangedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationLanguageChangedNotificationParams value;
     if (object.contains(QStringLiteral("language"))) {
@@ -7934,19 +3032,14 @@ inline QJsonObject ConfigurationLanguageChangedNotificationParams::toJson() cons
     return object;
 }
 
-inline ConfigurationMqttPolicyChangedNotificationParams ConfigurationMqttPolicyChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationMqttPolicyChangedNotificationParams value;
-    if (object.contains(QStringLiteral("policy"))) {
-        value.policy = QSharedPointer<MqttPolicy>::create(MqttPolicy::fromJson((object.value(QStringLiteral("policy"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationMqttPolicyRemovedNotificationParams {
+public:
+    // wire: 'clientId' (field)
+    QString clientId{};
 
-inline QJsonObject ConfigurationMqttPolicyChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("policy"), ((policy) ? QJsonValue((policy)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationMqttPolicyRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationMqttPolicyRemovedNotificationParams ConfigurationMqttPolicyRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationMqttPolicyRemovedNotificationParams value;
@@ -7962,19 +3055,14 @@ inline QJsonObject ConfigurationMqttPolicyRemovedNotificationParams::toJson() co
     return object;
 }
 
-inline ConfigurationMqttServerConfigurationChangedNotificationParams ConfigurationMqttServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationMqttServerConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("mqttServerConfiguration"))) {
-        value.mqttServerConfiguration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("mqttServerConfiguration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationMqttServerConfigurationRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
 
-inline QJsonObject ConfigurationMqttServerConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("mqttServerConfiguration"), ((mqttServerConfiguration) ? QJsonValue((mqttServerConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationMqttServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationMqttServerConfigurationRemovedNotificationParams ConfigurationMqttServerConfigurationRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationMqttServerConfigurationRemovedNotificationParams value;
@@ -7990,6 +3078,15 @@ inline QJsonObject ConfigurationMqttServerConfigurationRemovedNotificationParams
     return object;
 }
 
+class ConfigurationSetDebugServerEnabledParams {
+public:
+    // wire: 'enabled' (field)
+    QString enabled{};
+
+    static ConfigurationSetDebugServerEnabledParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationSetDebugServerEnabledParams ConfigurationSetDebugServerEnabledParams::fromJson(const QJsonObject &object) {
     ConfigurationSetDebugServerEnabledParams value;
     if (object.contains(QStringLiteral("enabled"))) {
@@ -8003,6 +3100,15 @@ inline QJsonObject ConfigurationSetDebugServerEnabledParams::toJson() const {
     object.insert(QStringLiteral("enabled"), QJsonValue(enabled));
     return object;
 }
+
+class ConfigurationSetDebugServerEnabledResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationSetDebugServerEnabledResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetDebugServerEnabledResponse ConfigurationSetDebugServerEnabledResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetDebugServerEnabledResponse value;
@@ -8018,6 +3124,15 @@ inline QJsonObject ConfigurationSetDebugServerEnabledResponse::toJson() const {
     return object;
 }
 
+class ConfigurationSetLanguageParams {
+public:
+    // wire: 'language' (field)
+    QString language{};
+
+    static ConfigurationSetLanguageParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationSetLanguageParams ConfigurationSetLanguageParams::fromJson(const QJsonObject &object) {
     ConfigurationSetLanguageParams value;
     if (object.contains(QStringLiteral("language"))) {
@@ -8031,6 +3146,15 @@ inline QJsonObject ConfigurationSetLanguageParams::toJson() const {
     object.insert(QStringLiteral("language"), QJsonValue(language));
     return object;
 }
+
+class ConfigurationSetLanguageResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationSetLanguageResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetLanguageResponse ConfigurationSetLanguageResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetLanguageResponse value;
@@ -8046,19 +3170,18 @@ inline QJsonObject ConfigurationSetLanguageResponse::toJson() const {
     return object;
 }
 
-inline ConfigurationSetLocationParams ConfigurationSetLocationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetLocationParams value;
-    if (object.contains(QStringLiteral("location"))) {
-        value.location = QSharedPointer<ConfigurationSetLocationParamsLocation>::create(ConfigurationSetLocationParamsLocation::fromJson((object.value(QStringLiteral("location"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetLocationParamsLocation {
+public:
+    // wire: 'latitude' (field)
+    double latitude{};
+    // wire: 'longitude' (field)
+    double longitude{};
+    // wire: 'name' (field)
+    QString name{};
 
-inline QJsonObject ConfigurationSetLocationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("location"), ((location) ? QJsonValue((location)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetLocationParamsLocation fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetLocationParamsLocation ConfigurationSetLocationParamsLocation::fromJson(const QJsonObject &object) {
     ConfigurationSetLocationParamsLocation value;
@@ -8082,6 +3205,38 @@ inline QJsonObject ConfigurationSetLocationParamsLocation::toJson() const {
     return object;
 }
 
+class ConfigurationSetLocationParams {
+public:
+    // wire: 'location' (field)
+    ConfigurationSetLocationParamsLocation location{};
+
+    static ConfigurationSetLocationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetLocationParams ConfigurationSetLocationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetLocationParams value;
+    if (object.contains(QStringLiteral("location"))) {
+        value.location = ConfigurationSetLocationParamsLocation::fromJson((object.value(QStringLiteral("location"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetLocationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("location"), QJsonValue((location).toJson()));
+    return object;
+}
+
+class ConfigurationSetLocationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationSetLocationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationSetLocationResponse ConfigurationSetLocationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetLocationResponse value;
     if (object.contains(QStringLiteral("configurationError"))) {
@@ -8096,19 +3251,14 @@ inline QJsonObject ConfigurationSetLocationResponse::toJson() const {
     return object;
 }
 
-inline ConfigurationSetMqttPolicyParams ConfigurationSetMqttPolicyParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetMqttPolicyParams value;
-    if (object.contains(QStringLiteral("policy"))) {
-        value.policy = QSharedPointer<MqttPolicy>::create(MqttPolicy::fromJson((object.value(QStringLiteral("policy"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetMqttPolicyResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetMqttPolicyParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("policy"), ((policy) ? QJsonValue((policy)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetMqttPolicyResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetMqttPolicyResponse ConfigurationSetMqttPolicyResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetMqttPolicyResponse value;
@@ -8124,19 +3274,14 @@ inline QJsonObject ConfigurationSetMqttPolicyResponse::toJson() const {
     return object;
 }
 
-inline ConfigurationSetMqttServerConfigurationParams ConfigurationSetMqttServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetMqttServerConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetMqttServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetMqttServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ((configuration) ? QJsonValue((configuration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetMqttServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetMqttServerConfigurationResponse ConfigurationSetMqttServerConfigurationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetMqttServerConfigurationResponse value;
@@ -8152,6 +3297,15 @@ inline QJsonObject ConfigurationSetMqttServerConfigurationResponse::toJson() con
     return object;
 }
 
+class ConfigurationSetServerNameParams {
+public:
+    // wire: 'serverName' (field)
+    QString serverName{};
+
+    static ConfigurationSetServerNameParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationSetServerNameParams ConfigurationSetServerNameParams::fromJson(const QJsonObject &object) {
     ConfigurationSetServerNameParams value;
     if (object.contains(QStringLiteral("serverName"))) {
@@ -8165,6 +3319,15 @@ inline QJsonObject ConfigurationSetServerNameParams::toJson() const {
     object.insert(QStringLiteral("serverName"), QJsonValue(serverName));
     return object;
 }
+
+class ConfigurationSetServerNameResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationSetServerNameResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetServerNameResponse ConfigurationSetServerNameResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetServerNameResponse value;
@@ -8180,19 +3343,14 @@ inline QJsonObject ConfigurationSetServerNameResponse::toJson() const {
     return object;
 }
 
-inline ConfigurationSetTcpServerConfigurationParams ConfigurationSetTcpServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetTcpServerConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetTcpServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetTcpServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ((configuration) ? QJsonValue((configuration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetTcpServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetTcpServerConfigurationResponse ConfigurationSetTcpServerConfigurationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetTcpServerConfigurationResponse value;
@@ -8208,6 +3366,15 @@ inline QJsonObject ConfigurationSetTcpServerConfigurationResponse::toJson() cons
     return object;
 }
 
+class ConfigurationSetTimeZoneParams {
+public:
+    // wire: 'timeZone' (field)
+    QString timeZone{};
+
+    static ConfigurationSetTimeZoneParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ConfigurationSetTimeZoneParams ConfigurationSetTimeZoneParams::fromJson(const QJsonObject &object) {
     ConfigurationSetTimeZoneParams value;
     if (object.contains(QStringLiteral("timeZone"))) {
@@ -8221,6 +3388,15 @@ inline QJsonObject ConfigurationSetTimeZoneParams::toJson() const {
     object.insert(QStringLiteral("timeZone"), QJsonValue(timeZone));
     return object;
 }
+
+class ConfigurationSetTimeZoneResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
+
+    static ConfigurationSetTimeZoneResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetTimeZoneResponse ConfigurationSetTimeZoneResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetTimeZoneResponse value;
@@ -8236,19 +3412,14 @@ inline QJsonObject ConfigurationSetTimeZoneResponse::toJson() const {
     return object;
 }
 
-inline ConfigurationSetTunnelProxyServerConfigurationParams ConfigurationSetTunnelProxyServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetTunnelProxyServerConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = QSharedPointer<TunnelProxyServerConfiguration>::create(TunnelProxyServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetTunnelProxyServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetTunnelProxyServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ((configuration) ? QJsonValue((configuration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetTunnelProxyServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetTunnelProxyServerConfigurationResponse ConfigurationSetTunnelProxyServerConfigurationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetTunnelProxyServerConfigurationResponse value;
@@ -8264,19 +3435,14 @@ inline QJsonObject ConfigurationSetTunnelProxyServerConfigurationResponse::toJso
     return object;
 }
 
-inline ConfigurationSetWebServerConfigurationParams ConfigurationSetWebServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetWebServerConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = QSharedPointer<WebServerConfiguration>::create(WebServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetWebServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetWebServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ((configuration) ? QJsonValue((configuration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetWebServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetWebServerConfigurationResponse ConfigurationSetWebServerConfigurationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetWebServerConfigurationResponse value;
@@ -8292,19 +3458,14 @@ inline QJsonObject ConfigurationSetWebServerConfigurationResponse::toJson() cons
     return object;
 }
 
-inline ConfigurationSetWebSocketServerConfigurationParams ConfigurationSetWebSocketServerConfigurationParams::fromJson(const QJsonObject &object) {
-    ConfigurationSetWebSocketServerConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationSetWebSocketServerConfigurationResponse {
+public:
+    // wire: 'configurationError' (field)
+    ConfigurationError configurationError{};
 
-inline QJsonObject ConfigurationSetWebSocketServerConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ((configuration) ? QJsonValue((configuration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationSetWebSocketServerConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationSetWebSocketServerConfigurationResponse ConfigurationSetWebSocketServerConfigurationResponse::fromJson(const QJsonObject &object) {
     ConfigurationSetWebSocketServerConfigurationResponse value;
@@ -8320,19 +3481,14 @@ inline QJsonObject ConfigurationSetWebSocketServerConfigurationResponse::toJson(
     return object;
 }
 
-inline ConfigurationTcpServerConfigurationChangedNotificationParams ConfigurationTcpServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationTcpServerConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("tcpServerConfiguration"))) {
-        value.tcpServerConfiguration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("tcpServerConfiguration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationTcpServerConfigurationRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
 
-inline QJsonObject ConfigurationTcpServerConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("tcpServerConfiguration"), ((tcpServerConfiguration) ? QJsonValue((tcpServerConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationTcpServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationTcpServerConfigurationRemovedNotificationParams ConfigurationTcpServerConfigurationRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationTcpServerConfigurationRemovedNotificationParams value;
@@ -8348,19 +3504,14 @@ inline QJsonObject ConfigurationTcpServerConfigurationRemovedNotificationParams:
     return object;
 }
 
-inline ConfigurationTunnelProxyServerConfigurationChangedNotificationParams ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationTunnelProxyServerConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("tunnelProxyServerConfiguration"))) {
-        value.tunnelProxyServerConfiguration = QSharedPointer<TunnelProxyServerConfiguration>::create(TunnelProxyServerConfiguration::fromJson((object.value(QStringLiteral("tunnelProxyServerConfiguration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
 
-inline QJsonObject ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("tunnelProxyServerConfiguration"), ((tunnelProxyServerConfiguration) ? QJsonValue((tunnelProxyServerConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams value;
@@ -8376,19 +3527,14 @@ inline QJsonObject ConfigurationTunnelProxyServerConfigurationRemovedNotificatio
     return object;
 }
 
-inline ConfigurationWebServerConfigurationChangedNotificationParams ConfigurationWebServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationWebServerConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("webServerConfiguration"))) {
-        value.webServerConfiguration = QSharedPointer<WebServerConfiguration>::create(WebServerConfiguration::fromJson((object.value(QStringLiteral("webServerConfiguration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationWebServerConfigurationRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
 
-inline QJsonObject ConfigurationWebServerConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("webServerConfiguration"), ((webServerConfiguration) ? QJsonValue((webServerConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationWebServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationWebServerConfigurationRemovedNotificationParams ConfigurationWebServerConfigurationRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationWebServerConfigurationRemovedNotificationParams value;
@@ -8404,19 +3550,14 @@ inline QJsonObject ConfigurationWebServerConfigurationRemovedNotificationParams:
     return object;
 }
 
-inline ConfigurationWebSocketServerConfigurationChangedNotificationParams ConfigurationWebSocketServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ConfigurationWebSocketServerConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("webSocketServerConfiguration"))) {
-        value.webSocketServerConfiguration = QSharedPointer<ServerConfiguration>::create(ServerConfiguration::fromJson((object.value(QStringLiteral("webSocketServerConfiguration"))).toObject()));
-    }
-    return value;
-}
+class ConfigurationWebSocketServerConfigurationRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QString id{};
 
-inline QJsonObject ConfigurationWebSocketServerConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("webSocketServerConfiguration"), ((webSocketServerConfiguration) ? QJsonValue((webSocketServerConfiguration)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ConfigurationWebSocketServerConfigurationRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ConfigurationWebSocketServerConfigurationRemovedNotificationParams ConfigurationWebSocketServerConfigurationRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ConfigurationWebSocketServerConfigurationRemovedNotificationParams value;
@@ -8432,6 +3573,15 @@ inline QJsonObject ConfigurationWebSocketServerConfigurationRemovedNotificationP
     return object;
 }
 
+using CreateMethods = QList<CreateMethod>;
+
+class DebugGetLoggingCategoriesParams {
+public:
+
+    static DebugGetLoggingCategoriesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline DebugGetLoggingCategoriesParams DebugGetLoggingCategoriesParams::fromJson(const QJsonObject &object) {
     DebugGetLoggingCategoriesParams value;
     return value;
@@ -8442,19 +3592,16 @@ inline QJsonObject DebugGetLoggingCategoriesParams::toJson() const {
     return object;
 }
 
-inline DebugGetLoggingCategoriesResponse DebugGetLoggingCategoriesResponse::fromJson(const QJsonObject &object) {
-    DebugGetLoggingCategoriesResponse value;
-    if (object.contains(QStringLiteral("loggingCategories"))) {
-        value.loggingCategories = ([&]() { QList<QSharedPointer<LoggingCategory>> list; for (const QJsonValue &item : (object.value(QStringLiteral("loggingCategories"))).toArray()) { list.append(QSharedPointer<LoggingCategory>::create(LoggingCategory::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class DebugLoggingCategoryLevelChangedNotificationParams {
+public:
+    // wire: 'level' (field)
+    LoggingLevel level{};
+    // wire: 'name' (field)
+    QString name{};
 
-inline QJsonObject DebugGetLoggingCategoriesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("loggingCategories"), ([&]() { QJsonArray array; for (const auto &item : loggingCategories) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static DebugLoggingCategoryLevelChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline DebugLoggingCategoryLevelChangedNotificationParams DebugLoggingCategoryLevelChangedNotificationParams::fromJson(const QJsonObject &object) {
     DebugLoggingCategoryLevelChangedNotificationParams value;
@@ -8474,6 +3621,17 @@ inline QJsonObject DebugLoggingCategoryLevelChangedNotificationParams::toJson() 
     return object;
 }
 
+class DebugSetLoggingCategoryLevelParams {
+public:
+    // wire: 'level' (field)
+    LoggingLevel level{};
+    // wire: 'name' (field)
+    QString name{};
+
+    static DebugSetLoggingCategoryLevelParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline DebugSetLoggingCategoryLevelParams DebugSetLoggingCategoryLevelParams::fromJson(const QJsonObject &object) {
     DebugSetLoggingCategoryLevelParams value;
     if (object.contains(QStringLiteral("level"))) {
@@ -8492,6 +3650,15 @@ inline QJsonObject DebugSetLoggingCategoryLevelParams::toJson() const {
     return object;
 }
 
+class DebugSetLoggingCategoryLevelResponse {
+public:
+    // wire: 'debugError' (field)
+    DebugError debugError{};
+
+    static DebugSetLoggingCategoryLevelResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline DebugSetLoggingCategoryLevelResponse DebugSetLoggingCategoryLevelResponse::fromJson(const QJsonObject &object) {
     DebugSetLoggingCategoryLevelResponse value;
     if (object.contains(QStringLiteral("debugError"))) {
@@ -8506,97 +3673,16 @@ inline QJsonObject DebugSetLoggingCategoryLevelResponse::toJson() const {
     return object;
 }
 
-inline Event Event::fromJson(const QJsonObject &object) {
-    Event value;
-    if (object.contains(QStringLiteral("eventTypeId"))) {
-        value.eventTypeId = QUuid((object.value(QStringLiteral("eventTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
+class Experience {
+public:
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'version' (field)
+    QString version{};
 
-inline QJsonObject Event::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("eventTypeId"), QJsonValue((eventTypeId).toString()));
-    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
-    return object;
-}
-
-inline EventDescriptor EventDescriptor::fromJson(const QJsonObject &object) {
-    EventDescriptor value;
-    if (object.contains(QStringLiteral("eventTypeId"))) {
-        value.eventTypeId = QUuid((object.value(QStringLiteral("eventTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("interface"))) {
-        value.interface = (object.value(QStringLiteral("interface"))).toString();
-    }
-    if (object.contains(QStringLiteral("interfaceEvent"))) {
-        value.interfaceEvent = (object.value(QStringLiteral("interfaceEvent"))).toString();
-    }
-    if (object.contains(QStringLiteral("paramDescriptors"))) {
-        value.paramDescriptors = ([&]() { QList<QSharedPointer<ParamDescriptor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramDescriptors"))).toArray()) { list.append(QSharedPointer<ParamDescriptor>::create(ParamDescriptor::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject EventDescriptor::toJson() const {
-    QJsonObject object;
-    if (eventTypeId.has_value()) {
-        object.insert(QStringLiteral("eventTypeId"), QJsonValue((*eventTypeId).toString()));
-    }
-    if (interface.has_value()) {
-        object.insert(QStringLiteral("interface"), QJsonValue(*interface));
-    }
-    if (interfaceEvent.has_value()) {
-        object.insert(QStringLiteral("interfaceEvent"), QJsonValue(*interfaceEvent));
-    }
-    if (paramDescriptors.has_value()) {
-        object.insert(QStringLiteral("paramDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *paramDescriptors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (thingId.has_value()) {
-        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
-    }
-    return object;
-}
-
-inline EventType EventType::fromJson(const QJsonObject &object) {
-    EventType value;
-    if (object.contains(QStringLiteral("displayName"))) {
-        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("paramTypes"))) {
-        value.paramTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
-    }
-    if (object.contains(QStringLiteral("index"))) {
-        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
-    }
-    return value;
-}
-
-inline QJsonObject EventType::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
-    object.insert(QStringLiteral("index"), QJsonValue(static_cast<qint64>(index)));
-    return object;
-}
+    static Experience fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Experience Experience::fromJson(const QJsonObject &object) {
     Experience value;
@@ -8615,6 +3701,25 @@ inline QJsonObject Experience::toJson() const {
     object.insert(QStringLiteral("version"), QJsonValue(version));
     return object;
 }
+
+class IOConnection {
+public:
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'inputStateTypeId' (required)
+    QUuid inputStateTypeId{};
+    // wire: 'inputThingId' (required)
+    QUuid inputThingId{};
+    // wire: 'inverted' (required)
+    bool inverted{};
+    // wire: 'outputStateTypeId' (required)
+    QUuid outputStateTypeId{};
+    // wire: 'outputThingId' (required)
+    QUuid outputThingId{};
+
+    static IOConnection fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IOConnection IOConnection::fromJson(const QJsonObject &object) {
     IOConnection value;
@@ -8650,63 +3755,20 @@ inline QJsonObject IOConnection::toJson() const {
     return object;
 }
 
-inline IntegrationPlugin IntegrationPlugin::fromJson(const QJsonObject &object) {
-    IntegrationPlugin value;
-    if (object.contains(QStringLiteral("displayName"))) {
-        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
-    }
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("paramTypes"))) {
-        value.paramTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+using IOConnections = QList<IOConnection>;
 
-inline QJsonObject IntegrationPlugin::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
-    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+class IntegrationsAddThingResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline IntegrationsAddThingParams IntegrationsAddThingParams::fromJson(const QJsonObject &object) {
-    IntegrationsAddThingParams value;
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("thingClassId"))) {
-        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingDescriptorId"))) {
-        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingParams"))) {
-        value.thingParams = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
-
-inline QJsonObject IntegrationsAddThingParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    if (thingClassId.has_value()) {
-        object.insert(QStringLiteral("thingClassId"), QJsonValue((*thingClassId).toString()));
-    }
-    if (thingDescriptorId.has_value()) {
-        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
-    }
-    if (thingParams.has_value()) {
-        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
+    static IntegrationsAddThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsAddThingResponse IntegrationsAddThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsAddThingResponse value;
@@ -8734,6 +3796,17 @@ inline QJsonObject IntegrationsAddThingResponse::toJson() const {
     return object;
 }
 
+class IntegrationsBrowseThingParams {
+public:
+    // wire: 'itemId' (optional)
+    std::optional<QString> itemId;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsBrowseThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsBrowseThingParams IntegrationsBrowseThingParams::fromJson(const QJsonObject &object) {
     IntegrationsBrowseThingParams value;
     if (object.contains(QStringLiteral("itemId"))) {
@@ -8754,13 +3827,26 @@ inline QJsonObject IntegrationsBrowseThingParams::toJson() const {
     return object;
 }
 
+class IntegrationsBrowseThingResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'items' (optional)
+    std::optional<QList<BrowserItem>> items;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsBrowseThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsBrowseThingResponse IntegrationsBrowseThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsBrowseThingResponse value;
     if (object.contains(QStringLiteral("displayMessage"))) {
         value.displayMessage = (object.value(QStringLiteral("displayMessage"))).toString();
     }
     if (object.contains(QStringLiteral("items"))) {
-        value.items = ([&]() { QList<QSharedPointer<BrowserItem>> list; for (const QJsonValue &item : (object.value(QStringLiteral("items"))).toArray()) { list.append(QSharedPointer<BrowserItem>::create(BrowserItem::fromJson((item).toObject()))); } return list; }());
+        value.items = ([&]() { QList<BrowserItem> list; for (const QJsonValue &item : (object.value(QStringLiteral("items"))).toArray()) { list.append(BrowserItem::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("thingError"))) {
         value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
@@ -8774,11 +3860,24 @@ inline QJsonObject IntegrationsBrowseThingResponse::toJson() const {
         object.insert(QStringLiteral("displayMessage"), QJsonValue(*displayMessage));
     }
     if (items.has_value()) {
-        object.insert(QStringLiteral("items"), ([&]() { QJsonArray array; for (const auto &item : *items) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("items"), ([&]() { QJsonArray array; for (const auto &item : *items) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsConfirmPairingParams {
+public:
+    // wire: 'secret' (optional)
+    std::optional<QString> secret;
+    // wire: 'username' (optional)
+    std::optional<QString> username;
+    // wire: 'pairingTransactionId' (field)
+    QUuid pairingTransactionId{};
+
+    static IntegrationsConfirmPairingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsConfirmPairingParams IntegrationsConfirmPairingParams::fromJson(const QJsonObject &object) {
     IntegrationsConfirmPairingParams value;
@@ -8806,6 +3905,19 @@ inline QJsonObject IntegrationsConfirmPairingParams::toJson() const {
     return object;
 }
 
+class IntegrationsConfirmPairingResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsConfirmPairingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsConfirmPairingResponse IntegrationsConfirmPairingResponse::fromJson(const QJsonObject &object) {
     IntegrationsConfirmPairingResponse value;
     if (object.contains(QStringLiteral("displayMessage"))) {
@@ -8831,6 +3943,23 @@ inline QJsonObject IntegrationsConfirmPairingResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsConnectIOParams {
+public:
+    // wire: 'inputStateTypeId' (field)
+    QUuid inputStateTypeId{};
+    // wire: 'inputThingId' (field)
+    QUuid inputThingId{};
+    // wire: 'inverted' (optional)
+    std::optional<bool> inverted;
+    // wire: 'outputStateTypeId' (field)
+    QUuid outputStateTypeId{};
+    // wire: 'outputThingId' (field)
+    QUuid outputThingId{};
+
+    static IntegrationsConnectIOParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsConnectIOParams IntegrationsConnectIOParams::fromJson(const QJsonObject &object) {
     IntegrationsConnectIOParams value;
@@ -8864,6 +3993,17 @@ inline QJsonObject IntegrationsConnectIOParams::toJson() const {
     return object;
 }
 
+class IntegrationsConnectIOResponse {
+public:
+    // wire: 'ioConnectionId' (optional)
+    std::optional<QUuid> ioConnectionId;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsConnectIOResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsConnectIOResponse IntegrationsConnectIOResponse::fromJson(const QJsonObject &object) {
     IntegrationsConnectIOResponse value;
     if (object.contains(QStringLiteral("ioConnectionId"))) {
@@ -8884,6 +4024,15 @@ inline QJsonObject IntegrationsConnectIOResponse::toJson() const {
     return object;
 }
 
+class IntegrationsDisconnectIOParams {
+public:
+    // wire: 'ioConnectionId' (field)
+    QUuid ioConnectionId{};
+
+    static IntegrationsDisconnectIOParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsDisconnectIOParams IntegrationsDisconnectIOParams::fromJson(const QJsonObject &object) {
     IntegrationsDisconnectIOParams value;
     if (object.contains(QStringLiteral("ioConnectionId"))) {
@@ -8897,6 +4046,15 @@ inline QJsonObject IntegrationsDisconnectIOParams::toJson() const {
     object.insert(QStringLiteral("ioConnectionId"), QJsonValue((ioConnectionId).toString()));
     return object;
 }
+
+class IntegrationsDisconnectIOResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsDisconnectIOResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsDisconnectIOResponse IntegrationsDisconnectIOResponse::fromJson(const QJsonObject &object) {
     IntegrationsDisconnectIOResponse value;
@@ -8912,51 +4070,16 @@ inline QJsonObject IntegrationsDisconnectIOResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsDiscoverThingsParams IntegrationsDiscoverThingsParams::fromJson(const QJsonObject &object) {
-    IntegrationsDiscoverThingsParams value;
-    if (object.contains(QStringLiteral("discoveryParams"))) {
-        value.discoveryParams = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("discoveryParams"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingClassId"))) {
-        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
-    }
-    return value;
-}
+class IntegrationsEditThingParams {
+public:
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
 
-inline QJsonObject IntegrationsDiscoverThingsParams::toJson() const {
-    QJsonObject object;
-    if (discoveryParams.has_value()) {
-        object.insert(QStringLiteral("discoveryParams"), ([&]() { QJsonArray array; for (const auto &item : *discoveryParams) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingClassId"), QJsonValue((thingClassId).toString()));
-    return object;
-}
-
-inline IntegrationsDiscoverThingsResponse IntegrationsDiscoverThingsResponse::fromJson(const QJsonObject &object) {
-    IntegrationsDiscoverThingsResponse value;
-    if (object.contains(QStringLiteral("displayMessage"))) {
-        value.displayMessage = (object.value(QStringLiteral("displayMessage"))).toString();
-    }
-    if (object.contains(QStringLiteral("thingDescriptors"))) {
-        value.thingDescriptors = ([&]() { QList<QSharedPointer<ThingDescriptor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingDescriptors"))).toArray()) { list.append(QSharedPointer<ThingDescriptor>::create(ThingDescriptor::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingError"))) {
-        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
-    }
-    return value;
-}
-
-inline QJsonObject IntegrationsDiscoverThingsResponse::toJson() const {
-    QJsonObject object;
-    if (displayMessage.has_value()) {
-        object.insert(QStringLiteral("displayMessage"), QJsonValue(*displayMessage));
-    }
-    if (thingDescriptors.has_value()) {
-        object.insert(QStringLiteral("thingDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *thingDescriptors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
-    return object;
-}
+    static IntegrationsEditThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsEditThingParams IntegrationsEditThingParams::fromJson(const QJsonObject &object) {
     IntegrationsEditThingParams value;
@@ -8976,6 +4099,15 @@ inline QJsonObject IntegrationsEditThingParams::toJson() const {
     return object;
 }
 
+class IntegrationsEditThingResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsEditThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsEditThingResponse IntegrationsEditThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsEditThingResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -8990,43 +4122,16 @@ inline QJsonObject IntegrationsEditThingResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsEventTriggeredNotificationParams IntegrationsEventTriggeredNotificationParams::fromJson(const QJsonObject &object) {
-    IntegrationsEventTriggeredNotificationParams value;
-    if (object.contains(QStringLiteral("event"))) {
-        value.event = QSharedPointer<Event>::create(Event::fromJson((object.value(QStringLiteral("event"))).toObject()));
-    }
-    return value;
-}
+class IntegrationsExecuteActionResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsEventTriggeredNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("event"), ((event) ? QJsonValue((event)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline IntegrationsExecuteActionParams IntegrationsExecuteActionParams::fromJson(const QJsonObject &object) {
-    IntegrationsExecuteActionParams value;
-    if (object.contains(QStringLiteral("actionTypeId"))) {
-        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject IntegrationsExecuteActionParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
-    if (params.has_value()) {
-        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
-    return object;
-}
+    static IntegrationsExecuteActionResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsExecuteActionResponse IntegrationsExecuteActionResponse::fromJson(const QJsonObject &object) {
     IntegrationsExecuteActionResponse value;
@@ -9048,33 +4153,16 @@ inline QJsonObject IntegrationsExecuteActionResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsExecuteBrowserItemActionParams IntegrationsExecuteBrowserItemActionParams::fromJson(const QJsonObject &object) {
-    IntegrationsExecuteBrowserItemActionParams value;
-    if (object.contains(QStringLiteral("actionTypeId"))) {
-        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("itemId"))) {
-        value.itemId = (object.value(QStringLiteral("itemId"))).toString();
-    }
-    if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
+class IntegrationsExecuteBrowserItemActionResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsExecuteBrowserItemActionParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
-    object.insert(QStringLiteral("itemId"), QJsonValue(itemId));
-    if (params.has_value()) {
-        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
-    return object;
-}
+    static IntegrationsExecuteBrowserItemActionResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsExecuteBrowserItemActionResponse IntegrationsExecuteBrowserItemActionResponse::fromJson(const QJsonObject &object) {
     IntegrationsExecuteBrowserItemActionResponse value;
@@ -9096,6 +4184,17 @@ inline QJsonObject IntegrationsExecuteBrowserItemActionResponse::toJson() const 
     return object;
 }
 
+class IntegrationsExecuteBrowserItemParams {
+public:
+    // wire: 'itemId' (field)
+    QString itemId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsExecuteBrowserItemParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsExecuteBrowserItemParams IntegrationsExecuteBrowserItemParams::fromJson(const QJsonObject &object) {
     IntegrationsExecuteBrowserItemParams value;
     if (object.contains(QStringLiteral("itemId"))) {
@@ -9113,6 +4212,17 @@ inline QJsonObject IntegrationsExecuteBrowserItemParams::toJson() const {
     object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
     return object;
 }
+
+class IntegrationsExecuteBrowserItemResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsExecuteBrowserItemResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsExecuteBrowserItemResponse IntegrationsExecuteBrowserItemResponse::fromJson(const QJsonObject &object) {
     IntegrationsExecuteBrowserItemResponse value;
@@ -9134,6 +4244,15 @@ inline QJsonObject IntegrationsExecuteBrowserItemResponse::toJson() const {
     return object;
 }
 
+class IntegrationsGetActionTypesParams {
+public:
+    // wire: 'thingClassId' (field)
+    QUuid thingClassId{};
+
+    static IntegrationsGetActionTypesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsGetActionTypesParams IntegrationsGetActionTypesParams::fromJson(const QJsonObject &object) {
     IntegrationsGetActionTypesParams value;
     if (object.contains(QStringLiteral("thingClassId"))) {
@@ -9148,19 +4267,16 @@ inline QJsonObject IntegrationsGetActionTypesParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetActionTypesResponse IntegrationsGetActionTypesResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetActionTypesResponse value;
-    if (object.contains(QStringLiteral("actionTypes"))) {
-        value.actionTypes = ([&]() { QList<QSharedPointer<ActionType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("actionTypes"))).toArray()) { list.append(QSharedPointer<ActionType>::create(ActionType::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsGetBrowserItemParams {
+public:
+    // wire: 'itemId' (optional)
+    std::optional<QString> itemId;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
 
-inline QJsonObject IntegrationsGetActionTypesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actionTypes"), ([&]() { QJsonArray array; for (const auto &item : actionTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static IntegrationsGetBrowserItemParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetBrowserItemParams IntegrationsGetBrowserItemParams::fromJson(const QJsonObject &object) {
     IntegrationsGetBrowserItemParams value;
@@ -9182,13 +4298,26 @@ inline QJsonObject IntegrationsGetBrowserItemParams::toJson() const {
     return object;
 }
 
+class IntegrationsGetBrowserItemResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'item' (optional)
+    std::optional<BrowserItem> item;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetBrowserItemResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsGetBrowserItemResponse IntegrationsGetBrowserItemResponse::fromJson(const QJsonObject &object) {
     IntegrationsGetBrowserItemResponse value;
     if (object.contains(QStringLiteral("displayMessage"))) {
         value.displayMessage = (object.value(QStringLiteral("displayMessage"))).toString();
     }
     if (object.contains(QStringLiteral("item"))) {
-        value.item = QSharedPointer<BrowserItem>::create(BrowserItem::fromJson((object.value(QStringLiteral("item"))).toObject()));
+        value.item = BrowserItem::fromJson((object.value(QStringLiteral("item"))).toObject());
     }
     if (object.contains(QStringLiteral("thingError"))) {
         value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
@@ -9202,11 +4331,20 @@ inline QJsonObject IntegrationsGetBrowserItemResponse::toJson() const {
         object.insert(QStringLiteral("displayMessage"), QJsonValue(*displayMessage));
     }
     if (item.has_value()) {
-        object.insert(QStringLiteral("item"), ((*item) ? QJsonValue((*item)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("item"), QJsonValue((*item).toJson()));
     }
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsGetEventTypesParams {
+public:
+    // wire: 'thingClassId' (field)
+    QUuid thingClassId{};
+
+    static IntegrationsGetEventTypesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetEventTypesParams IntegrationsGetEventTypesParams::fromJson(const QJsonObject &object) {
     IntegrationsGetEventTypesParams value;
@@ -9222,19 +4360,14 @@ inline QJsonObject IntegrationsGetEventTypesParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetEventTypesResponse IntegrationsGetEventTypesResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetEventTypesResponse value;
-    if (object.contains(QStringLiteral("eventTypes"))) {
-        value.eventTypes = ([&]() { QList<QSharedPointer<EventType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventTypes"))).toArray()) { list.append(QSharedPointer<EventType>::create(EventType::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsGetIOConnectionsParams {
+public:
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
 
-inline QJsonObject IntegrationsGetEventTypesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("eventTypes"), ([&]() { QJsonArray array; for (const auto &item : eventTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static IntegrationsGetIOConnectionsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetIOConnectionsParams IntegrationsGetIOConnectionsParams::fromJson(const QJsonObject &object) {
     IntegrationsGetIOConnectionsParams value;
@@ -9252,10 +4385,21 @@ inline QJsonObject IntegrationsGetIOConnectionsParams::toJson() const {
     return object;
 }
 
+class IntegrationsGetIOConnectionsResponse {
+public:
+    // wire: 'ioConnections' (optional)
+    std::optional<IOConnections> ioConnections;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetIOConnectionsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsGetIOConnectionsResponse IntegrationsGetIOConnectionsResponse::fromJson(const QJsonObject &object) {
     IntegrationsGetIOConnectionsResponse value;
     if (object.contains(QStringLiteral("ioConnections"))) {
-        value.ioConnections = ([&]() { QList<QSharedPointer<IOConnection>> list; for (const QJsonValue &item : (object.value(QStringLiteral("ioConnections"))).toArray()) { list.append(QSharedPointer<IOConnection>::create(IOConnection::fromJson((item).toObject()))); } return list; }());
+        value.ioConnections = ([&]() { QList<IOConnection> list; for (const QJsonValue &item : (object.value(QStringLiteral("ioConnections"))).toArray()) { list.append(IOConnection::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("thingError"))) {
         value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
@@ -9266,11 +4410,20 @@ inline IntegrationsGetIOConnectionsResponse IntegrationsGetIOConnectionsResponse
 inline QJsonObject IntegrationsGetIOConnectionsResponse::toJson() const {
     QJsonObject object;
     if (ioConnections.has_value()) {
-        object.insert(QStringLiteral("ioConnections"), ([&]() { QJsonArray array; for (const auto &item : *ioConnections) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("ioConnections"), ([&]() { QJsonArray array; for (const auto &item : *ioConnections) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsGetPluginConfigurationParams {
+public:
+    // wire: 'pluginId' (field)
+    QUuid pluginId{};
+
+    static IntegrationsGetPluginConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetPluginConfigurationParams IntegrationsGetPluginConfigurationParams::fromJson(const QJsonObject &object) {
     IntegrationsGetPluginConfigurationParams value;
@@ -9286,25 +4439,12 @@ inline QJsonObject IntegrationsGetPluginConfigurationParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetPluginConfigurationResponse IntegrationsGetPluginConfigurationResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetPluginConfigurationResponse value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingError"))) {
-        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
-    }
-    return value;
-}
+class IntegrationsGetPluginsParams {
+public:
 
-inline QJsonObject IntegrationsGetPluginConfigurationResponse::toJson() const {
-    QJsonObject object;
-    if (configuration.has_value()) {
-        object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : *configuration) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
-    return object;
-}
+    static IntegrationsGetPluginsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetPluginsParams IntegrationsGetPluginsParams::fromJson(const QJsonObject &object) {
     IntegrationsGetPluginsParams value;
@@ -9316,19 +4456,14 @@ inline QJsonObject IntegrationsGetPluginsParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetPluginsResponse IntegrationsGetPluginsResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetPluginsResponse value;
-    if (object.contains(QStringLiteral("plugins"))) {
-        value.plugins = ([&]() { QList<QSharedPointer<IntegrationPlugin>> list; for (const QJsonValue &item : (object.value(QStringLiteral("plugins"))).toArray()) { list.append(QSharedPointer<IntegrationPlugin>::create(IntegrationPlugin::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsGetStateTypesParams {
+public:
+    // wire: 'thingClassId' (field)
+    QUuid thingClassId{};
 
-inline QJsonObject IntegrationsGetPluginsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("plugins"), ([&]() { QJsonArray array; for (const auto &item : plugins) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static IntegrationsGetStateTypesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetStateTypesParams IntegrationsGetStateTypesParams::fromJson(const QJsonObject &object) {
     IntegrationsGetStateTypesParams value;
@@ -9344,19 +4479,16 @@ inline QJsonObject IntegrationsGetStateTypesParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetStateTypesResponse IntegrationsGetStateTypesResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetStateTypesResponse value;
-    if (object.contains(QStringLiteral("stateTypes"))) {
-        value.stateTypes = ([&]() { QList<QSharedPointer<StateType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("stateTypes"))).toArray()) { list.append(QSharedPointer<StateType>::create(StateType::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsGetStateValueParams {
+public:
+    // wire: 'stateTypeId' (field)
+    QUuid stateTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
 
-inline QJsonObject IntegrationsGetStateTypesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("stateTypes"), ([&]() { QJsonArray array; for (const auto &item : stateTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static IntegrationsGetStateValueParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetStateValueParams IntegrationsGetStateValueParams::fromJson(const QJsonObject &object) {
     IntegrationsGetStateValueParams value;
@@ -9375,6 +4507,17 @@ inline QJsonObject IntegrationsGetStateValueParams::toJson() const {
     object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
     return object;
 }
+
+class IntegrationsGetStateValueResponse {
+public:
+    // wire: 'value' (optional)
+    std::optional<QJsonValue> value;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetStateValueResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetStateValueResponse IntegrationsGetStateValueResponse::fromJson(const QJsonObject &object) {
     IntegrationsGetStateValueResponse value;
@@ -9396,6 +4539,15 @@ inline QJsonObject IntegrationsGetStateValueResponse::toJson() const {
     return object;
 }
 
+class IntegrationsGetStateValuesParams {
+public:
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsGetStateValuesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsGetStateValuesParams IntegrationsGetStateValuesParams::fromJson(const QJsonObject &object) {
     IntegrationsGetStateValuesParams value;
     if (object.contains(QStringLiteral("thingId"))) {
@@ -9410,25 +4562,16 @@ inline QJsonObject IntegrationsGetStateValuesParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetStateValuesResponse IntegrationsGetStateValuesResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetStateValuesResponse value;
-    if (object.contains(QStringLiteral("values"))) {
-        value.values = ([&]() { QList<QSharedPointer<State>> list; for (const QJsonValue &item : (object.value(QStringLiteral("values"))).toArray()) { list.append(QSharedPointer<State>::create(State::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingError"))) {
-        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
-    }
-    return value;
-}
+class IntegrationsGetThingClassesParams {
+public:
+    // wire: 'thingClassIds' (optional)
+    std::optional<QList<QUuid>> thingClassIds;
+    // wire: 'vendorId' (optional)
+    std::optional<QUuid> vendorId;
 
-inline QJsonObject IntegrationsGetStateValuesResponse::toJson() const {
-    QJsonObject object;
-    if (values.has_value()) {
-        object.insert(QStringLiteral("values"), ([&]() { QJsonArray array; for (const auto &item : *values) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
-    return object;
-}
+    static IntegrationsGetThingClassesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetThingClassesParams IntegrationsGetThingClassesParams::fromJson(const QJsonObject &object) {
     IntegrationsGetThingClassesParams value;
@@ -9452,25 +4595,14 @@ inline QJsonObject IntegrationsGetThingClassesParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetThingClassesResponse IntegrationsGetThingClassesResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetThingClassesResponse value;
-    if (object.contains(QStringLiteral("thingClasses"))) {
-        value.thingClasses = ([&]() { QList<QSharedPointer<ThingClass>> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingClasses"))).toArray()) { list.append(QSharedPointer<ThingClass>::create(ThingClass::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingError"))) {
-        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
-    }
-    return value;
-}
+class IntegrationsGetThingsParams {
+public:
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
 
-inline QJsonObject IntegrationsGetThingClassesResponse::toJson() const {
-    QJsonObject object;
-    if (thingClasses.has_value()) {
-        object.insert(QStringLiteral("thingClasses"), ([&]() { QJsonArray array; for (const auto &item : *thingClasses) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
-    return object;
-}
+    static IntegrationsGetThingsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetThingsParams IntegrationsGetThingsParams::fromJson(const QJsonObject &object) {
     IntegrationsGetThingsParams value;
@@ -9488,25 +4620,12 @@ inline QJsonObject IntegrationsGetThingsParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetThingsResponse IntegrationsGetThingsResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetThingsResponse value;
-    if (object.contains(QStringLiteral("things"))) {
-        value.things = ([&]() { QList<QSharedPointer<Thing>> list; for (const QJsonValue &item : (object.value(QStringLiteral("things"))).toArray()) { list.append(QSharedPointer<Thing>::create(Thing::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingError"))) {
-        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
-    }
-    return value;
-}
+class IntegrationsGetVendorsParams {
+public:
 
-inline QJsonObject IntegrationsGetThingsResponse::toJson() const {
-    QJsonObject object;
-    if (things.has_value()) {
-        object.insert(QStringLiteral("things"), ([&]() { QJsonArray array; for (const auto &item : *things) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
-    return object;
-}
+    static IntegrationsGetVendorsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsGetVendorsParams IntegrationsGetVendorsParams::fromJson(const QJsonObject &object) {
     IntegrationsGetVendorsParams value;
@@ -9518,33 +4637,37 @@ inline QJsonObject IntegrationsGetVendorsParams::toJson() const {
     return object;
 }
 
-inline IntegrationsGetVendorsResponse IntegrationsGetVendorsResponse::fromJson(const QJsonObject &object) {
-    IntegrationsGetVendorsResponse value;
-    if (object.contains(QStringLiteral("vendors"))) {
-        value.vendors = ([&]() { QList<QSharedPointer<Vendor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("vendors"))).toArray()) { list.append(QSharedPointer<Vendor>::create(Vendor::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsIOConnectionAddedNotificationParams {
+public:
+    // wire: 'ioConnection' (field)
+    IOConnection ioConnection{};
 
-inline QJsonObject IntegrationsGetVendorsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("vendors"), ([&]() { QJsonArray array; for (const auto &item : vendors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static IntegrationsIOConnectionAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsIOConnectionAddedNotificationParams IntegrationsIOConnectionAddedNotificationParams::fromJson(const QJsonObject &object) {
     IntegrationsIOConnectionAddedNotificationParams value;
     if (object.contains(QStringLiteral("ioConnection"))) {
-        value.ioConnection = QSharedPointer<IOConnection>::create(IOConnection::fromJson((object.value(QStringLiteral("ioConnection"))).toObject()));
+        value.ioConnection = IOConnection::fromJson((object.value(QStringLiteral("ioConnection"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject IntegrationsIOConnectionAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("ioConnection"), ((ioConnection) ? QJsonValue((ioConnection)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("ioConnection"), QJsonValue((ioConnection).toJson()));
     return object;
 }
+
+class IntegrationsIOConnectionRemovedNotificationParams {
+public:
+    // wire: 'ioConnectionId' (field)
+    QUuid ioConnectionId{};
+
+    static IntegrationsIOConnectionRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsIOConnectionRemovedNotificationParams IntegrationsIOConnectionRemovedNotificationParams::fromJson(const QJsonObject &object) {
     IntegrationsIOConnectionRemovedNotificationParams value;
@@ -9560,45 +4683,24 @@ inline QJsonObject IntegrationsIOConnectionRemovedNotificationParams::toJson() c
     return object;
 }
 
-inline IntegrationsPairThingParams IntegrationsPairThingParams::fromJson(const QJsonObject &object) {
-    IntegrationsPairThingParams value;
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("thingClassId"))) {
-        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingDescriptorId"))) {
-        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingParams"))) {
-        value.thingParams = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class IntegrationsPairThingResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'oAuthUrl' (optional)
+    std::optional<QString> oAuthUrl;
+    // wire: 'pairingTransactionId' (optional)
+    std::optional<QUuid> pairingTransactionId;
+    // wire: 'pin' (optional)
+    std::optional<QString> pin;
+    // wire: 'setupMethod' (optional)
+    std::optional<SetupMethod> setupMethod;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsPairThingParams::toJson() const {
-    QJsonObject object;
-    if (name.has_value()) {
-        object.insert(QStringLiteral("name"), QJsonValue(*name));
-    }
-    if (thingClassId.has_value()) {
-        object.insert(QStringLiteral("thingClassId"), QJsonValue((*thingClassId).toString()));
-    }
-    if (thingDescriptorId.has_value()) {
-        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
-    }
-    if (thingId.has_value()) {
-        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
-    }
-    if (thingParams.has_value()) {
-        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
+    static IntegrationsPairThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsPairThingResponse IntegrationsPairThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsPairThingResponse value;
@@ -9644,51 +4746,16 @@ inline QJsonObject IntegrationsPairThingResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsPluginConfigurationChangedNotificationParams IntegrationsPluginConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    IntegrationsPluginConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("pluginId"))) {
-        value.pluginId = QUuid((object.value(QStringLiteral("pluginId"))).toString());
-    }
-    return value;
-}
+class IntegrationsReconfigureThingResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsPluginConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : configuration) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("pluginId"), QJsonValue((pluginId).toString()));
-    return object;
-}
-
-inline IntegrationsReconfigureThingParams IntegrationsReconfigureThingParams::fromJson(const QJsonObject &object) {
-    IntegrationsReconfigureThingParams value;
-    if (object.contains(QStringLiteral("thingDescriptorId"))) {
-        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    if (object.contains(QStringLiteral("thingParams"))) {
-        value.thingParams = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
-
-inline QJsonObject IntegrationsReconfigureThingParams::toJson() const {
-    QJsonObject object;
-    if (thingDescriptorId.has_value()) {
-        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
-    }
-    if (thingId.has_value()) {
-        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
-    }
-    if (thingParams.has_value()) {
-        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
+    static IntegrationsReconfigureThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsReconfigureThingResponse IntegrationsReconfigureThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsReconfigureThingResponse value;
@@ -9710,6 +4777,17 @@ inline QJsonObject IntegrationsReconfigureThingResponse::toJson() const {
     return object;
 }
 
+class IntegrationsRemoveThingParams {
+public:
+    // wire: 'removePolicy' (optional, deprecated)
+    std::optional<QString> removePolicy;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsRemoveThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsRemoveThingParams IntegrationsRemoveThingParams::fromJson(const QJsonObject &object) {
     IntegrationsRemoveThingParams value;
     if (object.contains(QStringLiteral("removePolicy"))) {
@@ -9730,6 +4808,15 @@ inline QJsonObject IntegrationsRemoveThingParams::toJson() const {
     return object;
 }
 
+class IntegrationsRemoveThingResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsRemoveThingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsRemoveThingResponse IntegrationsRemoveThingResponse::fromJson(const QJsonObject &object) {
     IntegrationsRemoveThingResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -9743,6 +4830,19 @@ inline QJsonObject IntegrationsRemoveThingResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsSetActionLoggingParams {
+public:
+    // wire: 'actionTypeId' (field)
+    QUuid actionTypeId{};
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsSetActionLoggingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetActionLoggingParams IntegrationsSetActionLoggingParams::fromJson(const QJsonObject &object) {
     IntegrationsSetActionLoggingParams value;
@@ -9766,6 +4866,15 @@ inline QJsonObject IntegrationsSetActionLoggingParams::toJson() const {
     return object;
 }
 
+class IntegrationsSetActionLoggingResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsSetActionLoggingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsSetActionLoggingResponse IntegrationsSetActionLoggingResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetActionLoggingResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -9779,6 +4888,19 @@ inline QJsonObject IntegrationsSetActionLoggingResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsSetEventLoggingParams {
+public:
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'eventTypeId' (field)
+    QUuid eventTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsSetEventLoggingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetEventLoggingParams IntegrationsSetEventLoggingParams::fromJson(const QJsonObject &object) {
     IntegrationsSetEventLoggingParams value;
@@ -9802,6 +4924,15 @@ inline QJsonObject IntegrationsSetEventLoggingParams::toJson() const {
     return object;
 }
 
+class IntegrationsSetEventLoggingResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsSetEventLoggingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsSetEventLoggingResponse IntegrationsSetEventLoggingResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetEventLoggingResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -9816,23 +4947,14 @@ inline QJsonObject IntegrationsSetEventLoggingResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsSetPluginConfigurationParams IntegrationsSetPluginConfigurationParams::fromJson(const QJsonObject &object) {
-    IntegrationsSetPluginConfigurationParams value;
-    if (object.contains(QStringLiteral("configuration"))) {
-        value.configuration = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("pluginId"))) {
-        value.pluginId = QUuid((object.value(QStringLiteral("pluginId"))).toString());
-    }
-    return value;
-}
+class IntegrationsSetPluginConfigurationResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsSetPluginConfigurationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : configuration) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("pluginId"), QJsonValue((pluginId).toString()));
-    return object;
-}
+    static IntegrationsSetPluginConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetPluginConfigurationResponse IntegrationsSetPluginConfigurationResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetPluginConfigurationResponse value;
@@ -9847,6 +4969,19 @@ inline QJsonObject IntegrationsSetPluginConfigurationResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsSetStateFilterParams {
+public:
+    // wire: 'filter' (field)
+    StateValueFilter filter{};
+    // wire: 'stateTypeId' (field)
+    QUuid stateTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsSetStateFilterParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetStateFilterParams IntegrationsSetStateFilterParams::fromJson(const QJsonObject &object) {
     IntegrationsSetStateFilterParams value;
@@ -9870,6 +5005,15 @@ inline QJsonObject IntegrationsSetStateFilterParams::toJson() const {
     return object;
 }
 
+class IntegrationsSetStateFilterResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsSetStateFilterResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsSetStateFilterResponse IntegrationsSetStateFilterResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetStateFilterResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -9883,6 +5027,19 @@ inline QJsonObject IntegrationsSetStateFilterResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsSetStateLoggingParams {
+public:
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'stateTypeId' (field)
+    QUuid stateTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsSetStateLoggingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetStateLoggingParams IntegrationsSetStateLoggingParams::fromJson(const QJsonObject &object) {
     IntegrationsSetStateLoggingParams value;
@@ -9906,6 +5063,15 @@ inline QJsonObject IntegrationsSetStateLoggingParams::toJson() const {
     return object;
 }
 
+class IntegrationsSetStateLoggingResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsSetStateLoggingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline IntegrationsSetStateLoggingResponse IntegrationsSetStateLoggingResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetStateLoggingResponse value;
     if (object.contains(QStringLiteral("thingError"))) {
@@ -9920,23 +5086,14 @@ inline QJsonObject IntegrationsSetStateLoggingResponse::toJson() const {
     return object;
 }
 
-inline IntegrationsSetThingSettingsParams IntegrationsSetThingSettingsParams::fromJson(const QJsonObject &object) {
-    IntegrationsSetThingSettingsParams value;
-    if (object.contains(QStringLiteral("settings"))) {
-        value.settings = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("settings"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
+class IntegrationsSetThingSettingsResponse {
+public:
+    // wire: 'thingError' (field)
+    ThingError thingError{};
 
-inline QJsonObject IntegrationsSetThingSettingsParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("settings"), ([&]() { QJsonArray array; for (const auto &item : settings) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
-    return object;
-}
+    static IntegrationsSetThingSettingsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsSetThingSettingsResponse IntegrationsSetThingSettingsResponse::fromJson(const QJsonObject &object) {
     IntegrationsSetThingSettingsResponse value;
@@ -9951,6 +5108,25 @@ inline QJsonObject IntegrationsSetThingSettingsResponse::toJson() const {
     object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+class IntegrationsStateChangedNotificationParams {
+public:
+    // wire: 'maxValue' (field)
+    QJsonValue maxValue{};
+    // wire: 'minValue' (field)
+    QJsonValue minValue{};
+    // wire: 'possibleValues' (field)
+    QList<QJsonValue> possibleValues{};
+    // wire: 'stateTypeId' (field)
+    QUuid stateTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+    // wire: 'value' (field)
+    QJsonValue value{};
+
+    static IntegrationsStateChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsStateChangedNotificationParams IntegrationsStateChangedNotificationParams::fromJson(const QJsonObject &object) {
     IntegrationsStateChangedNotificationParams value;
@@ -9986,33 +5162,14 @@ inline QJsonObject IntegrationsStateChangedNotificationParams::toJson() const {
     return object;
 }
 
-inline IntegrationsThingAddedNotificationParams IntegrationsThingAddedNotificationParams::fromJson(const QJsonObject &object) {
-    IntegrationsThingAddedNotificationParams value;
-    if (object.contains(QStringLiteral("thing"))) {
-        value.thing = QSharedPointer<Thing>::create(Thing::fromJson((object.value(QStringLiteral("thing"))).toObject()));
-    }
-    return value;
-}
+class IntegrationsThingRemovedNotificationParams {
+public:
+    // wire: 'thingId' (field)
+    QUuid thingId{};
 
-inline QJsonObject IntegrationsThingAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("thing"), ((thing) ? QJsonValue((thing)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline IntegrationsThingChangedNotificationParams IntegrationsThingChangedNotificationParams::fromJson(const QJsonObject &object) {
-    IntegrationsThingChangedNotificationParams value;
-    if (object.contains(QStringLiteral("thing"))) {
-        value.thing = QSharedPointer<Thing>::create(Thing::fromJson((object.value(QStringLiteral("thing"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject IntegrationsThingChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("thing"), ((thing) ? QJsonValue((thing)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static IntegrationsThingRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsThingRemovedNotificationParams IntegrationsThingRemovedNotificationParams::fromJson(const QJsonObject &object) {
     IntegrationsThingRemovedNotificationParams value;
@@ -10027,6 +5184,19 @@ inline QJsonObject IntegrationsThingRemovedNotificationParams::toJson() const {
     object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
     return object;
 }
+
+class IntegrationsThingSettingChangedNotificationParams {
+public:
+    // wire: 'paramTypeId' (field)
+    QUuid paramTypeId{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+    // wire: 'value' (field)
+    QJsonValue value{};
+
+    static IntegrationsThingSettingChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline IntegrationsThingSettingChangedNotificationParams IntegrationsThingSettingChangedNotificationParams::fromJson(const QJsonObject &object) {
     IntegrationsThingSettingChangedNotificationParams value;
@@ -10050,6 +5220,19 @@ inline QJsonObject IntegrationsThingSettingChangedNotificationParams::toJson() c
     return object;
 }
 
+class JSONRPCAuthenticateParams {
+public:
+    // wire: 'deviceName' (field)
+    QString deviceName{};
+    // wire: 'password' (field)
+    QString password{};
+    // wire: 'username' (field)
+    QString username{};
+
+    static JSONRPCAuthenticateParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCAuthenticateParams JSONRPCAuthenticateParams::fromJson(const QJsonObject &object) {
     JSONRPCAuthenticateParams value;
     if (object.contains(QStringLiteral("deviceName"))) {
@@ -10072,37 +5255,20 @@ inline QJsonObject JSONRPCAuthenticateParams::toJson() const {
     return object;
 }
 
-inline JSONRPCAuthenticateResponse JSONRPCAuthenticateResponse::fromJson(const QJsonObject &object) {
-    JSONRPCAuthenticateResponse value;
-    if (object.contains(QStringLiteral("scopes"))) {
-        value.scopes = ([&]() { QList<PermissionScope> list; for (const QJsonValue &item : (object.value(QStringLiteral("scopes"))).toArray()) { list.append(parsePermissionScope(item)); } return list; }());
-    }
-    if (object.contains(QStringLiteral("token"))) {
-        value.token = (object.value(QStringLiteral("token"))).toString();
-    }
-    if (object.contains(QStringLiteral("username"))) {
-        value.username = (object.value(QStringLiteral("username"))).toString();
-    }
-    if (object.contains(QStringLiteral("success"))) {
-        value.success = (object.value(QStringLiteral("success"))).toBool();
-    }
-    return value;
-}
+class JSONRPCCreateUserParams {
+public:
+    // wire: 'displayName' (optional)
+    std::optional<QString> displayName;
+    // wire: 'email' (optional)
+    std::optional<QString> email;
+    // wire: 'password' (field)
+    QString password{};
+    // wire: 'username' (field)
+    QString username{};
 
-inline QJsonObject JSONRPCAuthenticateResponse::toJson() const {
-    QJsonObject object;
-    if (scopes.has_value()) {
-        object.insert(QStringLiteral("scopes"), ([&]() { QJsonArray array; for (const auto &item : *scopes) { array.append(QJsonValue(toString(item))); } return QJsonValue(array); }()));
-    }
-    if (token.has_value()) {
-        object.insert(QStringLiteral("token"), QJsonValue(*token));
-    }
-    if (username.has_value()) {
-        object.insert(QStringLiteral("username"), QJsonValue(*username));
-    }
-    object.insert(QStringLiteral("success"), QJsonValue(success));
-    return object;
-}
+    static JSONRPCCreateUserParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCCreateUserParams JSONRPCCreateUserParams::fromJson(const QJsonObject &object) {
     JSONRPCCreateUserParams value;
@@ -10134,6 +5300,15 @@ inline QJsonObject JSONRPCCreateUserParams::toJson() const {
     return object;
 }
 
+class JSONRPCCreateUserResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static JSONRPCCreateUserResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCCreateUserResponse JSONRPCCreateUserResponse::fromJson(const QJsonObject &object) {
     JSONRPCCreateUserResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -10147,6 +5322,15 @@ inline QJsonObject JSONRPCCreateUserResponse::toJson() const {
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     return object;
 }
+
+class JSONRPCHelloParams {
+public:
+    // wire: 'locale' (optional)
+    std::optional<QString> locale;
+
+    static JSONRPCHelloParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCHelloParams JSONRPCHelloParams::fromJson(const QJsonObject &object) {
     JSONRPCHelloParams value;
@@ -10164,85 +5348,12 @@ inline QJsonObject JSONRPCHelloParams::toJson() const {
     return object;
 }
 
-inline JSONRPCHelloResponse JSONRPCHelloResponse::fromJson(const QJsonObject &object) {
-    JSONRPCHelloResponse value;
-    if (object.contains(QStringLiteral("authenticationRequired"))) {
-        value.authenticationRequired = (object.value(QStringLiteral("authenticationRequired"))).toBool();
-    }
-    if (object.contains(QStringLiteral("initialSetupRequired"))) {
-        value.initialSetupRequired = (object.value(QStringLiteral("initialSetupRequired"))).toBool();
-    }
-    if (object.contains(QStringLiteral("language"))) {
-        value.language = (object.value(QStringLiteral("language"))).toString();
-    }
-    if (object.contains(QStringLiteral("locale"))) {
-        value.locale = (object.value(QStringLiteral("locale"))).toString();
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("authenticated"))) {
-        value.authenticated = (object.value(QStringLiteral("authenticated"))).toBool();
-    }
-    if (object.contains(QStringLiteral("cacheHashes"))) {
-        value.cacheHashes = ([&]() { QList<QSharedPointer<CacheHash>> list; for (const QJsonValue &item : (object.value(QStringLiteral("cacheHashes"))).toArray()) { list.append(QSharedPointer<CacheHash>::create(CacheHash::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("experiences"))) {
-        value.experiences = ([&]() { QList<QSharedPointer<Experience>> list; for (const QJsonValue &item : (object.value(QStringLiteral("experiences"))).toArray()) { list.append(QSharedPointer<Experience>::create(Experience::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("permissionScopes"))) {
-        value.permissionScopes = ([&]() { QList<PermissionScope> list; for (const QJsonValue &item : (object.value(QStringLiteral("permissionScopes"))).toArray()) { list.append(parsePermissionScope(item)); } return list; }());
-    }
-    if (object.contains(QStringLiteral("username"))) {
-        value.username = (object.value(QStringLiteral("username"))).toString();
-    }
-    if (object.contains(QStringLiteral("protocol version"))) {
-        value.protocolVersion = (object.value(QStringLiteral("protocol version"))).toString();
-    }
-    if (object.contains(QStringLiteral("pushButtonAuthAvailable"))) {
-        value.pushButtonAuthAvailable = (object.value(QStringLiteral("pushButtonAuthAvailable"))).toBool();
-    }
-    if (object.contains(QStringLiteral("server"))) {
-        value.server = (object.value(QStringLiteral("server"))).toString();
-    }
-    if (object.contains(QStringLiteral("uuid"))) {
-        value.uuid = QUuid((object.value(QStringLiteral("uuid"))).toString());
-    }
-    if (object.contains(QStringLiteral("version"))) {
-        value.version = (object.value(QStringLiteral("version"))).toString();
-    }
-    return value;
-}
+class JSONRPCIntrospectParams {
+public:
 
-inline QJsonObject JSONRPCHelloResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("authenticationRequired"), QJsonValue(authenticationRequired));
-    object.insert(QStringLiteral("initialSetupRequired"), QJsonValue(initialSetupRequired));
-    object.insert(QStringLiteral("language"), QJsonValue(language));
-    object.insert(QStringLiteral("locale"), QJsonValue(locale));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    if (authenticated.has_value()) {
-        object.insert(QStringLiteral("authenticated"), QJsonValue(*authenticated));
-    }
-    if (cacheHashes.has_value()) {
-        object.insert(QStringLiteral("cacheHashes"), ([&]() { QJsonArray array; for (const auto &item : *cacheHashes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (experiences.has_value()) {
-        object.insert(QStringLiteral("experiences"), ([&]() { QJsonArray array; for (const auto &item : *experiences) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (permissionScopes.has_value()) {
-        object.insert(QStringLiteral("permissionScopes"), ([&]() { QJsonArray array; for (const auto &item : *permissionScopes) { array.append(QJsonValue(toString(item))); } return QJsonValue(array); }()));
-    }
-    if (username.has_value()) {
-        object.insert(QStringLiteral("username"), QJsonValue(*username));
-    }
-    object.insert(QStringLiteral("protocol version"), QJsonValue(protocolVersion));
-    object.insert(QStringLiteral("pushButtonAuthAvailable"), QJsonValue(pushButtonAuthAvailable));
-    object.insert(QStringLiteral("server"), QJsonValue(server));
-    object.insert(QStringLiteral("uuid"), QJsonValue((uuid).toString()));
-    object.insert(QStringLiteral("version"), QJsonValue(version));
-    return object;
-}
+    static JSONRPCIntrospectParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCIntrospectParams JSONRPCIntrospectParams::fromJson(const QJsonObject &object) {
     JSONRPCIntrospectParams value;
@@ -10253,6 +5364,19 @@ inline QJsonObject JSONRPCIntrospectParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class JSONRPCIntrospectResponse {
+public:
+    // wire: 'methods' (field)
+    QJsonObject methods{};
+    // wire: 'notifications' (field)
+    QJsonObject notifications{};
+    // wire: 'types' (field)
+    QJsonObject types{};
+
+    static JSONRPCIntrospectResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCIntrospectResponse JSONRPCIntrospectResponse::fromJson(const QJsonObject &object) {
     JSONRPCIntrospectResponse value;
@@ -10276,6 +5400,15 @@ inline QJsonObject JSONRPCIntrospectResponse::toJson() const {
     return object;
 }
 
+class JSONRPCKeepAliveParams {
+public:
+    // wire: 'sessionId' (field)
+    QString sessionId{};
+
+    static JSONRPCKeepAliveParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCKeepAliveParams JSONRPCKeepAliveParams::fromJson(const QJsonObject &object) {
     JSONRPCKeepAliveParams value;
     if (object.contains(QStringLiteral("sessionId"))) {
@@ -10289,6 +5422,17 @@ inline QJsonObject JSONRPCKeepAliveParams::toJson() const {
     object.insert(QStringLiteral("sessionId"), QJsonValue(sessionId));
     return object;
 }
+
+class JSONRPCKeepAliveResponse {
+public:
+    // wire: 'sessionId' (field)
+    QString sessionId{};
+    // wire: 'success' (field)
+    bool success{};
+
+    static JSONRPCKeepAliveResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCKeepAliveResponse JSONRPCKeepAliveResponse::fromJson(const QJsonObject &object) {
     JSONRPCKeepAliveResponse value;
@@ -10307,6 +5451,19 @@ inline QJsonObject JSONRPCKeepAliveResponse::toJson() const {
     object.insert(QStringLiteral("success"), QJsonValue(success));
     return object;
 }
+
+class JSONRPCPushButtonAuthFinishedNotificationParams {
+public:
+    // wire: 'token' (optional)
+    std::optional<QString> token;
+    // wire: 'success' (field)
+    bool success{};
+    // wire: 'transactionId' (field)
+    qint64 transactionId{};
+
+    static JSONRPCPushButtonAuthFinishedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCPushButtonAuthFinishedNotificationParams JSONRPCPushButtonAuthFinishedNotificationParams::fromJson(const QJsonObject &object) {
     JSONRPCPushButtonAuthFinishedNotificationParams value;
@@ -10332,6 +5489,15 @@ inline QJsonObject JSONRPCPushButtonAuthFinishedNotificationParams::toJson() con
     return object;
 }
 
+class JSONRPCRequestPushButtonAuthParams {
+public:
+    // wire: 'deviceName' (field)
+    QString deviceName{};
+
+    static JSONRPCRequestPushButtonAuthParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCRequestPushButtonAuthParams JSONRPCRequestPushButtonAuthParams::fromJson(const QJsonObject &object) {
     JSONRPCRequestPushButtonAuthParams value;
     if (object.contains(QStringLiteral("deviceName"))) {
@@ -10345,6 +5511,17 @@ inline QJsonObject JSONRPCRequestPushButtonAuthParams::toJson() const {
     object.insert(QStringLiteral("deviceName"), QJsonValue(deviceName));
     return object;
 }
+
+class JSONRPCRequestPushButtonAuthResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+    // wire: 'transactionId' (field)
+    qint64 transactionId{};
+
+    static JSONRPCRequestPushButtonAuthResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCRequestPushButtonAuthResponse JSONRPCRequestPushButtonAuthResponse::fromJson(const QJsonObject &object) {
     JSONRPCRequestPushButtonAuthResponse value;
@@ -10363,6 +5540,17 @@ inline QJsonObject JSONRPCRequestPushButtonAuthResponse::toJson() const {
     object.insert(QStringLiteral("transactionId"), QJsonValue(static_cast<qint64>(transactionId)));
     return object;
 }
+
+class JSONRPCSetNotificationStatusParams {
+public:
+    // wire: 'enabled' (optional, deprecated)
+    std::optional<bool> enabled;
+    // wire: 'namespaces' (optional)
+    std::optional<QStringList> namespaces;
+
+    static JSONRPCSetNotificationStatusParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCSetNotificationStatusParams JSONRPCSetNotificationStatusParams::fromJson(const QJsonObject &object) {
     JSONRPCSetNotificationStatusParams value;
@@ -10386,6 +5574,17 @@ inline QJsonObject JSONRPCSetNotificationStatusParams::toJson() const {
     return object;
 }
 
+class JSONRPCSetNotificationStatusResponse {
+public:
+    // wire: 'enabled' (deprecated)
+    bool enabled{};
+    // wire: 'namespaces' (field)
+    QStringList namespaces{};
+
+    static JSONRPCSetNotificationStatusResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCSetNotificationStatusResponse JSONRPCSetNotificationStatusResponse::fromJson(const QJsonObject &object) {
     JSONRPCSetNotificationStatusResponse value;
     if (object.contains(QStringLiteral("enabled"))) {
@@ -10404,6 +5603,13 @@ inline QJsonObject JSONRPCSetNotificationStatusResponse::toJson() const {
     return object;
 }
 
+class JSONRPCVersionParams {
+public:
+
+    static JSONRPCVersionParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline JSONRPCVersionParams JSONRPCVersionParams::fromJson(const QJsonObject &object) {
     JSONRPCVersionParams value;
     return value;
@@ -10413,6 +5619,21 @@ inline QJsonObject JSONRPCVersionParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class JSONRPCVersionResponse {
+public:
+    // wire: 'protocol version' (field)
+    QString protocolVersion{};
+    // wire: 'qtBuildVersion' (field)
+    QString qtBuildVersion{};
+    // wire: 'qtVersion' (field)
+    QString qtVersion{};
+    // wire: 'version' (field)
+    QString version{};
+
+    static JSONRPCVersionResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline JSONRPCVersionResponse JSONRPCVersionResponse::fromJson(const QJsonObject &object) {
     JSONRPCVersionResponse value;
@@ -10440,6 +5661,19 @@ inline QJsonObject JSONRPCVersionResponse::toJson() const {
     return object;
 }
 
+class LogEntry {
+public:
+    // wire: 'source' (required)
+    QString source{};
+    // wire: 'timestamp' (required)
+    quint64 timestamp{};
+    // wire: 'values' (required)
+    QJsonObject values{};
+
+    static LogEntry fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline LogEntry LogEntry::fromJson(const QJsonObject &object) {
     LogEntry value;
     if (object.contains(QStringLiteral("source"))) {
@@ -10462,6 +5696,21 @@ inline QJsonObject LogEntry::toJson() const {
     return object;
 }
 
+using LogEntries = QList<LogEntry>;
+
+class LoggingCategory {
+public:
+    // wire: 'level' (field)
+    LoggingLevel level{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'type' (field)
+    LoggingCategoryType type{};
+
+    static LoggingCategory fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline LoggingCategory LoggingCategory::fromJson(const QJsonObject &object) {
     LoggingCategory value;
     if (object.contains(QStringLiteral("level"))) {
@@ -10483,6 +5732,54 @@ inline QJsonObject LoggingCategory::toJson() const {
     object.insert(QStringLiteral("type"), QJsonValue(toString(type)));
     return object;
 }
+
+class DebugGetLoggingCategoriesResponse {
+public:
+    // wire: 'loggingCategories' (field)
+    QList<LoggingCategory> loggingCategories{};
+
+    static DebugGetLoggingCategoriesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline DebugGetLoggingCategoriesResponse DebugGetLoggingCategoriesResponse::fromJson(const QJsonObject &object) {
+    DebugGetLoggingCategoriesResponse value;
+    if (object.contains(QStringLiteral("loggingCategories"))) {
+        value.loggingCategories = ([&]() { QList<LoggingCategory> list; for (const QJsonValue &item : (object.value(QStringLiteral("loggingCategories"))).toArray()) { list.append(LoggingCategory::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject DebugGetLoggingCategoriesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("loggingCategories"), ([&]() { QJsonArray array; for (const auto &item : loggingCategories) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class LoggingGetLogEntriesParams {
+public:
+    // wire: 'columns' (optional)
+    std::optional<QList<QString>> columns;
+    // wire: 'endTime' (optional)
+    std::optional<quint64> endTime;
+    // wire: 'filter' (optional)
+    std::optional<QJsonValue> filter;
+    // wire: 'limit' (optional)
+    std::optional<qint64> limit;
+    // wire: 'offset' (optional)
+    std::optional<qint64> offset;
+    // wire: 'sampleRate' (optional)
+    std::optional<SampleRate> sampleRate;
+    // wire: 'sortOrder' (optional)
+    std::optional<SortOrder> sortOrder;
+    // wire: 'startTime' (optional)
+    std::optional<quint64> startTime;
+    // wire: 'sources' (field)
+    QList<QString> sources{};
+
+    static LoggingGetLogEntriesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline LoggingGetLogEntriesParams LoggingGetLogEntriesParams::fromJson(const QJsonObject &object) {
     LoggingGetLogEntriesParams value;
@@ -10546,13 +5843,26 @@ inline QJsonObject LoggingGetLogEntriesParams::toJson() const {
     return object;
 }
 
+class LoggingGetLogEntriesResponse {
+public:
+    // wire: 'count' (field)
+    qint64 count{};
+    // wire: 'logEntries' (optional)
+    std::optional<LogEntries> logEntries;
+    // wire: 'offset' (field)
+    qint64 offset{};
+
+    static LoggingGetLogEntriesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline LoggingGetLogEntriesResponse LoggingGetLogEntriesResponse::fromJson(const QJsonObject &object) {
     LoggingGetLogEntriesResponse value;
     if (object.contains(QStringLiteral("count"))) {
         value.count = static_cast<qint64>((object.value(QStringLiteral("count"))).toInteger());
     }
     if (object.contains(QStringLiteral("logEntries"))) {
-        value.logEntries = ([&]() { QList<QSharedPointer<LogEntry>> list; for (const QJsonValue &item : (object.value(QStringLiteral("logEntries"))).toArray()) { list.append(QSharedPointer<LogEntry>::create(LogEntry::fromJson((item).toObject()))); } return list; }());
+        value.logEntries = ([&]() { QList<LogEntry> list; for (const QJsonValue &item : (object.value(QStringLiteral("logEntries"))).toArray()) { list.append(LogEntry::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("offset"))) {
         value.offset = static_cast<qint64>((object.value(QStringLiteral("offset"))).toInteger());
@@ -10564,25 +5874,55 @@ inline QJsonObject LoggingGetLogEntriesResponse::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("count"), QJsonValue(static_cast<qint64>(count)));
     if (logEntries.has_value()) {
-        object.insert(QStringLiteral("logEntries"), ([&]() { QJsonArray array; for (const auto &item : *logEntries) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("logEntries"), ([&]() { QJsonArray array; for (const auto &item : *logEntries) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     object.insert(QStringLiteral("offset"), QJsonValue(static_cast<qint64>(offset)));
     return object;
 }
 
+class LoggingLogEntryAddedNotificationParams {
+public:
+    // wire: 'logEntry' (field)
+    LogEntry logEntry{};
+
+    static LoggingLogEntryAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline LoggingLogEntryAddedNotificationParams LoggingLogEntryAddedNotificationParams::fromJson(const QJsonObject &object) {
     LoggingLogEntryAddedNotificationParams value;
     if (object.contains(QStringLiteral("logEntry"))) {
-        value.logEntry = QSharedPointer<LogEntry>::create(LogEntry::fromJson((object.value(QStringLiteral("logEntry"))).toObject()));
+        value.logEntry = LogEntry::fromJson((object.value(QStringLiteral("logEntry"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject LoggingLogEntryAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("logEntry"), ((logEntry) ? QJsonValue((logEntry)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("logEntry"), QJsonValue((logEntry).toJson()));
     return object;
 }
+
+class ModbusRtuAddModbusRtuMasterParams {
+public:
+    // wire: 'baudrate' (field)
+    quint64 baudrate{};
+    // wire: 'dataBits' (field)
+    SerialPortDataBits dataBits{};
+    // wire: 'numberOfRetries' (field)
+    quint64 numberOfRetries{};
+    // wire: 'parity' (field)
+    SerialPortParity parity{};
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+    // wire: 'stopBits' (field)
+    SerialPortStopBits stopBits{};
+    // wire: 'timeout' (field)
+    quint64 timeout{};
+
+    static ModbusRtuAddModbusRtuMasterParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuAddModbusRtuMasterParams ModbusRtuAddModbusRtuMasterParams::fromJson(const QJsonObject &object) {
     ModbusRtuAddModbusRtuMasterParams value;
@@ -10622,6 +5962,17 @@ inline QJsonObject ModbusRtuAddModbusRtuMasterParams::toJson() const {
     return object;
 }
 
+class ModbusRtuAddModbusRtuMasterResponse {
+public:
+    // wire: 'modbusError' (field)
+    ModbusRtuError modbusError{};
+    // wire: 'modbusUuid' (optional)
+    std::optional<QUuid> modbusUuid;
+
+    static ModbusRtuAddModbusRtuMasterResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ModbusRtuAddModbusRtuMasterResponse ModbusRtuAddModbusRtuMasterResponse::fromJson(const QJsonObject &object) {
     ModbusRtuAddModbusRtuMasterResponse value;
     if (object.contains(QStringLiteral("modbusError"))) {
@@ -10642,6 +5993,13 @@ inline QJsonObject ModbusRtuAddModbusRtuMasterResponse::toJson() const {
     return object;
 }
 
+class ModbusRtuGetModbusRtuMastersParams {
+public:
+
+    static ModbusRtuGetModbusRtuMastersParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ModbusRtuGetModbusRtuMastersParams ModbusRtuGetModbusRtuMastersParams::fromJson(const QJsonObject &object) {
     ModbusRtuGetModbusRtuMastersParams value;
     return value;
@@ -10652,25 +6010,12 @@ inline QJsonObject ModbusRtuGetModbusRtuMastersParams::toJson() const {
     return object;
 }
 
-inline ModbusRtuGetModbusRtuMastersResponse ModbusRtuGetModbusRtuMastersResponse::fromJson(const QJsonObject &object) {
-    ModbusRtuGetModbusRtuMastersResponse value;
-    if (object.contains(QStringLiteral("modbusError"))) {
-        value.modbusError = parseModbusRtuError(object.value(QStringLiteral("modbusError")));
-    }
-    if (object.contains(QStringLiteral("modbusRtuMasters"))) {
-        value.modbusRtuMasters = ([&]() { QList<QSharedPointer<ModbusRtuMaster>> list; for (const QJsonValue &item : (object.value(QStringLiteral("modbusRtuMasters"))).toArray()) { list.append(QSharedPointer<ModbusRtuMaster>::create(ModbusRtuMaster::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ModbusRtuGetSerialPortsParams {
+public:
 
-inline QJsonObject ModbusRtuGetModbusRtuMastersResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("modbusError"), QJsonValue(toString(modbusError)));
-    if (modbusRtuMasters.has_value()) {
-        object.insert(QStringLiteral("modbusRtuMasters"), ([&]() { QJsonArray array; for (const auto &item : *modbusRtuMasters) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
+    static ModbusRtuGetSerialPortsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuGetSerialPortsParams ModbusRtuGetSerialPortsParams::fromJson(const QJsonObject &object) {
     ModbusRtuGetSerialPortsParams value;
@@ -10682,19 +6027,30 @@ inline QJsonObject ModbusRtuGetSerialPortsParams::toJson() const {
     return object;
 }
 
-inline ModbusRtuGetSerialPortsResponse ModbusRtuGetSerialPortsResponse::fromJson(const QJsonObject &object) {
-    ModbusRtuGetSerialPortsResponse value;
-    if (object.contains(QStringLiteral("serialPorts"))) {
-        value.serialPorts = ([&]() { QList<QSharedPointer<SerialPort>> list; for (const QJsonValue &item : (object.value(QStringLiteral("serialPorts"))).toArray()) { list.append(QSharedPointer<SerialPort>::create(SerialPort::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ModbusRtuMaster {
+public:
+    // wire: 'baudrate' (field)
+    quint64 baudrate{};
+    // wire: 'connected' (field)
+    bool connected{};
+    // wire: 'dataBits' (field)
+    SerialPortDataBits dataBits{};
+    // wire: 'modbusUuid' (field)
+    QUuid modbusUuid{};
+    // wire: 'numberOfRetries' (field)
+    quint64 numberOfRetries{};
+    // wire: 'parity' (field)
+    SerialPortParity parity{};
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+    // wire: 'stopBits' (field)
+    SerialPortStopBits stopBits{};
+    // wire: 'timeout' (field)
+    quint64 timeout{};
 
-inline QJsonObject ModbusRtuGetSerialPortsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("serialPorts"), ([&]() { QJsonArray array; for (const auto &item : serialPorts) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static ModbusRtuMaster fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuMaster ModbusRtuMaster::fromJson(const QJsonObject &object) {
     ModbusRtuMaster value;
@@ -10742,33 +6098,91 @@ inline QJsonObject ModbusRtuMaster::toJson() const {
     return object;
 }
 
+class ModbusRtuGetModbusRtuMastersResponse {
+public:
+    // wire: 'modbusError' (field)
+    ModbusRtuError modbusError{};
+    // wire: 'modbusRtuMasters' (optional)
+    std::optional<QList<ModbusRtuMaster>> modbusRtuMasters;
+
+    static ModbusRtuGetModbusRtuMastersResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ModbusRtuGetModbusRtuMastersResponse ModbusRtuGetModbusRtuMastersResponse::fromJson(const QJsonObject &object) {
+    ModbusRtuGetModbusRtuMastersResponse value;
+    if (object.contains(QStringLiteral("modbusError"))) {
+        value.modbusError = parseModbusRtuError(object.value(QStringLiteral("modbusError")));
+    }
+    if (object.contains(QStringLiteral("modbusRtuMasters"))) {
+        value.modbusRtuMasters = ([&]() { QList<ModbusRtuMaster> list; for (const QJsonValue &item : (object.value(QStringLiteral("modbusRtuMasters"))).toArray()) { list.append(ModbusRtuMaster::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ModbusRtuGetModbusRtuMastersResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("modbusError"), QJsonValue(toString(modbusError)));
+    if (modbusRtuMasters.has_value()) {
+        object.insert(QStringLiteral("modbusRtuMasters"), ([&]() { QJsonArray array; for (const auto &item : *modbusRtuMasters) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class ModbusRtuModbusRtuMasterAddedNotificationParams {
+public:
+    // wire: 'modbusRtuMaster' (field)
+    ModbusRtuMaster modbusRtuMaster{};
+
+    static ModbusRtuModbusRtuMasterAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ModbusRtuModbusRtuMasterAddedNotificationParams ModbusRtuModbusRtuMasterAddedNotificationParams::fromJson(const QJsonObject &object) {
     ModbusRtuModbusRtuMasterAddedNotificationParams value;
     if (object.contains(QStringLiteral("modbusRtuMaster"))) {
-        value.modbusRtuMaster = QSharedPointer<ModbusRtuMaster>::create(ModbusRtuMaster::fromJson((object.value(QStringLiteral("modbusRtuMaster"))).toObject()));
+        value.modbusRtuMaster = ModbusRtuMaster::fromJson((object.value(QStringLiteral("modbusRtuMaster"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ModbusRtuModbusRtuMasterAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("modbusRtuMaster"), ((modbusRtuMaster) ? QJsonValue((modbusRtuMaster)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("modbusRtuMaster"), QJsonValue((modbusRtuMaster).toJson()));
     return object;
 }
+
+class ModbusRtuModbusRtuMasterChangedNotificationParams {
+public:
+    // wire: 'modbusRtuMaster' (field)
+    ModbusRtuMaster modbusRtuMaster{};
+
+    static ModbusRtuModbusRtuMasterChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuModbusRtuMasterChangedNotificationParams ModbusRtuModbusRtuMasterChangedNotificationParams::fromJson(const QJsonObject &object) {
     ModbusRtuModbusRtuMasterChangedNotificationParams value;
     if (object.contains(QStringLiteral("modbusRtuMaster"))) {
-        value.modbusRtuMaster = QSharedPointer<ModbusRtuMaster>::create(ModbusRtuMaster::fromJson((object.value(QStringLiteral("modbusRtuMaster"))).toObject()));
+        value.modbusRtuMaster = ModbusRtuMaster::fromJson((object.value(QStringLiteral("modbusRtuMaster"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ModbusRtuModbusRtuMasterChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("modbusRtuMaster"), ((modbusRtuMaster) ? QJsonValue((modbusRtuMaster)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("modbusRtuMaster"), QJsonValue((modbusRtuMaster).toJson()));
     return object;
 }
+
+class ModbusRtuModbusRtuMasterRemovedNotificationParams {
+public:
+    // wire: 'modbusUuid' (field)
+    QUuid modbusUuid{};
+
+    static ModbusRtuModbusRtuMasterRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuModbusRtuMasterRemovedNotificationParams ModbusRtuModbusRtuMasterRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ModbusRtuModbusRtuMasterRemovedNotificationParams value;
@@ -10783,6 +6197,29 @@ inline QJsonObject ModbusRtuModbusRtuMasterRemovedNotificationParams::toJson() c
     object.insert(QStringLiteral("modbusUuid"), QJsonValue((modbusUuid).toString()));
     return object;
 }
+
+class ModbusRtuReconfigureModbusRtuMasterParams {
+public:
+    // wire: 'baudrate' (field)
+    quint64 baudrate{};
+    // wire: 'dataBits' (field)
+    SerialPortDataBits dataBits{};
+    // wire: 'modbusUuid' (field)
+    QUuid modbusUuid{};
+    // wire: 'numberOfRetries' (field)
+    quint64 numberOfRetries{};
+    // wire: 'parity' (field)
+    SerialPortParity parity{};
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+    // wire: 'stopBits' (field)
+    SerialPortStopBits stopBits{};
+    // wire: 'timeout' (field)
+    quint64 timeout{};
+
+    static ModbusRtuReconfigureModbusRtuMasterParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuReconfigureModbusRtuMasterParams ModbusRtuReconfigureModbusRtuMasterParams::fromJson(const QJsonObject &object) {
     ModbusRtuReconfigureModbusRtuMasterParams value;
@@ -10826,6 +6263,15 @@ inline QJsonObject ModbusRtuReconfigureModbusRtuMasterParams::toJson() const {
     return object;
 }
 
+class ModbusRtuReconfigureModbusRtuMasterResponse {
+public:
+    // wire: 'modbusError' (field)
+    ModbusRtuError modbusError{};
+
+    static ModbusRtuReconfigureModbusRtuMasterResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ModbusRtuReconfigureModbusRtuMasterResponse ModbusRtuReconfigureModbusRtuMasterResponse::fromJson(const QJsonObject &object) {
     ModbusRtuReconfigureModbusRtuMasterResponse value;
     if (object.contains(QStringLiteral("modbusError"))) {
@@ -10839,6 +6285,15 @@ inline QJsonObject ModbusRtuReconfigureModbusRtuMasterResponse::toJson() const {
     object.insert(QStringLiteral("modbusError"), QJsonValue(toString(modbusError)));
     return object;
 }
+
+class ModbusRtuRemoveModbusRtuMasterParams {
+public:
+    // wire: 'modbusUuid' (field)
+    QUuid modbusUuid{};
+
+    static ModbusRtuRemoveModbusRtuMasterParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ModbusRtuRemoveModbusRtuMasterParams ModbusRtuRemoveModbusRtuMasterParams::fromJson(const QJsonObject &object) {
     ModbusRtuRemoveModbusRtuMasterParams value;
@@ -10854,6 +6309,15 @@ inline QJsonObject ModbusRtuRemoveModbusRtuMasterParams::toJson() const {
     return object;
 }
 
+class ModbusRtuRemoveModbusRtuMasterResponse {
+public:
+    // wire: 'modbusError' (field)
+    ModbusRtuError modbusError{};
+
+    static ModbusRtuRemoveModbusRtuMasterResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ModbusRtuRemoveModbusRtuMasterResponse ModbusRtuRemoveModbusRtuMasterResponse::fromJson(const QJsonObject &object) {
     ModbusRtuRemoveModbusRtuMasterResponse value;
     if (object.contains(QStringLiteral("modbusError"))) {
@@ -10868,33 +6332,22 @@ inline QJsonObject ModbusRtuRemoveModbusRtuMasterResponse::toJson() const {
     return object;
 }
 
-inline ModbusRtuSerialPortAddedNotificationParams ModbusRtuSerialPortAddedNotificationParams::fromJson(const QJsonObject &object) {
-    ModbusRtuSerialPortAddedNotificationParams value;
-    if (object.contains(QStringLiteral("serialPort"))) {
-        value.serialPort = QSharedPointer<SerialPort>::create(SerialPort::fromJson((object.value(QStringLiteral("serialPort"))).toObject()));
-    }
-    return value;
-}
+class MqttPolicy {
+public:
+    // wire: 'allowedPublishTopicFilters' (field)
+    QStringList allowedPublishTopicFilters{};
+    // wire: 'allowedSubscribeTopicFilters' (field)
+    QStringList allowedSubscribeTopicFilters{};
+    // wire: 'clientId' (field)
+    QString clientId{};
+    // wire: 'password' (field)
+    QString password{};
+    // wire: 'username' (field)
+    QString username{};
 
-inline QJsonObject ModbusRtuSerialPortAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("serialPort"), ((serialPort) ? QJsonValue((serialPort)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline ModbusRtuSerialPortRemovedNotificationParams ModbusRtuSerialPortRemovedNotificationParams::fromJson(const QJsonObject &object) {
-    ModbusRtuSerialPortRemovedNotificationParams value;
-    if (object.contains(QStringLiteral("serialPort"))) {
-        value.serialPort = QSharedPointer<SerialPort>::create(SerialPort::fromJson((object.value(QStringLiteral("serialPort"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject ModbusRtuSerialPortRemovedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("serialPort"), ((serialPort) ? QJsonValue((serialPort)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static MqttPolicy fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline MqttPolicy MqttPolicy::fromJson(const QJsonObject &object) {
     MqttPolicy value;
@@ -10926,6 +6379,88 @@ inline QJsonObject MqttPolicy::toJson() const {
     return object;
 }
 
+class ConfigurationGetMqttPoliciesResponse {
+public:
+    // wire: 'mqttPolicies' (field)
+    QList<MqttPolicy> mqttPolicies{};
+
+    static ConfigurationGetMqttPoliciesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetMqttPoliciesResponse ConfigurationGetMqttPoliciesResponse::fromJson(const QJsonObject &object) {
+    ConfigurationGetMqttPoliciesResponse value;
+    if (object.contains(QStringLiteral("mqttPolicies"))) {
+        value.mqttPolicies = ([&]() { QList<MqttPolicy> list; for (const QJsonValue &item : (object.value(QStringLiteral("mqttPolicies"))).toArray()) { list.append(MqttPolicy::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationGetMqttPoliciesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("mqttPolicies"), ([&]() { QJsonArray array; for (const auto &item : mqttPolicies) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ConfigurationMqttPolicyChangedNotificationParams {
+public:
+    // wire: 'policy' (field)
+    MqttPolicy policy{};
+
+    static ConfigurationMqttPolicyChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationMqttPolicyChangedNotificationParams ConfigurationMqttPolicyChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationMqttPolicyChangedNotificationParams value;
+    if (object.contains(QStringLiteral("policy"))) {
+        value.policy = MqttPolicy::fromJson((object.value(QStringLiteral("policy"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationMqttPolicyChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("policy"), QJsonValue((policy).toJson()));
+    return object;
+}
+
+class ConfigurationSetMqttPolicyParams {
+public:
+    // wire: 'policy' (field)
+    MqttPolicy policy{};
+
+    static ConfigurationSetMqttPolicyParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetMqttPolicyParams ConfigurationSetMqttPolicyParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetMqttPolicyParams value;
+    if (object.contains(QStringLiteral("policy"))) {
+        value.policy = MqttPolicy::fromJson((object.value(QStringLiteral("policy"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetMqttPolicyParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("policy"), QJsonValue((policy).toJson()));
+    return object;
+}
+
+class NetworkManagerConnectWifiNetworkParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+    // wire: 'password' (optional)
+    std::optional<QString> password;
+    // wire: 'ssid' (field)
+    QString ssid{};
+
+    static NetworkManagerConnectWifiNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerConnectWifiNetworkParams NetworkManagerConnectWifiNetworkParams::fromJson(const QJsonObject &object) {
     NetworkManagerConnectWifiNetworkParams value;
     if (object.contains(QStringLiteral("interface"))) {
@@ -10950,6 +6485,15 @@ inline QJsonObject NetworkManagerConnectWifiNetworkParams::toJson() const {
     return object;
 }
 
+class NetworkManagerConnectWifiNetworkResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerConnectWifiNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerConnectWifiNetworkResponse NetworkManagerConnectWifiNetworkResponse::fromJson(const QJsonObject &object) {
     NetworkManagerConnectWifiNetworkResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -10963,6 +6507,25 @@ inline QJsonObject NetworkManagerConnectWifiNetworkResponse::toJson() const {
     object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
     return object;
 }
+
+class NetworkManagerCreateWiredConnectionParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+    // wire: 'dns' (optional)
+    std::optional<QString> dns;
+    // wire: 'gateway' (optional)
+    std::optional<QString> gateway;
+    // wire: 'ip' (optional)
+    std::optional<QString> ip;
+    // wire: 'prefix' (optional)
+    std::optional<quint64> prefix;
+    // wire: 'type' (field)
+    WiredNetworkConnectionType type{};
+
+    static NetworkManagerCreateWiredConnectionParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerCreateWiredConnectionParams NetworkManagerCreateWiredConnectionParams::fromJson(const QJsonObject &object) {
     NetworkManagerCreateWiredConnectionParams value;
@@ -11006,6 +6569,15 @@ inline QJsonObject NetworkManagerCreateWiredConnectionParams::toJson() const {
     return object;
 }
 
+class NetworkManagerCreateWiredConnectionResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerCreateWiredConnectionResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerCreateWiredConnectionResponse NetworkManagerCreateWiredConnectionResponse::fromJson(const QJsonObject &object) {
     NetworkManagerCreateWiredConnectionResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11019,6 +6591,15 @@ inline QJsonObject NetworkManagerCreateWiredConnectionResponse::toJson() const {
     object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
     return object;
 }
+
+class NetworkManagerDisconnectInterfaceParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+
+    static NetworkManagerDisconnectInterfaceParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerDisconnectInterfaceParams NetworkManagerDisconnectInterfaceParams::fromJson(const QJsonObject &object) {
     NetworkManagerDisconnectInterfaceParams value;
@@ -11034,6 +6615,15 @@ inline QJsonObject NetworkManagerDisconnectInterfaceParams::toJson() const {
     return object;
 }
 
+class NetworkManagerDisconnectInterfaceResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerDisconnectInterfaceResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerDisconnectInterfaceResponse NetworkManagerDisconnectInterfaceResponse::fromJson(const QJsonObject &object) {
     NetworkManagerDisconnectInterfaceResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11047,6 +6637,15 @@ inline QJsonObject NetworkManagerDisconnectInterfaceResponse::toJson() const {
     object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
     return object;
 }
+
+class NetworkManagerEnableNetworkingParams {
+public:
+    // wire: 'enable' (field)
+    bool enable{};
+
+    static NetworkManagerEnableNetworkingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerEnableNetworkingParams NetworkManagerEnableNetworkingParams::fromJson(const QJsonObject &object) {
     NetworkManagerEnableNetworkingParams value;
@@ -11062,6 +6661,15 @@ inline QJsonObject NetworkManagerEnableNetworkingParams::toJson() const {
     return object;
 }
 
+class NetworkManagerEnableNetworkingResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerEnableNetworkingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerEnableNetworkingResponse NetworkManagerEnableNetworkingResponse::fromJson(const QJsonObject &object) {
     NetworkManagerEnableNetworkingResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11075,6 +6683,15 @@ inline QJsonObject NetworkManagerEnableNetworkingResponse::toJson() const {
     object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
     return object;
 }
+
+class NetworkManagerEnableWirelessNetworkingParams {
+public:
+    // wire: 'enable' (field)
+    bool enable{};
+
+    static NetworkManagerEnableWirelessNetworkingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerEnableWirelessNetworkingParams NetworkManagerEnableWirelessNetworkingParams::fromJson(const QJsonObject &object) {
     NetworkManagerEnableWirelessNetworkingParams value;
@@ -11090,6 +6707,15 @@ inline QJsonObject NetworkManagerEnableWirelessNetworkingParams::toJson() const 
     return object;
 }
 
+class NetworkManagerEnableWirelessNetworkingResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerEnableWirelessNetworkingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerEnableWirelessNetworkingResponse NetworkManagerEnableWirelessNetworkingResponse::fromJson(const QJsonObject &object) {
     NetworkManagerEnableWirelessNetworkingResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11104,6 +6730,13 @@ inline QJsonObject NetworkManagerEnableWirelessNetworkingResponse::toJson() cons
     return object;
 }
 
+class NetworkManagerGetNetworkDevicesParams {
+public:
+
+    static NetworkManagerGetNetworkDevicesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerGetNetworkDevicesParams NetworkManagerGetNetworkDevicesParams::fromJson(const QJsonObject &object) {
     NetworkManagerGetNetworkDevicesParams value;
     return value;
@@ -11114,31 +6747,12 @@ inline QJsonObject NetworkManagerGetNetworkDevicesParams::toJson() const {
     return object;
 }
 
-inline NetworkManagerGetNetworkDevicesResponse NetworkManagerGetNetworkDevicesResponse::fromJson(const QJsonObject &object) {
-    NetworkManagerGetNetworkDevicesResponse value;
-    if (object.contains(QStringLiteral("networkManagerError"))) {
-        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
-    }
-    if (object.contains(QStringLiteral("wiredNetworkDevices"))) {
-        value.wiredNetworkDevices = ([&]() { QList<QSharedPointer<WiredNetworkDevice>> list; for (const QJsonValue &item : (object.value(QStringLiteral("wiredNetworkDevices"))).toArray()) { list.append(QSharedPointer<WiredNetworkDevice>::create(WiredNetworkDevice::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("wirelessNetworkDevices"))) {
-        value.wirelessNetworkDevices = ([&]() { QList<QSharedPointer<WirelessNetworkDevice>> list; for (const QJsonValue &item : (object.value(QStringLiteral("wirelessNetworkDevices"))).toArray()) { list.append(QSharedPointer<WirelessNetworkDevice>::create(WirelessNetworkDevice::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class NetworkManagerGetNetworkStatusParams {
+public:
 
-inline QJsonObject NetworkManagerGetNetworkDevicesResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
-    if (wiredNetworkDevices.has_value()) {
-        object.insert(QStringLiteral("wiredNetworkDevices"), ([&]() { QJsonArray array; for (const auto &item : *wiredNetworkDevices) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (wirelessNetworkDevices.has_value()) {
-        object.insert(QStringLiteral("wirelessNetworkDevices"), ([&]() { QJsonArray array; for (const auto &item : *wirelessNetworkDevices) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
+    static NetworkManagerGetNetworkStatusParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerGetNetworkStatusParams NetworkManagerGetNetworkStatusParams::fromJson(const QJsonObject &object) {
     NetworkManagerGetNetworkStatusParams value;
@@ -11150,25 +6764,18 @@ inline QJsonObject NetworkManagerGetNetworkStatusParams::toJson() const {
     return object;
 }
 
-inline NetworkManagerGetNetworkStatusResponse NetworkManagerGetNetworkStatusResponse::fromJson(const QJsonObject &object) {
-    NetworkManagerGetNetworkStatusResponse value;
-    if (object.contains(QStringLiteral("networkManagerError"))) {
-        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
-    }
-    if (object.contains(QStringLiteral("status"))) {
-        value.status = QSharedPointer<NetworkManagerGetNetworkStatusResponseStatus>::create(NetworkManagerGetNetworkStatusResponseStatus::fromJson((object.value(QStringLiteral("status"))).toObject()));
-    }
-    return value;
-}
+class NetworkManagerGetNetworkStatusResponseStatus {
+public:
+    // wire: 'networkingEnabled' (field)
+    bool networkingEnabled{};
+    // wire: 'state' (field)
+    NetworkManagerState state{};
+    // wire: 'wirelessNetworkingEnabled' (field)
+    bool wirelessNetworkingEnabled{};
 
-inline QJsonObject NetworkManagerGetNetworkStatusResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
-    if (status.has_value()) {
-        object.insert(QStringLiteral("status"), ((*status) ? QJsonValue((*status)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    return object;
-}
+    static NetworkManagerGetNetworkStatusResponseStatus fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerGetNetworkStatusResponseStatus NetworkManagerGetNetworkStatusResponseStatus::fromJson(const QJsonObject &object) {
     NetworkManagerGetNetworkStatusResponseStatus value;
@@ -11192,6 +6799,46 @@ inline QJsonObject NetworkManagerGetNetworkStatusResponseStatus::toJson() const 
     return object;
 }
 
+class NetworkManagerGetNetworkStatusResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+    // wire: 'status' (optional)
+    std::optional<NetworkManagerGetNetworkStatusResponseStatus> status;
+
+    static NetworkManagerGetNetworkStatusResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerGetNetworkStatusResponse NetworkManagerGetNetworkStatusResponse::fromJson(const QJsonObject &object) {
+    NetworkManagerGetNetworkStatusResponse value;
+    if (object.contains(QStringLiteral("networkManagerError"))) {
+        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
+    }
+    if (object.contains(QStringLiteral("status"))) {
+        value.status = NetworkManagerGetNetworkStatusResponseStatus::fromJson((object.value(QStringLiteral("status"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerGetNetworkStatusResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
+    if (status.has_value()) {
+        object.insert(QStringLiteral("status"), QJsonValue((*status).toJson()));
+    }
+    return object;
+}
+
+class NetworkManagerGetWirelessAccessPointsParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+
+    static NetworkManagerGetWirelessAccessPointsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerGetWirelessAccessPointsParams NetworkManagerGetWirelessAccessPointsParams::fromJson(const QJsonObject &object) {
     NetworkManagerGetWirelessAccessPointsParams value;
     if (object.contains(QStringLiteral("interface"))) {
@@ -11206,39 +6853,18 @@ inline QJsonObject NetworkManagerGetWirelessAccessPointsParams::toJson() const {
     return object;
 }
 
-inline NetworkManagerGetWirelessAccessPointsResponse NetworkManagerGetWirelessAccessPointsResponse::fromJson(const QJsonObject &object) {
-    NetworkManagerGetWirelessAccessPointsResponse value;
-    if (object.contains(QStringLiteral("networkManagerError"))) {
-        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
-    }
-    if (object.contains(QStringLiteral("wirelessAccessPoints"))) {
-        value.wirelessAccessPoints = ([&]() { QList<QSharedPointer<WirelessAccessPoint>> list; for (const QJsonValue &item : (object.value(QStringLiteral("wirelessAccessPoints"))).toArray()) { list.append(QSharedPointer<WirelessAccessPoint>::create(WirelessAccessPoint::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class NetworkManagerNetworkStatusChangedNotificationParamsStatus {
+public:
+    // wire: 'networkingEnabled' (field)
+    bool networkingEnabled{};
+    // wire: 'state' (field)
+    NetworkManagerState state{};
+    // wire: 'wirelessNetworkingEnabled' (field)
+    bool wirelessNetworkingEnabled{};
 
-inline QJsonObject NetworkManagerGetWirelessAccessPointsResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
-    if (wirelessAccessPoints.has_value()) {
-        object.insert(QStringLiteral("wirelessAccessPoints"), ([&]() { QJsonArray array; for (const auto &item : *wirelessAccessPoints) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    return object;
-}
-
-inline NetworkManagerNetworkStatusChangedNotificationParams NetworkManagerNetworkStatusChangedNotificationParams::fromJson(const QJsonObject &object) {
-    NetworkManagerNetworkStatusChangedNotificationParams value;
-    if (object.contains(QStringLiteral("status"))) {
-        value.status = QSharedPointer<NetworkManagerNetworkStatusChangedNotificationParamsStatus>::create(NetworkManagerNetworkStatusChangedNotificationParamsStatus::fromJson((object.value(QStringLiteral("status"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject NetworkManagerNetworkStatusChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("status"), ((status) ? QJsonValue((status)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static NetworkManagerNetworkStatusChangedNotificationParamsStatus fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerNetworkStatusChangedNotificationParamsStatus NetworkManagerNetworkStatusChangedNotificationParamsStatus::fromJson(const QJsonObject &object) {
     NetworkManagerNetworkStatusChangedNotificationParamsStatus value;
@@ -11262,6 +6888,38 @@ inline QJsonObject NetworkManagerNetworkStatusChangedNotificationParamsStatus::t
     return object;
 }
 
+class NetworkManagerNetworkStatusChangedNotificationParams {
+public:
+    // wire: 'status' (field)
+    NetworkManagerNetworkStatusChangedNotificationParamsStatus status{};
+
+    static NetworkManagerNetworkStatusChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerNetworkStatusChangedNotificationParams NetworkManagerNetworkStatusChangedNotificationParams::fromJson(const QJsonObject &object) {
+    NetworkManagerNetworkStatusChangedNotificationParams value;
+    if (object.contains(QStringLiteral("status"))) {
+        value.status = NetworkManagerNetworkStatusChangedNotificationParamsStatus::fromJson((object.value(QStringLiteral("status"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerNetworkStatusChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("status"), QJsonValue((status).toJson()));
+    return object;
+}
+
+class NetworkManagerScanWifiNetworksParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+
+    static NetworkManagerScanWifiNetworksParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerScanWifiNetworksParams NetworkManagerScanWifiNetworksParams::fromJson(const QJsonObject &object) {
     NetworkManagerScanWifiNetworksParams value;
     if (object.contains(QStringLiteral("interface"))) {
@@ -11276,6 +6934,15 @@ inline QJsonObject NetworkManagerScanWifiNetworksParams::toJson() const {
     return object;
 }
 
+class NetworkManagerScanWifiNetworksResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerScanWifiNetworksResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerScanWifiNetworksResponse NetworkManagerScanWifiNetworksResponse::fromJson(const QJsonObject &object) {
     NetworkManagerScanWifiNetworksResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11289,6 +6956,19 @@ inline QJsonObject NetworkManagerScanWifiNetworksResponse::toJson() const {
     object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
     return object;
 }
+
+class NetworkManagerStartAccessPointParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
+    // wire: 'password' (field)
+    QString password{};
+    // wire: 'ssid' (field)
+    QString ssid{};
+
+    static NetworkManagerStartAccessPointParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerStartAccessPointParams NetworkManagerStartAccessPointParams::fromJson(const QJsonObject &object) {
     NetworkManagerStartAccessPointParams value;
@@ -11312,6 +6992,15 @@ inline QJsonObject NetworkManagerStartAccessPointParams::toJson() const {
     return object;
 }
 
+class NetworkManagerStartAccessPointResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+
+    static NetworkManagerStartAccessPointResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline NetworkManagerStartAccessPointResponse NetworkManagerStartAccessPointResponse::fromJson(const QJsonObject &object) {
     NetworkManagerStartAccessPointResponse value;
     if (object.contains(QStringLiteral("networkManagerError"))) {
@@ -11326,33 +7015,14 @@ inline QJsonObject NetworkManagerStartAccessPointResponse::toJson() const {
     return object;
 }
 
-inline NetworkManagerWiredNetworkDeviceAddedNotificationParams NetworkManagerWiredNetworkDeviceAddedNotificationParams::fromJson(const QJsonObject &object) {
-    NetworkManagerWiredNetworkDeviceAddedNotificationParams value;
-    if (object.contains(QStringLiteral("wiredNetworkDevice"))) {
-        value.wiredNetworkDevice = QSharedPointer<WiredNetworkDevice>::create(WiredNetworkDevice::fromJson((object.value(QStringLiteral("wiredNetworkDevice"))).toObject()));
-    }
-    return value;
-}
+class NetworkManagerWiredNetworkDeviceRemovedNotificationParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
 
-inline QJsonObject NetworkManagerWiredNetworkDeviceAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("wiredNetworkDevice"), ((wiredNetworkDevice) ? QJsonValue((wiredNetworkDevice)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline NetworkManagerWiredNetworkDeviceChangedNotificationParams NetworkManagerWiredNetworkDeviceChangedNotificationParams::fromJson(const QJsonObject &object) {
-    NetworkManagerWiredNetworkDeviceChangedNotificationParams value;
-    if (object.contains(QStringLiteral("wiredNetworkDevice"))) {
-        value.wiredNetworkDevice = QSharedPointer<WiredNetworkDevice>::create(WiredNetworkDevice::fromJson((object.value(QStringLiteral("wiredNetworkDevice"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject NetworkManagerWiredNetworkDeviceChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("wiredNetworkDevice"), ((wiredNetworkDevice) ? QJsonValue((wiredNetworkDevice)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static NetworkManagerWiredNetworkDeviceRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerWiredNetworkDeviceRemovedNotificationParams NetworkManagerWiredNetworkDeviceRemovedNotificationParams::fromJson(const QJsonObject &object) {
     NetworkManagerWiredNetworkDeviceRemovedNotificationParams value;
@@ -11368,33 +7038,14 @@ inline QJsonObject NetworkManagerWiredNetworkDeviceRemovedNotificationParams::to
     return object;
 }
 
-inline NetworkManagerWirelessNetworkDeviceAddedNotificationParams NetworkManagerWirelessNetworkDeviceAddedNotificationParams::fromJson(const QJsonObject &object) {
-    NetworkManagerWirelessNetworkDeviceAddedNotificationParams value;
-    if (object.contains(QStringLiteral("wirelessNetworkDevice"))) {
-        value.wirelessNetworkDevice = QSharedPointer<WirelessNetworkDevice>::create(WirelessNetworkDevice::fromJson((object.value(QStringLiteral("wirelessNetworkDevice"))).toObject()));
-    }
-    return value;
-}
+class NetworkManagerWirelessNetworkDeviceRemovedNotificationParams {
+public:
+    // wire: 'interface' (field)
+    QString interface{};
 
-inline QJsonObject NetworkManagerWirelessNetworkDeviceAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("wirelessNetworkDevice"), ((wirelessNetworkDevice) ? QJsonValue((wirelessNetworkDevice)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline NetworkManagerWirelessNetworkDeviceChangedNotificationParams NetworkManagerWirelessNetworkDeviceChangedNotificationParams::fromJson(const QJsonObject &object) {
-    NetworkManagerWirelessNetworkDeviceChangedNotificationParams value;
-    if (object.contains(QStringLiteral("wirelessNetworkDevice"))) {
-        value.wirelessNetworkDevice = QSharedPointer<WirelessNetworkDevice>::create(WirelessNetworkDevice::fromJson((object.value(QStringLiteral("wirelessNetworkDevice"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject NetworkManagerWirelessNetworkDeviceChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("wirelessNetworkDevice"), ((wirelessNetworkDevice) ? QJsonValue((wirelessNetworkDevice)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static NetworkManagerWirelessNetworkDeviceRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline NetworkManagerWirelessNetworkDeviceRemovedNotificationParams NetworkManagerWirelessNetworkDeviceRemovedNotificationParams::fromJson(const QJsonObject &object) {
     NetworkManagerWirelessNetworkDeviceRemovedNotificationParams value;
@@ -11409,6 +7060,31 @@ inline QJsonObject NetworkManagerWirelessNetworkDeviceRemovedNotificationParams:
     object.insert(QStringLiteral("interface"), QJsonValue(interface));
     return object;
 }
+
+class Package {
+public:
+    // wire: 'canRemove' (required)
+    bool canRemove{};
+    // wire: 'candidateVersion' (required)
+    QString candidateVersion{};
+    // wire: 'changelog' (required)
+    QString changelog{};
+    // wire: 'displayName' (required)
+    QString displayName{};
+    // wire: 'id' (required)
+    QString id{};
+    // wire: 'installedVersion' (required)
+    QString installedVersion{};
+    // wire: 'rollbackAvailable' (required)
+    bool rollbackAvailable{};
+    // wire: 'summary' (required)
+    QString summary{};
+    // wire: 'updateAvailable' (required)
+    bool updateAvailable{};
+
+    static Package fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Package Package::fromJson(const QJsonObject &object) {
     Package value;
@@ -11456,6 +7132,19 @@ inline QJsonObject Package::toJson() const {
     return object;
 }
 
+using Packages = QList<Package>;
+
+class Param {
+public:
+    // wire: 'paramTypeId' (optional)
+    std::optional<QUuid> paramTypeId;
+    // wire: 'value' (field)
+    QJsonValue value{};
+
+    static Param fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline Param Param::fromJson(const QJsonObject &object) {
     Param value;
     if (object.contains(QStringLiteral("paramTypeId"))) {
@@ -11475,6 +7164,21 @@ inline QJsonObject Param::toJson() const {
     object.insert(QStringLiteral("value"), value);
     return object;
 }
+
+class ParamDescriptor {
+public:
+    // wire: 'paramName' (optional)
+    std::optional<QString> paramName;
+    // wire: 'paramTypeId' (optional)
+    std::optional<QUuid> paramTypeId;
+    // wire: 'operator' (field)
+    ValueOperator operatorValue{};
+    // wire: 'value' (field)
+    QJsonValue value{};
+
+    static ParamDescriptor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ParamDescriptor ParamDescriptor::fromJson(const QJsonObject &object) {
     ParamDescriptor value;
@@ -11505,6 +7209,571 @@ inline QJsonObject ParamDescriptor::toJson() const {
     object.insert(QStringLiteral("value"), value);
     return object;
 }
+
+using ParamDescriptors = QList<ParamDescriptor>;
+
+class EventDescriptor {
+public:
+    // wire: 'eventTypeId' (optional)
+    std::optional<QUuid> eventTypeId;
+    // wire: 'interface' (optional)
+    std::optional<QString> interface;
+    // wire: 'interfaceEvent' (optional)
+    std::optional<QString> interfaceEvent;
+    // wire: 'paramDescriptors' (optional)
+    std::optional<ParamDescriptors> paramDescriptors;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+
+    static EventDescriptor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline EventDescriptor EventDescriptor::fromJson(const QJsonObject &object) {
+    EventDescriptor value;
+    if (object.contains(QStringLiteral("eventTypeId"))) {
+        value.eventTypeId = QUuid((object.value(QStringLiteral("eventTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("interface"))) {
+        value.interface = (object.value(QStringLiteral("interface"))).toString();
+    }
+    if (object.contains(QStringLiteral("interfaceEvent"))) {
+        value.interfaceEvent = (object.value(QStringLiteral("interfaceEvent"))).toString();
+    }
+    if (object.contains(QStringLiteral("paramDescriptors"))) {
+        value.paramDescriptors = ([&]() { QList<ParamDescriptor> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramDescriptors"))).toArray()) { list.append(ParamDescriptor::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject EventDescriptor::toJson() const {
+    QJsonObject object;
+    if (eventTypeId.has_value()) {
+        object.insert(QStringLiteral("eventTypeId"), QJsonValue((*eventTypeId).toString()));
+    }
+    if (interface.has_value()) {
+        object.insert(QStringLiteral("interface"), QJsonValue(*interface));
+    }
+    if (interfaceEvent.has_value()) {
+        object.insert(QStringLiteral("interfaceEvent"), QJsonValue(*interfaceEvent));
+    }
+    if (paramDescriptors.has_value()) {
+        object.insert(QStringLiteral("paramDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *paramDescriptors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (thingId.has_value()) {
+        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
+    }
+    return object;
+}
+
+using EventDescriptors = QList<EventDescriptor>;
+
+using ParamList = QList<Param>;
+
+class Action {
+public:
+    // wire: 'actionTypeId' (field)
+    QUuid actionTypeId{};
+    // wire: 'params' (optional)
+    std::optional<ParamList> params;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static Action fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline Action Action::fromJson(const QJsonObject &object) {
+    Action value;
+    if (object.contains(QStringLiteral("actionTypeId"))) {
+        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("params"))) {
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject Action::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
+    if (params.has_value()) {
+        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
+    return object;
+}
+
+class Event {
+public:
+    // wire: 'eventTypeId' (required)
+    QUuid eventTypeId{};
+    // wire: 'params' (required)
+    ParamList params{};
+    // wire: 'thingId' (required)
+    QUuid thingId{};
+
+    static Event fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline Event Event::fromJson(const QJsonObject &object) {
+    Event value;
+    if (object.contains(QStringLiteral("eventTypeId"))) {
+        value.eventTypeId = QUuid((object.value(QStringLiteral("eventTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("params"))) {
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject Event::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("eventTypeId"), QJsonValue((eventTypeId).toString()));
+    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
+    return object;
+}
+
+class IntegrationsAddThingParams {
+public:
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'thingClassId' (optional)
+    std::optional<QUuid> thingClassId;
+    // wire: 'thingDescriptorId' (optional)
+    std::optional<QUuid> thingDescriptorId;
+    // wire: 'thingParams' (optional)
+    std::optional<ParamList> thingParams;
+
+    static IntegrationsAddThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsAddThingParams IntegrationsAddThingParams::fromJson(const QJsonObject &object) {
+    IntegrationsAddThingParams value;
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("thingClassId"))) {
+        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingDescriptorId"))) {
+        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingParams"))) {
+        value.thingParams = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsAddThingParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    if (thingClassId.has_value()) {
+        object.insert(QStringLiteral("thingClassId"), QJsonValue((*thingClassId).toString()));
+    }
+    if (thingDescriptorId.has_value()) {
+        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
+    }
+    if (thingParams.has_value()) {
+        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class IntegrationsDiscoverThingsParams {
+public:
+    // wire: 'discoveryParams' (optional)
+    std::optional<ParamList> discoveryParams;
+    // wire: 'thingClassId' (field)
+    QUuid thingClassId{};
+
+    static IntegrationsDiscoverThingsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsDiscoverThingsParams IntegrationsDiscoverThingsParams::fromJson(const QJsonObject &object) {
+    IntegrationsDiscoverThingsParams value;
+    if (object.contains(QStringLiteral("discoveryParams"))) {
+        value.discoveryParams = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("discoveryParams"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingClassId"))) {
+        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsDiscoverThingsParams::toJson() const {
+    QJsonObject object;
+    if (discoveryParams.has_value()) {
+        object.insert(QStringLiteral("discoveryParams"), ([&]() { QJsonArray array; for (const auto &item : *discoveryParams) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingClassId"), QJsonValue((thingClassId).toString()));
+    return object;
+}
+
+class IntegrationsEventTriggeredNotificationParams {
+public:
+    // wire: 'event' (field)
+    Event event{};
+
+    static IntegrationsEventTriggeredNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsEventTriggeredNotificationParams IntegrationsEventTriggeredNotificationParams::fromJson(const QJsonObject &object) {
+    IntegrationsEventTriggeredNotificationParams value;
+    if (object.contains(QStringLiteral("event"))) {
+        value.event = Event::fromJson((object.value(QStringLiteral("event"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsEventTriggeredNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("event"), QJsonValue((event).toJson()));
+    return object;
+}
+
+class IntegrationsExecuteActionParams {
+public:
+    // wire: 'actionTypeId' (field)
+    QUuid actionTypeId{};
+    // wire: 'params' (optional)
+    std::optional<ParamList> params;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsExecuteActionParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsExecuteActionParams IntegrationsExecuteActionParams::fromJson(const QJsonObject &object) {
+    IntegrationsExecuteActionParams value;
+    if (object.contains(QStringLiteral("actionTypeId"))) {
+        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("params"))) {
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsExecuteActionParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
+    if (params.has_value()) {
+        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
+    return object;
+}
+
+class IntegrationsExecuteBrowserItemActionParams {
+public:
+    // wire: 'actionTypeId' (field)
+    QUuid actionTypeId{};
+    // wire: 'itemId' (field)
+    QString itemId{};
+    // wire: 'params' (optional)
+    std::optional<ParamList> params;
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsExecuteBrowserItemActionParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsExecuteBrowserItemActionParams IntegrationsExecuteBrowserItemActionParams::fromJson(const QJsonObject &object) {
+    IntegrationsExecuteBrowserItemActionParams value;
+    if (object.contains(QStringLiteral("actionTypeId"))) {
+        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("itemId"))) {
+        value.itemId = (object.value(QStringLiteral("itemId"))).toString();
+    }
+    if (object.contains(QStringLiteral("params"))) {
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsExecuteBrowserItemActionParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actionTypeId"), QJsonValue((actionTypeId).toString()));
+    object.insert(QStringLiteral("itemId"), QJsonValue(itemId));
+    if (params.has_value()) {
+        object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : *params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
+    return object;
+}
+
+class IntegrationsGetPluginConfigurationResponse {
+public:
+    // wire: 'configuration' (optional)
+    std::optional<ParamList> configuration;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetPluginConfigurationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetPluginConfigurationResponse IntegrationsGetPluginConfigurationResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetPluginConfigurationResponse value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingError"))) {
+        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetPluginConfigurationResponse::toJson() const {
+    QJsonObject object;
+    if (configuration.has_value()) {
+        object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : *configuration) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
+    return object;
+}
+
+class IntegrationsPairThingParams {
+public:
+    // wire: 'name' (optional)
+    std::optional<QString> name;
+    // wire: 'thingClassId' (optional)
+    std::optional<QUuid> thingClassId;
+    // wire: 'thingDescriptorId' (optional)
+    std::optional<QUuid> thingDescriptorId;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'thingParams' (optional)
+    std::optional<ParamList> thingParams;
+
+    static IntegrationsPairThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsPairThingParams IntegrationsPairThingParams::fromJson(const QJsonObject &object) {
+    IntegrationsPairThingParams value;
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("thingClassId"))) {
+        value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingDescriptorId"))) {
+        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingParams"))) {
+        value.thingParams = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsPairThingParams::toJson() const {
+    QJsonObject object;
+    if (name.has_value()) {
+        object.insert(QStringLiteral("name"), QJsonValue(*name));
+    }
+    if (thingClassId.has_value()) {
+        object.insert(QStringLiteral("thingClassId"), QJsonValue((*thingClassId).toString()));
+    }
+    if (thingDescriptorId.has_value()) {
+        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
+    }
+    if (thingId.has_value()) {
+        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
+    }
+    if (thingParams.has_value()) {
+        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class IntegrationsPluginConfigurationChangedNotificationParams {
+public:
+    // wire: 'configuration' (field)
+    ParamList configuration{};
+    // wire: 'pluginId' (field)
+    QUuid pluginId{};
+
+    static IntegrationsPluginConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsPluginConfigurationChangedNotificationParams IntegrationsPluginConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    IntegrationsPluginConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("pluginId"))) {
+        value.pluginId = QUuid((object.value(QStringLiteral("pluginId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsPluginConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : configuration) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("pluginId"), QJsonValue((pluginId).toString()));
+    return object;
+}
+
+class IntegrationsReconfigureThingParams {
+public:
+    // wire: 'thingDescriptorId' (optional)
+    std::optional<QUuid> thingDescriptorId;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'thingParams' (optional)
+    std::optional<ParamList> thingParams;
+
+    static IntegrationsReconfigureThingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsReconfigureThingParams IntegrationsReconfigureThingParams::fromJson(const QJsonObject &object) {
+    IntegrationsReconfigureThingParams value;
+    if (object.contains(QStringLiteral("thingDescriptorId"))) {
+        value.thingDescriptorId = QUuid((object.value(QStringLiteral("thingDescriptorId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    if (object.contains(QStringLiteral("thingParams"))) {
+        value.thingParams = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingParams"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsReconfigureThingParams::toJson() const {
+    QJsonObject object;
+    if (thingDescriptorId.has_value()) {
+        object.insert(QStringLiteral("thingDescriptorId"), QJsonValue((*thingDescriptorId).toString()));
+    }
+    if (thingId.has_value()) {
+        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
+    }
+    if (thingParams.has_value()) {
+        object.insert(QStringLiteral("thingParams"), ([&]() { QJsonArray array; for (const auto &item : *thingParams) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class IntegrationsSetPluginConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    ParamList configuration{};
+    // wire: 'pluginId' (field)
+    QUuid pluginId{};
+
+    static IntegrationsSetPluginConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsSetPluginConfigurationParams IntegrationsSetPluginConfigurationParams::fromJson(const QJsonObject &object) {
+    IntegrationsSetPluginConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("configuration"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("pluginId"))) {
+        value.pluginId = QUuid((object.value(QStringLiteral("pluginId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsSetPluginConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), ([&]() { QJsonArray array; for (const auto &item : configuration) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("pluginId"), QJsonValue((pluginId).toString()));
+    return object;
+}
+
+class IntegrationsSetThingSettingsParams {
+public:
+    // wire: 'settings' (field)
+    ParamList settings{};
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static IntegrationsSetThingSettingsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsSetThingSettingsParams IntegrationsSetThingSettingsParams::fromJson(const QJsonObject &object) {
+    IntegrationsSetThingSettingsParams value;
+    if (object.contains(QStringLiteral("settings"))) {
+        value.settings = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("settings"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsSetThingSettingsParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("settings"), ([&]() { QJsonArray array; for (const auto &item : settings) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("thingId"), QJsonValue((thingId).toString()));
+    return object;
+}
+
+class ParamType {
+public:
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'index' (field)
+    qint64 index{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'allowedValues' (optional)
+    std::optional<QList<QJsonValue>> allowedValues;
+    // wire: 'defaultValue' (optional)
+    std::optional<QJsonValue> defaultValue;
+    // wire: 'inputType' (optional)
+    std::optional<InputType> inputType;
+    // wire: 'maxValue' (optional)
+    std::optional<QJsonValue> maxValue;
+    // wire: 'minValue' (optional)
+    std::optional<QJsonValue> minValue;
+    // wire: 'readOnly' (optional)
+    std::optional<bool> readOnly;
+    // wire: 'stepSize' (optional)
+    std::optional<double> stepSize;
+    // wire: 'unit' (optional)
+    std::optional<Unit> unit;
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'type' (field)
+    BasicType type{};
+
+    static ParamType fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ParamType ParamType::fromJson(const QJsonObject &object) {
     ParamType value;
@@ -11584,6 +7853,397 @@ inline QJsonObject ParamType::toJson() const {
     return object;
 }
 
+using ParamTypes = QList<ParamType>;
+
+class ActionType {
+public:
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'index' (field)
+    qint64 index{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'paramTypes' (field)
+    ParamTypes paramTypes{};
+    // wire: 'id' (required)
+    QUuid id{};
+
+    static ActionType fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ActionType ActionType::fromJson(const QJsonObject &object) {
+    ActionType value;
+    if (object.contains(QStringLiteral("displayName"))) {
+        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
+    }
+    if (object.contains(QStringLiteral("index"))) {
+        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("paramTypes"))) {
+        value.paramTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject ActionType::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
+    object.insert(QStringLiteral("index"), QJsonValue(static_cast<qint64>(index)));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
+    return object;
+}
+
+using ActionTypes = QList<ActionType>;
+
+class EventType {
+public:
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'paramTypes' (field)
+    ParamTypes paramTypes{};
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'index' (required)
+    qint64 index{};
+
+    static EventType fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline EventType EventType::fromJson(const QJsonObject &object) {
+    EventType value;
+    if (object.contains(QStringLiteral("displayName"))) {
+        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("paramTypes"))) {
+        value.paramTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
+    }
+    if (object.contains(QStringLiteral("index"))) {
+        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
+    }
+    return value;
+}
+
+inline QJsonObject EventType::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
+    object.insert(QStringLiteral("index"), QJsonValue(static_cast<qint64>(index)));
+    return object;
+}
+
+using EventTypes = QList<EventType>;
+
+class IntegrationPlugin {
+public:
+    // wire: 'displayName' (required)
+    QString displayName{};
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'name' (required)
+    QString name{};
+    // wire: 'paramTypes' (required)
+    ParamTypes paramTypes{};
+
+    static IntegrationPlugin fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationPlugin IntegrationPlugin::fromJson(const QJsonObject &object) {
+    IntegrationPlugin value;
+    if (object.contains(QStringLiteral("displayName"))) {
+        value.displayName = (object.value(QStringLiteral("displayName"))).toString();
+    }
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("paramTypes"))) {
+        value.paramTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationPlugin::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
+    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+using IntegrationPlugins = QList<IntegrationPlugin>;
+
+class IntegrationsGetActionTypesResponse {
+public:
+    // wire: 'actionTypes' (field)
+    ActionTypes actionTypes{};
+
+    static IntegrationsGetActionTypesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetActionTypesResponse IntegrationsGetActionTypesResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetActionTypesResponse value;
+    if (object.contains(QStringLiteral("actionTypes"))) {
+        value.actionTypes = ([&]() { QList<ActionType> list; for (const QJsonValue &item : (object.value(QStringLiteral("actionTypes"))).toArray()) { list.append(ActionType::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetActionTypesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actionTypes"), ([&]() { QJsonArray array; for (const auto &item : actionTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class IntegrationsGetEventTypesResponse {
+public:
+    // wire: 'eventTypes' (field)
+    EventTypes eventTypes{};
+
+    static IntegrationsGetEventTypesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetEventTypesResponse IntegrationsGetEventTypesResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetEventTypesResponse value;
+    if (object.contains(QStringLiteral("eventTypes"))) {
+        value.eventTypes = ([&]() { QList<EventType> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventTypes"))).toArray()) { list.append(EventType::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetEventTypesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("eventTypes"), ([&]() { QJsonArray array; for (const auto &item : eventTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class IntegrationsGetPluginsResponse {
+public:
+    // wire: 'plugins' (field)
+    IntegrationPlugins plugins{};
+
+    static IntegrationsGetPluginsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetPluginsResponse IntegrationsGetPluginsResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetPluginsResponse value;
+    if (object.contains(QStringLiteral("plugins"))) {
+        value.plugins = ([&]() { QList<IntegrationPlugin> list; for (const QJsonValue &item : (object.value(QStringLiteral("plugins"))).toArray()) { list.append(IntegrationPlugin::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetPluginsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("plugins"), ([&]() { QJsonArray array; for (const auto &item : plugins) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+using PermissionScopes = QList<PermissionScope>;
+
+class JSONRPCAuthenticateResponse {
+public:
+    // wire: 'scopes' (optional)
+    std::optional<PermissionScopes> scopes;
+    // wire: 'token' (optional)
+    std::optional<QString> token;
+    // wire: 'username' (optional)
+    std::optional<QString> username;
+    // wire: 'success' (field)
+    bool success{};
+
+    static JSONRPCAuthenticateResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline JSONRPCAuthenticateResponse JSONRPCAuthenticateResponse::fromJson(const QJsonObject &object) {
+    JSONRPCAuthenticateResponse value;
+    if (object.contains(QStringLiteral("scopes"))) {
+        value.scopes = ([&]() { QList<PermissionScope> list; for (const QJsonValue &item : (object.value(QStringLiteral("scopes"))).toArray()) { list.append(parsePermissionScope(item)); } return list; }());
+    }
+    if (object.contains(QStringLiteral("token"))) {
+        value.token = (object.value(QStringLiteral("token"))).toString();
+    }
+    if (object.contains(QStringLiteral("username"))) {
+        value.username = (object.value(QStringLiteral("username"))).toString();
+    }
+    if (object.contains(QStringLiteral("success"))) {
+        value.success = (object.value(QStringLiteral("success"))).toBool();
+    }
+    return value;
+}
+
+inline QJsonObject JSONRPCAuthenticateResponse::toJson() const {
+    QJsonObject object;
+    if (scopes.has_value()) {
+        object.insert(QStringLiteral("scopes"), ([&]() { QJsonArray array; for (const auto &item : *scopes) { array.append(QJsonValue(toString(item))); } return QJsonValue(array); }()));
+    }
+    if (token.has_value()) {
+        object.insert(QStringLiteral("token"), QJsonValue(*token));
+    }
+    if (username.has_value()) {
+        object.insert(QStringLiteral("username"), QJsonValue(*username));
+    }
+    object.insert(QStringLiteral("success"), QJsonValue(success));
+    return object;
+}
+
+class JSONRPCHelloResponse {
+public:
+    // wire: 'authenticationRequired' (field)
+    bool authenticationRequired{};
+    // wire: 'initialSetupRequired' (field)
+    bool initialSetupRequired{};
+    // wire: 'language' (field)
+    QString language{};
+    // wire: 'locale' (field)
+    QString locale{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'authenticated' (optional)
+    std::optional<bool> authenticated;
+    // wire: 'cacheHashes' (optional)
+    std::optional<QList<CacheHash>> cacheHashes;
+    // wire: 'experiences' (optional)
+    std::optional<QList<Experience>> experiences;
+    // wire: 'permissionScopes' (optional)
+    std::optional<PermissionScopes> permissionScopes;
+    // wire: 'username' (optional)
+    std::optional<QString> username;
+    // wire: 'protocol version' (field)
+    QString protocolVersion{};
+    // wire: 'pushButtonAuthAvailable' (field)
+    bool pushButtonAuthAvailable{};
+    // wire: 'server' (field)
+    QString server{};
+    // wire: 'uuid' (field)
+    QUuid uuid{};
+    // wire: 'version' (field)
+    QString version{};
+
+    static JSONRPCHelloResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline JSONRPCHelloResponse JSONRPCHelloResponse::fromJson(const QJsonObject &object) {
+    JSONRPCHelloResponse value;
+    if (object.contains(QStringLiteral("authenticationRequired"))) {
+        value.authenticationRequired = (object.value(QStringLiteral("authenticationRequired"))).toBool();
+    }
+    if (object.contains(QStringLiteral("initialSetupRequired"))) {
+        value.initialSetupRequired = (object.value(QStringLiteral("initialSetupRequired"))).toBool();
+    }
+    if (object.contains(QStringLiteral("language"))) {
+        value.language = (object.value(QStringLiteral("language"))).toString();
+    }
+    if (object.contains(QStringLiteral("locale"))) {
+        value.locale = (object.value(QStringLiteral("locale"))).toString();
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("authenticated"))) {
+        value.authenticated = (object.value(QStringLiteral("authenticated"))).toBool();
+    }
+    if (object.contains(QStringLiteral("cacheHashes"))) {
+        value.cacheHashes = ([&]() { QList<CacheHash> list; for (const QJsonValue &item : (object.value(QStringLiteral("cacheHashes"))).toArray()) { list.append(CacheHash::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("experiences"))) {
+        value.experiences = ([&]() { QList<Experience> list; for (const QJsonValue &item : (object.value(QStringLiteral("experiences"))).toArray()) { list.append(Experience::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("permissionScopes"))) {
+        value.permissionScopes = ([&]() { QList<PermissionScope> list; for (const QJsonValue &item : (object.value(QStringLiteral("permissionScopes"))).toArray()) { list.append(parsePermissionScope(item)); } return list; }());
+    }
+    if (object.contains(QStringLiteral("username"))) {
+        value.username = (object.value(QStringLiteral("username"))).toString();
+    }
+    if (object.contains(QStringLiteral("protocol version"))) {
+        value.protocolVersion = (object.value(QStringLiteral("protocol version"))).toString();
+    }
+    if (object.contains(QStringLiteral("pushButtonAuthAvailable"))) {
+        value.pushButtonAuthAvailable = (object.value(QStringLiteral("pushButtonAuthAvailable"))).toBool();
+    }
+    if (object.contains(QStringLiteral("server"))) {
+        value.server = (object.value(QStringLiteral("server"))).toString();
+    }
+    if (object.contains(QStringLiteral("uuid"))) {
+        value.uuid = QUuid((object.value(QStringLiteral("uuid"))).toString());
+    }
+    if (object.contains(QStringLiteral("version"))) {
+        value.version = (object.value(QStringLiteral("version"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject JSONRPCHelloResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("authenticationRequired"), QJsonValue(authenticationRequired));
+    object.insert(QStringLiteral("initialSetupRequired"), QJsonValue(initialSetupRequired));
+    object.insert(QStringLiteral("language"), QJsonValue(language));
+    object.insert(QStringLiteral("locale"), QJsonValue(locale));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    if (authenticated.has_value()) {
+        object.insert(QStringLiteral("authenticated"), QJsonValue(*authenticated));
+    }
+    if (cacheHashes.has_value()) {
+        object.insert(QStringLiteral("cacheHashes"), ([&]() { QJsonArray array; for (const auto &item : *cacheHashes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (experiences.has_value()) {
+        object.insert(QStringLiteral("experiences"), ([&]() { QJsonArray array; for (const auto &item : *experiences) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (permissionScopes.has_value()) {
+        object.insert(QStringLiteral("permissionScopes"), ([&]() { QJsonArray array; for (const auto &item : *permissionScopes) { array.append(QJsonValue(toString(item))); } return QJsonValue(array); }()));
+    }
+    if (username.has_value()) {
+        object.insert(QStringLiteral("username"), QJsonValue(*username));
+    }
+    object.insert(QStringLiteral("protocol version"), QJsonValue(protocolVersion));
+    object.insert(QStringLiteral("pushButtonAuthAvailable"), QJsonValue(pushButtonAuthAvailable));
+    object.insert(QStringLiteral("server"), QJsonValue(server));
+    object.insert(QStringLiteral("uuid"), QJsonValue((uuid).toString()));
+    object.insert(QStringLiteral("version"), QJsonValue(version));
+    return object;
+}
+
+class RepeatingOption {
+public:
+    // wire: 'mode' (field)
+    RepeatingMode mode{};
+    // wire: 'monthDays' (optional)
+    std::optional<QList<qint64>> monthDays;
+    // wire: 'weekDays' (optional)
+    std::optional<QList<qint64>> weekDays;
+
+    static RepeatingOption fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RepeatingOption RepeatingOption::fromJson(const QJsonObject &object) {
     RepeatingOption value;
     if (object.contains(QStringLiteral("mode"))) {
@@ -11610,6 +8270,68 @@ inline QJsonObject RepeatingOption::toJson() const {
     return object;
 }
 
+class CalendarItem {
+public:
+    // wire: 'duration' (field)
+    quint64 duration{};
+    // wire: 'datetime' (optional)
+    std::optional<quint64> datetime;
+    // wire: 'repeating' (optional)
+    std::optional<RepeatingOption> repeating;
+    // wire: 'startTime' (optional)
+    std::optional<qint64> startTime;
+
+    static CalendarItem fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline CalendarItem CalendarItem::fromJson(const QJsonObject &object) {
+    CalendarItem value;
+    if (object.contains(QStringLiteral("duration"))) {
+        value.duration = static_cast<quint64>((object.value(QStringLiteral("duration"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("datetime"))) {
+        value.datetime = static_cast<quint64>((object.value(QStringLiteral("datetime"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("repeating"))) {
+        value.repeating = RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject());
+    }
+    if (object.contains(QStringLiteral("startTime"))) {
+        value.startTime = static_cast<qint64>((object.value(QStringLiteral("startTime"))).toInteger());
+    }
+    return value;
+}
+
+inline QJsonObject CalendarItem::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("duration"), QJsonValue(static_cast<qint64>(duration)));
+    if (datetime.has_value()) {
+        object.insert(QStringLiteral("datetime"), QJsonValue(static_cast<qint64>(*datetime)));
+    }
+    if (repeating.has_value()) {
+        object.insert(QStringLiteral("repeating"), QJsonValue((*repeating).toJson()));
+    }
+    if (startTime.has_value()) {
+        object.insert(QStringLiteral("startTime"), QJsonValue(static_cast<qint64>(*startTime)));
+    }
+    return object;
+}
+
+using CalendarItems = QList<CalendarItem>;
+
+class Repository {
+public:
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'displayName' (required)
+    QString displayName{};
+    // wire: 'id' (required)
+    QString id{};
+
+    static Repository fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline Repository Repository::fromJson(const QJsonObject &object) {
     Repository value;
     if (object.contains(QStringLiteral("enabled"))) {
@@ -11632,113 +8354,28 @@ inline QJsonObject Repository::toJson() const {
     return object;
 }
 
-inline Rule Rule::fromJson(const QJsonObject &object) {
-    Rule value;
-    if (object.contains(QStringLiteral("actions"))) {
-        value.actions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("enabled"))) {
-        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
-    }
-    if (object.contains(QStringLiteral("eventDescriptors"))) {
-        value.eventDescriptors = ([&]() { QList<QSharedPointer<EventDescriptor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(QSharedPointer<EventDescriptor>::create(EventDescriptor::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("executable"))) {
-        value.executable = (object.value(QStringLiteral("executable"))).toBool();
-    }
-    if (object.contains(QStringLiteral("exitActions"))) {
-        value.exitActions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("stateEvaluator"))) {
-        value.stateEvaluator = QSharedPointer<StateEvaluator>::create(StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("timeDescriptor"))) {
-        value.timeDescriptor = QSharedPointer<TimeDescriptor>::create(TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("active"))) {
-        value.active = (object.value(QStringLiteral("active"))).toBool();
-    }
-    if (object.contains(QStringLiteral("id"))) {
-        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
-    }
-    return value;
-}
+using Repositories = QList<Repository>;
 
-inline QJsonObject Rule::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    if (enabled.has_value()) {
-        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
-    }
-    if (eventDescriptors.has_value()) {
-        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (executable.has_value()) {
-        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
-    }
-    if (exitActions.has_value()) {
-        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (stateEvaluator.has_value()) {
-        object.insert(QStringLiteral("stateEvaluator"), ((*stateEvaluator) ? QJsonValue((*stateEvaluator)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    if (timeDescriptor.has_value()) {
-        object.insert(QStringLiteral("timeDescriptor"), ((*timeDescriptor) ? QJsonValue((*timeDescriptor)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    object.insert(QStringLiteral("active"), QJsonValue(active));
-    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
-    return object;
-}
+class RuleActionParam {
+public:
+    // wire: 'eventParamTypeId' (optional)
+    std::optional<QUuid> eventParamTypeId;
+    // wire: 'eventTypeId' (optional)
+    std::optional<QUuid> eventTypeId;
+    // wire: 'paramName' (optional)
+    std::optional<QString> paramName;
+    // wire: 'paramTypeId' (optional)
+    std::optional<QUuid> paramTypeId;
+    // wire: 'stateThingId' (optional)
+    std::optional<QUuid> stateThingId;
+    // wire: 'stateTypeId' (optional)
+    std::optional<QUuid> stateTypeId;
+    // wire: 'value' (optional)
+    std::optional<QJsonValue> value;
 
-inline RuleAction RuleAction::fromJson(const QJsonObject &object) {
-    RuleAction value;
-    if (object.contains(QStringLiteral("actionTypeId"))) {
-        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
-    }
-    if (object.contains(QStringLiteral("browserItemId"))) {
-        value.browserItemId = (object.value(QStringLiteral("browserItemId"))).toString();
-    }
-    if (object.contains(QStringLiteral("interface"))) {
-        value.interface = (object.value(QStringLiteral("interface"))).toString();
-    }
-    if (object.contains(QStringLiteral("interfaceAction"))) {
-        value.interfaceAction = (object.value(QStringLiteral("interfaceAction"))).toString();
-    }
-    if (object.contains(QStringLiteral("ruleActionParams"))) {
-        value.ruleActionParams = ([&]() { QList<QSharedPointer<RuleActionParam>> list; for (const QJsonValue &item : (object.value(QStringLiteral("ruleActionParams"))).toArray()) { list.append(QSharedPointer<RuleActionParam>::create(RuleActionParam::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("thingId"))) {
-        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
-    }
-    return value;
-}
-
-inline QJsonObject RuleAction::toJson() const {
-    QJsonObject object;
-    if (actionTypeId.has_value()) {
-        object.insert(QStringLiteral("actionTypeId"), QJsonValue((*actionTypeId).toString()));
-    }
-    if (browserItemId.has_value()) {
-        object.insert(QStringLiteral("browserItemId"), QJsonValue(*browserItemId));
-    }
-    if (interface.has_value()) {
-        object.insert(QStringLiteral("interface"), QJsonValue(*interface));
-    }
-    if (interfaceAction.has_value()) {
-        object.insert(QStringLiteral("interfaceAction"), QJsonValue(*interfaceAction));
-    }
-    if (ruleActionParams.has_value()) {
-        object.insert(QStringLiteral("ruleActionParams"), ([&]() { QJsonArray array; for (const auto &item : *ruleActionParams) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (thingId.has_value()) {
-        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
-    }
-    return object;
-}
+    static RuleActionParam fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RuleActionParam RuleActionParam::fromJson(const QJsonObject &object) {
     RuleActionParam value;
@@ -11792,6 +8429,92 @@ inline QJsonObject RuleActionParam::toJson() const {
     return object;
 }
 
+using RuleActionParams = QList<RuleActionParam>;
+
+class RuleAction {
+public:
+    // wire: 'actionTypeId' (optional)
+    std::optional<QUuid> actionTypeId;
+    // wire: 'browserItemId' (optional)
+    std::optional<QString> browserItemId;
+    // wire: 'interface' (optional)
+    std::optional<QString> interface;
+    // wire: 'interfaceAction' (optional)
+    std::optional<QString> interfaceAction;
+    // wire: 'ruleActionParams' (optional)
+    std::optional<RuleActionParams> ruleActionParams;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+
+    static RuleAction fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RuleAction RuleAction::fromJson(const QJsonObject &object) {
+    RuleAction value;
+    if (object.contains(QStringLiteral("actionTypeId"))) {
+        value.actionTypeId = QUuid((object.value(QStringLiteral("actionTypeId"))).toString());
+    }
+    if (object.contains(QStringLiteral("browserItemId"))) {
+        value.browserItemId = (object.value(QStringLiteral("browserItemId"))).toString();
+    }
+    if (object.contains(QStringLiteral("interface"))) {
+        value.interface = (object.value(QStringLiteral("interface"))).toString();
+    }
+    if (object.contains(QStringLiteral("interfaceAction"))) {
+        value.interfaceAction = (object.value(QStringLiteral("interfaceAction"))).toString();
+    }
+    if (object.contains(QStringLiteral("ruleActionParams"))) {
+        value.ruleActionParams = ([&]() { QList<RuleActionParam> list; for (const QJsonValue &item : (object.value(QStringLiteral("ruleActionParams"))).toArray()) { list.append(RuleActionParam::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingId"))) {
+        value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject RuleAction::toJson() const {
+    QJsonObject object;
+    if (actionTypeId.has_value()) {
+        object.insert(QStringLiteral("actionTypeId"), QJsonValue((*actionTypeId).toString()));
+    }
+    if (browserItemId.has_value()) {
+        object.insert(QStringLiteral("browserItemId"), QJsonValue(*browserItemId));
+    }
+    if (interface.has_value()) {
+        object.insert(QStringLiteral("interface"), QJsonValue(*interface));
+    }
+    if (interfaceAction.has_value()) {
+        object.insert(QStringLiteral("interfaceAction"), QJsonValue(*interfaceAction));
+    }
+    if (ruleActionParams.has_value()) {
+        object.insert(QStringLiteral("ruleActionParams"), ([&]() { QJsonArray array; for (const auto &item : *ruleActionParams) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (thingId.has_value()) {
+        object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
+    }
+    return object;
+}
+
+using RuleActions = QList<RuleAction>;
+
+class RuleDescription {
+public:
+    // wire: 'active' (field)
+    bool active{};
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'executable' (field)
+    bool executable{};
+    // wire: 'id' (field)
+    QUuid id{};
+    // wire: 'name' (field)
+    QString name{};
+
+    static RuleDescription fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RuleDescription RuleDescription::fromJson(const QJsonObject &object) {
     RuleDescription value;
     if (object.contains(QStringLiteral("active"))) {
@@ -11822,59 +8545,16 @@ inline QJsonObject RuleDescription::toJson() const {
     return object;
 }
 
-inline RulesAddRuleParams RulesAddRuleParams::fromJson(const QJsonObject &object) {
-    RulesAddRuleParams value;
-    if (object.contains(QStringLiteral("actions"))) {
-        value.actions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("enabled"))) {
-        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
-    }
-    if (object.contains(QStringLiteral("eventDescriptors"))) {
-        value.eventDescriptors = ([&]() { QList<QSharedPointer<EventDescriptor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(QSharedPointer<EventDescriptor>::create(EventDescriptor::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("executable"))) {
-        value.executable = (object.value(QStringLiteral("executable"))).toBool();
-    }
-    if (object.contains(QStringLiteral("exitActions"))) {
-        value.exitActions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("stateEvaluator"))) {
-        value.stateEvaluator = QSharedPointer<StateEvaluator>::create(StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("timeDescriptor"))) {
-        value.timeDescriptor = QSharedPointer<TimeDescriptor>::create(TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject()));
-    }
-    return value;
-}
+class RulesAddRuleResponse {
+public:
+    // wire: 'ruleId' (optional)
+    std::optional<QUuid> ruleId;
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
 
-inline QJsonObject RulesAddRuleParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    if (enabled.has_value()) {
-        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
-    }
-    if (eventDescriptors.has_value()) {
-        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (executable.has_value()) {
-        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
-    }
-    if (exitActions.has_value()) {
-        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (stateEvaluator.has_value()) {
-        object.insert(QStringLiteral("stateEvaluator"), ((*stateEvaluator) ? QJsonValue((*stateEvaluator)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    if (timeDescriptor.has_value()) {
-        object.insert(QStringLiteral("timeDescriptor"), ((*timeDescriptor) ? QJsonValue((*timeDescriptor)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    return object;
-}
+    static RulesAddRuleResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesAddRuleResponse RulesAddRuleResponse::fromJson(const QJsonObject &object) {
     RulesAddRuleResponse value;
@@ -11896,6 +8576,15 @@ inline QJsonObject RulesAddRuleResponse::toJson() const {
     return object;
 }
 
+class RulesDisableRuleParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesDisableRuleParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesDisableRuleParams RulesDisableRuleParams::fromJson(const QJsonObject &object) {
     RulesDisableRuleParams value;
     if (object.contains(QStringLiteral("ruleId"))) {
@@ -11909,6 +8598,15 @@ inline QJsonObject RulesDisableRuleParams::toJson() const {
     object.insert(QStringLiteral("ruleId"), QJsonValue((ruleId).toString()));
     return object;
 }
+
+class RulesDisableRuleResponse {
+public:
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesDisableRuleResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesDisableRuleResponse RulesDisableRuleResponse::fromJson(const QJsonObject &object) {
     RulesDisableRuleResponse value;
@@ -11924,83 +8622,14 @@ inline QJsonObject RulesDisableRuleResponse::toJson() const {
     return object;
 }
 
-inline RulesEditRuleParams RulesEditRuleParams::fromJson(const QJsonObject &object) {
-    RulesEditRuleParams value;
-    if (object.contains(QStringLiteral("actions"))) {
-        value.actions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("name"))) {
-        value.name = (object.value(QStringLiteral("name"))).toString();
-    }
-    if (object.contains(QStringLiteral("enabled"))) {
-        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
-    }
-    if (object.contains(QStringLiteral("eventDescriptors"))) {
-        value.eventDescriptors = ([&]() { QList<QSharedPointer<EventDescriptor>> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(QSharedPointer<EventDescriptor>::create(EventDescriptor::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("executable"))) {
-        value.executable = (object.value(QStringLiteral("executable"))).toBool();
-    }
-    if (object.contains(QStringLiteral("exitActions"))) {
-        value.exitActions = ([&]() { QList<QSharedPointer<RuleAction>> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(QSharedPointer<RuleAction>::create(RuleAction::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("stateEvaluator"))) {
-        value.stateEvaluator = QSharedPointer<StateEvaluator>::create(StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("timeDescriptor"))) {
-        value.timeDescriptor = QSharedPointer<TimeDescriptor>::create(TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("ruleId"))) {
-        value.ruleId = QUuid((object.value(QStringLiteral("ruleId"))).toString());
-    }
-    return value;
-}
+class RulesEnableRuleParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
 
-inline QJsonObject RulesEditRuleParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("name"), QJsonValue(name));
-    if (enabled.has_value()) {
-        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
-    }
-    if (eventDescriptors.has_value()) {
-        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (executable.has_value()) {
-        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
-    }
-    if (exitActions.has_value()) {
-        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    if (stateEvaluator.has_value()) {
-        object.insert(QStringLiteral("stateEvaluator"), ((*stateEvaluator) ? QJsonValue((*stateEvaluator)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    if (timeDescriptor.has_value()) {
-        object.insert(QStringLiteral("timeDescriptor"), ((*timeDescriptor) ? QJsonValue((*timeDescriptor)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    object.insert(QStringLiteral("ruleId"), QJsonValue((ruleId).toString()));
-    return object;
-}
-
-inline RulesEditRuleResponse RulesEditRuleResponse::fromJson(const QJsonObject &object) {
-    RulesEditRuleResponse value;
-    if (object.contains(QStringLiteral("rule"))) {
-        value.rule = QSharedPointer<Rule>::create(Rule::fromJson((object.value(QStringLiteral("rule"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("ruleError"))) {
-        value.ruleError = parseRuleError(object.value(QStringLiteral("ruleError")));
-    }
-    return value;
-}
-
-inline QJsonObject RulesEditRuleResponse::toJson() const {
-    QJsonObject object;
-    if (rule.has_value()) {
-        object.insert(QStringLiteral("rule"), ((*rule) ? QJsonValue((*rule)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
-    return object;
-}
+    static RulesEnableRuleParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesEnableRuleParams RulesEnableRuleParams::fromJson(const QJsonObject &object) {
     RulesEnableRuleParams value;
@@ -12016,6 +8645,15 @@ inline QJsonObject RulesEnableRuleParams::toJson() const {
     return object;
 }
 
+class RulesEnableRuleResponse {
+public:
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesEnableRuleResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesEnableRuleResponse RulesEnableRuleResponse::fromJson(const QJsonObject &object) {
     RulesEnableRuleResponse value;
     if (object.contains(QStringLiteral("ruleError"))) {
@@ -12029,6 +8667,15 @@ inline QJsonObject RulesEnableRuleResponse::toJson() const {
     object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
     return object;
 }
+
+class RulesExecuteActionsParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesExecuteActionsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesExecuteActionsParams RulesExecuteActionsParams::fromJson(const QJsonObject &object) {
     RulesExecuteActionsParams value;
@@ -12044,6 +8691,15 @@ inline QJsonObject RulesExecuteActionsParams::toJson() const {
     return object;
 }
 
+class RulesExecuteActionsResponse {
+public:
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesExecuteActionsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesExecuteActionsResponse RulesExecuteActionsResponse::fromJson(const QJsonObject &object) {
     RulesExecuteActionsResponse value;
     if (object.contains(QStringLiteral("ruleError"))) {
@@ -12057,6 +8713,15 @@ inline QJsonObject RulesExecuteActionsResponse::toJson() const {
     object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
     return object;
 }
+
+class RulesExecuteExitActionsParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesExecuteExitActionsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesExecuteExitActionsParams RulesExecuteExitActionsParams::fromJson(const QJsonObject &object) {
     RulesExecuteExitActionsParams value;
@@ -12072,6 +8737,15 @@ inline QJsonObject RulesExecuteExitActionsParams::toJson() const {
     return object;
 }
 
+class RulesExecuteExitActionsResponse {
+public:
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesExecuteExitActionsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesExecuteExitActionsResponse RulesExecuteExitActionsResponse::fromJson(const QJsonObject &object) {
     RulesExecuteExitActionsResponse value;
     if (object.contains(QStringLiteral("ruleError"))) {
@@ -12085,6 +8759,15 @@ inline QJsonObject RulesExecuteExitActionsResponse::toJson() const {
     object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
     return object;
 }
+
+class RulesFindRulesParams {
+public:
+    // wire: 'thingId' (field)
+    QUuid thingId{};
+
+    static RulesFindRulesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesFindRulesParams RulesFindRulesParams::fromJson(const QJsonObject &object) {
     RulesFindRulesParams value;
@@ -12100,6 +8783,15 @@ inline QJsonObject RulesFindRulesParams::toJson() const {
     return object;
 }
 
+class RulesFindRulesResponse {
+public:
+    // wire: 'ruleIds' (field)
+    QList<QUuid> ruleIds{};
+
+    static RulesFindRulesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesFindRulesResponse RulesFindRulesResponse::fromJson(const QJsonObject &object) {
     RulesFindRulesResponse value;
     if (object.contains(QStringLiteral("ruleIds"))) {
@@ -12113,6 +8805,15 @@ inline QJsonObject RulesFindRulesResponse::toJson() const {
     object.insert(QStringLiteral("ruleIds"), ([&]() { QJsonArray array; for (const auto &item : ruleIds) { array.append(QJsonValue((item).toString())); } return QJsonValue(array); }()));
     return object;
 }
+
+class RulesGetRuleDetailsParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesGetRuleDetailsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesGetRuleDetailsParams RulesGetRuleDetailsParams::fromJson(const QJsonObject &object) {
     RulesGetRuleDetailsParams value;
@@ -12128,25 +8829,12 @@ inline QJsonObject RulesGetRuleDetailsParams::toJson() const {
     return object;
 }
 
-inline RulesGetRuleDetailsResponse RulesGetRuleDetailsResponse::fromJson(const QJsonObject &object) {
-    RulesGetRuleDetailsResponse value;
-    if (object.contains(QStringLiteral("rule"))) {
-        value.rule = QSharedPointer<Rule>::create(Rule::fromJson((object.value(QStringLiteral("rule"))).toObject()));
-    }
-    if (object.contains(QStringLiteral("ruleError"))) {
-        value.ruleError = parseRuleError(object.value(QStringLiteral("ruleError")));
-    }
-    return value;
-}
+class RulesGetRulesParams {
+public:
 
-inline QJsonObject RulesGetRuleDetailsResponse::toJson() const {
-    QJsonObject object;
-    if (rule.has_value()) {
-        object.insert(QStringLiteral("rule"), ((*rule) ? QJsonValue((*rule)->toJson()) : QJsonValue(QJsonObject{})));
-    }
-    object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
-    return object;
-}
+    static RulesGetRulesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesGetRulesParams RulesGetRulesParams::fromJson(const QJsonObject &object) {
     RulesGetRulesParams value;
@@ -12158,19 +8846,37 @@ inline QJsonObject RulesGetRulesParams::toJson() const {
     return object;
 }
 
+class RulesGetRulesResponse {
+public:
+    // wire: 'ruleDescriptions' (field)
+    QList<RuleDescription> ruleDescriptions{};
+
+    static RulesGetRulesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesGetRulesResponse RulesGetRulesResponse::fromJson(const QJsonObject &object) {
     RulesGetRulesResponse value;
     if (object.contains(QStringLiteral("ruleDescriptions"))) {
-        value.ruleDescriptions = ([&]() { QList<QSharedPointer<RuleDescription>> list; for (const QJsonValue &item : (object.value(QStringLiteral("ruleDescriptions"))).toArray()) { list.append(QSharedPointer<RuleDescription>::create(RuleDescription::fromJson((item).toObject()))); } return list; }());
+        value.ruleDescriptions = ([&]() { QList<RuleDescription> list; for (const QJsonValue &item : (object.value(QStringLiteral("ruleDescriptions"))).toArray()) { list.append(RuleDescription::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject RulesGetRulesResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("ruleDescriptions"), ([&]() { QJsonArray array; for (const auto &item : ruleDescriptions) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("ruleDescriptions"), ([&]() { QJsonArray array; for (const auto &item : ruleDescriptions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class RulesRemoveRuleParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesRemoveRuleParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesRemoveRuleParams RulesRemoveRuleParams::fromJson(const QJsonObject &object) {
     RulesRemoveRuleParams value;
@@ -12186,6 +8892,15 @@ inline QJsonObject RulesRemoveRuleParams::toJson() const {
     return object;
 }
 
+class RulesRemoveRuleResponse {
+public:
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesRemoveRuleResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline RulesRemoveRuleResponse RulesRemoveRuleResponse::fromJson(const QJsonObject &object) {
     RulesRemoveRuleResponse value;
     if (object.contains(QStringLiteral("ruleError"))) {
@@ -12199,6 +8914,17 @@ inline QJsonObject RulesRemoveRuleResponse::toJson() const {
     object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
     return object;
 }
+
+class RulesRuleActiveChangedNotificationParams {
+public:
+    // wire: 'active' (field)
+    bool active{};
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesRuleActiveChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesRuleActiveChangedNotificationParams RulesRuleActiveChangedNotificationParams::fromJson(const QJsonObject &object) {
     RulesRuleActiveChangedNotificationParams value;
@@ -12218,33 +8944,14 @@ inline QJsonObject RulesRuleActiveChangedNotificationParams::toJson() const {
     return object;
 }
 
-inline RulesRuleAddedNotificationParams RulesRuleAddedNotificationParams::fromJson(const QJsonObject &object) {
-    RulesRuleAddedNotificationParams value;
-    if (object.contains(QStringLiteral("rule"))) {
-        value.rule = QSharedPointer<Rule>::create(Rule::fromJson((object.value(QStringLiteral("rule"))).toObject()));
-    }
-    return value;
-}
+class RulesRuleRemovedNotificationParams {
+public:
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
 
-inline QJsonObject RulesRuleAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("rule"), ((rule) ? QJsonValue((rule)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline RulesRuleConfigurationChangedNotificationParams RulesRuleConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
-    RulesRuleConfigurationChangedNotificationParams value;
-    if (object.contains(QStringLiteral("rule"))) {
-        value.rule = QSharedPointer<Rule>::create(Rule::fromJson((object.value(QStringLiteral("rule"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject RulesRuleConfigurationChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("rule"), ((rule) ? QJsonValue((rule)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static RulesRuleRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline RulesRuleRemovedNotificationParams RulesRuleRemovedNotificationParams::fromJson(const QJsonObject &object) {
     RulesRuleRemovedNotificationParams value;
@@ -12259,6 +8966,17 @@ inline QJsonObject RulesRuleRemovedNotificationParams::toJson() const {
     object.insert(QStringLiteral("ruleId"), QJsonValue((ruleId).toString()));
     return object;
 }
+
+class Script {
+public:
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'id' (required)
+    QUuid id{};
+
+    static Script fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Script Script::fromJson(const QJsonObject &object) {
     Script value;
@@ -12278,6 +8996,19 @@ inline QJsonObject Script::toJson() const {
     return object;
 }
 
+using Scripts = QList<Script>;
+
+class ScriptsAddScriptParams {
+public:
+    // wire: 'content' (field)
+    QString content{};
+    // wire: 'name' (field)
+    QString name{};
+
+    static ScriptsAddScriptParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsAddScriptParams ScriptsAddScriptParams::fromJson(const QJsonObject &object) {
     ScriptsAddScriptParams value;
     if (object.contains(QStringLiteral("content"))) {
@@ -12296,13 +9027,26 @@ inline QJsonObject ScriptsAddScriptParams::toJson() const {
     return object;
 }
 
+class ScriptsAddScriptResponse {
+public:
+    // wire: 'errors' (optional)
+    std::optional<QStringList> errors;
+    // wire: 'script' (optional)
+    std::optional<Script> script;
+    // wire: 'scriptError' (field)
+    ScriptError scriptError{};
+
+    static ScriptsAddScriptResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsAddScriptResponse ScriptsAddScriptResponse::fromJson(const QJsonObject &object) {
     ScriptsAddScriptResponse value;
     if (object.contains(QStringLiteral("errors"))) {
         value.errors = ([&]() { QStringList list; for (const QJsonValue &item : (object.value(QStringLiteral("errors"))).toArray()) { list.append(item.toString()); } return list; }());
     }
     if (object.contains(QStringLiteral("script"))) {
-        value.script = QSharedPointer<Script>::create(Script::fromJson((object.value(QStringLiteral("script"))).toObject()));
+        value.script = Script::fromJson((object.value(QStringLiteral("script"))).toObject());
     }
     if (object.contains(QStringLiteral("scriptError"))) {
         value.scriptError = parseScriptError(object.value(QStringLiteral("scriptError")));
@@ -12316,11 +9060,24 @@ inline QJsonObject ScriptsAddScriptResponse::toJson() const {
         object.insert(QStringLiteral("errors"), ([&]() { QJsonArray array; for (const QString &item : *errors) { array.append(item); } return QJsonValue(array); }()));
     }
     if (script.has_value()) {
-        object.insert(QStringLiteral("script"), ((*script) ? QJsonValue((*script)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("script"), QJsonValue((*script).toJson()));
     }
     object.insert(QStringLiteral("scriptError"), QJsonValue(toString(scriptError)));
     return object;
 }
+
+class ScriptsEditScriptParams {
+public:
+    // wire: 'id' (field)
+    QUuid id{};
+    // wire: 'content' (optional)
+    std::optional<QString> content;
+    // wire: 'name' (optional)
+    std::optional<QString> name;
+
+    static ScriptsEditScriptParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ScriptsEditScriptParams ScriptsEditScriptParams::fromJson(const QJsonObject &object) {
     ScriptsEditScriptParams value;
@@ -12348,6 +9105,17 @@ inline QJsonObject ScriptsEditScriptParams::toJson() const {
     return object;
 }
 
+class ScriptsEditScriptResponse {
+public:
+    // wire: 'errors' (optional)
+    std::optional<QStringList> errors;
+    // wire: 'scriptError' (field)
+    ScriptError scriptError{};
+
+    static ScriptsEditScriptResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsEditScriptResponse ScriptsEditScriptResponse::fromJson(const QJsonObject &object) {
     ScriptsEditScriptResponse value;
     if (object.contains(QStringLiteral("errors"))) {
@@ -12368,6 +9136,15 @@ inline QJsonObject ScriptsEditScriptResponse::toJson() const {
     return object;
 }
 
+class ScriptsGetScriptContentParams {
+public:
+    // wire: 'id' (field)
+    QUuid id{};
+
+    static ScriptsGetScriptContentParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsGetScriptContentParams ScriptsGetScriptContentParams::fromJson(const QJsonObject &object) {
     ScriptsGetScriptContentParams value;
     if (object.contains(QStringLiteral("id"))) {
@@ -12381,6 +9158,17 @@ inline QJsonObject ScriptsGetScriptContentParams::toJson() const {
     object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
     return object;
 }
+
+class ScriptsGetScriptContentResponse {
+public:
+    // wire: 'content' (optional)
+    std::optional<QString> content;
+    // wire: 'scriptError' (field)
+    ScriptError scriptError{};
+
+    static ScriptsGetScriptContentResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ScriptsGetScriptContentResponse ScriptsGetScriptContentResponse::fromJson(const QJsonObject &object) {
     ScriptsGetScriptContentResponse value;
@@ -12402,6 +9190,13 @@ inline QJsonObject ScriptsGetScriptContentResponse::toJson() const {
     return object;
 }
 
+class ScriptsGetScriptsParams {
+public:
+
+    static ScriptsGetScriptsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsGetScriptsParams ScriptsGetScriptsParams::fromJson(const QJsonObject &object) {
     ScriptsGetScriptsParams value;
     return value;
@@ -12412,19 +9207,37 @@ inline QJsonObject ScriptsGetScriptsParams::toJson() const {
     return object;
 }
 
+class ScriptsGetScriptsResponse {
+public:
+    // wire: 'scripts' (field)
+    Scripts scripts{};
+
+    static ScriptsGetScriptsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsGetScriptsResponse ScriptsGetScriptsResponse::fromJson(const QJsonObject &object) {
     ScriptsGetScriptsResponse value;
     if (object.contains(QStringLiteral("scripts"))) {
-        value.scripts = ([&]() { QList<QSharedPointer<Script>> list; for (const QJsonValue &item : (object.value(QStringLiteral("scripts"))).toArray()) { list.append(QSharedPointer<Script>::create(Script::fromJson((item).toObject()))); } return list; }());
+        value.scripts = ([&]() { QList<Script> list; for (const QJsonValue &item : (object.value(QStringLiteral("scripts"))).toArray()) { list.append(Script::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject ScriptsGetScriptsResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("scripts"), ([&]() { QJsonArray array; for (const auto &item : scripts) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("scripts"), ([&]() { QJsonArray array; for (const auto &item : scripts) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class ScriptsRemoveScriptParams {
+public:
+    // wire: 'id' (field)
+    QUuid id{};
+
+    static ScriptsRemoveScriptParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ScriptsRemoveScriptParams ScriptsRemoveScriptParams::fromJson(const QJsonObject &object) {
     ScriptsRemoveScriptParams value;
@@ -12440,6 +9253,15 @@ inline QJsonObject ScriptsRemoveScriptParams::toJson() const {
     return object;
 }
 
+class ScriptsRemoveScriptResponse {
+public:
+    // wire: 'scriptError' (field)
+    ScriptError scriptError{};
+
+    static ScriptsRemoveScriptResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsRemoveScriptResponse ScriptsRemoveScriptResponse::fromJson(const QJsonObject &object) {
     ScriptsRemoveScriptResponse value;
     if (object.contains(QStringLiteral("scriptError"))) {
@@ -12454,19 +9276,39 @@ inline QJsonObject ScriptsRemoveScriptResponse::toJson() const {
     return object;
 }
 
+class ScriptsScriptAddedNotificationParams {
+public:
+    // wire: 'script' (field)
+    Script script{};
+
+    static ScriptsScriptAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsScriptAddedNotificationParams ScriptsScriptAddedNotificationParams::fromJson(const QJsonObject &object) {
     ScriptsScriptAddedNotificationParams value;
     if (object.contains(QStringLiteral("script"))) {
-        value.script = QSharedPointer<Script>::create(Script::fromJson((object.value(QStringLiteral("script"))).toObject()));
+        value.script = Script::fromJson((object.value(QStringLiteral("script"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ScriptsScriptAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("script"), ((script) ? QJsonValue((script)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("script"), QJsonValue((script).toJson()));
     return object;
 }
+
+class ScriptsScriptChangedNotificationParams {
+public:
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'scriptId' (field)
+    QUuid scriptId{};
+
+    static ScriptsScriptChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ScriptsScriptChangedNotificationParams ScriptsScriptChangedNotificationParams::fromJson(const QJsonObject &object) {
     ScriptsScriptChangedNotificationParams value;
@@ -12486,6 +9328,15 @@ inline QJsonObject ScriptsScriptChangedNotificationParams::toJson() const {
     return object;
 }
 
+class ScriptsScriptContentChangedNotificationParams {
+public:
+    // wire: 'scriptId' (field)
+    QUuid scriptId{};
+
+    static ScriptsScriptContentChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsScriptContentChangedNotificationParams ScriptsScriptContentChangedNotificationParams::fromJson(const QJsonObject &object) {
     ScriptsScriptContentChangedNotificationParams value;
     if (object.contains(QStringLiteral("scriptId"))) {
@@ -12499,6 +9350,19 @@ inline QJsonObject ScriptsScriptContentChangedNotificationParams::toJson() const
     object.insert(QStringLiteral("scriptId"), QJsonValue((scriptId).toString()));
     return object;
 }
+
+class ScriptsScriptLogMessageNotificationParams {
+public:
+    // wire: 'message' (field)
+    QString message{};
+    // wire: 'scriptId' (field)
+    QUuid scriptId{};
+    // wire: 'type' (field)
+    ScriptMessageType type{};
+
+    static ScriptsScriptLogMessageNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ScriptsScriptLogMessageNotificationParams ScriptsScriptLogMessageNotificationParams::fromJson(const QJsonObject &object) {
     ScriptsScriptLogMessageNotificationParams value;
@@ -12522,6 +9386,15 @@ inline QJsonObject ScriptsScriptLogMessageNotificationParams::toJson() const {
     return object;
 }
 
+class ScriptsScriptRemovedNotificationParams {
+public:
+    // wire: 'id' (field)
+    QUuid id{};
+
+    static ScriptsScriptRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ScriptsScriptRemovedNotificationParams ScriptsScriptRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ScriptsScriptRemovedNotificationParams value;
     if (object.contains(QStringLiteral("id"))) {
@@ -12535,6 +9408,21 @@ inline QJsonObject ScriptsScriptRemovedNotificationParams::toJson() const {
     object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
     return object;
 }
+
+class SerialPort {
+public:
+    // wire: 'description' (required)
+    QString description{};
+    // wire: 'manufacturer' (required)
+    QString manufacturer{};
+    // wire: 'serialNumber' (required)
+    QString serialNumber{};
+    // wire: 'systemLocation' (required)
+    QString systemLocation{};
+
+    static SerialPort fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SerialPort SerialPort::fromJson(const QJsonObject &object) {
     SerialPort value;
@@ -12561,6 +9449,94 @@ inline QJsonObject SerialPort::toJson() const {
     object.insert(QStringLiteral("systemLocation"), QJsonValue(systemLocation));
     return object;
 }
+
+class ModbusRtuSerialPortAddedNotificationParams {
+public:
+    // wire: 'serialPort' (field)
+    SerialPort serialPort{};
+
+    static ModbusRtuSerialPortAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ModbusRtuSerialPortAddedNotificationParams ModbusRtuSerialPortAddedNotificationParams::fromJson(const QJsonObject &object) {
+    ModbusRtuSerialPortAddedNotificationParams value;
+    if (object.contains(QStringLiteral("serialPort"))) {
+        value.serialPort = SerialPort::fromJson((object.value(QStringLiteral("serialPort"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ModbusRtuSerialPortAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("serialPort"), QJsonValue((serialPort).toJson()));
+    return object;
+}
+
+class ModbusRtuSerialPortRemovedNotificationParams {
+public:
+    // wire: 'serialPort' (field)
+    SerialPort serialPort{};
+
+    static ModbusRtuSerialPortRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ModbusRtuSerialPortRemovedNotificationParams ModbusRtuSerialPortRemovedNotificationParams::fromJson(const QJsonObject &object) {
+    ModbusRtuSerialPortRemovedNotificationParams value;
+    if (object.contains(QStringLiteral("serialPort"))) {
+        value.serialPort = SerialPort::fromJson((object.value(QStringLiteral("serialPort"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ModbusRtuSerialPortRemovedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("serialPort"), QJsonValue((serialPort).toJson()));
+    return object;
+}
+
+using SerialPorts = QList<SerialPort>;
+
+class ModbusRtuGetSerialPortsResponse {
+public:
+    // wire: 'serialPorts' (field)
+    SerialPorts serialPorts{};
+
+    static ModbusRtuGetSerialPortsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ModbusRtuGetSerialPortsResponse ModbusRtuGetSerialPortsResponse::fromJson(const QJsonObject &object) {
+    ModbusRtuGetSerialPortsResponse value;
+    if (object.contains(QStringLiteral("serialPorts"))) {
+        value.serialPorts = ([&]() { QList<SerialPort> list; for (const QJsonValue &item : (object.value(QStringLiteral("serialPorts"))).toArray()) { list.append(SerialPort::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ModbusRtuGetSerialPortsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("serialPorts"), ([&]() { QJsonArray array; for (const auto &item : serialPorts) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ServerConfiguration {
+public:
+    // wire: 'address' (field)
+    QString address{};
+    // wire: 'authenticationEnabled' (field)
+    bool authenticationEnabled{};
+    // wire: 'id' (field)
+    QString id{};
+    // wire: 'port' (field)
+    quint64 port{};
+    // wire: 'sslEnabled' (field)
+    bool sslEnabled{};
+
+    static ServerConfiguration fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ServerConfiguration ServerConfiguration::fromJson(const QJsonObject &object) {
     ServerConfiguration value;
@@ -12591,6 +9567,186 @@ inline QJsonObject ServerConfiguration::toJson() const {
     object.insert(QStringLiteral("sslEnabled"), QJsonValue(sslEnabled));
     return object;
 }
+
+class ConfigurationGetMqttServerConfigurationsResponse {
+public:
+    // wire: 'mqttServerConfigurations' (field)
+    QList<ServerConfiguration> mqttServerConfigurations{};
+
+    static ConfigurationGetMqttServerConfigurationsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetMqttServerConfigurationsResponse ConfigurationGetMqttServerConfigurationsResponse::fromJson(const QJsonObject &object) {
+    ConfigurationGetMqttServerConfigurationsResponse value;
+    if (object.contains(QStringLiteral("mqttServerConfigurations"))) {
+        value.mqttServerConfigurations = ([&]() { QList<ServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("mqttServerConfigurations"))).toArray()) { list.append(ServerConfiguration::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationGetMqttServerConfigurationsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("mqttServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : mqttServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ConfigurationMqttServerConfigurationChangedNotificationParams {
+public:
+    // wire: 'mqttServerConfiguration' (field)
+    ServerConfiguration mqttServerConfiguration{};
+
+    static ConfigurationMqttServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationMqttServerConfigurationChangedNotificationParams ConfigurationMqttServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationMqttServerConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("mqttServerConfiguration"))) {
+        value.mqttServerConfiguration = ServerConfiguration::fromJson((object.value(QStringLiteral("mqttServerConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationMqttServerConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("mqttServerConfiguration"), QJsonValue((mqttServerConfiguration).toJson()));
+    return object;
+}
+
+class ConfigurationSetMqttServerConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    ServerConfiguration configuration{};
+
+    static ConfigurationSetMqttServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetMqttServerConfigurationParams ConfigurationSetMqttServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetMqttServerConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetMqttServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), QJsonValue((configuration).toJson()));
+    return object;
+}
+
+class ConfigurationSetTcpServerConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    ServerConfiguration configuration{};
+
+    static ConfigurationSetTcpServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetTcpServerConfigurationParams ConfigurationSetTcpServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetTcpServerConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetTcpServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), QJsonValue((configuration).toJson()));
+    return object;
+}
+
+class ConfigurationSetWebSocketServerConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    ServerConfiguration configuration{};
+
+    static ConfigurationSetWebSocketServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetWebSocketServerConfigurationParams ConfigurationSetWebSocketServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetWebSocketServerConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = ServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetWebSocketServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), QJsonValue((configuration).toJson()));
+    return object;
+}
+
+class ConfigurationTcpServerConfigurationChangedNotificationParams {
+public:
+    // wire: 'tcpServerConfiguration' (field)
+    ServerConfiguration tcpServerConfiguration{};
+
+    static ConfigurationTcpServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationTcpServerConfigurationChangedNotificationParams ConfigurationTcpServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationTcpServerConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("tcpServerConfiguration"))) {
+        value.tcpServerConfiguration = ServerConfiguration::fromJson((object.value(QStringLiteral("tcpServerConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationTcpServerConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("tcpServerConfiguration"), QJsonValue((tcpServerConfiguration).toJson()));
+    return object;
+}
+
+class ConfigurationWebSocketServerConfigurationChangedNotificationParams {
+public:
+    // wire: 'webSocketServerConfiguration' (field)
+    ServerConfiguration webSocketServerConfiguration{};
+
+    static ConfigurationWebSocketServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationWebSocketServerConfigurationChangedNotificationParams ConfigurationWebSocketServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationWebSocketServerConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("webSocketServerConfiguration"))) {
+        value.webSocketServerConfiguration = ServerConfiguration::fromJson((object.value(QStringLiteral("webSocketServerConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationWebSocketServerConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("webSocketServerConfiguration"), QJsonValue((webSocketServerConfiguration).toJson()));
+    return object;
+}
+
+class State {
+public:
+    // wire: 'filter' (required)
+    StateValueFilter filter{};
+    // wire: 'maxValue' (optional, required)
+    std::optional<QJsonValue> maxValue;
+    // wire: 'minValue' (optional, required)
+    std::optional<QJsonValue> minValue;
+    // wire: 'possibleValues' (optional, required)
+    std::optional<QList<QJsonValue>> possibleValues;
+    // wire: 'stateTypeId' (required)
+    QUuid stateTypeId{};
+    // wire: 'value' (required)
+    QJsonValue value{};
+
+    static State fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline State State::fromJson(const QJsonObject &object) {
     State value;
@@ -12631,6 +9787,29 @@ inline QJsonObject State::toJson() const {
     object.insert(QStringLiteral("value"), value);
     return object;
 }
+
+class StateDescriptor {
+public:
+    // wire: 'interface' (optional)
+    std::optional<QString> interface;
+    // wire: 'interfaceState' (optional)
+    std::optional<QString> interfaceState;
+    // wire: 'stateTypeId' (optional)
+    std::optional<QUuid> stateTypeId;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'value' (optional)
+    std::optional<QJsonValue> value;
+    // wire: 'valueStateTypeId' (optional)
+    std::optional<QUuid> valueStateTypeId;
+    // wire: 'valueThingId' (optional)
+    std::optional<QUuid> valueThingId;
+    // wire: 'operator' (field)
+    ValueOperator operatorValue{};
+
+    static StateDescriptor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline StateDescriptor StateDescriptor::fromJson(const QJsonObject &object) {
     StateDescriptor value;
@@ -12688,6 +9867,21 @@ inline QJsonObject StateDescriptor::toJson() const {
     return object;
 }
 
+using StateEvaluators = QList<QSharedPointer<StateEvaluator>>;
+
+class StateEvaluator {
+public:
+    // wire: 'childEvaluators' (optional)
+    std::optional<StateEvaluators> childEvaluators;
+    // wire: 'operator' (optional)
+    std::optional<StateOperator> operatorValue;
+    // wire: 'stateDescriptor' (optional)
+    std::optional<StateDescriptor> stateDescriptor;
+
+    static StateEvaluator fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline StateEvaluator StateEvaluator::fromJson(const QJsonObject &object) {
     StateEvaluator value;
     if (object.contains(QStringLiteral("childEvaluators"))) {
@@ -12697,7 +9891,7 @@ inline StateEvaluator StateEvaluator::fromJson(const QJsonObject &object) {
         value.operatorValue = parseStateOperator(object.value(QStringLiteral("operator")));
     }
     if (object.contains(QStringLiteral("stateDescriptor"))) {
-        value.stateDescriptor = QSharedPointer<StateDescriptor>::create(StateDescriptor::fromJson((object.value(QStringLiteral("stateDescriptor"))).toObject()));
+        value.stateDescriptor = StateDescriptor::fromJson((object.value(QStringLiteral("stateDescriptor"))).toObject());
     }
     return value;
 }
@@ -12711,10 +9905,43 @@ inline QJsonObject StateEvaluator::toJson() const {
         object.insert(QStringLiteral("operator"), QJsonValue(toString(*operatorValue)));
     }
     if (stateDescriptor.has_value()) {
-        object.insert(QStringLiteral("stateDescriptor"), ((*stateDescriptor) ? QJsonValue((*stateDescriptor)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("stateDescriptor"), QJsonValue((*stateDescriptor).toJson()));
     }
     return object;
 }
+
+class StateType {
+public:
+    // wire: 'defaultValue' (field)
+    QJsonValue defaultValue{};
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'index' (field)
+    qint64 index{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'ioType' (optional)
+    std::optional<IOType> ioType;
+    // wire: 'maxValue' (optional)
+    std::optional<QJsonValue> maxValue;
+    // wire: 'minValue' (optional)
+    std::optional<QJsonValue> minValue;
+    // wire: 'possibleValues' (optional)
+    std::optional<QList<QJsonValue>> possibleValues;
+    // wire: 'possibleValuesDisplayNames' (optional)
+    std::optional<QStringList> possibleValuesDisplayNames;
+    // wire: 'stepSize' (optional)
+    std::optional<double> stepSize;
+    // wire: 'unit' (optional)
+    std::optional<Unit> unit;
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'type' (field)
+    BasicType type{};
+
+    static StateType fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline StateType StateType::fromJson(const QJsonObject &object) {
     StateType value;
@@ -12792,6 +10019,77 @@ inline QJsonObject StateType::toJson() const {
     return object;
 }
 
+using StateTypes = QList<StateType>;
+
+class IntegrationsGetStateTypesResponse {
+public:
+    // wire: 'stateTypes' (field)
+    StateTypes stateTypes{};
+
+    static IntegrationsGetStateTypesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetStateTypesResponse IntegrationsGetStateTypesResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetStateTypesResponse value;
+    if (object.contains(QStringLiteral("stateTypes"))) {
+        value.stateTypes = ([&]() { QList<StateType> list; for (const QJsonValue &item : (object.value(QStringLiteral("stateTypes"))).toArray()) { list.append(StateType::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetStateTypesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("stateTypes"), ([&]() { QJsonArray array; for (const auto &item : stateTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+using States = QList<State>;
+
+class IntegrationsGetStateValuesResponse {
+public:
+    // wire: 'values' (optional)
+    std::optional<States> values;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetStateValuesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetStateValuesResponse IntegrationsGetStateValuesResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetStateValuesResponse value;
+    if (object.contains(QStringLiteral("values"))) {
+        value.values = ([&]() { QList<State> list; for (const QJsonValue &item : (object.value(QStringLiteral("values"))).toArray()) { list.append(State::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingError"))) {
+        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetStateValuesResponse::toJson() const {
+    QJsonObject object;
+    if (values.has_value()) {
+        object.insert(QStringLiteral("values"), ([&]() { QJsonArray array; for (const auto &item : *values) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
+    return object;
+}
+
+class SystemCapabilitiesChangedNotificationParams {
+public:
+    // wire: 'powerManagement' (field)
+    bool powerManagement{};
+    // wire: 'updateManagement' (field)
+    bool updateManagement{};
+    // wire: 'updateManagementType' (field)
+    UpdateType updateManagementType{};
+
+    static SystemCapabilitiesChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemCapabilitiesChangedNotificationParams SystemCapabilitiesChangedNotificationParams::fromJson(const QJsonObject &object) {
     SystemCapabilitiesChangedNotificationParams value;
     if (object.contains(QStringLiteral("powerManagement"))) {
@@ -12814,6 +10112,13 @@ inline QJsonObject SystemCapabilitiesChangedNotificationParams::toJson() const {
     return object;
 }
 
+class SystemCheckForUpdatesParams {
+public:
+
+    static SystemCheckForUpdatesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemCheckForUpdatesParams SystemCheckForUpdatesParams::fromJson(const QJsonObject &object) {
     SystemCheckForUpdatesParams value;
     return value;
@@ -12823,6 +10128,15 @@ inline QJsonObject SystemCheckForUpdatesParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemCheckForUpdatesResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemCheckForUpdatesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemCheckForUpdatesResponse SystemCheckForUpdatesResponse::fromJson(const QJsonObject &object) {
     SystemCheckForUpdatesResponse value;
@@ -12837,6 +10151,17 @@ inline QJsonObject SystemCheckForUpdatesResponse::toJson() const {
     object.insert(QStringLiteral("success"), QJsonValue(success));
     return object;
 }
+
+class SystemEnableRepositoryParams {
+public:
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'repositoryId' (field)
+    QString repositoryId{};
+
+    static SystemEnableRepositoryParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemEnableRepositoryParams SystemEnableRepositoryParams::fromJson(const QJsonObject &object) {
     SystemEnableRepositoryParams value;
@@ -12856,6 +10181,15 @@ inline QJsonObject SystemEnableRepositoryParams::toJson() const {
     return object;
 }
 
+class SystemEnableRepositoryResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemEnableRepositoryResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemEnableRepositoryResponse SystemEnableRepositoryResponse::fromJson(const QJsonObject &object) {
     SystemEnableRepositoryResponse value;
     if (object.contains(QStringLiteral("success"))) {
@@ -12870,6 +10204,13 @@ inline QJsonObject SystemEnableRepositoryResponse::toJson() const {
     return object;
 }
 
+class SystemGetCapabilitiesParams {
+public:
+
+    static SystemGetCapabilitiesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetCapabilitiesParams SystemGetCapabilitiesParams::fromJson(const QJsonObject &object) {
     SystemGetCapabilitiesParams value;
     return value;
@@ -12879,6 +10220,21 @@ inline QJsonObject SystemGetCapabilitiesParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemGetCapabilitiesResponse {
+public:
+    // wire: 'powerManagement' (field)
+    bool powerManagement{};
+    // wire: 'timeManagement' (field)
+    bool timeManagement{};
+    // wire: 'updateManagement' (field)
+    bool updateManagement{};
+    // wire: 'updateManagementType' (field)
+    UpdateType updateManagementType{};
+
+    static SystemGetCapabilitiesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetCapabilitiesResponse SystemGetCapabilitiesResponse::fromJson(const QJsonObject &object) {
     SystemGetCapabilitiesResponse value;
@@ -12906,6 +10262,13 @@ inline QJsonObject SystemGetCapabilitiesResponse::toJson() const {
     return object;
 }
 
+class SystemGetPackagesParams {
+public:
+
+    static SystemGetPackagesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetPackagesParams SystemGetPackagesParams::fromJson(const QJsonObject &object) {
     SystemGetPackagesParams value;
     return value;
@@ -12916,19 +10279,35 @@ inline QJsonObject SystemGetPackagesParams::toJson() const {
     return object;
 }
 
+class SystemGetPackagesResponse {
+public:
+    // wire: 'packages' (field)
+    Packages packages{};
+
+    static SystemGetPackagesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetPackagesResponse SystemGetPackagesResponse::fromJson(const QJsonObject &object) {
     SystemGetPackagesResponse value;
     if (object.contains(QStringLiteral("packages"))) {
-        value.packages = ([&]() { QList<QSharedPointer<Package>> list; for (const QJsonValue &item : (object.value(QStringLiteral("packages"))).toArray()) { list.append(QSharedPointer<Package>::create(Package::fromJson((item).toObject()))); } return list; }());
+        value.packages = ([&]() { QList<Package> list; for (const QJsonValue &item : (object.value(QStringLiteral("packages"))).toArray()) { list.append(Package::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject SystemGetPackagesResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("packages"), ([&]() { QJsonArray array; for (const auto &item : packages) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("packages"), ([&]() { QJsonArray array; for (const auto &item : packages) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class SystemGetRepositoriesParams {
+public:
+
+    static SystemGetRepositoriesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetRepositoriesParams SystemGetRepositoriesParams::fromJson(const QJsonObject &object) {
     SystemGetRepositoriesParams value;
@@ -12940,19 +10319,35 @@ inline QJsonObject SystemGetRepositoriesParams::toJson() const {
     return object;
 }
 
+class SystemGetRepositoriesResponse {
+public:
+    // wire: 'repositories' (field)
+    Repositories repositories{};
+
+    static SystemGetRepositoriesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetRepositoriesResponse SystemGetRepositoriesResponse::fromJson(const QJsonObject &object) {
     SystemGetRepositoriesResponse value;
     if (object.contains(QStringLiteral("repositories"))) {
-        value.repositories = ([&]() { QList<QSharedPointer<Repository>> list; for (const QJsonValue &item : (object.value(QStringLiteral("repositories"))).toArray()) { list.append(QSharedPointer<Repository>::create(Repository::fromJson((item).toObject()))); } return list; }());
+        value.repositories = ([&]() { QList<Repository> list; for (const QJsonValue &item : (object.value(QStringLiteral("repositories"))).toArray()) { list.append(Repository::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject SystemGetRepositoriesResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("repositories"), ([&]() { QJsonArray array; for (const auto &item : repositories) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("repositories"), ([&]() { QJsonArray array; for (const auto &item : repositories) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class SystemGetSystemInfoParams {
+public:
+
+    static SystemGetSystemInfoParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetSystemInfoParams SystemGetSystemInfoParams::fromJson(const QJsonObject &object) {
     SystemGetSystemInfoParams value;
@@ -12963,6 +10358,15 @@ inline QJsonObject SystemGetSystemInfoParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemGetSystemInfoResponse {
+public:
+    // wire: 'deviceSerialNumber' (field)
+    QString deviceSerialNumber{};
+
+    static SystemGetSystemInfoResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetSystemInfoResponse SystemGetSystemInfoResponse::fromJson(const QJsonObject &object) {
     SystemGetSystemInfoResponse value;
@@ -12978,6 +10382,13 @@ inline QJsonObject SystemGetSystemInfoResponse::toJson() const {
     return object;
 }
 
+class SystemGetTimeParams {
+public:
+
+    static SystemGetTimeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetTimeParams SystemGetTimeParams::fromJson(const QJsonObject &object) {
     SystemGetTimeParams value;
     return value;
@@ -12987,6 +10398,21 @@ inline QJsonObject SystemGetTimeParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemGetTimeResponse {
+public:
+    // wire: 'automaticTime' (field)
+    bool automaticTime{};
+    // wire: 'automaticTimeAvailable' (field)
+    bool automaticTimeAvailable{};
+    // wire: 'time' (field)
+    quint64 time{};
+    // wire: 'timeZone' (field)
+    QString timeZone{};
+
+    static SystemGetTimeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetTimeResponse SystemGetTimeResponse::fromJson(const QJsonObject &object) {
     SystemGetTimeResponse value;
@@ -13014,6 +10440,13 @@ inline QJsonObject SystemGetTimeResponse::toJson() const {
     return object;
 }
 
+class SystemGetTimeZonesParams {
+public:
+
+    static SystemGetTimeZonesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetTimeZonesParams SystemGetTimeZonesParams::fromJson(const QJsonObject &object) {
     SystemGetTimeZonesParams value;
     return value;
@@ -13023,6 +10456,15 @@ inline QJsonObject SystemGetTimeZonesParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemGetTimeZonesResponse {
+public:
+    // wire: 'timeZones' (field)
+    QStringList timeZones{};
+
+    static SystemGetTimeZonesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetTimeZonesResponse SystemGetTimeZonesResponse::fromJson(const QJsonObject &object) {
     SystemGetTimeZonesResponse value;
@@ -13038,6 +10480,13 @@ inline QJsonObject SystemGetTimeZonesResponse::toJson() const {
     return object;
 }
 
+class SystemGetUpdateStatusParams {
+public:
+
+    static SystemGetUpdateStatusParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemGetUpdateStatusParams SystemGetUpdateStatusParams::fromJson(const QJsonObject &object) {
     SystemGetUpdateStatusParams value;
     return value;
@@ -13047,6 +10496,19 @@ inline QJsonObject SystemGetUpdateStatusParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemGetUpdateStatusResponse {
+public:
+    // wire: 'busy' (field)
+    bool busy{};
+    // wire: 'updateProgress' (optional)
+    std::optional<qint64> updateProgress;
+    // wire: 'updateRunning' (field)
+    bool updateRunning{};
+
+    static SystemGetUpdateStatusResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemGetUpdateStatusResponse SystemGetUpdateStatusResponse::fromJson(const QJsonObject &object) {
     SystemGetUpdateStatusResponse value;
@@ -13072,33 +10534,60 @@ inline QJsonObject SystemGetUpdateStatusResponse::toJson() const {
     return object;
 }
 
+class SystemPackageAddedNotificationParams {
+public:
+    // wire: 'package' (field)
+    Package package{};
+
+    static SystemPackageAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemPackageAddedNotificationParams SystemPackageAddedNotificationParams::fromJson(const QJsonObject &object) {
     SystemPackageAddedNotificationParams value;
     if (object.contains(QStringLiteral("package"))) {
-        value.package = QSharedPointer<Package>::create(Package::fromJson((object.value(QStringLiteral("package"))).toObject()));
+        value.package = Package::fromJson((object.value(QStringLiteral("package"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject SystemPackageAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("package"), ((package) ? QJsonValue((package)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("package"), QJsonValue((package).toJson()));
     return object;
 }
+
+class SystemPackageChangedNotificationParams {
+public:
+    // wire: 'package' (field)
+    Package package{};
+
+    static SystemPackageChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemPackageChangedNotificationParams SystemPackageChangedNotificationParams::fromJson(const QJsonObject &object) {
     SystemPackageChangedNotificationParams value;
     if (object.contains(QStringLiteral("package"))) {
-        value.package = QSharedPointer<Package>::create(Package::fromJson((object.value(QStringLiteral("package"))).toObject()));
+        value.package = Package::fromJson((object.value(QStringLiteral("package"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject SystemPackageChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("package"), ((package) ? QJsonValue((package)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("package"), QJsonValue((package).toJson()));
     return object;
 }
+
+class SystemPackageRemovedNotificationParams {
+public:
+    // wire: 'packageId' (field)
+    QString packageId{};
+
+    static SystemPackageRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemPackageRemovedNotificationParams SystemPackageRemovedNotificationParams::fromJson(const QJsonObject &object) {
     SystemPackageRemovedNotificationParams value;
@@ -13114,6 +10603,13 @@ inline QJsonObject SystemPackageRemovedNotificationParams::toJson() const {
     return object;
 }
 
+class SystemRebootParams {
+public:
+
+    static SystemRebootParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRebootParams SystemRebootParams::fromJson(const QJsonObject &object) {
     SystemRebootParams value;
     return value;
@@ -13123,6 +10619,15 @@ inline QJsonObject SystemRebootParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemRebootResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemRebootResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemRebootResponse SystemRebootResponse::fromJson(const QJsonObject &object) {
     SystemRebootResponse value;
@@ -13138,6 +10643,15 @@ inline QJsonObject SystemRebootResponse::toJson() const {
     return object;
 }
 
+class SystemRemovePackagesParams {
+public:
+    // wire: 'packageIds' (field)
+    QList<QString> packageIds{};
+
+    static SystemRemovePackagesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRemovePackagesParams SystemRemovePackagesParams::fromJson(const QJsonObject &object) {
     SystemRemovePackagesParams value;
     if (object.contains(QStringLiteral("packageIds"))) {
@@ -13151,6 +10665,15 @@ inline QJsonObject SystemRemovePackagesParams::toJson() const {
     object.insert(QStringLiteral("packageIds"), ([&]() { QJsonArray array; for (const auto &item : packageIds) { array.append(QJsonValue(item)); } return QJsonValue(array); }()));
     return object;
 }
+
+class SystemRemovePackagesResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemRemovePackagesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemRemovePackagesResponse SystemRemovePackagesResponse::fromJson(const QJsonObject &object) {
     SystemRemovePackagesResponse value;
@@ -13166,33 +10689,60 @@ inline QJsonObject SystemRemovePackagesResponse::toJson() const {
     return object;
 }
 
+class SystemRepositoryAddedNotificationParams {
+public:
+    // wire: 'repository' (field)
+    Repository repository{};
+
+    static SystemRepositoryAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRepositoryAddedNotificationParams SystemRepositoryAddedNotificationParams::fromJson(const QJsonObject &object) {
     SystemRepositoryAddedNotificationParams value;
     if (object.contains(QStringLiteral("repository"))) {
-        value.repository = QSharedPointer<Repository>::create(Repository::fromJson((object.value(QStringLiteral("repository"))).toObject()));
+        value.repository = Repository::fromJson((object.value(QStringLiteral("repository"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject SystemRepositoryAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("repository"), ((repository) ? QJsonValue((repository)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("repository"), QJsonValue((repository).toJson()));
     return object;
 }
+
+class SystemRepositoryChangedNotificationParams {
+public:
+    // wire: 'repository' (field)
+    Repository repository{};
+
+    static SystemRepositoryChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemRepositoryChangedNotificationParams SystemRepositoryChangedNotificationParams::fromJson(const QJsonObject &object) {
     SystemRepositoryChangedNotificationParams value;
     if (object.contains(QStringLiteral("repository"))) {
-        value.repository = QSharedPointer<Repository>::create(Repository::fromJson((object.value(QStringLiteral("repository"))).toObject()));
+        value.repository = Repository::fromJson((object.value(QStringLiteral("repository"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject SystemRepositoryChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("repository"), ((repository) ? QJsonValue((repository)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("repository"), QJsonValue((repository).toJson()));
     return object;
 }
+
+class SystemRepositoryRemovedNotificationParams {
+public:
+    // wire: 'repositoryId' (field)
+    QString repositoryId{};
+
+    static SystemRepositoryRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemRepositoryRemovedNotificationParams SystemRepositoryRemovedNotificationParams::fromJson(const QJsonObject &object) {
     SystemRepositoryRemovedNotificationParams value;
@@ -13208,6 +10758,13 @@ inline QJsonObject SystemRepositoryRemovedNotificationParams::toJson() const {
     return object;
 }
 
+class SystemRestartParams {
+public:
+
+    static SystemRestartParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRestartParams SystemRestartParams::fromJson(const QJsonObject &object) {
     SystemRestartParams value;
     return value;
@@ -13217,6 +10774,15 @@ inline QJsonObject SystemRestartParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemRestartResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemRestartResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemRestartResponse SystemRestartResponse::fromJson(const QJsonObject &object) {
     SystemRestartResponse value;
@@ -13232,6 +10798,15 @@ inline QJsonObject SystemRestartResponse::toJson() const {
     return object;
 }
 
+class SystemRollbackPackagesParams {
+public:
+    // wire: 'packageIds' (field)
+    QList<QString> packageIds{};
+
+    static SystemRollbackPackagesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRollbackPackagesParams SystemRollbackPackagesParams::fromJson(const QJsonObject &object) {
     SystemRollbackPackagesParams value;
     if (object.contains(QStringLiteral("packageIds"))) {
@@ -13246,6 +10821,15 @@ inline QJsonObject SystemRollbackPackagesParams::toJson() const {
     return object;
 }
 
+class SystemRollbackPackagesResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemRollbackPackagesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemRollbackPackagesResponse SystemRollbackPackagesResponse::fromJson(const QJsonObject &object) {
     SystemRollbackPackagesResponse value;
     if (object.contains(QStringLiteral("success"))) {
@@ -13259,6 +10843,19 @@ inline QJsonObject SystemRollbackPackagesResponse::toJson() const {
     object.insert(QStringLiteral("success"), QJsonValue(success));
     return object;
 }
+
+class SystemSetTimeParams {
+public:
+    // wire: 'automaticTime' (optional)
+    std::optional<bool> automaticTime;
+    // wire: 'time' (optional)
+    std::optional<quint64> time;
+    // wire: 'timeZone' (optional)
+    std::optional<QString> timeZone;
+
+    static SystemSetTimeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemSetTimeParams SystemSetTimeParams::fromJson(const QJsonObject &object) {
     SystemSetTimeParams value;
@@ -13288,6 +10885,15 @@ inline QJsonObject SystemSetTimeParams::toJson() const {
     return object;
 }
 
+class SystemSetTimeResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemSetTimeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemSetTimeResponse SystemSetTimeResponse::fromJson(const QJsonObject &object) {
     SystemSetTimeResponse value;
     if (object.contains(QStringLiteral("success"))) {
@@ -13302,6 +10908,13 @@ inline QJsonObject SystemSetTimeResponse::toJson() const {
     return object;
 }
 
+class SystemShutdownParams {
+public:
+
+    static SystemShutdownParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemShutdownParams SystemShutdownParams::fromJson(const QJsonObject &object) {
     SystemShutdownParams value;
     return value;
@@ -13311,6 +10924,15 @@ inline QJsonObject SystemShutdownParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class SystemShutdownResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemShutdownResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemShutdownResponse SystemShutdownResponse::fromJson(const QJsonObject &object) {
     SystemShutdownResponse value;
@@ -13325,6 +10947,21 @@ inline QJsonObject SystemShutdownResponse::toJson() const {
     object.insert(QStringLiteral("success"), QJsonValue(success));
     return object;
 }
+
+class SystemTimeConfigurationChangedNotificationParams {
+public:
+    // wire: 'automaticTime' (field)
+    bool automaticTime{};
+    // wire: 'automaticTimeAvailable' (field)
+    bool automaticTimeAvailable{};
+    // wire: 'time' (field)
+    quint64 time{};
+    // wire: 'timeZone' (field)
+    QString timeZone{};
+
+    static SystemTimeConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemTimeConfigurationChangedNotificationParams SystemTimeConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
     SystemTimeConfigurationChangedNotificationParams value;
@@ -13352,6 +10989,15 @@ inline QJsonObject SystemTimeConfigurationChangedNotificationParams::toJson() co
     return object;
 }
 
+class SystemUpdatePackagesParams {
+public:
+    // wire: 'packageIds' (optional)
+    std::optional<QList<QString>> packageIds;
+
+    static SystemUpdatePackagesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemUpdatePackagesParams SystemUpdatePackagesParams::fromJson(const QJsonObject &object) {
     SystemUpdatePackagesParams value;
     if (object.contains(QStringLiteral("packageIds"))) {
@@ -13368,6 +11014,15 @@ inline QJsonObject SystemUpdatePackagesParams::toJson() const {
     return object;
 }
 
+class SystemUpdatePackagesResponse {
+public:
+    // wire: 'success' (field)
+    bool success{};
+
+    static SystemUpdatePackagesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline SystemUpdatePackagesResponse SystemUpdatePackagesResponse::fromJson(const QJsonObject &object) {
     SystemUpdatePackagesResponse value;
     if (object.contains(QStringLiteral("success"))) {
@@ -13381,6 +11036,19 @@ inline QJsonObject SystemUpdatePackagesResponse::toJson() const {
     object.insert(QStringLiteral("success"), QJsonValue(success));
     return object;
 }
+
+class SystemUpdateStatusChangedNotificationParams {
+public:
+    // wire: 'busy' (field)
+    bool busy{};
+    // wire: 'updateProgress' (optional)
+    std::optional<qint64> updateProgress;
+    // wire: 'updateRunning' (field)
+    bool updateRunning{};
+
+    static SystemUpdateStatusChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline SystemUpdateStatusChangedNotificationParams SystemUpdateStatusChangedNotificationParams::fromJson(const QJsonObject &object) {
     SystemUpdateStatusChangedNotificationParams value;
@@ -13405,6 +11073,23 @@ inline QJsonObject SystemUpdateStatusChangedNotificationParams::toJson() const {
     object.insert(QStringLiteral("updateRunning"), QJsonValue(updateRunning));
     return object;
 }
+
+class Tag {
+public:
+    // wire: 'appId' (field)
+    QString appId{};
+    // wire: 'ruleId' (optional)
+    std::optional<QUuid> ruleId;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+    // wire: 'value' (optional)
+    std::optional<QString> value;
+    // wire: 'tagId' (field)
+    QString tagId{};
+
+    static Tag fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Tag Tag::fromJson(const QJsonObject &object) {
     Tag value;
@@ -13442,19 +11127,39 @@ inline QJsonObject Tag::toJson() const {
     return object;
 }
 
+using Tags = QList<Tag>;
+
+class TagsAddTagParams {
+public:
+    // wire: 'tag' (field)
+    Tag tag{};
+
+    static TagsAddTagParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline TagsAddTagParams TagsAddTagParams::fromJson(const QJsonObject &object) {
     TagsAddTagParams value;
     if (object.contains(QStringLiteral("tag"))) {
-        value.tag = QSharedPointer<Tag>::create(Tag::fromJson((object.value(QStringLiteral("tag"))).toObject()));
+        value.tag = Tag::fromJson((object.value(QStringLiteral("tag"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject TagsAddTagParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("tag"), ((tag) ? QJsonValue((tag)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("tag"), QJsonValue((tag).toJson()));
     return object;
 }
+
+class TagsAddTagResponse {
+public:
+    // wire: 'tagError' (field)
+    TagError tagError{};
+
+    static TagsAddTagResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TagsAddTagResponse TagsAddTagResponse::fromJson(const QJsonObject &object) {
     TagsAddTagResponse value;
@@ -13469,6 +11174,21 @@ inline QJsonObject TagsAddTagResponse::toJson() const {
     object.insert(QStringLiteral("tagError"), QJsonValue(toString(tagError)));
     return object;
 }
+
+class TagsGetTagsParams {
+public:
+    // wire: 'appId' (optional)
+    std::optional<QString> appId;
+    // wire: 'ruleId' (optional)
+    std::optional<QUuid> ruleId;
+    // wire: 'tagId' (optional)
+    std::optional<QString> tagId;
+    // wire: 'thingId' (optional)
+    std::optional<QUuid> thingId;
+
+    static TagsGetTagsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TagsGetTagsParams TagsGetTagsParams::fromJson(const QJsonObject &object) {
     TagsGetTagsParams value;
@@ -13504,10 +11224,21 @@ inline QJsonObject TagsGetTagsParams::toJson() const {
     return object;
 }
 
+class TagsGetTagsResponse {
+public:
+    // wire: 'tags' (optional)
+    std::optional<Tags> tags;
+    // wire: 'tagError' (field)
+    TagError tagError{};
+
+    static TagsGetTagsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline TagsGetTagsResponse TagsGetTagsResponse::fromJson(const QJsonObject &object) {
     TagsGetTagsResponse value;
     if (object.contains(QStringLiteral("tags"))) {
-        value.tags = ([&]() { QList<QSharedPointer<Tag>> list; for (const QJsonValue &item : (object.value(QStringLiteral("tags"))).toArray()) { list.append(QSharedPointer<Tag>::create(Tag::fromJson((item).toObject()))); } return list; }());
+        value.tags = ([&]() { QList<Tag> list; for (const QJsonValue &item : (object.value(QStringLiteral("tags"))).toArray()) { list.append(Tag::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("tagError"))) {
         value.tagError = parseTagError(object.value(QStringLiteral("tagError")));
@@ -13518,25 +11249,43 @@ inline TagsGetTagsResponse TagsGetTagsResponse::fromJson(const QJsonObject &obje
 inline QJsonObject TagsGetTagsResponse::toJson() const {
     QJsonObject object;
     if (tags.has_value()) {
-        object.insert(QStringLiteral("tags"), ([&]() { QJsonArray array; for (const auto &item : *tags) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("tags"), ([&]() { QJsonArray array; for (const auto &item : *tags) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     object.insert(QStringLiteral("tagError"), QJsonValue(toString(tagError)));
     return object;
 }
 
+class TagsRemoveTagParams {
+public:
+    // wire: 'tag' (field)
+    Tag tag{};
+
+    static TagsRemoveTagParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline TagsRemoveTagParams TagsRemoveTagParams::fromJson(const QJsonObject &object) {
     TagsRemoveTagParams value;
     if (object.contains(QStringLiteral("tag"))) {
-        value.tag = QSharedPointer<Tag>::create(Tag::fromJson((object.value(QStringLiteral("tag"))).toObject()));
+        value.tag = Tag::fromJson((object.value(QStringLiteral("tag"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject TagsRemoveTagParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("tag"), ((tag) ? QJsonValue((tag)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("tag"), QJsonValue((tag).toJson()));
     return object;
 }
+
+class TagsRemoveTagResponse {
+public:
+    // wire: 'tagError' (field)
+    TagError tagError{};
+
+    static TagsRemoveTagResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TagsRemoveTagResponse TagsRemoveTagResponse::fromJson(const QJsonObject &object) {
     TagsRemoveTagResponse value;
@@ -13552,47 +11301,109 @@ inline QJsonObject TagsRemoveTagResponse::toJson() const {
     return object;
 }
 
+class TagsTagAddedNotificationParams {
+public:
+    // wire: 'tag' (field)
+    Tag tag{};
+
+    static TagsTagAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline TagsTagAddedNotificationParams TagsTagAddedNotificationParams::fromJson(const QJsonObject &object) {
     TagsTagAddedNotificationParams value;
     if (object.contains(QStringLiteral("tag"))) {
-        value.tag = QSharedPointer<Tag>::create(Tag::fromJson((object.value(QStringLiteral("tag"))).toObject()));
+        value.tag = Tag::fromJson((object.value(QStringLiteral("tag"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject TagsTagAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("tag"), ((tag) ? QJsonValue((tag)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("tag"), QJsonValue((tag).toJson()));
     return object;
 }
+
+class TagsTagRemovedNotificationParams {
+public:
+    // wire: 'tag' (field)
+    Tag tag{};
+
+    static TagsTagRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TagsTagRemovedNotificationParams TagsTagRemovedNotificationParams::fromJson(const QJsonObject &object) {
     TagsTagRemovedNotificationParams value;
     if (object.contains(QStringLiteral("tag"))) {
-        value.tag = QSharedPointer<Tag>::create(Tag::fromJson((object.value(QStringLiteral("tag"))).toObject()));
+        value.tag = Tag::fromJson((object.value(QStringLiteral("tag"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject TagsTagRemovedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("tag"), ((tag) ? QJsonValue((tag)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("tag"), QJsonValue((tag).toJson()));
     return object;
 }
+
+class TagsTagValueChangedNotificationParams {
+public:
+    // wire: 'tag' (field)
+    Tag tag{};
+
+    static TagsTagValueChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TagsTagValueChangedNotificationParams TagsTagValueChangedNotificationParams::fromJson(const QJsonObject &object) {
     TagsTagValueChangedNotificationParams value;
     if (object.contains(QStringLiteral("tag"))) {
-        value.tag = QSharedPointer<Tag>::create(Tag::fromJson((object.value(QStringLiteral("tag"))).toObject()));
+        value.tag = Tag::fromJson((object.value(QStringLiteral("tag"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject TagsTagValueChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("tag"), ((tag) ? QJsonValue((tag)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("tag"), QJsonValue((tag).toJson()));
     return object;
 }
+
+class Thing {
+public:
+    // wire: 'setupComplete' (required, deprecated)
+    bool setupComplete{};
+    // wire: 'name' (optional)
+    std::optional<QString> name;
+    // wire: 'settings' (optional)
+    std::optional<ParamList> settings;
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'loggedActionTypeIds' (optional, required)
+    std::optional<QList<QUuid>> loggedActionTypeIds;
+    // wire: 'loggedEventTypeIds' (optional, required)
+    std::optional<QList<QUuid>> loggedEventTypeIds;
+    // wire: 'loggedStateTypeIds' (optional, required)
+    std::optional<QList<QUuid>> loggedStateTypeIds;
+    // wire: 'parentId' (optional, required)
+    std::optional<QUuid> parentId;
+    // wire: 'setupDisplayMessage' (optional, required)
+    std::optional<QString> setupDisplayMessage;
+    // wire: 'params' (required)
+    ParamList params{};
+    // wire: 'setupError' (required)
+    ThingError setupError{};
+    // wire: 'setupStatus' (required)
+    ThingSetupStatus setupStatus{};
+    // wire: 'states' (required)
+    States states{};
+    // wire: 'thingClassId' (required)
+    QUuid thingClassId{};
+
+    static Thing fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Thing Thing::fromJson(const QJsonObject &object) {
     Thing value;
@@ -13603,7 +11414,7 @@ inline Thing Thing::fromJson(const QJsonObject &object) {
         value.name = (object.value(QStringLiteral("name"))).toString();
     }
     if (object.contains(QStringLiteral("settings"))) {
-        value.settings = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("settings"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
+        value.settings = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("settings"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("id"))) {
         value.id = QUuid((object.value(QStringLiteral("id"))).toString());
@@ -13624,7 +11435,7 @@ inline Thing Thing::fromJson(const QJsonObject &object) {
         value.setupDisplayMessage = (object.value(QStringLiteral("setupDisplayMessage"))).toString();
     }
     if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("setupError"))) {
         value.setupError = parseThingError(object.value(QStringLiteral("setupError")));
@@ -13633,7 +11444,7 @@ inline Thing Thing::fromJson(const QJsonObject &object) {
         value.setupStatus = parseThingSetupStatus(object.value(QStringLiteral("setupStatus")));
     }
     if (object.contains(QStringLiteral("states"))) {
-        value.states = ([&]() { QList<QSharedPointer<State>> list; for (const QJsonValue &item : (object.value(QStringLiteral("states"))).toArray()) { list.append(QSharedPointer<State>::create(State::fromJson((item).toObject()))); } return list; }());
+        value.states = ([&]() { QList<State> list; for (const QJsonValue &item : (object.value(QStringLiteral("states"))).toArray()) { list.append(State::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("thingClassId"))) {
         value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
@@ -13648,7 +11459,7 @@ inline QJsonObject Thing::toJson() const {
         object.insert(QStringLiteral("name"), QJsonValue(*name));
     }
     if (settings.has_value()) {
-        object.insert(QStringLiteral("settings"), ([&]() { QJsonArray array; for (const auto &item : *settings) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("settings"), ([&]() { QJsonArray array; for (const auto &item : *settings) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
     if (loggedActionTypeIds.has_value()) {
@@ -13666,30 +11477,119 @@ inline QJsonObject Thing::toJson() const {
     if (setupDisplayMessage.has_value()) {
         object.insert(QStringLiteral("setupDisplayMessage"), QJsonValue(*setupDisplayMessage));
     }
-    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("setupError"), QJsonValue(toString(setupError)));
     object.insert(QStringLiteral("setupStatus"), QJsonValue(toString(setupStatus)));
-    object.insert(QStringLiteral("states"), ([&]() { QJsonArray array; for (const auto &item : states) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("states"), ([&]() { QJsonArray array; for (const auto &item : states) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("thingClassId"), QJsonValue((thingClassId).toString()));
     return object;
 }
 
+class IntegrationsThingAddedNotificationParams {
+public:
+    // wire: 'thing' (field)
+    Thing thing{};
+
+    static IntegrationsThingAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsThingAddedNotificationParams IntegrationsThingAddedNotificationParams::fromJson(const QJsonObject &object) {
+    IntegrationsThingAddedNotificationParams value;
+    if (object.contains(QStringLiteral("thing"))) {
+        value.thing = Thing::fromJson((object.value(QStringLiteral("thing"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsThingAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("thing"), QJsonValue((thing).toJson()));
+    return object;
+}
+
+class IntegrationsThingChangedNotificationParams {
+public:
+    // wire: 'thing' (field)
+    Thing thing{};
+
+    static IntegrationsThingChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsThingChangedNotificationParams IntegrationsThingChangedNotificationParams::fromJson(const QJsonObject &object) {
+    IntegrationsThingChangedNotificationParams value;
+    if (object.contains(QStringLiteral("thing"))) {
+        value.thing = Thing::fromJson((object.value(QStringLiteral("thing"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsThingChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("thing"), QJsonValue((thing).toJson()));
+    return object;
+}
+
+class ThingClass {
+public:
+    // wire: 'actionTypes' (required)
+    ActionTypes actionTypes{};
+    // wire: 'browsable' (required)
+    bool browsable{};
+    // wire: 'browserItemActionTypes' (required)
+    ActionTypes browserItemActionTypes{};
+    // wire: 'createMethods' (required)
+    CreateMethods createMethods{};
+    // wire: 'discoveryParamTypes' (required)
+    ParamTypes discoveryParamTypes{};
+    // wire: 'discoveryType' (required)
+    DiscoveryType discoveryType{};
+    // wire: 'displayName' (required)
+    QString displayName{};
+    // wire: 'eventTypes' (required)
+    EventTypes eventTypes{};
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'interfaces' (required)
+    QStringList interfaces{};
+    // wire: 'name' (required)
+    QString name{};
+    // wire: 'paramTypes' (required)
+    ParamTypes paramTypes{};
+    // wire: 'pluginId' (required)
+    QUuid pluginId{};
+    // wire: 'providedInterfaces' (required)
+    QStringList providedInterfaces{};
+    // wire: 'settingsTypes' (required)
+    ParamTypes settingsTypes{};
+    // wire: 'setupMethod' (required)
+    SetupMethod setupMethod{};
+    // wire: 'stateTypes' (required)
+    StateTypes stateTypes{};
+    // wire: 'vendorId' (required)
+    QUuid vendorId{};
+
+    static ThingClass fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ThingClass ThingClass::fromJson(const QJsonObject &object) {
     ThingClass value;
     if (object.contains(QStringLiteral("actionTypes"))) {
-        value.actionTypes = ([&]() { QList<QSharedPointer<ActionType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("actionTypes"))).toArray()) { list.append(QSharedPointer<ActionType>::create(ActionType::fromJson((item).toObject()))); } return list; }());
+        value.actionTypes = ([&]() { QList<ActionType> list; for (const QJsonValue &item : (object.value(QStringLiteral("actionTypes"))).toArray()) { list.append(ActionType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("browsable"))) {
         value.browsable = (object.value(QStringLiteral("browsable"))).toBool();
     }
     if (object.contains(QStringLiteral("browserItemActionTypes"))) {
-        value.browserItemActionTypes = ([&]() { QList<QSharedPointer<ActionType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("browserItemActionTypes"))).toArray()) { list.append(QSharedPointer<ActionType>::create(ActionType::fromJson((item).toObject()))); } return list; }());
+        value.browserItemActionTypes = ([&]() { QList<ActionType> list; for (const QJsonValue &item : (object.value(QStringLiteral("browserItemActionTypes"))).toArray()) { list.append(ActionType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("createMethods"))) {
         value.createMethods = ([&]() { QList<CreateMethod> list; for (const QJsonValue &item : (object.value(QStringLiteral("createMethods"))).toArray()) { list.append(parseCreateMethod(item)); } return list; }());
     }
     if (object.contains(QStringLiteral("discoveryParamTypes"))) {
-        value.discoveryParamTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("discoveryParamTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
+        value.discoveryParamTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("discoveryParamTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("discoveryType"))) {
         value.discoveryType = parseDiscoveryType(object.value(QStringLiteral("discoveryType")));
@@ -13698,7 +11598,7 @@ inline ThingClass ThingClass::fromJson(const QJsonObject &object) {
         value.displayName = (object.value(QStringLiteral("displayName"))).toString();
     }
     if (object.contains(QStringLiteral("eventTypes"))) {
-        value.eventTypes = ([&]() { QList<QSharedPointer<EventType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventTypes"))).toArray()) { list.append(QSharedPointer<EventType>::create(EventType::fromJson((item).toObject()))); } return list; }());
+        value.eventTypes = ([&]() { QList<EventType> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventTypes"))).toArray()) { list.append(EventType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("id"))) {
         value.id = QUuid((object.value(QStringLiteral("id"))).toString());
@@ -13710,7 +11610,7 @@ inline ThingClass ThingClass::fromJson(const QJsonObject &object) {
         value.name = (object.value(QStringLiteral("name"))).toString();
     }
     if (object.contains(QStringLiteral("paramTypes"))) {
-        value.paramTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
+        value.paramTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("paramTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("pluginId"))) {
         value.pluginId = QUuid((object.value(QStringLiteral("pluginId"))).toString());
@@ -13719,13 +11619,13 @@ inline ThingClass ThingClass::fromJson(const QJsonObject &object) {
         value.providedInterfaces = ([&]() { QStringList list; for (const QJsonValue &item : (object.value(QStringLiteral("providedInterfaces"))).toArray()) { list.append(item.toString()); } return list; }());
     }
     if (object.contains(QStringLiteral("settingsTypes"))) {
-        value.settingsTypes = ([&]() { QList<QSharedPointer<ParamType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("settingsTypes"))).toArray()) { list.append(QSharedPointer<ParamType>::create(ParamType::fromJson((item).toObject()))); } return list; }());
+        value.settingsTypes = ([&]() { QList<ParamType> list; for (const QJsonValue &item : (object.value(QStringLiteral("settingsTypes"))).toArray()) { list.append(ParamType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("setupMethod"))) {
         value.setupMethod = parseSetupMethod(object.value(QStringLiteral("setupMethod")));
     }
     if (object.contains(QStringLiteral("stateTypes"))) {
-        value.stateTypes = ([&]() { QList<QSharedPointer<StateType>> list; for (const QJsonValue &item : (object.value(QStringLiteral("stateTypes"))).toArray()) { list.append(QSharedPointer<StateType>::create(StateType::fromJson((item).toObject()))); } return list; }());
+        value.stateTypes = ([&]() { QList<StateType> list; for (const QJsonValue &item : (object.value(QStringLiteral("stateTypes"))).toArray()) { list.append(StateType::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("vendorId"))) {
         value.vendorId = QUuid((object.value(QStringLiteral("vendorId"))).toString());
@@ -13735,26 +11635,78 @@ inline ThingClass ThingClass::fromJson(const QJsonObject &object) {
 
 inline QJsonObject ThingClass::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("actionTypes"), ([&]() { QJsonArray array; for (const auto &item : actionTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("actionTypes"), ([&]() { QJsonArray array; for (const auto &item : actionTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("browsable"), QJsonValue(browsable));
-    object.insert(QStringLiteral("browserItemActionTypes"), ([&]() { QJsonArray array; for (const auto &item : browserItemActionTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("browserItemActionTypes"), ([&]() { QJsonArray array; for (const auto &item : browserItemActionTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("createMethods"), ([&]() { QJsonArray array; for (const auto &item : createMethods) { array.append(QJsonValue(toString(item))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("discoveryParamTypes"), ([&]() { QJsonArray array; for (const auto &item : discoveryParamTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("discoveryParamTypes"), ([&]() { QJsonArray array; for (const auto &item : discoveryParamTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("discoveryType"), QJsonValue(toString(discoveryType)));
     object.insert(QStringLiteral("displayName"), QJsonValue(displayName));
-    object.insert(QStringLiteral("eventTypes"), ([&]() { QJsonArray array; for (const auto &item : eventTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("eventTypes"), ([&]() { QJsonArray array; for (const auto &item : eventTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
     object.insert(QStringLiteral("interfaces"), ([&]() { QJsonArray array; for (const QString &item : interfaces) { array.append(item); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("name"), QJsonValue(name));
-    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("paramTypes"), ([&]() { QJsonArray array; for (const auto &item : paramTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("pluginId"), QJsonValue((pluginId).toString()));
     object.insert(QStringLiteral("providedInterfaces"), ([&]() { QJsonArray array; for (const QString &item : providedInterfaces) { array.append(item); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("settingsTypes"), ([&]() { QJsonArray array; for (const auto &item : settingsTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("settingsTypes"), ([&]() { QJsonArray array; for (const auto &item : settingsTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("setupMethod"), QJsonValue(toString(setupMethod)));
-    object.insert(QStringLiteral("stateTypes"), ([&]() { QJsonArray array; for (const auto &item : stateTypes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("stateTypes"), ([&]() { QJsonArray array; for (const auto &item : stateTypes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("vendorId"), QJsonValue((vendorId).toString()));
     return object;
 }
+
+using ThingClasses = QList<ThingClass>;
+
+class IntegrationsGetThingClassesResponse {
+public:
+    // wire: 'thingClasses' (optional)
+    std::optional<ThingClasses> thingClasses;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetThingClassesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetThingClassesResponse IntegrationsGetThingClassesResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetThingClassesResponse value;
+    if (object.contains(QStringLiteral("thingClasses"))) {
+        value.thingClasses = ([&]() { QList<ThingClass> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingClasses"))).toArray()) { list.append(ThingClass::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingError"))) {
+        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetThingClassesResponse::toJson() const {
+    QJsonObject object;
+    if (thingClasses.has_value()) {
+        object.insert(QStringLiteral("thingClasses"), ([&]() { QJsonArray array; for (const auto &item : *thingClasses) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
+    return object;
+}
+
+class ThingDescriptor {
+public:
+    // wire: 'description' (required)
+    QString description{};
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'thingId' (optional, required)
+    std::optional<QUuid> thingId;
+    // wire: 'params' (required)
+    ParamList params{};
+    // wire: 'thingClassId' (required)
+    QUuid thingClassId{};
+    // wire: 'title' (required)
+    QString title{};
+
+    static ThingDescriptor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ThingDescriptor ThingDescriptor::fromJson(const QJsonObject &object) {
     ThingDescriptor value;
@@ -13768,7 +11720,7 @@ inline ThingDescriptor ThingDescriptor::fromJson(const QJsonObject &object) {
         value.thingId = QUuid((object.value(QStringLiteral("thingId"))).toString());
     }
     if (object.contains(QStringLiteral("params"))) {
-        value.params = ([&]() { QList<QSharedPointer<Param>> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(QSharedPointer<Param>::create(Param::fromJson((item).toObject()))); } return list; }());
+        value.params = ([&]() { QList<Param> list; for (const QJsonValue &item : (object.value(QStringLiteral("params"))).toArray()) { list.append(Param::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("thingClassId"))) {
         value.thingClassId = QUuid((object.value(QStringLiteral("thingClassId"))).toString());
@@ -13786,33 +11738,98 @@ inline QJsonObject ThingDescriptor::toJson() const {
     if (thingId.has_value()) {
         object.insert(QStringLiteral("thingId"), QJsonValue((*thingId).toString()));
     }
-    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("params"), ([&]() { QJsonArray array; for (const auto &item : params) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("thingClassId"), QJsonValue((thingClassId).toString()));
     object.insert(QStringLiteral("title"), QJsonValue(title));
     return object;
 }
 
-inline TimeDescriptor TimeDescriptor::fromJson(const QJsonObject &object) {
-    TimeDescriptor value;
-    if (object.contains(QStringLiteral("calendarItems"))) {
-        value.calendarItems = ([&]() { QList<QSharedPointer<CalendarItem>> list; for (const QJsonValue &item : (object.value(QStringLiteral("calendarItems"))).toArray()) { list.append(QSharedPointer<CalendarItem>::create(CalendarItem::fromJson((item).toObject()))); } return list; }());
+using ThingDescriptors = QList<ThingDescriptor>;
+
+class IntegrationsDiscoverThingsResponse {
+public:
+    // wire: 'displayMessage' (optional)
+    std::optional<QString> displayMessage;
+    // wire: 'thingDescriptors' (optional)
+    std::optional<ThingDescriptors> thingDescriptors;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsDiscoverThingsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsDiscoverThingsResponse IntegrationsDiscoverThingsResponse::fromJson(const QJsonObject &object) {
+    IntegrationsDiscoverThingsResponse value;
+    if (object.contains(QStringLiteral("displayMessage"))) {
+        value.displayMessage = (object.value(QStringLiteral("displayMessage"))).toString();
     }
-    if (object.contains(QStringLiteral("timeEventItems"))) {
-        value.timeEventItems = ([&]() { QList<QSharedPointer<TimeEventItem>> list; for (const QJsonValue &item : (object.value(QStringLiteral("timeEventItems"))).toArray()) { list.append(QSharedPointer<TimeEventItem>::create(TimeEventItem::fromJson((item).toObject()))); } return list; }());
+    if (object.contains(QStringLiteral("thingDescriptors"))) {
+        value.thingDescriptors = ([&]() { QList<ThingDescriptor> list; for (const QJsonValue &item : (object.value(QStringLiteral("thingDescriptors"))).toArray()) { list.append(ThingDescriptor::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingError"))) {
+        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
     }
     return value;
 }
 
-inline QJsonObject TimeDescriptor::toJson() const {
+inline QJsonObject IntegrationsDiscoverThingsResponse::toJson() const {
     QJsonObject object;
-    if (calendarItems.has_value()) {
-        object.insert(QStringLiteral("calendarItems"), ([&]() { QJsonArray array; for (const auto &item : *calendarItems) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    if (displayMessage.has_value()) {
+        object.insert(QStringLiteral("displayMessage"), QJsonValue(*displayMessage));
     }
-    if (timeEventItems.has_value()) {
-        object.insert(QStringLiteral("timeEventItems"), ([&]() { QJsonArray array; for (const auto &item : *timeEventItems) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    if (thingDescriptors.has_value()) {
+        object.insert(QStringLiteral("thingDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *thingDescriptors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
+    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
     return object;
 }
+
+using Things = QList<Thing>;
+
+class IntegrationsGetThingsResponse {
+public:
+    // wire: 'things' (optional)
+    std::optional<Things> things;
+    // wire: 'thingError' (field)
+    ThingError thingError{};
+
+    static IntegrationsGetThingsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetThingsResponse IntegrationsGetThingsResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetThingsResponse value;
+    if (object.contains(QStringLiteral("things"))) {
+        value.things = ([&]() { QList<Thing> list; for (const QJsonValue &item : (object.value(QStringLiteral("things"))).toArray()) { list.append(Thing::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("thingError"))) {
+        value.thingError = parseThingError(object.value(QStringLiteral("thingError")));
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetThingsResponse::toJson() const {
+    QJsonObject object;
+    if (things.has_value()) {
+        object.insert(QStringLiteral("things"), ([&]() { QJsonArray array; for (const auto &item : *things) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("thingError"), QJsonValue(toString(thingError)));
+    return object;
+}
+
+class TimeEventItem {
+public:
+    // wire: 'datetime' (optional)
+    std::optional<quint64> datetime;
+    // wire: 'repeating' (optional)
+    std::optional<RepeatingOption> repeating;
+    // wire: 'time' (optional)
+    std::optional<qint64> time;
+
+    static TimeEventItem fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TimeEventItem TimeEventItem::fromJson(const QJsonObject &object) {
     TimeEventItem value;
@@ -13820,7 +11837,7 @@ inline TimeEventItem TimeEventItem::fromJson(const QJsonObject &object) {
         value.datetime = static_cast<quint64>((object.value(QStringLiteral("datetime"))).toInteger());
     }
     if (object.contains(QStringLiteral("repeating"))) {
-        value.repeating = QSharedPointer<RepeatingOption>::create(RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject()));
+        value.repeating = RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject());
     }
     if (object.contains(QStringLiteral("time"))) {
         value.time = static_cast<qint64>((object.value(QStringLiteral("time"))).toInteger());
@@ -13834,13 +11851,422 @@ inline QJsonObject TimeEventItem::toJson() const {
         object.insert(QStringLiteral("datetime"), QJsonValue(static_cast<qint64>(*datetime)));
     }
     if (repeating.has_value()) {
-        object.insert(QStringLiteral("repeating"), ((*repeating) ? QJsonValue((*repeating)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("repeating"), QJsonValue((*repeating).toJson()));
     }
     if (time.has_value()) {
         object.insert(QStringLiteral("time"), QJsonValue(static_cast<qint64>(*time)));
     }
     return object;
 }
+
+using TimeEventItems = QList<TimeEventItem>;
+
+class TimeDescriptor {
+public:
+    // wire: 'calendarItems' (optional)
+    std::optional<CalendarItems> calendarItems;
+    // wire: 'timeEventItems' (optional)
+    std::optional<TimeEventItems> timeEventItems;
+
+    static TimeDescriptor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline TimeDescriptor TimeDescriptor::fromJson(const QJsonObject &object) {
+    TimeDescriptor value;
+    if (object.contains(QStringLiteral("calendarItems"))) {
+        value.calendarItems = ([&]() { QList<CalendarItem> list; for (const QJsonValue &item : (object.value(QStringLiteral("calendarItems"))).toArray()) { list.append(CalendarItem::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("timeEventItems"))) {
+        value.timeEventItems = ([&]() { QList<TimeEventItem> list; for (const QJsonValue &item : (object.value(QStringLiteral("timeEventItems"))).toArray()) { list.append(TimeEventItem::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject TimeDescriptor::toJson() const {
+    QJsonObject object;
+    if (calendarItems.has_value()) {
+        object.insert(QStringLiteral("calendarItems"), ([&]() { QJsonArray array; for (const auto &item : *calendarItems) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (timeEventItems.has_value()) {
+        object.insert(QStringLiteral("timeEventItems"), ([&]() { QJsonArray array; for (const auto &item : *timeEventItems) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class Rule {
+public:
+    // wire: 'actions' (field)
+    RuleActions actions{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'enabled' (optional)
+    std::optional<bool> enabled;
+    // wire: 'eventDescriptors' (optional)
+    std::optional<EventDescriptors> eventDescriptors;
+    // wire: 'executable' (optional)
+    std::optional<bool> executable;
+    // wire: 'exitActions' (optional)
+    std::optional<RuleActions> exitActions;
+    // wire: 'stateEvaluator' (optional)
+    std::optional<StateEvaluator> stateEvaluator;
+    // wire: 'timeDescriptor' (optional)
+    std::optional<TimeDescriptor> timeDescriptor;
+    // wire: 'active' (required)
+    bool active{};
+    // wire: 'id' (required)
+    QUuid id{};
+
+    static Rule fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline Rule Rule::fromJson(const QJsonObject &object) {
+    Rule value;
+    if (object.contains(QStringLiteral("actions"))) {
+        value.actions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("enabled"))) {
+        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
+    }
+    if (object.contains(QStringLiteral("eventDescriptors"))) {
+        value.eventDescriptors = ([&]() { QList<EventDescriptor> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(EventDescriptor::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("executable"))) {
+        value.executable = (object.value(QStringLiteral("executable"))).toBool();
+    }
+    if (object.contains(QStringLiteral("exitActions"))) {
+        value.exitActions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("stateEvaluator"))) {
+        value.stateEvaluator = StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject());
+    }
+    if (object.contains(QStringLiteral("timeDescriptor"))) {
+        value.timeDescriptor = TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject());
+    }
+    if (object.contains(QStringLiteral("active"))) {
+        value.active = (object.value(QStringLiteral("active"))).toBool();
+    }
+    if (object.contains(QStringLiteral("id"))) {
+        value.id = QUuid((object.value(QStringLiteral("id"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject Rule::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    if (enabled.has_value()) {
+        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
+    }
+    if (eventDescriptors.has_value()) {
+        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (executable.has_value()) {
+        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
+    }
+    if (exitActions.has_value()) {
+        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (stateEvaluator.has_value()) {
+        object.insert(QStringLiteral("stateEvaluator"), QJsonValue((*stateEvaluator).toJson()));
+    }
+    if (timeDescriptor.has_value()) {
+        object.insert(QStringLiteral("timeDescriptor"), QJsonValue((*timeDescriptor).toJson()));
+    }
+    object.insert(QStringLiteral("active"), QJsonValue(active));
+    object.insert(QStringLiteral("id"), QJsonValue((id).toString()));
+    return object;
+}
+
+using Rules = QList<Rule>;
+
+class RulesAddRuleParams {
+public:
+    // wire: 'actions' (field)
+    QList<RuleAction> actions{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'enabled' (optional)
+    std::optional<bool> enabled;
+    // wire: 'eventDescriptors' (optional)
+    std::optional<QList<EventDescriptor>> eventDescriptors;
+    // wire: 'executable' (optional)
+    std::optional<bool> executable;
+    // wire: 'exitActions' (optional)
+    std::optional<QList<RuleAction>> exitActions;
+    // wire: 'stateEvaluator' (optional)
+    std::optional<StateEvaluator> stateEvaluator;
+    // wire: 'timeDescriptor' (optional)
+    std::optional<TimeDescriptor> timeDescriptor;
+
+    static RulesAddRuleParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesAddRuleParams RulesAddRuleParams::fromJson(const QJsonObject &object) {
+    RulesAddRuleParams value;
+    if (object.contains(QStringLiteral("actions"))) {
+        value.actions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("enabled"))) {
+        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
+    }
+    if (object.contains(QStringLiteral("eventDescriptors"))) {
+        value.eventDescriptors = ([&]() { QList<EventDescriptor> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(EventDescriptor::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("executable"))) {
+        value.executable = (object.value(QStringLiteral("executable"))).toBool();
+    }
+    if (object.contains(QStringLiteral("exitActions"))) {
+        value.exitActions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("stateEvaluator"))) {
+        value.stateEvaluator = StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject());
+    }
+    if (object.contains(QStringLiteral("timeDescriptor"))) {
+        value.timeDescriptor = TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject RulesAddRuleParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    if (enabled.has_value()) {
+        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
+    }
+    if (eventDescriptors.has_value()) {
+        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (executable.has_value()) {
+        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
+    }
+    if (exitActions.has_value()) {
+        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (stateEvaluator.has_value()) {
+        object.insert(QStringLiteral("stateEvaluator"), QJsonValue((*stateEvaluator).toJson()));
+    }
+    if (timeDescriptor.has_value()) {
+        object.insert(QStringLiteral("timeDescriptor"), QJsonValue((*timeDescriptor).toJson()));
+    }
+    return object;
+}
+
+class RulesEditRuleParams {
+public:
+    // wire: 'actions' (field)
+    QList<RuleAction> actions{};
+    // wire: 'name' (field)
+    QString name{};
+    // wire: 'enabled' (optional)
+    std::optional<bool> enabled;
+    // wire: 'eventDescriptors' (optional)
+    std::optional<QList<EventDescriptor>> eventDescriptors;
+    // wire: 'executable' (optional)
+    std::optional<bool> executable;
+    // wire: 'exitActions' (optional)
+    std::optional<QList<RuleAction>> exitActions;
+    // wire: 'stateEvaluator' (optional)
+    std::optional<StateEvaluator> stateEvaluator;
+    // wire: 'timeDescriptor' (optional)
+    std::optional<TimeDescriptor> timeDescriptor;
+    // wire: 'ruleId' (field)
+    QUuid ruleId{};
+
+    static RulesEditRuleParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesEditRuleParams RulesEditRuleParams::fromJson(const QJsonObject &object) {
+    RulesEditRuleParams value;
+    if (object.contains(QStringLiteral("actions"))) {
+        value.actions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("actions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("name"))) {
+        value.name = (object.value(QStringLiteral("name"))).toString();
+    }
+    if (object.contains(QStringLiteral("enabled"))) {
+        value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
+    }
+    if (object.contains(QStringLiteral("eventDescriptors"))) {
+        value.eventDescriptors = ([&]() { QList<EventDescriptor> list; for (const QJsonValue &item : (object.value(QStringLiteral("eventDescriptors"))).toArray()) { list.append(EventDescriptor::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("executable"))) {
+        value.executable = (object.value(QStringLiteral("executable"))).toBool();
+    }
+    if (object.contains(QStringLiteral("exitActions"))) {
+        value.exitActions = ([&]() { QList<RuleAction> list; for (const QJsonValue &item : (object.value(QStringLiteral("exitActions"))).toArray()) { list.append(RuleAction::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("stateEvaluator"))) {
+        value.stateEvaluator = StateEvaluator::fromJson((object.value(QStringLiteral("stateEvaluator"))).toObject());
+    }
+    if (object.contains(QStringLiteral("timeDescriptor"))) {
+        value.timeDescriptor = TimeDescriptor::fromJson((object.value(QStringLiteral("timeDescriptor"))).toObject());
+    }
+    if (object.contains(QStringLiteral("ruleId"))) {
+        value.ruleId = QUuid((object.value(QStringLiteral("ruleId"))).toString());
+    }
+    return value;
+}
+
+inline QJsonObject RulesEditRuleParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("actions"), ([&]() { QJsonArray array; for (const auto &item : actions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("name"), QJsonValue(name));
+    if (enabled.has_value()) {
+        object.insert(QStringLiteral("enabled"), QJsonValue(*enabled));
+    }
+    if (eventDescriptors.has_value()) {
+        object.insert(QStringLiteral("eventDescriptors"), ([&]() { QJsonArray array; for (const auto &item : *eventDescriptors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (executable.has_value()) {
+        object.insert(QStringLiteral("executable"), QJsonValue(*executable));
+    }
+    if (exitActions.has_value()) {
+        object.insert(QStringLiteral("exitActions"), ([&]() { QJsonArray array; for (const auto &item : *exitActions) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (stateEvaluator.has_value()) {
+        object.insert(QStringLiteral("stateEvaluator"), QJsonValue((*stateEvaluator).toJson()));
+    }
+    if (timeDescriptor.has_value()) {
+        object.insert(QStringLiteral("timeDescriptor"), QJsonValue((*timeDescriptor).toJson()));
+    }
+    object.insert(QStringLiteral("ruleId"), QJsonValue((ruleId).toString()));
+    return object;
+}
+
+class RulesEditRuleResponse {
+public:
+    // wire: 'rule' (optional)
+    std::optional<Rule> rule;
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesEditRuleResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesEditRuleResponse RulesEditRuleResponse::fromJson(const QJsonObject &object) {
+    RulesEditRuleResponse value;
+    if (object.contains(QStringLiteral("rule"))) {
+        value.rule = Rule::fromJson((object.value(QStringLiteral("rule"))).toObject());
+    }
+    if (object.contains(QStringLiteral("ruleError"))) {
+        value.ruleError = parseRuleError(object.value(QStringLiteral("ruleError")));
+    }
+    return value;
+}
+
+inline QJsonObject RulesEditRuleResponse::toJson() const {
+    QJsonObject object;
+    if (rule.has_value()) {
+        object.insert(QStringLiteral("rule"), QJsonValue((*rule).toJson()));
+    }
+    object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
+    return object;
+}
+
+class RulesGetRuleDetailsResponse {
+public:
+    // wire: 'rule' (optional)
+    std::optional<Rule> rule;
+    // wire: 'ruleError' (field)
+    RuleError ruleError{};
+
+    static RulesGetRuleDetailsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesGetRuleDetailsResponse RulesGetRuleDetailsResponse::fromJson(const QJsonObject &object) {
+    RulesGetRuleDetailsResponse value;
+    if (object.contains(QStringLiteral("rule"))) {
+        value.rule = Rule::fromJson((object.value(QStringLiteral("rule"))).toObject());
+    }
+    if (object.contains(QStringLiteral("ruleError"))) {
+        value.ruleError = parseRuleError(object.value(QStringLiteral("ruleError")));
+    }
+    return value;
+}
+
+inline QJsonObject RulesGetRuleDetailsResponse::toJson() const {
+    QJsonObject object;
+    if (rule.has_value()) {
+        object.insert(QStringLiteral("rule"), QJsonValue((*rule).toJson()));
+    }
+    object.insert(QStringLiteral("ruleError"), QJsonValue(toString(ruleError)));
+    return object;
+}
+
+class RulesRuleAddedNotificationParams {
+public:
+    // wire: 'rule' (field)
+    Rule rule{};
+
+    static RulesRuleAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesRuleAddedNotificationParams RulesRuleAddedNotificationParams::fromJson(const QJsonObject &object) {
+    RulesRuleAddedNotificationParams value;
+    if (object.contains(QStringLiteral("rule"))) {
+        value.rule = Rule::fromJson((object.value(QStringLiteral("rule"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject RulesRuleAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("rule"), QJsonValue((rule).toJson()));
+    return object;
+}
+
+class RulesRuleConfigurationChangedNotificationParams {
+public:
+    // wire: 'rule' (field)
+    Rule rule{};
+
+    static RulesRuleConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline RulesRuleConfigurationChangedNotificationParams RulesRuleConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    RulesRuleConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("rule"))) {
+        value.rule = Rule::fromJson((object.value(QStringLiteral("rule"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject RulesRuleConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("rule"), QJsonValue((rule).toJson()));
+    return object;
+}
+
+class TokenInfo {
+public:
+    // wire: 'creationTime' (required)
+    quint64 creationTime{};
+    // wire: 'deviceName' (required)
+    QString deviceName{};
+    // wire: 'id' (required)
+    QUuid id{};
+    // wire: 'username' (required)
+    QString username{};
+
+    static TokenInfo fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TokenInfo TokenInfo::fromJson(const QJsonObject &object) {
     TokenInfo value;
@@ -13867,6 +12293,27 @@ inline QJsonObject TokenInfo::toJson() const {
     object.insert(QStringLiteral("username"), QJsonValue(username));
     return object;
 }
+
+using TokenInfoList = QList<TokenInfo>;
+
+class TunnelProxyServerConfiguration {
+public:
+    // wire: 'address' (field)
+    QString address{};
+    // wire: 'authenticationEnabled' (field)
+    bool authenticationEnabled{};
+    // wire: 'id' (field)
+    QString id{};
+    // wire: 'ignoreSslErrors' (field)
+    bool ignoreSslErrors{};
+    // wire: 'port' (field)
+    quint64 port{};
+    // wire: 'sslEnabled' (field)
+    bool sslEnabled{};
+
+    static TunnelProxyServerConfiguration fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline TunnelProxyServerConfiguration TunnelProxyServerConfiguration::fromJson(const QJsonObject &object) {
     TunnelProxyServerConfiguration value;
@@ -13902,6 +12349,69 @@ inline QJsonObject TunnelProxyServerConfiguration::toJson() const {
     return object;
 }
 
+class ConfigurationSetTunnelProxyServerConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    TunnelProxyServerConfiguration configuration{};
+
+    static ConfigurationSetTunnelProxyServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetTunnelProxyServerConfigurationParams ConfigurationSetTunnelProxyServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetTunnelProxyServerConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = TunnelProxyServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetTunnelProxyServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), QJsonValue((configuration).toJson()));
+    return object;
+}
+
+class ConfigurationTunnelProxyServerConfigurationChangedNotificationParams {
+public:
+    // wire: 'tunnelProxyServerConfiguration' (field)
+    TunnelProxyServerConfiguration tunnelProxyServerConfiguration{};
+
+    static ConfigurationTunnelProxyServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationTunnelProxyServerConfigurationChangedNotificationParams ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationTunnelProxyServerConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("tunnelProxyServerConfiguration"))) {
+        value.tunnelProxyServerConfiguration = TunnelProxyServerConfiguration::fromJson((object.value(QStringLiteral("tunnelProxyServerConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("tunnelProxyServerConfiguration"), QJsonValue((tunnelProxyServerConfiguration).toJson()));
+    return object;
+}
+
+class UserInfo {
+public:
+    // wire: 'allowedThingIds' (required)
+    QList<QUuid> allowedThingIds{};
+    // wire: 'displayName' (required)
+    QString displayName{};
+    // wire: 'email' (required)
+    QString email{};
+    // wire: 'scopes' (required)
+    PermissionScopes scopes{};
+    // wire: 'username' (required)
+    QString username{};
+
+    static UserInfo fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UserInfo UserInfo::fromJson(const QJsonObject &object) {
     UserInfo value;
     if (object.contains(QStringLiteral("allowedThingIds"))) {
@@ -13932,6 +12442,17 @@ inline QJsonObject UserInfo::toJson() const {
     return object;
 }
 
+using UserInfoList = QList<UserInfo>;
+
+class UsersChangePasswordParams {
+public:
+    // wire: 'newPassword' (field)
+    QString newPassword{};
+
+    static UsersChangePasswordParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersChangePasswordParams UsersChangePasswordParams::fromJson(const QJsonObject &object) {
     UsersChangePasswordParams value;
     if (object.contains(QStringLiteral("newPassword"))) {
@@ -13946,6 +12467,15 @@ inline QJsonObject UsersChangePasswordParams::toJson() const {
     return object;
 }
 
+class UsersChangePasswordResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersChangePasswordResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersChangePasswordResponse UsersChangePasswordResponse::fromJson(const QJsonObject &object) {
     UsersChangePasswordResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -13959,6 +12489,17 @@ inline QJsonObject UsersChangePasswordResponse::toJson() const {
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     return object;
 }
+
+class UsersChangeUserPasswordParams {
+public:
+    // wire: 'newPassword' (field)
+    QString newPassword{};
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersChangeUserPasswordParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersChangeUserPasswordParams UsersChangeUserPasswordParams::fromJson(const QJsonObject &object) {
     UsersChangeUserPasswordParams value;
@@ -13978,6 +12519,15 @@ inline QJsonObject UsersChangeUserPasswordParams::toJson() const {
     return object;
 }
 
+class UsersChangeUserPasswordResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersChangeUserPasswordResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersChangeUserPasswordResponse UsersChangeUserPasswordResponse::fromJson(const QJsonObject &object) {
     UsersChangeUserPasswordResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -13991,6 +12541,25 @@ inline QJsonObject UsersChangeUserPasswordResponse::toJson() const {
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     return object;
 }
+
+class UsersCreateUserParams {
+public:
+    // wire: 'allowedThingIds' (optional)
+    std::optional<QList<QUuid>> allowedThingIds;
+    // wire: 'displayName' (optional)
+    std::optional<QString> displayName;
+    // wire: 'email' (optional)
+    std::optional<QString> email;
+    // wire: 'scopes' (optional)
+    std::optional<PermissionScopes> scopes;
+    // wire: 'password' (field)
+    QString password{};
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersCreateUserParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersCreateUserParams UsersCreateUserParams::fromJson(const QJsonObject &object) {
     UsersCreateUserParams value;
@@ -14034,6 +12603,15 @@ inline QJsonObject UsersCreateUserParams::toJson() const {
     return object;
 }
 
+class UsersCreateUserResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersCreateUserResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersCreateUserResponse UsersCreateUserResponse::fromJson(const QJsonObject &object) {
     UsersCreateUserResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -14048,6 +12626,13 @@ inline QJsonObject UsersCreateUserResponse::toJson() const {
     return object;
 }
 
+class UsersGetTokensParams {
+public:
+
+    static UsersGetTokensParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersGetTokensParams UsersGetTokensParams::fromJson(const QJsonObject &object) {
     UsersGetTokensParams value;
     return value;
@@ -14058,13 +12643,24 @@ inline QJsonObject UsersGetTokensParams::toJson() const {
     return object;
 }
 
+class UsersGetTokensResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+    // wire: 'tokenInfoList' (optional)
+    std::optional<TokenInfoList> tokenInfoList;
+
+    static UsersGetTokensResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersGetTokensResponse UsersGetTokensResponse::fromJson(const QJsonObject &object) {
     UsersGetTokensResponse value;
     if (object.contains(QStringLiteral("error"))) {
         value.error = parseUserError(object.value(QStringLiteral("error")));
     }
     if (object.contains(QStringLiteral("tokenInfoList"))) {
-        value.tokenInfoList = ([&]() { QList<QSharedPointer<TokenInfo>> list; for (const QJsonValue &item : (object.value(QStringLiteral("tokenInfoList"))).toArray()) { list.append(QSharedPointer<TokenInfo>::create(TokenInfo::fromJson((item).toObject()))); } return list; }());
+        value.tokenInfoList = ([&]() { QList<TokenInfo> list; for (const QJsonValue &item : (object.value(QStringLiteral("tokenInfoList"))).toArray()) { list.append(TokenInfo::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
@@ -14073,10 +12669,17 @@ inline QJsonObject UsersGetTokensResponse::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     if (tokenInfoList.has_value()) {
-        object.insert(QStringLiteral("tokenInfoList"), ([&]() { QJsonArray array; for (const auto &item : *tokenInfoList) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("tokenInfoList"), ([&]() { QJsonArray array; for (const auto &item : *tokenInfoList) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     return object;
 }
+
+class UsersGetUserInfoParams {
+public:
+
+    static UsersGetUserInfoParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersGetUserInfoParams UsersGetUserInfoParams::fromJson(const QJsonObject &object) {
     UsersGetUserInfoParams value;
@@ -14088,13 +12691,24 @@ inline QJsonObject UsersGetUserInfoParams::toJson() const {
     return object;
 }
 
+class UsersGetUserInfoResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+    // wire: 'userInfo' (optional)
+    std::optional<UserInfo> userInfo;
+
+    static UsersGetUserInfoResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersGetUserInfoResponse UsersGetUserInfoResponse::fromJson(const QJsonObject &object) {
     UsersGetUserInfoResponse value;
     if (object.contains(QStringLiteral("error"))) {
         value.error = parseUserError(object.value(QStringLiteral("error")));
     }
     if (object.contains(QStringLiteral("userInfo"))) {
-        value.userInfo = QSharedPointer<UserInfo>::create(UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject()));
+        value.userInfo = UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject());
     }
     return value;
 }
@@ -14103,10 +12717,19 @@ inline QJsonObject UsersGetUserInfoResponse::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     if (userInfo.has_value()) {
-        object.insert(QStringLiteral("userInfo"), ((*userInfo) ? QJsonValue((*userInfo)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("userInfo"), QJsonValue((*userInfo).toJson()));
     }
     return object;
 }
+
+class UsersGetUserTokensParams {
+public:
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersGetUserTokensParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersGetUserTokensParams UsersGetUserTokensParams::fromJson(const QJsonObject &object) {
     UsersGetUserTokensParams value;
@@ -14122,13 +12745,24 @@ inline QJsonObject UsersGetUserTokensParams::toJson() const {
     return object;
 }
 
+class UsersGetUserTokensResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+    // wire: 'tokenInfoList' (optional)
+    std::optional<TokenInfoList> tokenInfoList;
+
+    static UsersGetUserTokensResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersGetUserTokensResponse UsersGetUserTokensResponse::fromJson(const QJsonObject &object) {
     UsersGetUserTokensResponse value;
     if (object.contains(QStringLiteral("error"))) {
         value.error = parseUserError(object.value(QStringLiteral("error")));
     }
     if (object.contains(QStringLiteral("tokenInfoList"))) {
-        value.tokenInfoList = ([&]() { QList<QSharedPointer<TokenInfo>> list; for (const QJsonValue &item : (object.value(QStringLiteral("tokenInfoList"))).toArray()) { list.append(QSharedPointer<TokenInfo>::create(TokenInfo::fromJson((item).toObject()))); } return list; }());
+        value.tokenInfoList = ([&]() { QList<TokenInfo> list; for (const QJsonValue &item : (object.value(QStringLiteral("tokenInfoList"))).toArray()) { list.append(TokenInfo::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
@@ -14137,10 +12771,17 @@ inline QJsonObject UsersGetUserTokensResponse::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     if (tokenInfoList.has_value()) {
-        object.insert(QStringLiteral("tokenInfoList"), ([&]() { QJsonArray array; for (const auto &item : *tokenInfoList) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+        object.insert(QStringLiteral("tokenInfoList"), ([&]() { QJsonArray array; for (const auto &item : *tokenInfoList) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     }
     return object;
 }
+
+class UsersGetUsersParams {
+public:
+
+    static UsersGetUsersParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersGetUsersParams UsersGetUsersParams::fromJson(const QJsonObject &object) {
     UsersGetUsersParams value;
@@ -14152,19 +12793,41 @@ inline QJsonObject UsersGetUsersParams::toJson() const {
     return object;
 }
 
+class UsersGetUsersResponse {
+public:
+    // wire: 'users' (field)
+    UserInfoList users{};
+
+    static UsersGetUsersResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersGetUsersResponse UsersGetUsersResponse::fromJson(const QJsonObject &object) {
     UsersGetUsersResponse value;
     if (object.contains(QStringLiteral("users"))) {
-        value.users = ([&]() { QList<QSharedPointer<UserInfo>> list; for (const QJsonValue &item : (object.value(QStringLiteral("users"))).toArray()) { list.append(QSharedPointer<UserInfo>::create(UserInfo::fromJson((item).toObject()))); } return list; }());
+        value.users = ([&]() { QList<UserInfo> list; for (const QJsonValue &item : (object.value(QStringLiteral("users"))).toArray()) { list.append(UserInfo::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject UsersGetUsersResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("users"), ([&]() { QJsonArray array; for (const auto &item : users) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("users"), ([&]() { QJsonArray array; for (const auto &item : users) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class UsersPushButtonAuthFinishedNotificationParams {
+public:
+    // wire: 'token' (optional)
+    std::optional<QString> token;
+    // wire: 'success' (field)
+    bool success{};
+    // wire: 'transactionId' (field)
+    qint64 transactionId{};
+
+    static UsersPushButtonAuthFinishedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersPushButtonAuthFinishedNotificationParams UsersPushButtonAuthFinishedNotificationParams::fromJson(const QJsonObject &object) {
     UsersPushButtonAuthFinishedNotificationParams value;
@@ -14190,6 +12853,15 @@ inline QJsonObject UsersPushButtonAuthFinishedNotificationParams::toJson() const
     return object;
 }
 
+class UsersRemoveTokenParams {
+public:
+    // wire: 'tokenId' (field)
+    QUuid tokenId{};
+
+    static UsersRemoveTokenParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersRemoveTokenParams UsersRemoveTokenParams::fromJson(const QJsonObject &object) {
     UsersRemoveTokenParams value;
     if (object.contains(QStringLiteral("tokenId"))) {
@@ -14203,6 +12875,15 @@ inline QJsonObject UsersRemoveTokenParams::toJson() const {
     object.insert(QStringLiteral("tokenId"), QJsonValue((tokenId).toString()));
     return object;
 }
+
+class UsersRemoveTokenResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersRemoveTokenResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersRemoveTokenResponse UsersRemoveTokenResponse::fromJson(const QJsonObject &object) {
     UsersRemoveTokenResponse value;
@@ -14218,6 +12899,15 @@ inline QJsonObject UsersRemoveTokenResponse::toJson() const {
     return object;
 }
 
+class UsersRemoveUserParams {
+public:
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersRemoveUserParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersRemoveUserParams UsersRemoveUserParams::fromJson(const QJsonObject &object) {
     UsersRemoveUserParams value;
     if (object.contains(QStringLiteral("username"))) {
@@ -14232,6 +12922,15 @@ inline QJsonObject UsersRemoveUserParams::toJson() const {
     return object;
 }
 
+class UsersRemoveUserResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersRemoveUserResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersRemoveUserResponse UsersRemoveUserResponse::fromJson(const QJsonObject &object) {
     UsersRemoveUserResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -14245,6 +12944,19 @@ inline QJsonObject UsersRemoveUserResponse::toJson() const {
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     return object;
 }
+
+class UsersSetUserInfoParams {
+public:
+    // wire: 'displayName' (optional)
+    std::optional<QString> displayName;
+    // wire: 'email' (optional)
+    std::optional<QString> email;
+    // wire: 'username' (optional)
+    std::optional<QString> username;
+
+    static UsersSetUserInfoParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersSetUserInfoParams UsersSetUserInfoParams::fromJson(const QJsonObject &object) {
     UsersSetUserInfoParams value;
@@ -14274,6 +12986,15 @@ inline QJsonObject UsersSetUserInfoParams::toJson() const {
     return object;
 }
 
+class UsersSetUserInfoResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersSetUserInfoResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersSetUserInfoResponse UsersSetUserInfoResponse::fromJson(const QJsonObject &object) {
     UsersSetUserInfoResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -14287,6 +13008,19 @@ inline QJsonObject UsersSetUserInfoResponse::toJson() const {
     object.insert(QStringLiteral("error"), QJsonValue(toString(error)));
     return object;
 }
+
+class UsersSetUserScopesParams {
+public:
+    // wire: 'allowedThingIds' (optional)
+    std::optional<QList<QUuid>> allowedThingIds;
+    // wire: 'scopes' (field)
+    PermissionScopes scopes{};
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersSetUserScopesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersSetUserScopesParams UsersSetUserScopesParams::fromJson(const QJsonObject &object) {
     UsersSetUserScopesParams value;
@@ -14312,6 +13046,15 @@ inline QJsonObject UsersSetUserScopesParams::toJson() const {
     return object;
 }
 
+class UsersSetUserScopesResponse {
+public:
+    // wire: 'error' (field)
+    UserError error{};
+
+    static UsersSetUserScopesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersSetUserScopesResponse UsersSetUserScopesResponse::fromJson(const QJsonObject &object) {
     UsersSetUserScopesResponse value;
     if (object.contains(QStringLiteral("error"))) {
@@ -14326,33 +13069,60 @@ inline QJsonObject UsersSetUserScopesResponse::toJson() const {
     return object;
 }
 
+class UsersUserAddedNotificationParams {
+public:
+    // wire: 'userInfo' (field)
+    UserInfo userInfo{};
+
+    static UsersUserAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline UsersUserAddedNotificationParams UsersUserAddedNotificationParams::fromJson(const QJsonObject &object) {
     UsersUserAddedNotificationParams value;
     if (object.contains(QStringLiteral("userInfo"))) {
-        value.userInfo = QSharedPointer<UserInfo>::create(UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject()));
+        value.userInfo = UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject UsersUserAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("userInfo"), ((userInfo) ? QJsonValue((userInfo)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("userInfo"), QJsonValue((userInfo).toJson()));
     return object;
 }
+
+class UsersUserChangedNotificationParams {
+public:
+    // wire: 'userInfo' (field)
+    UserInfo userInfo{};
+
+    static UsersUserChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersUserChangedNotificationParams UsersUserChangedNotificationParams::fromJson(const QJsonObject &object) {
     UsersUserChangedNotificationParams value;
     if (object.contains(QStringLiteral("userInfo"))) {
-        value.userInfo = QSharedPointer<UserInfo>::create(UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject()));
+        value.userInfo = UserInfo::fromJson((object.value(QStringLiteral("userInfo"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject UsersUserChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("userInfo"), ((userInfo) ? QJsonValue((userInfo)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("userInfo"), QJsonValue((userInfo).toJson()));
     return object;
 }
+
+class UsersUserRemovedNotificationParams {
+public:
+    // wire: 'username' (field)
+    QString username{};
+
+    static UsersUserRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline UsersUserRemovedNotificationParams UsersUserRemovedNotificationParams::fromJson(const QJsonObject &object) {
     UsersUserRemovedNotificationParams value;
@@ -14367,6 +13137,19 @@ inline QJsonObject UsersUserRemovedNotificationParams::toJson() const {
     object.insert(QStringLiteral("username"), QJsonValue(username));
     return object;
 }
+
+class Vendor {
+public:
+    // wire: 'displayName' (field)
+    QString displayName{};
+    // wire: 'id' (field)
+    QUuid id{};
+    // wire: 'name' (field)
+    QString name{};
+
+    static Vendor fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline Vendor Vendor::fromJson(const QJsonObject &object) {
     Vendor value;
@@ -14389,6 +13172,50 @@ inline QJsonObject Vendor::toJson() const {
     object.insert(QStringLiteral("name"), QJsonValue(name));
     return object;
 }
+
+using Vendors = QList<Vendor>;
+
+class IntegrationsGetVendorsResponse {
+public:
+    // wire: 'vendors' (field)
+    Vendors vendors{};
+
+    static IntegrationsGetVendorsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline IntegrationsGetVendorsResponse IntegrationsGetVendorsResponse::fromJson(const QJsonObject &object) {
+    IntegrationsGetVendorsResponse value;
+    if (object.contains(QStringLiteral("vendors"))) {
+        value.vendors = ([&]() { QList<Vendor> list; for (const QJsonValue &item : (object.value(QStringLiteral("vendors"))).toArray()) { list.append(Vendor::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject IntegrationsGetVendorsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("vendors"), ([&]() { QJsonArray array; for (const auto &item : vendors) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class WebServerConfiguration {
+public:
+    // wire: 'address' (field)
+    QString address{};
+    // wire: 'authenticationEnabled' (field)
+    bool authenticationEnabled{};
+    // wire: 'id' (field)
+    QString id{};
+    // wire: 'port' (field)
+    quint64 port{};
+    // wire: 'publicFolder' (field)
+    QString publicFolder{};
+    // wire: 'sslEnabled' (field)
+    bool sslEnabled{};
+
+    static WebServerConfiguration fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline WebServerConfiguration WebServerConfiguration::fromJson(const QJsonObject &object) {
     WebServerConfiguration value;
@@ -14423,6 +13250,120 @@ inline QJsonObject WebServerConfiguration::toJson() const {
     object.insert(QStringLiteral("sslEnabled"), QJsonValue(sslEnabled));
     return object;
 }
+
+class ConfigurationGetConfigurationsResponse {
+public:
+    // wire: 'basicConfiguration' (field)
+    ConfigurationGetConfigurationsResponseBasicConfiguration basicConfiguration{};
+    // wire: 'tcpServerConfigurations' (field)
+    QList<ServerConfiguration> tcpServerConfigurations{};
+    // wire: 'tunnelProxyServerConfigurations' (field)
+    QList<TunnelProxyServerConfiguration> tunnelProxyServerConfigurations{};
+    // wire: 'webServerConfigurations' (field)
+    QList<WebServerConfiguration> webServerConfigurations{};
+    // wire: 'webSocketServerConfigurations' (field)
+    QList<ServerConfiguration> webSocketServerConfigurations{};
+
+    static ConfigurationGetConfigurationsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationGetConfigurationsResponse ConfigurationGetConfigurationsResponse::fromJson(const QJsonObject &object) {
+    ConfigurationGetConfigurationsResponse value;
+    if (object.contains(QStringLiteral("basicConfiguration"))) {
+        value.basicConfiguration = ConfigurationGetConfigurationsResponseBasicConfiguration::fromJson((object.value(QStringLiteral("basicConfiguration"))).toObject());
+    }
+    if (object.contains(QStringLiteral("tcpServerConfigurations"))) {
+        value.tcpServerConfigurations = ([&]() { QList<ServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("tcpServerConfigurations"))).toArray()) { list.append(ServerConfiguration::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("tunnelProxyServerConfigurations"))) {
+        value.tunnelProxyServerConfigurations = ([&]() { QList<TunnelProxyServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("tunnelProxyServerConfigurations"))).toArray()) { list.append(TunnelProxyServerConfiguration::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("webServerConfigurations"))) {
+        value.webServerConfigurations = ([&]() { QList<WebServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("webServerConfigurations"))).toArray()) { list.append(WebServerConfiguration::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("webSocketServerConfigurations"))) {
+        value.webSocketServerConfigurations = ([&]() { QList<ServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("webSocketServerConfigurations"))).toArray()) { list.append(ServerConfiguration::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationGetConfigurationsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("basicConfiguration"), QJsonValue((basicConfiguration).toJson()));
+    object.insert(QStringLiteral("tcpServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tcpServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("tunnelProxyServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tunnelProxyServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("webServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : webServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("webSocketServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : webSocketServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ConfigurationSetWebServerConfigurationParams {
+public:
+    // wire: 'configuration' (field)
+    WebServerConfiguration configuration{};
+
+    static ConfigurationSetWebServerConfigurationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationSetWebServerConfigurationParams ConfigurationSetWebServerConfigurationParams::fromJson(const QJsonObject &object) {
+    ConfigurationSetWebServerConfigurationParams value;
+    if (object.contains(QStringLiteral("configuration"))) {
+        value.configuration = WebServerConfiguration::fromJson((object.value(QStringLiteral("configuration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationSetWebServerConfigurationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("configuration"), QJsonValue((configuration).toJson()));
+    return object;
+}
+
+class ConfigurationWebServerConfigurationChangedNotificationParams {
+public:
+    // wire: 'webServerConfiguration' (field)
+    WebServerConfiguration webServerConfiguration{};
+
+    static ConfigurationWebServerConfigurationChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ConfigurationWebServerConfigurationChangedNotificationParams ConfigurationWebServerConfigurationChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ConfigurationWebServerConfigurationChangedNotificationParams value;
+    if (object.contains(QStringLiteral("webServerConfiguration"))) {
+        value.webServerConfiguration = WebServerConfiguration::fromJson((object.value(QStringLiteral("webServerConfiguration"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ConfigurationWebServerConfigurationChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("webServerConfiguration"), QJsonValue((webServerConfiguration).toJson()));
+    return object;
+}
+
+class WiredNetworkDevice {
+public:
+    // wire: 'bitRate' (required)
+    QString bitRate{};
+    // wire: 'interface' (required)
+    QString interface{};
+    // wire: 'ipv4Addresses' (required)
+    QStringList ipv4Addresses{};
+    // wire: 'ipv6Addresses' (required)
+    QStringList ipv6Addresses{};
+    // wire: 'macAddress' (required)
+    QString macAddress{};
+    // wire: 'pluggedIn' (required)
+    bool pluggedIn{};
+    // wire: 'state' (required)
+    NetworkDeviceState state{};
+
+    static WiredNetworkDevice fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline WiredNetworkDevice WiredNetworkDevice::fromJson(const QJsonObject &object) {
     WiredNetworkDevice value;
@@ -14462,6 +13403,69 @@ inline QJsonObject WiredNetworkDevice::toJson() const {
     return object;
 }
 
+class NetworkManagerWiredNetworkDeviceAddedNotificationParams {
+public:
+    // wire: 'wiredNetworkDevice' (field)
+    WiredNetworkDevice wiredNetworkDevice{};
+
+    static NetworkManagerWiredNetworkDeviceAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerWiredNetworkDeviceAddedNotificationParams NetworkManagerWiredNetworkDeviceAddedNotificationParams::fromJson(const QJsonObject &object) {
+    NetworkManagerWiredNetworkDeviceAddedNotificationParams value;
+    if (object.contains(QStringLiteral("wiredNetworkDevice"))) {
+        value.wiredNetworkDevice = WiredNetworkDevice::fromJson((object.value(QStringLiteral("wiredNetworkDevice"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerWiredNetworkDeviceAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("wiredNetworkDevice"), QJsonValue((wiredNetworkDevice).toJson()));
+    return object;
+}
+
+class NetworkManagerWiredNetworkDeviceChangedNotificationParams {
+public:
+    // wire: 'wiredNetworkDevice' (field)
+    WiredNetworkDevice wiredNetworkDevice{};
+
+    static NetworkManagerWiredNetworkDeviceChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerWiredNetworkDeviceChangedNotificationParams NetworkManagerWiredNetworkDeviceChangedNotificationParams::fromJson(const QJsonObject &object) {
+    NetworkManagerWiredNetworkDeviceChangedNotificationParams value;
+    if (object.contains(QStringLiteral("wiredNetworkDevice"))) {
+        value.wiredNetworkDevice = WiredNetworkDevice::fromJson((object.value(QStringLiteral("wiredNetworkDevice"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerWiredNetworkDeviceChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("wiredNetworkDevice"), QJsonValue((wiredNetworkDevice).toJson()));
+    return object;
+}
+
+class WirelessAccessPoint {
+public:
+    // wire: 'frequency' (required)
+    double frequency{};
+    // wire: 'macAddress' (required)
+    QString macAddress{};
+    // wire: 'protected' (required)
+    bool protectedValue{};
+    // wire: 'signalStrength' (required)
+    qint64 signalStrength{};
+    // wire: 'ssid' (required)
+    QString ssid{};
+
+    static WirelessAccessPoint fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline WirelessAccessPoint WirelessAccessPoint::fromJson(const QJsonObject &object) {
     WirelessAccessPoint value;
     if (object.contains(QStringLiteral("frequency"))) {
@@ -14492,6 +13496,64 @@ inline QJsonObject WirelessAccessPoint::toJson() const {
     return object;
 }
 
+class NetworkManagerGetWirelessAccessPointsResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+    // wire: 'wirelessAccessPoints' (optional)
+    std::optional<QList<WirelessAccessPoint>> wirelessAccessPoints;
+
+    static NetworkManagerGetWirelessAccessPointsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerGetWirelessAccessPointsResponse NetworkManagerGetWirelessAccessPointsResponse::fromJson(const QJsonObject &object) {
+    NetworkManagerGetWirelessAccessPointsResponse value;
+    if (object.contains(QStringLiteral("networkManagerError"))) {
+        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
+    }
+    if (object.contains(QStringLiteral("wirelessAccessPoints"))) {
+        value.wirelessAccessPoints = ([&]() { QList<WirelessAccessPoint> list; for (const QJsonValue &item : (object.value(QStringLiteral("wirelessAccessPoints"))).toArray()) { list.append(WirelessAccessPoint::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerGetWirelessAccessPointsResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
+    if (wirelessAccessPoints.has_value()) {
+        object.insert(QStringLiteral("wirelessAccessPoints"), ([&]() { QJsonArray array; for (const auto &item : *wirelessAccessPoints) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+using WirelessCapabilities = QList<WirelessCapability>;
+
+class WirelessNetworkDevice {
+public:
+    // wire: 'bitRate' (required)
+    QString bitRate{};
+    // wire: 'capabilities' (required)
+    WirelessCapabilities capabilities{};
+    // wire: 'interface' (required)
+    QString interface{};
+    // wire: 'ipv4Addresses' (required)
+    QStringList ipv4Addresses{};
+    // wire: 'ipv6Addresses' (required)
+    QStringList ipv6Addresses{};
+    // wire: 'macAddress' (required)
+    QString macAddress{};
+    // wire: 'mode' (required)
+    WirelessMode mode{};
+    // wire: 'currentAccessPoint' (optional, required)
+    std::optional<WirelessAccessPoint> currentAccessPoint;
+    // wire: 'state' (required)
+    NetworkDeviceState state{};
+
+    static WirelessNetworkDevice fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline WirelessNetworkDevice WirelessNetworkDevice::fromJson(const QJsonObject &object) {
     WirelessNetworkDevice value;
     if (object.contains(QStringLiteral("bitRate"))) {
@@ -14516,7 +13578,7 @@ inline WirelessNetworkDevice WirelessNetworkDevice::fromJson(const QJsonObject &
         value.mode = parseWirelessMode(object.value(QStringLiteral("mode")));
     }
     if (object.contains(QStringLiteral("currentAccessPoint"))) {
-        value.currentAccessPoint = QSharedPointer<WirelessAccessPoint>::create(WirelessAccessPoint::fromJson((object.value(QStringLiteral("currentAccessPoint"))).toObject()));
+        value.currentAccessPoint = WirelessAccessPoint::fromJson((object.value(QStringLiteral("currentAccessPoint"))).toObject());
     }
     if (object.contains(QStringLiteral("state"))) {
         value.state = parseNetworkDeviceState(object.value(QStringLiteral("state")));
@@ -14534,11 +13596,105 @@ inline QJsonObject WirelessNetworkDevice::toJson() const {
     object.insert(QStringLiteral("macAddress"), QJsonValue(macAddress));
     object.insert(QStringLiteral("mode"), QJsonValue(toString(mode)));
     if (currentAccessPoint.has_value()) {
-        object.insert(QStringLiteral("currentAccessPoint"), ((*currentAccessPoint) ? QJsonValue((*currentAccessPoint)->toJson()) : QJsonValue(QJsonObject{})));
+        object.insert(QStringLiteral("currentAccessPoint"), QJsonValue((*currentAccessPoint).toJson()));
     }
     object.insert(QStringLiteral("state"), QJsonValue(toString(state)));
     return object;
 }
+
+class NetworkManagerGetNetworkDevicesResponse {
+public:
+    // wire: 'networkManagerError' (field)
+    NetworkManagerError networkManagerError{};
+    // wire: 'wiredNetworkDevices' (optional)
+    std::optional<QList<WiredNetworkDevice>> wiredNetworkDevices;
+    // wire: 'wirelessNetworkDevices' (optional)
+    std::optional<QList<WirelessNetworkDevice>> wirelessNetworkDevices;
+
+    static NetworkManagerGetNetworkDevicesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerGetNetworkDevicesResponse NetworkManagerGetNetworkDevicesResponse::fromJson(const QJsonObject &object) {
+    NetworkManagerGetNetworkDevicesResponse value;
+    if (object.contains(QStringLiteral("networkManagerError"))) {
+        value.networkManagerError = parseNetworkManagerError(object.value(QStringLiteral("networkManagerError")));
+    }
+    if (object.contains(QStringLiteral("wiredNetworkDevices"))) {
+        value.wiredNetworkDevices = ([&]() { QList<WiredNetworkDevice> list; for (const QJsonValue &item : (object.value(QStringLiteral("wiredNetworkDevices"))).toArray()) { list.append(WiredNetworkDevice::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("wirelessNetworkDevices"))) {
+        value.wirelessNetworkDevices = ([&]() { QList<WirelessNetworkDevice> list; for (const QJsonValue &item : (object.value(QStringLiteral("wirelessNetworkDevices"))).toArray()) { list.append(WirelessNetworkDevice::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerGetNetworkDevicesResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkManagerError"), QJsonValue(toString(networkManagerError)));
+    if (wiredNetworkDevices.has_value()) {
+        object.insert(QStringLiteral("wiredNetworkDevices"), ([&]() { QJsonArray array; for (const auto &item : *wiredNetworkDevices) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    if (wirelessNetworkDevices.has_value()) {
+        object.insert(QStringLiteral("wirelessNetworkDevices"), ([&]() { QJsonArray array; for (const auto &item : *wirelessNetworkDevices) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    return object;
+}
+
+class NetworkManagerWirelessNetworkDeviceAddedNotificationParams {
+public:
+    // wire: 'wirelessNetworkDevice' (field)
+    WirelessNetworkDevice wirelessNetworkDevice{};
+
+    static NetworkManagerWirelessNetworkDeviceAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerWirelessNetworkDeviceAddedNotificationParams NetworkManagerWirelessNetworkDeviceAddedNotificationParams::fromJson(const QJsonObject &object) {
+    NetworkManagerWirelessNetworkDeviceAddedNotificationParams value;
+    if (object.contains(QStringLiteral("wirelessNetworkDevice"))) {
+        value.wirelessNetworkDevice = WirelessNetworkDevice::fromJson((object.value(QStringLiteral("wirelessNetworkDevice"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerWirelessNetworkDeviceAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("wirelessNetworkDevice"), QJsonValue((wirelessNetworkDevice).toJson()));
+    return object;
+}
+
+class NetworkManagerWirelessNetworkDeviceChangedNotificationParams {
+public:
+    // wire: 'wirelessNetworkDevice' (field)
+    WirelessNetworkDevice wirelessNetworkDevice{};
+
+    static NetworkManagerWirelessNetworkDeviceChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline NetworkManagerWirelessNetworkDeviceChangedNotificationParams NetworkManagerWirelessNetworkDeviceChangedNotificationParams::fromJson(const QJsonObject &object) {
+    NetworkManagerWirelessNetworkDeviceChangedNotificationParams value;
+    if (object.contains(QStringLiteral("wirelessNetworkDevice"))) {
+        value.wirelessNetworkDevice = WirelessNetworkDevice::fromJson((object.value(QStringLiteral("wirelessNetworkDevice"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject NetworkManagerWirelessNetworkDeviceChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("wirelessNetworkDevice"), QJsonValue((wirelessNetworkDevice).toJson()));
+    return object;
+}
+
+class ZWaveAddNetworkParams {
+public:
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+
+    static ZWaveAddNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveAddNetworkParams ZWaveAddNetworkParams::fromJson(const QJsonObject &object) {
     ZWaveAddNetworkParams value;
@@ -14553,6 +13709,17 @@ inline QJsonObject ZWaveAddNetworkParams::toJson() const {
     object.insert(QStringLiteral("serialPort"), QJsonValue(serialPort));
     return object;
 }
+
+class ZWaveAddNetworkResponse {
+public:
+    // wire: 'networkUuid' (optional)
+    std::optional<QUuid> networkUuid;
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveAddNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveAddNetworkResponse ZWaveAddNetworkResponse::fromJson(const QJsonObject &object) {
     ZWaveAddNetworkResponse value;
@@ -14574,6 +13741,15 @@ inline QJsonObject ZWaveAddNetworkResponse::toJson() const {
     return object;
 }
 
+class ZWaveAddNodeParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveAddNodeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveAddNodeParams ZWaveAddNodeParams::fromJson(const QJsonObject &object) {
     ZWaveAddNodeParams value;
     if (object.contains(QStringLiteral("networkUuid"))) {
@@ -14587,6 +13763,15 @@ inline QJsonObject ZWaveAddNodeParams::toJson() const {
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
     return object;
 }
+
+class ZWaveAddNodeResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveAddNodeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveAddNodeResponse ZWaveAddNodeResponse::fromJson(const QJsonObject &object) {
     ZWaveAddNodeResponse value;
@@ -14602,6 +13787,15 @@ inline QJsonObject ZWaveAddNodeResponse::toJson() const {
     return object;
 }
 
+class ZWaveCancelPendingOperationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveCancelPendingOperationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveCancelPendingOperationParams ZWaveCancelPendingOperationParams::fromJson(const QJsonObject &object) {
     ZWaveCancelPendingOperationParams value;
     if (object.contains(QStringLiteral("networkUuid"))) {
@@ -14615,6 +13809,15 @@ inline QJsonObject ZWaveCancelPendingOperationParams::toJson() const {
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
     return object;
 }
+
+class ZWaveCancelPendingOperationResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveCancelPendingOperationResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveCancelPendingOperationResponse ZWaveCancelPendingOperationResponse::fromJson(const QJsonObject &object) {
     ZWaveCancelPendingOperationResponse value;
@@ -14630,6 +13833,15 @@ inline QJsonObject ZWaveCancelPendingOperationResponse::toJson() const {
     return object;
 }
 
+class ZWaveFactoryResetNetworkParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveFactoryResetNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveFactoryResetNetworkParams ZWaveFactoryResetNetworkParams::fromJson(const QJsonObject &object) {
     ZWaveFactoryResetNetworkParams value;
     if (object.contains(QStringLiteral("networkUuid"))) {
@@ -14643,6 +13855,15 @@ inline QJsonObject ZWaveFactoryResetNetworkParams::toJson() const {
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
     return object;
 }
+
+class ZWaveFactoryResetNetworkResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveFactoryResetNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveFactoryResetNetworkResponse ZWaveFactoryResetNetworkResponse::fromJson(const QJsonObject &object) {
     ZWaveFactoryResetNetworkResponse value;
@@ -14658,6 +13879,13 @@ inline QJsonObject ZWaveFactoryResetNetworkResponse::toJson() const {
     return object;
 }
 
+class ZWaveGetNetworksParams {
+public:
+
+    static ZWaveGetNetworksParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveGetNetworksParams ZWaveGetNetworksParams::fromJson(const QJsonObject &object) {
     ZWaveGetNetworksParams value;
     return value;
@@ -14668,19 +13896,14 @@ inline QJsonObject ZWaveGetNetworksParams::toJson() const {
     return object;
 }
 
-inline ZWaveGetNetworksResponse ZWaveGetNetworksResponse::fromJson(const QJsonObject &object) {
-    ZWaveGetNetworksResponse value;
-    if (object.contains(QStringLiteral("networks"))) {
-        value.networks = ([&]() { QList<QSharedPointer<ZWaveNetwork>> list; for (const QJsonValue &item : (object.value(QStringLiteral("networks"))).toArray()) { list.append(QSharedPointer<ZWaveNetwork>::create(ZWaveNetwork::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ZWaveGetNodesParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
 
-inline QJsonObject ZWaveGetNetworksResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networks"), ([&]() { QJsonArray array; for (const auto &item : networks) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static ZWaveGetNodesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveGetNodesParams ZWaveGetNodesParams::fromJson(const QJsonObject &object) {
     ZWaveGetNodesParams value;
@@ -14696,25 +13919,12 @@ inline QJsonObject ZWaveGetNodesParams::toJson() const {
     return object;
 }
 
-inline ZWaveGetNodesResponse ZWaveGetNodesResponse::fromJson(const QJsonObject &object) {
-    ZWaveGetNodesResponse value;
-    if (object.contains(QStringLiteral("nodes"))) {
-        value.nodes = ([&]() { QList<QSharedPointer<ZWaveNode>> list; for (const QJsonValue &item : (object.value(QStringLiteral("nodes"))).toArray()) { list.append(QSharedPointer<ZWaveNode>::create(ZWaveNode::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("zwaveError"))) {
-        value.zwaveError = parseZWaveError(object.value(QStringLiteral("zwaveError")));
-    }
-    return value;
-}
+class ZWaveGetSerialPortsParams {
+public:
 
-inline QJsonObject ZWaveGetNodesResponse::toJson() const {
-    QJsonObject object;
-    if (nodes.has_value()) {
-        object.insert(QStringLiteral("nodes"), ([&]() { QJsonArray array; for (const auto &item : *nodes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("zwaveError"), QJsonValue(toString(zwaveError)));
-    return object;
-}
+    static ZWaveGetSerialPortsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveGetSerialPortsParams ZWaveGetSerialPortsParams::fromJson(const QJsonObject &object) {
     ZWaveGetSerialPortsParams value;
@@ -14726,19 +13936,35 @@ inline QJsonObject ZWaveGetSerialPortsParams::toJson() const {
     return object;
 }
 
+class ZWaveGetSerialPortsResponse {
+public:
+    // wire: 'serialPorts' (field)
+    SerialPorts serialPorts{};
+
+    static ZWaveGetSerialPortsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveGetSerialPortsResponse ZWaveGetSerialPortsResponse::fromJson(const QJsonObject &object) {
     ZWaveGetSerialPortsResponse value;
     if (object.contains(QStringLiteral("serialPorts"))) {
-        value.serialPorts = ([&]() { QList<QSharedPointer<SerialPort>> list; for (const QJsonValue &item : (object.value(QStringLiteral("serialPorts"))).toArray()) { list.append(QSharedPointer<SerialPort>::create(SerialPort::fromJson((item).toObject()))); } return list; }());
+        value.serialPorts = ([&]() { QList<SerialPort> list; for (const QJsonValue &item : (object.value(QStringLiteral("serialPorts"))).toArray()) { list.append(SerialPort::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject ZWaveGetSerialPortsResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("serialPorts"), ([&]() { QJsonArray array; for (const auto &item : serialPorts) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("serialPorts"), ([&]() { QJsonArray array; for (const auto &item : serialPorts) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class ZWaveIsZWaveAvailableParams {
+public:
+
+    static ZWaveIsZWaveAvailableParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveIsZWaveAvailableParams ZWaveIsZWaveAvailableParams::fromJson(const QJsonObject &object) {
     ZWaveIsZWaveAvailableParams value;
@@ -14749,6 +13975,15 @@ inline QJsonObject ZWaveIsZWaveAvailableParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class ZWaveIsZWaveAvailableResponse {
+public:
+    // wire: 'available' (field)
+    bool available{};
+
+    static ZWaveIsZWaveAvailableResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveIsZWaveAvailableResponse ZWaveIsZWaveAvailableResponse::fromJson(const QJsonObject &object) {
     ZWaveIsZWaveAvailableResponse value;
@@ -14763,6 +13998,33 @@ inline QJsonObject ZWaveIsZWaveAvailableResponse::toJson() const {
     object.insert(QStringLiteral("available"), QJsonValue(available));
     return object;
 }
+
+class ZWaveNetwork {
+public:
+    // wire: 'homeId' (field)
+    quint64 homeId{};
+    // wire: 'isBridgeController' (field)
+    bool isBridgeController{};
+    // wire: 'isPrimaryController' (field)
+    bool isPrimaryController{};
+    // wire: 'isStaticUpdateController' (field)
+    bool isStaticUpdateController{};
+    // wire: 'isZWavePlus' (field)
+    bool isZWavePlus{};
+    // wire: 'networkState' (field)
+    ZWaveNetworkState networkState{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+    // wire: 'waitingForNodeAddition' (field)
+    bool waitingForNodeAddition{};
+    // wire: 'waitingForNodeRemoval' (field)
+    bool waitingForNodeRemoval{};
+
+    static ZWaveNetwork fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNetwork ZWaveNetwork::fromJson(const QJsonObject &object) {
     ZWaveNetwork value;
@@ -14814,33 +14076,83 @@ inline QJsonObject ZWaveNetwork::toJson() const {
     return object;
 }
 
+class ZWaveGetNetworksResponse {
+public:
+    // wire: 'networks' (field)
+    QList<ZWaveNetwork> networks{};
+
+    static ZWaveGetNetworksResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZWaveGetNetworksResponse ZWaveGetNetworksResponse::fromJson(const QJsonObject &object) {
+    ZWaveGetNetworksResponse value;
+    if (object.contains(QStringLiteral("networks"))) {
+        value.networks = ([&]() { QList<ZWaveNetwork> list; for (const QJsonValue &item : (object.value(QStringLiteral("networks"))).toArray()) { list.append(ZWaveNetwork::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ZWaveGetNetworksResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networks"), ([&]() { QJsonArray array; for (const auto &item : networks) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ZWaveNetworkAddedNotificationParams {
+public:
+    // wire: 'network' (field)
+    ZWaveNetwork network{};
+
+    static ZWaveNetworkAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveNetworkAddedNotificationParams ZWaveNetworkAddedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNetworkAddedNotificationParams value;
     if (object.contains(QStringLiteral("network"))) {
-        value.network = QSharedPointer<ZWaveNetwork>::create(ZWaveNetwork::fromJson((object.value(QStringLiteral("network"))).toObject()));
+        value.network = ZWaveNetwork::fromJson((object.value(QStringLiteral("network"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZWaveNetworkAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("network"), ((network) ? QJsonValue((network)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("network"), QJsonValue((network).toJson()));
     return object;
 }
+
+class ZWaveNetworkChangedNotificationParams {
+public:
+    // wire: 'network' (field)
+    ZWaveNetwork network{};
+
+    static ZWaveNetworkChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNetworkChangedNotificationParams ZWaveNetworkChangedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNetworkChangedNotificationParams value;
     if (object.contains(QStringLiteral("network"))) {
-        value.network = QSharedPointer<ZWaveNetwork>::create(ZWaveNetwork::fromJson((object.value(QStringLiteral("network"))).toObject()));
+        value.network = ZWaveNetwork::fromJson((object.value(QStringLiteral("network"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZWaveNetworkChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("network"), ((network) ? QJsonValue((network)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("network"), QJsonValue((network).toJson()));
     return object;
 }
+
+class ZWaveNetworkRemovedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveNetworkRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNetworkRemovedNotificationParams ZWaveNetworkRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNetworkRemovedNotificationParams value;
@@ -14855,6 +14167,53 @@ inline QJsonObject ZWaveNetworkRemovedNotificationParams::toJson() const {
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
     return object;
 }
+
+class ZWaveNode {
+public:
+    // wire: 'deviceType' (field)
+    ZWaveDeviceType deviceType{};
+    // wire: 'failed' (field)
+    bool failed{};
+    // wire: 'initialized' (field)
+    bool initialized{};
+    // wire: 'isBeamingDevice' (field)
+    bool isBeamingDevice{};
+    // wire: 'isSecurityDevice' (field)
+    bool isSecurityDevice{};
+    // wire: 'isZWavePlusDevice' (field)
+    bool isZWavePlusDevice{};
+    // wire: 'linkQuality' (field)
+    quint64 linkQuality{};
+    // wire: 'manufacturerId' (field)
+    quint64 manufacturerId{};
+    // wire: 'manufacturerName' (field)
+    QString manufacturerName{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'nodeId' (field)
+    quint64 nodeId{};
+    // wire: 'nodeType' (field)
+    ZWaveNodeType nodeType{};
+    // wire: 'productId' (field)
+    quint64 productId{};
+    // wire: 'productName' (field)
+    QString productName{};
+    // wire: 'productType' (field)
+    quint64 productType{};
+    // wire: 'reachable' (field)
+    bool reachable{};
+    // wire: 'role' (field)
+    ZWaveNodeRole role{};
+    // wire: 'securityMode' (field)
+    quint64 securityMode{};
+    // wire: 'sleeping' (field)
+    bool sleeping{};
+    // wire: 'version' (field)
+    QString version{};
+
+    static ZWaveNode fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNode ZWaveNode::fromJson(const QJsonObject &object) {
     ZWaveNode value;
@@ -14946,13 +14305,55 @@ inline QJsonObject ZWaveNode::toJson() const {
     return object;
 }
 
+class ZWaveGetNodesResponse {
+public:
+    // wire: 'nodes' (optional)
+    std::optional<QList<ZWaveNode>> nodes;
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveGetNodesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZWaveGetNodesResponse ZWaveGetNodesResponse::fromJson(const QJsonObject &object) {
+    ZWaveGetNodesResponse value;
+    if (object.contains(QStringLiteral("nodes"))) {
+        value.nodes = ([&]() { QList<ZWaveNode> list; for (const QJsonValue &item : (object.value(QStringLiteral("nodes"))).toArray()) { list.append(ZWaveNode::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("zwaveError"))) {
+        value.zwaveError = parseZWaveError(object.value(QStringLiteral("zwaveError")));
+    }
+    return value;
+}
+
+inline QJsonObject ZWaveGetNodesResponse::toJson() const {
+    QJsonObject object;
+    if (nodes.has_value()) {
+        object.insert(QStringLiteral("nodes"), ([&]() { QJsonArray array; for (const auto &item : *nodes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("zwaveError"), QJsonValue(toString(zwaveError)));
+    return object;
+}
+
+class ZWaveNodeAddedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'node' (field)
+    ZWaveNode node{};
+
+    static ZWaveNodeAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveNodeAddedNotificationParams ZWaveNodeAddedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNodeAddedNotificationParams value;
     if (object.contains(QStringLiteral("networkUuid"))) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("node"))) {
-        value.node = QSharedPointer<ZWaveNode>::create(ZWaveNode::fromJson((object.value(QStringLiteral("node"))).toObject()));
+        value.node = ZWaveNode::fromJson((object.value(QStringLiteral("node"))).toObject());
     }
     return value;
 }
@@ -14960,9 +14361,20 @@ inline ZWaveNodeAddedNotificationParams ZWaveNodeAddedNotificationParams::fromJs
 inline QJsonObject ZWaveNodeAddedNotificationParams::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("node"), ((node) ? QJsonValue((node)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("node"), QJsonValue((node).toJson()));
     return object;
 }
+
+class ZWaveNodeChangedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'node' (field)
+    ZWaveNode node{};
+
+    static ZWaveNodeChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNodeChangedNotificationParams ZWaveNodeChangedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNodeChangedNotificationParams value;
@@ -14970,7 +14382,7 @@ inline ZWaveNodeChangedNotificationParams ZWaveNodeChangedNotificationParams::fr
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("node"))) {
-        value.node = QSharedPointer<ZWaveNode>::create(ZWaveNode::fromJson((object.value(QStringLiteral("node"))).toObject()));
+        value.node = ZWaveNode::fromJson((object.value(QStringLiteral("node"))).toObject());
     }
     return value;
 }
@@ -14978,9 +14390,20 @@ inline ZWaveNodeChangedNotificationParams ZWaveNodeChangedNotificationParams::fr
 inline QJsonObject ZWaveNodeChangedNotificationParams::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("node"), ((node) ? QJsonValue((node)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("node"), QJsonValue((node).toJson()));
     return object;
 }
+
+class ZWaveNodeRemovedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'nodeId' (field)
+    quint64 nodeId{};
+
+    static ZWaveNodeRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveNodeRemovedNotificationParams ZWaveNodeRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ZWaveNodeRemovedNotificationParams value;
@@ -15000,6 +14423,17 @@ inline QJsonObject ZWaveNodeRemovedNotificationParams::toJson() const {
     return object;
 }
 
+class ZWaveRemoveFailedNodeParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'nodeId' (field)
+    quint64 nodeId{};
+
+    static ZWaveRemoveFailedNodeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveRemoveFailedNodeParams ZWaveRemoveFailedNodeParams::fromJson(const QJsonObject &object) {
     ZWaveRemoveFailedNodeParams value;
     if (object.contains(QStringLiteral("networkUuid"))) {
@@ -15018,6 +14452,15 @@ inline QJsonObject ZWaveRemoveFailedNodeParams::toJson() const {
     return object;
 }
 
+class ZWaveRemoveFailedNodeResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveRemoveFailedNodeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveRemoveFailedNodeResponse ZWaveRemoveFailedNodeResponse::fromJson(const QJsonObject &object) {
     ZWaveRemoveFailedNodeResponse value;
     if (object.contains(QStringLiteral("zwaveError"))) {
@@ -15031,6 +14474,15 @@ inline QJsonObject ZWaveRemoveFailedNodeResponse::toJson() const {
     object.insert(QStringLiteral("zwaveError"), QJsonValue(toString(zwaveError)));
     return object;
 }
+
+class ZWaveRemoveNetworkParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveRemoveNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveRemoveNetworkParams ZWaveRemoveNetworkParams::fromJson(const QJsonObject &object) {
     ZWaveRemoveNetworkParams value;
@@ -15046,6 +14498,15 @@ inline QJsonObject ZWaveRemoveNetworkParams::toJson() const {
     return object;
 }
 
+class ZWaveRemoveNetworkResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveRemoveNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveRemoveNetworkResponse ZWaveRemoveNetworkResponse::fromJson(const QJsonObject &object) {
     ZWaveRemoveNetworkResponse value;
     if (object.contains(QStringLiteral("zwaveError"))) {
@@ -15059,6 +14520,15 @@ inline QJsonObject ZWaveRemoveNetworkResponse::toJson() const {
     object.insert(QStringLiteral("zwaveError"), QJsonValue(toString(zwaveError)));
     return object;
 }
+
+class ZWaveRemoveNodeParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZWaveRemoveNodeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZWaveRemoveNodeParams ZWaveRemoveNodeParams::fromJson(const QJsonObject &object) {
     ZWaveRemoveNodeParams value;
@@ -15074,6 +14544,15 @@ inline QJsonObject ZWaveRemoveNodeParams::toJson() const {
     return object;
 }
 
+class ZWaveRemoveNodeResponse {
+public:
+    // wire: 'zwaveError' (field)
+    ZWaveError zwaveError{};
+
+    static ZWaveRemoveNodeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZWaveRemoveNodeResponse ZWaveRemoveNodeResponse::fromJson(const QJsonObject &object) {
     ZWaveRemoveNodeResponse value;
     if (object.contains(QStringLiteral("zwaveError"))) {
@@ -15087,6 +14566,27 @@ inline QJsonObject ZWaveRemoveNodeResponse::toJson() const {
     object.insert(QStringLiteral("zwaveError"), QJsonValue(toString(zwaveError)));
     return object;
 }
+
+class ZigbeeAdapter {
+public:
+    // wire: 'backend' (required)
+    QString backend{};
+    // wire: 'baudRate' (required)
+    qint64 baudRate{};
+    // wire: 'description' (required)
+    QString description{};
+    // wire: 'hardwareRecognized' (required)
+    bool hardwareRecognized{};
+    // wire: 'name' (required)
+    QString name{};
+    // wire: 'serialNumber' (required)
+    QString serialNumber{};
+    // wire: 'serialPort' (required)
+    QString serialPort{};
+
+    static ZigbeeAdapter fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeAdapter ZigbeeAdapter::fromJson(const QJsonObject &object) {
     ZigbeeAdapter value;
@@ -15126,33 +14626,68 @@ inline QJsonObject ZigbeeAdapter::toJson() const {
     return object;
 }
 
+class ZigbeeAdapterAddedNotificationParams {
+public:
+    // wire: 'adapter' (field)
+    ZigbeeAdapter adapter{};
+
+    static ZigbeeAdapterAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeAdapterAddedNotificationParams ZigbeeAdapterAddedNotificationParams::fromJson(const QJsonObject &object) {
     ZigbeeAdapterAddedNotificationParams value;
     if (object.contains(QStringLiteral("adapter"))) {
-        value.adapter = QSharedPointer<ZigbeeAdapter>::create(ZigbeeAdapter::fromJson((object.value(QStringLiteral("adapter"))).toObject()));
+        value.adapter = ZigbeeAdapter::fromJson((object.value(QStringLiteral("adapter"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZigbeeAdapterAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("adapter"), ((adapter) ? QJsonValue((adapter)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("adapter"), QJsonValue((adapter).toJson()));
     return object;
 }
+
+class ZigbeeAdapterRemovedNotificationParams {
+public:
+    // wire: 'adapter' (field)
+    ZigbeeAdapter adapter{};
+
+    static ZigbeeAdapterRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeAdapterRemovedNotificationParams ZigbeeAdapterRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ZigbeeAdapterRemovedNotificationParams value;
     if (object.contains(QStringLiteral("adapter"))) {
-        value.adapter = QSharedPointer<ZigbeeAdapter>::create(ZigbeeAdapter::fromJson((object.value(QStringLiteral("adapter"))).toObject()));
+        value.adapter = ZigbeeAdapter::fromJson((object.value(QStringLiteral("adapter"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZigbeeAdapterRemovedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("adapter"), ((adapter) ? QJsonValue((adapter)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("adapter"), QJsonValue((adapter).toJson()));
     return object;
 }
+
+using ZigbeeAdapters = QList<ZigbeeAdapter>;
+
+class ZigbeeAddNetworkParams {
+public:
+    // wire: 'backend' (field)
+    QString backend{};
+    // wire: 'baudRate' (field)
+    quint64 baudRate{};
+    // wire: 'channelMask' (optional)
+    std::optional<quint64> channelMask;
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+
+    static ZigbeeAddNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeAddNetworkParams ZigbeeAddNetworkParams::fromJson(const QJsonObject &object) {
     ZigbeeAddNetworkParams value;
@@ -15182,6 +14717,17 @@ inline QJsonObject ZigbeeAddNetworkParams::toJson() const {
     return object;
 }
 
+class ZigbeeAddNetworkResponse {
+public:
+    // wire: 'networkUuid' (optional)
+    std::optional<QUuid> networkUuid;
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeAddNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeAddNetworkResponse ZigbeeAddNetworkResponse::fromJson(const QJsonObject &object) {
     ZigbeeAddNetworkResponse value;
     if (object.contains(QStringLiteral("networkUuid"))) {
@@ -15201,6 +14747,25 @@ inline QJsonObject ZigbeeAddNetworkResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeBindingTableRecord {
+public:
+    // wire: 'clusterId' (field)
+    quint64 clusterId{};
+    // wire: 'destinationAddress' (optional)
+    std::optional<QString> destinationAddress;
+    // wire: 'destinationEndpointId' (optional)
+    std::optional<quint64> destinationEndpointId;
+    // wire: 'destinationGroupAddress' (optional)
+    std::optional<quint64> destinationGroupAddress;
+    // wire: 'sourceAddress' (field)
+    QString sourceAddress{};
+    // wire: 'sourceEndpointId' (field)
+    quint64 sourceEndpointId{};
+
+    static ZigbeeBindingTableRecord fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeBindingTableRecord ZigbeeBindingTableRecord::fromJson(const QJsonObject &object) {
     ZigbeeBindingTableRecord value;
@@ -15242,6 +14807,17 @@ inline QJsonObject ZigbeeBindingTableRecord::toJson() const {
     return object;
 }
 
+class ZigbeeCluster {
+public:
+    // wire: 'clusterId' (field)
+    quint64 clusterId{};
+    // wire: 'direction' (field)
+    ZigbeeClusterDirection direction{};
+
+    static ZigbeeCluster fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeCluster ZigbeeCluster::fromJson(const QJsonObject &object) {
     ZigbeeCluster value;
     if (object.contains(QStringLiteral("clusterId"))) {
@@ -15259,6 +14835,27 @@ inline QJsonObject ZigbeeCluster::toJson() const {
     object.insert(QStringLiteral("direction"), QJsonValue(toString(direction)));
     return object;
 }
+
+class ZigbeeCreateBindingParams {
+public:
+    // wire: 'clusterId' (field)
+    quint64 clusterId{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'destinationAddress' (optional)
+    std::optional<QString> destinationAddress;
+    // wire: 'destinationEndpointId' (optional)
+    std::optional<quint64> destinationEndpointId;
+    // wire: 'destinationGroupAddress' (optional)
+    std::optional<quint64> destinationGroupAddress;
+    // wire: 'sourceAddress' (field)
+    QString sourceAddress{};
+    // wire: 'sourceEndpointId' (field)
+    quint64 sourceEndpointId{};
+
+    static ZigbeeCreateBindingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeCreateBindingParams ZigbeeCreateBindingParams::fromJson(const QJsonObject &object) {
     ZigbeeCreateBindingParams value;
@@ -15304,6 +14901,15 @@ inline QJsonObject ZigbeeCreateBindingParams::toJson() const {
     return object;
 }
 
+class ZigbeeCreateBindingResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeCreateBindingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeCreateBindingResponse ZigbeeCreateBindingResponse::fromJson(const QJsonObject &object) {
     ZigbeeCreateBindingResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15317,6 +14923,15 @@ inline QJsonObject ZigbeeCreateBindingResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeFactoryResetNetworkParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZigbeeFactoryResetNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeFactoryResetNetworkParams ZigbeeFactoryResetNetworkParams::fromJson(const QJsonObject &object) {
     ZigbeeFactoryResetNetworkParams value;
@@ -15332,6 +14947,15 @@ inline QJsonObject ZigbeeFactoryResetNetworkParams::toJson() const {
     return object;
 }
 
+class ZigbeeFactoryResetNetworkResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeFactoryResetNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeFactoryResetNetworkResponse ZigbeeFactoryResetNetworkResponse::fromJson(const QJsonObject &object) {
     ZigbeeFactoryResetNetworkResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15346,6 +14970,13 @@ inline QJsonObject ZigbeeFactoryResetNetworkResponse::toJson() const {
     return object;
 }
 
+class ZigbeeGetAdaptersParams {
+public:
+
+    static ZigbeeGetAdaptersParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeGetAdaptersParams ZigbeeGetAdaptersParams::fromJson(const QJsonObject &object) {
     ZigbeeGetAdaptersParams value;
     return value;
@@ -15356,19 +14987,35 @@ inline QJsonObject ZigbeeGetAdaptersParams::toJson() const {
     return object;
 }
 
+class ZigbeeGetAdaptersResponse {
+public:
+    // wire: 'adapters' (field)
+    ZigbeeAdapters adapters{};
+
+    static ZigbeeGetAdaptersResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeGetAdaptersResponse ZigbeeGetAdaptersResponse::fromJson(const QJsonObject &object) {
     ZigbeeGetAdaptersResponse value;
     if (object.contains(QStringLiteral("adapters"))) {
-        value.adapters = ([&]() { QList<QSharedPointer<ZigbeeAdapter>> list; for (const QJsonValue &item : (object.value(QStringLiteral("adapters"))).toArray()) { list.append(QSharedPointer<ZigbeeAdapter>::create(ZigbeeAdapter::fromJson((item).toObject()))); } return list; }());
+        value.adapters = ([&]() { QList<ZigbeeAdapter> list; for (const QJsonValue &item : (object.value(QStringLiteral("adapters"))).toArray()) { list.append(ZigbeeAdapter::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
 
 inline QJsonObject ZigbeeGetAdaptersResponse::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("adapters"), ([&]() { QJsonArray array; for (const auto &item : adapters) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("adapters"), ([&]() { QJsonArray array; for (const auto &item : adapters) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
+
+class ZigbeeGetAvailableBackendsParams {
+public:
+
+    static ZigbeeGetAvailableBackendsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeGetAvailableBackendsParams ZigbeeGetAvailableBackendsParams::fromJson(const QJsonObject &object) {
     ZigbeeGetAvailableBackendsParams value;
@@ -15379,6 +15026,15 @@ inline QJsonObject ZigbeeGetAvailableBackendsParams::toJson() const {
     QJsonObject object;
     return object;
 }
+
+class ZigbeeGetAvailableBackendsResponse {
+public:
+    // wire: 'backends' (field)
+    QList<QString> backends{};
+
+    static ZigbeeGetAvailableBackendsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeGetAvailableBackendsResponse ZigbeeGetAvailableBackendsResponse::fromJson(const QJsonObject &object) {
     ZigbeeGetAvailableBackendsResponse value;
@@ -15394,6 +15050,13 @@ inline QJsonObject ZigbeeGetAvailableBackendsResponse::toJson() const {
     return object;
 }
 
+class ZigbeeGetNetworksParams {
+public:
+
+    static ZigbeeGetNetworksParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeGetNetworksParams ZigbeeGetNetworksParams::fromJson(const QJsonObject &object) {
     ZigbeeGetNetworksParams value;
     return value;
@@ -15404,19 +15067,14 @@ inline QJsonObject ZigbeeGetNetworksParams::toJson() const {
     return object;
 }
 
-inline ZigbeeGetNetworksResponse ZigbeeGetNetworksResponse::fromJson(const QJsonObject &object) {
-    ZigbeeGetNetworksResponse value;
-    if (object.contains(QStringLiteral("zigbeeNetworks"))) {
-        value.zigbeeNetworks = ([&]() { QList<QSharedPointer<ZigbeeNetwork>> list; for (const QJsonValue &item : (object.value(QStringLiteral("zigbeeNetworks"))).toArray()) { list.append(QSharedPointer<ZigbeeNetwork>::create(ZigbeeNetwork::fromJson((item).toObject()))); } return list; }());
-    }
-    return value;
-}
+class ZigbeeGetNodesParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
 
-inline QJsonObject ZigbeeGetNetworksResponse::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("zigbeeNetworks"), ([&]() { QJsonArray array; for (const auto &item : zigbeeNetworks) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    return object;
-}
+    static ZigbeeGetNodesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeGetNodesParams ZigbeeGetNodesParams::fromJson(const QJsonObject &object) {
     ZigbeeGetNodesParams value;
@@ -15432,25 +15090,22 @@ inline QJsonObject ZigbeeGetNodesParams::toJson() const {
     return object;
 }
 
-inline ZigbeeGetNodesResponse ZigbeeGetNodesResponse::fromJson(const QJsonObject &object) {
-    ZigbeeGetNodesResponse value;
-    if (object.contains(QStringLiteral("zigbeeNodes"))) {
-        value.zigbeeNodes = ([&]() { QList<QSharedPointer<ZigbeeNode>> list; for (const QJsonValue &item : (object.value(QStringLiteral("zigbeeNodes"))).toArray()) { list.append(QSharedPointer<ZigbeeNode>::create(ZigbeeNode::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("zigbeeError"))) {
-        value.zigbeeError = parseZigbeeError(object.value(QStringLiteral("zigbeeError")));
-    }
-    return value;
-}
+class ZigbeeNeighborTableRecord {
+public:
+    // wire: 'depth' (field)
+    quint64 depth{};
+    // wire: 'lqi' (field)
+    quint64 lqi{};
+    // wire: 'networkAddress' (field)
+    quint64 networkAddress{};
+    // wire: 'permitJoining' (field)
+    bool permitJoining{};
+    // wire: 'relationship' (field)
+    ZigbeeNodeRelationship relationship{};
 
-inline QJsonObject ZigbeeGetNodesResponse::toJson() const {
-    QJsonObject object;
-    if (zigbeeNodes.has_value()) {
-        object.insert(QStringLiteral("zigbeeNodes"), ([&]() { QJsonArray array; for (const auto &item : *zigbeeNodes) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    }
-    object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
-    return object;
-}
+    static ZigbeeNeighborTableRecord fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeNeighborTableRecord ZigbeeNeighborTableRecord::fromJson(const QJsonObject &object) {
     ZigbeeNeighborTableRecord value;
@@ -15481,6 +15136,41 @@ inline QJsonObject ZigbeeNeighborTableRecord::toJson() const {
     object.insert(QStringLiteral("relationship"), QJsonValue(toString(relationship)));
     return object;
 }
+
+class ZigbeeNetwork {
+public:
+    // wire: 'backend' (field)
+    QString backend{};
+    // wire: 'baudRate' (field)
+    quint64 baudRate{};
+    // wire: 'channel' (field)
+    quint64 channel{};
+    // wire: 'channelMask' (field)
+    quint64 channelMask{};
+    // wire: 'enabled' (field)
+    bool enabled{};
+    // wire: 'firmwareVersion' (field)
+    QString firmwareVersion{};
+    // wire: 'macAddress' (field)
+    QString macAddress{};
+    // wire: 'networkState' (field)
+    ZigbeeNetworkState networkState{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'panId' (field)
+    quint64 panId{};
+    // wire: 'permitJoiningDuration' (field)
+    quint64 permitJoiningDuration{};
+    // wire: 'permitJoiningEnabled' (field)
+    bool permitJoiningEnabled{};
+    // wire: 'permitJoiningRemaining' (field)
+    quint64 permitJoiningRemaining{};
+    // wire: 'serialPort' (field)
+    QString serialPort{};
+
+    static ZigbeeNetwork fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeNetwork ZigbeeNetwork::fromJson(const QJsonObject &object) {
     ZigbeeNetwork value;
@@ -15548,33 +15238,83 @@ inline QJsonObject ZigbeeNetwork::toJson() const {
     return object;
 }
 
+class ZigbeeGetNetworksResponse {
+public:
+    // wire: 'zigbeeNetworks' (field)
+    QList<ZigbeeNetwork> zigbeeNetworks{};
+
+    static ZigbeeGetNetworksResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeGetNetworksResponse ZigbeeGetNetworksResponse::fromJson(const QJsonObject &object) {
+    ZigbeeGetNetworksResponse value;
+    if (object.contains(QStringLiteral("zigbeeNetworks"))) {
+        value.zigbeeNetworks = ([&]() { QList<ZigbeeNetwork> list; for (const QJsonValue &item : (object.value(QStringLiteral("zigbeeNetworks"))).toArray()) { list.append(ZigbeeNetwork::fromJson((item).toObject())); } return list; }());
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeGetNetworksResponse::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("zigbeeNetworks"), ([&]() { QJsonArray array; for (const auto &item : zigbeeNetworks) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    return object;
+}
+
+class ZigbeeNetworkAddedNotificationParams {
+public:
+    // wire: 'zigbeeNetwork' (field)
+    ZigbeeNetwork zigbeeNetwork{};
+
+    static ZigbeeNetworkAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeNetworkAddedNotificationParams ZigbeeNetworkAddedNotificationParams::fromJson(const QJsonObject &object) {
     ZigbeeNetworkAddedNotificationParams value;
     if (object.contains(QStringLiteral("zigbeeNetwork"))) {
-        value.zigbeeNetwork = QSharedPointer<ZigbeeNetwork>::create(ZigbeeNetwork::fromJson((object.value(QStringLiteral("zigbeeNetwork"))).toObject()));
+        value.zigbeeNetwork = ZigbeeNetwork::fromJson((object.value(QStringLiteral("zigbeeNetwork"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZigbeeNetworkAddedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("zigbeeNetwork"), ((zigbeeNetwork) ? QJsonValue((zigbeeNetwork)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("zigbeeNetwork"), QJsonValue((zigbeeNetwork).toJson()));
     return object;
 }
+
+class ZigbeeNetworkChangedNotificationParams {
+public:
+    // wire: 'zigbeeNetwork' (field)
+    ZigbeeNetwork zigbeeNetwork{};
+
+    static ZigbeeNetworkChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeNetworkChangedNotificationParams ZigbeeNetworkChangedNotificationParams::fromJson(const QJsonObject &object) {
     ZigbeeNetworkChangedNotificationParams value;
     if (object.contains(QStringLiteral("zigbeeNetwork"))) {
-        value.zigbeeNetwork = QSharedPointer<ZigbeeNetwork>::create(ZigbeeNetwork::fromJson((object.value(QStringLiteral("zigbeeNetwork"))).toObject()));
+        value.zigbeeNetwork = ZigbeeNetwork::fromJson((object.value(QStringLiteral("zigbeeNetwork"))).toObject());
     }
     return value;
 }
 
 inline QJsonObject ZigbeeNetworkChangedNotificationParams::toJson() const {
     QJsonObject object;
-    object.insert(QStringLiteral("zigbeeNetwork"), ((zigbeeNetwork) ? QJsonValue((zigbeeNetwork)->toJson()) : QJsonValue(QJsonObject{})));
+    object.insert(QStringLiteral("zigbeeNetwork"), QJsonValue((zigbeeNetwork).toJson()));
     return object;
 }
+
+class ZigbeeNetworkRemovedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZigbeeNetworkRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeNetworkRemovedNotificationParams ZigbeeNetworkRemovedNotificationParams::fromJson(const QJsonObject &object) {
     ZigbeeNetworkRemovedNotificationParams value;
@@ -15590,115 +15330,18 @@ inline QJsonObject ZigbeeNetworkRemovedNotificationParams::toJson() const {
     return object;
 }
 
-inline ZigbeeNode ZigbeeNode::fromJson(const QJsonObject &object) {
-    ZigbeeNode value;
-    if (object.contains(QStringLiteral("bindingTableRecords"))) {
-        value.bindingTableRecords = ([&]() { QList<QSharedPointer<ZigbeeBindingTableRecord>> list; for (const QJsonValue &item : (object.value(QStringLiteral("bindingTableRecords"))).toArray()) { list.append(QSharedPointer<ZigbeeBindingTableRecord>::create(ZigbeeBindingTableRecord::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("endpoints"))) {
-        value.endpoints = ([&]() { QList<QSharedPointer<ZigbeeNodeEndpoint>> list; for (const QJsonValue &item : (object.value(QStringLiteral("endpoints"))).toArray()) { list.append(QSharedPointer<ZigbeeNodeEndpoint>::create(ZigbeeNodeEndpoint::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("ieeeAddress"))) {
-        value.ieeeAddress = (object.value(QStringLiteral("ieeeAddress"))).toString();
-    }
-    if (object.contains(QStringLiteral("lastSeen"))) {
-        value.lastSeen = static_cast<quint64>((object.value(QStringLiteral("lastSeen"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("lqi"))) {
-        value.lqi = static_cast<quint64>((object.value(QStringLiteral("lqi"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("manufacturer"))) {
-        value.manufacturer = (object.value(QStringLiteral("manufacturer"))).toString();
-    }
-    if (object.contains(QStringLiteral("model"))) {
-        value.model = (object.value(QStringLiteral("model"))).toString();
-    }
-    if (object.contains(QStringLiteral("neighborTableRecords"))) {
-        value.neighborTableRecords = ([&]() { QList<QSharedPointer<ZigbeeNeighborTableRecord>> list; for (const QJsonValue &item : (object.value(QStringLiteral("neighborTableRecords"))).toArray()) { list.append(QSharedPointer<ZigbeeNeighborTableRecord>::create(ZigbeeNeighborTableRecord::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("networkAddress"))) {
-        value.networkAddress = static_cast<quint64>((object.value(QStringLiteral("networkAddress"))).toInteger());
-    }
-    if (object.contains(QStringLiteral("networkUuid"))) {
-        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
-    }
-    if (object.contains(QStringLiteral("reachable"))) {
-        value.reachable = (object.value(QStringLiteral("reachable"))).toBool();
-    }
-    if (object.contains(QStringLiteral("receiverOnWhileIdle"))) {
-        value.receiverOnWhileIdle = (object.value(QStringLiteral("receiverOnWhileIdle"))).toBool();
-    }
-    if (object.contains(QStringLiteral("routingTableRecords"))) {
-        value.routingTableRecords = ([&]() { QList<QSharedPointer<ZigbeeRoutingTableRecord>> list; for (const QJsonValue &item : (object.value(QStringLiteral("routingTableRecords"))).toArray()) { list.append(QSharedPointer<ZigbeeRoutingTableRecord>::create(ZigbeeRoutingTableRecord::fromJson((item).toObject()))); } return list; }());
-    }
-    if (object.contains(QStringLiteral("state"))) {
-        value.state = parseZigbeeNodeState(object.value(QStringLiteral("state")));
-    }
-    if (object.contains(QStringLiteral("type"))) {
-        value.type = parseZigbeeNodeType(object.value(QStringLiteral("type")));
-    }
-    if (object.contains(QStringLiteral("version"))) {
-        value.version = (object.value(QStringLiteral("version"))).toString();
-    }
-    return value;
-}
+class ZigbeeNodeEndpoint {
+public:
+    // wire: 'endpointId' (field)
+    quint64 endpointId{};
+    // wire: 'inputClusters' (field)
+    QList<ZigbeeCluster> inputClusters{};
+    // wire: 'outputClusters' (field)
+    QList<ZigbeeCluster> outputClusters{};
 
-inline QJsonObject ZigbeeNode::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("bindingTableRecords"), ([&]() { QJsonArray array; for (const auto &item : bindingTableRecords) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("endpoints"), ([&]() { QJsonArray array; for (const auto &item : endpoints) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("ieeeAddress"), QJsonValue(ieeeAddress));
-    object.insert(QStringLiteral("lastSeen"), QJsonValue(static_cast<qint64>(lastSeen)));
-    object.insert(QStringLiteral("lqi"), QJsonValue(static_cast<qint64>(lqi)));
-    object.insert(QStringLiteral("manufacturer"), QJsonValue(manufacturer));
-    object.insert(QStringLiteral("model"), QJsonValue(model));
-    object.insert(QStringLiteral("neighborTableRecords"), ([&]() { QJsonArray array; for (const auto &item : neighborTableRecords) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("networkAddress"), QJsonValue(static_cast<qint64>(networkAddress)));
-    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("reachable"), QJsonValue(reachable));
-    object.insert(QStringLiteral("receiverOnWhileIdle"), QJsonValue(receiverOnWhileIdle));
-    object.insert(QStringLiteral("routingTableRecords"), ([&]() { QJsonArray array; for (const auto &item : routingTableRecords) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("state"), QJsonValue(toString(state)));
-    object.insert(QStringLiteral("type"), QJsonValue(toString(type)));
-    object.insert(QStringLiteral("version"), QJsonValue(version));
-    return object;
-}
-
-inline ZigbeeNodeAddedNotificationParams ZigbeeNodeAddedNotificationParams::fromJson(const QJsonObject &object) {
-    ZigbeeNodeAddedNotificationParams value;
-    if (object.contains(QStringLiteral("networkUuid"))) {
-        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
-    }
-    if (object.contains(QStringLiteral("zigbeeNode"))) {
-        value.zigbeeNode = QSharedPointer<ZigbeeNode>::create(ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject ZigbeeNodeAddedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("zigbeeNode"), ((zigbeeNode) ? QJsonValue((zigbeeNode)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
-
-inline ZigbeeNodeChangedNotificationParams ZigbeeNodeChangedNotificationParams::fromJson(const QJsonObject &object) {
-    ZigbeeNodeChangedNotificationParams value;
-    if (object.contains(QStringLiteral("networkUuid"))) {
-        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
-    }
-    if (object.contains(QStringLiteral("zigbeeNode"))) {
-        value.zigbeeNode = QSharedPointer<ZigbeeNode>::create(ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject()));
-    }
-    return value;
-}
-
-inline QJsonObject ZigbeeNodeChangedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("zigbeeNode"), ((zigbeeNode) ? QJsonValue((zigbeeNode)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ZigbeeNodeEndpoint fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeNodeEndpoint ZigbeeNodeEndpoint::fromJson(const QJsonObject &object) {
     ZigbeeNodeEndpoint value;
@@ -15706,10 +15349,10 @@ inline ZigbeeNodeEndpoint ZigbeeNodeEndpoint::fromJson(const QJsonObject &object
         value.endpointId = static_cast<quint64>((object.value(QStringLiteral("endpointId"))).toInteger());
     }
     if (object.contains(QStringLiteral("inputClusters"))) {
-        value.inputClusters = ([&]() { QList<QSharedPointer<ZigbeeCluster>> list; for (const QJsonValue &item : (object.value(QStringLiteral("inputClusters"))).toArray()) { list.append(QSharedPointer<ZigbeeCluster>::create(ZigbeeCluster::fromJson((item).toObject()))); } return list; }());
+        value.inputClusters = ([&]() { QList<ZigbeeCluster> list; for (const QJsonValue &item : (object.value(QStringLiteral("inputClusters"))).toArray()) { list.append(ZigbeeCluster::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("outputClusters"))) {
-        value.outputClusters = ([&]() { QList<QSharedPointer<ZigbeeCluster>> list; for (const QJsonValue &item : (object.value(QStringLiteral("outputClusters"))).toArray()) { list.append(QSharedPointer<ZigbeeCluster>::create(ZigbeeCluster::fromJson((item).toObject()))); } return list; }());
+        value.outputClusters = ([&]() { QList<ZigbeeCluster> list; for (const QJsonValue &item : (object.value(QStringLiteral("outputClusters"))).toArray()) { list.append(ZigbeeCluster::fromJson((item).toObject())); } return list; }());
     }
     return value;
 }
@@ -15717,28 +15360,21 @@ inline ZigbeeNodeEndpoint ZigbeeNodeEndpoint::fromJson(const QJsonObject &object
 inline QJsonObject ZigbeeNodeEndpoint::toJson() const {
     QJsonObject object;
     object.insert(QStringLiteral("endpointId"), QJsonValue(static_cast<qint64>(endpointId)));
-    object.insert(QStringLiteral("inputClusters"), ([&]() { QJsonArray array; for (const auto &item : inputClusters) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
-    object.insert(QStringLiteral("outputClusters"), ([&]() { QJsonArray array; for (const auto &item : outputClusters) { array.append(((item) ? QJsonValue((item)->toJson()) : QJsonValue(QJsonObject{}))); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("inputClusters"), ([&]() { QJsonArray array; for (const auto &item : inputClusters) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("outputClusters"), ([&]() { QJsonArray array; for (const auto &item : outputClusters) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     return object;
 }
 
-inline ZigbeeNodeRemovedNotificationParams ZigbeeNodeRemovedNotificationParams::fromJson(const QJsonObject &object) {
-    ZigbeeNodeRemovedNotificationParams value;
-    if (object.contains(QStringLiteral("networkUuid"))) {
-        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
-    }
-    if (object.contains(QStringLiteral("zigbeeNode"))) {
-        value.zigbeeNode = QSharedPointer<ZigbeeNode>::create(ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject()));
-    }
-    return value;
-}
+class ZigbeeRefreshBindingsParams {
+public:
+    // wire: 'ieeeAddress' (field)
+    QString ieeeAddress{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
 
-inline QJsonObject ZigbeeNodeRemovedNotificationParams::toJson() const {
-    QJsonObject object;
-    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
-    object.insert(QStringLiteral("zigbeeNode"), ((zigbeeNode) ? QJsonValue((zigbeeNode)->toJson()) : QJsonValue(QJsonObject{})));
-    return object;
-}
+    static ZigbeeRefreshBindingsParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRefreshBindingsParams ZigbeeRefreshBindingsParams::fromJson(const QJsonObject &object) {
     ZigbeeRefreshBindingsParams value;
@@ -15758,6 +15394,15 @@ inline QJsonObject ZigbeeRefreshBindingsParams::toJson() const {
     return object;
 }
 
+class ZigbeeRefreshBindingsResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeRefreshBindingsResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeRefreshBindingsResponse ZigbeeRefreshBindingsResponse::fromJson(const QJsonObject &object) {
     ZigbeeRefreshBindingsResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15771,6 +15416,15 @@ inline QJsonObject ZigbeeRefreshBindingsResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeRefreshNeighborTablesParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZigbeeRefreshNeighborTablesParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRefreshNeighborTablesParams ZigbeeRefreshNeighborTablesParams::fromJson(const QJsonObject &object) {
     ZigbeeRefreshNeighborTablesParams value;
@@ -15786,6 +15440,15 @@ inline QJsonObject ZigbeeRefreshNeighborTablesParams::toJson() const {
     return object;
 }
 
+class ZigbeeRefreshNeighborTablesResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeRefreshNeighborTablesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeRefreshNeighborTablesResponse ZigbeeRefreshNeighborTablesResponse::fromJson(const QJsonObject &object) {
     ZigbeeRefreshNeighborTablesResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15799,6 +15462,27 @@ inline QJsonObject ZigbeeRefreshNeighborTablesResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeRemoveBindingParams {
+public:
+    // wire: 'clusterId' (field)
+    quint64 clusterId{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'destinationAddress' (optional)
+    std::optional<QString> destinationAddress;
+    // wire: 'destinationEndpointId' (optional)
+    std::optional<quint64> destinationEndpointId;
+    // wire: 'destinationGroupAddress' (optional)
+    std::optional<quint64> destinationGroupAddress;
+    // wire: 'sourceAddress' (field)
+    QString sourceAddress{};
+    // wire: 'sourceEndpointId' (field)
+    quint64 sourceEndpointId{};
+
+    static ZigbeeRemoveBindingParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRemoveBindingParams ZigbeeRemoveBindingParams::fromJson(const QJsonObject &object) {
     ZigbeeRemoveBindingParams value;
@@ -15844,6 +15528,15 @@ inline QJsonObject ZigbeeRemoveBindingParams::toJson() const {
     return object;
 }
 
+class ZigbeeRemoveBindingResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeRemoveBindingResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeRemoveBindingResponse ZigbeeRemoveBindingResponse::fromJson(const QJsonObject &object) {
     ZigbeeRemoveBindingResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15857,6 +15550,15 @@ inline QJsonObject ZigbeeRemoveBindingResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeRemoveNetworkParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZigbeeRemoveNetworkParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRemoveNetworkParams ZigbeeRemoveNetworkParams::fromJson(const QJsonObject &object) {
     ZigbeeRemoveNetworkParams value;
@@ -15872,6 +15574,15 @@ inline QJsonObject ZigbeeRemoveNetworkParams::toJson() const {
     return object;
 }
 
+class ZigbeeRemoveNetworkResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeRemoveNetworkResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeRemoveNetworkResponse ZigbeeRemoveNetworkResponse::fromJson(const QJsonObject &object) {
     ZigbeeRemoveNetworkResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15885,6 +15596,17 @@ inline QJsonObject ZigbeeRemoveNetworkResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeRemoveNodeParams {
+public:
+    // wire: 'ieeeAddress' (field)
+    QString ieeeAddress{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+
+    static ZigbeeRemoveNodeParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRemoveNodeParams ZigbeeRemoveNodeParams::fromJson(const QJsonObject &object) {
     ZigbeeRemoveNodeParams value;
@@ -15904,6 +15626,15 @@ inline QJsonObject ZigbeeRemoveNodeParams::toJson() const {
     return object;
 }
 
+class ZigbeeRemoveNodeResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeRemoveNodeResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeRemoveNodeResponse ZigbeeRemoveNodeResponse::fromJson(const QJsonObject &object) {
     ZigbeeRemoveNodeResponse value;
     if (object.contains(QStringLiteral("zigbeeError"))) {
@@ -15917,6 +15648,23 @@ inline QJsonObject ZigbeeRemoveNodeResponse::toJson() const {
     object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
     return object;
 }
+
+class ZigbeeRoutingTableRecord {
+public:
+    // wire: 'destinationAddress' (field)
+    quint64 destinationAddress{};
+    // wire: 'manyToOne' (field)
+    bool manyToOne{};
+    // wire: 'memoryConstrained' (field)
+    bool memoryConstrained{};
+    // wire: 'nextHopAddress' (field)
+    quint64 nextHopAddress{};
+    // wire: 'status' (field)
+    ZigbeeNodeRouteStatus status{};
+
+    static ZigbeeRoutingTableRecord fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeRoutingTableRecord ZigbeeRoutingTableRecord::fromJson(const QJsonObject &object) {
     ZigbeeRoutingTableRecord value;
@@ -15948,6 +15696,250 @@ inline QJsonObject ZigbeeRoutingTableRecord::toJson() const {
     return object;
 }
 
+class ZigbeeNode {
+public:
+    // wire: 'bindingTableRecords' (field)
+    QList<ZigbeeBindingTableRecord> bindingTableRecords{};
+    // wire: 'endpoints' (field)
+    QList<ZigbeeNodeEndpoint> endpoints{};
+    // wire: 'ieeeAddress' (field)
+    QString ieeeAddress{};
+    // wire: 'lastSeen' (field)
+    quint64 lastSeen{};
+    // wire: 'lqi' (field)
+    quint64 lqi{};
+    // wire: 'manufacturer' (field)
+    QString manufacturer{};
+    // wire: 'model' (field)
+    QString model{};
+    // wire: 'neighborTableRecords' (field)
+    QList<ZigbeeNeighborTableRecord> neighborTableRecords{};
+    // wire: 'networkAddress' (field)
+    quint64 networkAddress{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'reachable' (field)
+    bool reachable{};
+    // wire: 'receiverOnWhileIdle' (field)
+    bool receiverOnWhileIdle{};
+    // wire: 'routingTableRecords' (field)
+    QList<ZigbeeRoutingTableRecord> routingTableRecords{};
+    // wire: 'state' (field)
+    ZigbeeNodeState state{};
+    // wire: 'type' (field)
+    ZigbeeNodeType type{};
+    // wire: 'version' (field)
+    QString version{};
+
+    static ZigbeeNode fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeNode ZigbeeNode::fromJson(const QJsonObject &object) {
+    ZigbeeNode value;
+    if (object.contains(QStringLiteral("bindingTableRecords"))) {
+        value.bindingTableRecords = ([&]() { QList<ZigbeeBindingTableRecord> list; for (const QJsonValue &item : (object.value(QStringLiteral("bindingTableRecords"))).toArray()) { list.append(ZigbeeBindingTableRecord::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("endpoints"))) {
+        value.endpoints = ([&]() { QList<ZigbeeNodeEndpoint> list; for (const QJsonValue &item : (object.value(QStringLiteral("endpoints"))).toArray()) { list.append(ZigbeeNodeEndpoint::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("ieeeAddress"))) {
+        value.ieeeAddress = (object.value(QStringLiteral("ieeeAddress"))).toString();
+    }
+    if (object.contains(QStringLiteral("lastSeen"))) {
+        value.lastSeen = static_cast<quint64>((object.value(QStringLiteral("lastSeen"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("lqi"))) {
+        value.lqi = static_cast<quint64>((object.value(QStringLiteral("lqi"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("manufacturer"))) {
+        value.manufacturer = (object.value(QStringLiteral("manufacturer"))).toString();
+    }
+    if (object.contains(QStringLiteral("model"))) {
+        value.model = (object.value(QStringLiteral("model"))).toString();
+    }
+    if (object.contains(QStringLiteral("neighborTableRecords"))) {
+        value.neighborTableRecords = ([&]() { QList<ZigbeeNeighborTableRecord> list; for (const QJsonValue &item : (object.value(QStringLiteral("neighborTableRecords"))).toArray()) { list.append(ZigbeeNeighborTableRecord::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("networkAddress"))) {
+        value.networkAddress = static_cast<quint64>((object.value(QStringLiteral("networkAddress"))).toInteger());
+    }
+    if (object.contains(QStringLiteral("networkUuid"))) {
+        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
+    }
+    if (object.contains(QStringLiteral("reachable"))) {
+        value.reachable = (object.value(QStringLiteral("reachable"))).toBool();
+    }
+    if (object.contains(QStringLiteral("receiverOnWhileIdle"))) {
+        value.receiverOnWhileIdle = (object.value(QStringLiteral("receiverOnWhileIdle"))).toBool();
+    }
+    if (object.contains(QStringLiteral("routingTableRecords"))) {
+        value.routingTableRecords = ([&]() { QList<ZigbeeRoutingTableRecord> list; for (const QJsonValue &item : (object.value(QStringLiteral("routingTableRecords"))).toArray()) { list.append(ZigbeeRoutingTableRecord::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("state"))) {
+        value.state = parseZigbeeNodeState(object.value(QStringLiteral("state")));
+    }
+    if (object.contains(QStringLiteral("type"))) {
+        value.type = parseZigbeeNodeType(object.value(QStringLiteral("type")));
+    }
+    if (object.contains(QStringLiteral("version"))) {
+        value.version = (object.value(QStringLiteral("version"))).toString();
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeNode::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("bindingTableRecords"), ([&]() { QJsonArray array; for (const auto &item : bindingTableRecords) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("endpoints"), ([&]() { QJsonArray array; for (const auto &item : endpoints) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("ieeeAddress"), QJsonValue(ieeeAddress));
+    object.insert(QStringLiteral("lastSeen"), QJsonValue(static_cast<qint64>(lastSeen)));
+    object.insert(QStringLiteral("lqi"), QJsonValue(static_cast<qint64>(lqi)));
+    object.insert(QStringLiteral("manufacturer"), QJsonValue(manufacturer));
+    object.insert(QStringLiteral("model"), QJsonValue(model));
+    object.insert(QStringLiteral("neighborTableRecords"), ([&]() { QJsonArray array; for (const auto &item : neighborTableRecords) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("networkAddress"), QJsonValue(static_cast<qint64>(networkAddress)));
+    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
+    object.insert(QStringLiteral("reachable"), QJsonValue(reachable));
+    object.insert(QStringLiteral("receiverOnWhileIdle"), QJsonValue(receiverOnWhileIdle));
+    object.insert(QStringLiteral("routingTableRecords"), ([&]() { QJsonArray array; for (const auto &item : routingTableRecords) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    object.insert(QStringLiteral("state"), QJsonValue(toString(state)));
+    object.insert(QStringLiteral("type"), QJsonValue(toString(type)));
+    object.insert(QStringLiteral("version"), QJsonValue(version));
+    return object;
+}
+
+class ZigbeeGetNodesResponse {
+public:
+    // wire: 'zigbeeNodes' (optional)
+    std::optional<QList<ZigbeeNode>> zigbeeNodes;
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeGetNodesResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeGetNodesResponse ZigbeeGetNodesResponse::fromJson(const QJsonObject &object) {
+    ZigbeeGetNodesResponse value;
+    if (object.contains(QStringLiteral("zigbeeNodes"))) {
+        value.zigbeeNodes = ([&]() { QList<ZigbeeNode> list; for (const QJsonValue &item : (object.value(QStringLiteral("zigbeeNodes"))).toArray()) { list.append(ZigbeeNode::fromJson((item).toObject())); } return list; }());
+    }
+    if (object.contains(QStringLiteral("zigbeeError"))) {
+        value.zigbeeError = parseZigbeeError(object.value(QStringLiteral("zigbeeError")));
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeGetNodesResponse::toJson() const {
+    QJsonObject object;
+    if (zigbeeNodes.has_value()) {
+        object.insert(QStringLiteral("zigbeeNodes"), ([&]() { QJsonArray array; for (const auto &item : *zigbeeNodes) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
+    }
+    object.insert(QStringLiteral("zigbeeError"), QJsonValue(toString(zigbeeError)));
+    return object;
+}
+
+class ZigbeeNodeAddedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'zigbeeNode' (field)
+    ZigbeeNode zigbeeNode{};
+
+    static ZigbeeNodeAddedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeNodeAddedNotificationParams ZigbeeNodeAddedNotificationParams::fromJson(const QJsonObject &object) {
+    ZigbeeNodeAddedNotificationParams value;
+    if (object.contains(QStringLiteral("networkUuid"))) {
+        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
+    }
+    if (object.contains(QStringLiteral("zigbeeNode"))) {
+        value.zigbeeNode = ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeNodeAddedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
+    object.insert(QStringLiteral("zigbeeNode"), QJsonValue((zigbeeNode).toJson()));
+    return object;
+}
+
+class ZigbeeNodeChangedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'zigbeeNode' (field)
+    ZigbeeNode zigbeeNode{};
+
+    static ZigbeeNodeChangedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeNodeChangedNotificationParams ZigbeeNodeChangedNotificationParams::fromJson(const QJsonObject &object) {
+    ZigbeeNodeChangedNotificationParams value;
+    if (object.contains(QStringLiteral("networkUuid"))) {
+        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
+    }
+    if (object.contains(QStringLiteral("zigbeeNode"))) {
+        value.zigbeeNode = ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeNodeChangedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
+    object.insert(QStringLiteral("zigbeeNode"), QJsonValue((zigbeeNode).toJson()));
+    return object;
+}
+
+class ZigbeeNodeRemovedNotificationParams {
+public:
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'zigbeeNode' (field)
+    ZigbeeNode zigbeeNode{};
+
+    static ZigbeeNodeRemovedNotificationParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
+inline ZigbeeNodeRemovedNotificationParams ZigbeeNodeRemovedNotificationParams::fromJson(const QJsonObject &object) {
+    ZigbeeNodeRemovedNotificationParams value;
+    if (object.contains(QStringLiteral("networkUuid"))) {
+        value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
+    }
+    if (object.contains(QStringLiteral("zigbeeNode"))) {
+        value.zigbeeNode = ZigbeeNode::fromJson((object.value(QStringLiteral("zigbeeNode"))).toObject());
+    }
+    return value;
+}
+
+inline QJsonObject ZigbeeNodeRemovedNotificationParams::toJson() const {
+    QJsonObject object;
+    object.insert(QStringLiteral("networkUuid"), QJsonValue((networkUuid).toString()));
+    object.insert(QStringLiteral("zigbeeNode"), QJsonValue((zigbeeNode).toJson()));
+    return object;
+}
+
+class ZigbeeSetPermitJoinParams {
+public:
+    // wire: 'duration' (field)
+    quint64 duration{};
+    // wire: 'networkUuid' (field)
+    QUuid networkUuid{};
+    // wire: 'shortAddress' (optional)
+    std::optional<quint64> shortAddress;
+
+    static ZigbeeSetPermitJoinParams fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
+
 inline ZigbeeSetPermitJoinParams ZigbeeSetPermitJoinParams::fromJson(const QJsonObject &object) {
     ZigbeeSetPermitJoinParams value;
     if (object.contains(QStringLiteral("duration"))) {
@@ -15971,6 +15963,15 @@ inline QJsonObject ZigbeeSetPermitJoinParams::toJson() const {
     }
     return object;
 }
+
+class ZigbeeSetPermitJoinResponse {
+public:
+    // wire: 'zigbeeError' (field)
+    ZigbeeError zigbeeError{};
+
+    static ZigbeeSetPermitJoinResponse fromJson(const QJsonObject &object);
+    QJsonObject toJson() const;
+};
 
 inline ZigbeeSetPermitJoinResponse ZigbeeSetPermitJoinResponse::fromJson(const QJsonObject &object) {
     ZigbeeSetPermitJoinResponse value;

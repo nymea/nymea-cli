@@ -230,12 +230,19 @@ class ApiGenerator:
         self.method_defs: List[MethodDef] = []
         self.notification_defs: List[NotificationDef] = []
 
+        self.named_type_graph: Dict[str, Set[str]] = {}
+        self.sccs: List[List[str]] = []
+        self.node_to_scc: Dict[str, int] = {}
+        self.cyclic_sccs: Set[int] = set()
+        self.ordered_scc_indices: List[int] = []
+
         self._reserve_top_level_names()
         self._parse_enums()
         self._parse_flags()
         self._parse_types()
         self._parse_methods()
         self._parse_notifications()
+        self._build_type_graph()
 
     def _reserve_type_name(self, raw_name: str) -> str:
         base = sanitize_identifier(raw_name, pascal_case=True)
@@ -388,49 +395,136 @@ class ApiGenerator:
 
         raise ValueError(f"Unsupported schema value: {value!r}")
 
-    def _collect_alias_dependencies(self, schema: Schema, dependencies: Set[str]) -> None:
-        if schema.kind == "ref":
-            name = schema.name
-            if name is None:
-                return
-            if name in self.alias_types:
-                dependencies.add(name)
-            return
+    def _schema_named_dependencies(self, schema: Schema) -> Set[str]:
+        if schema.kind == "ref" and schema.name is not None:
+            if schema.name in self.object_types or schema.name in self.alias_types:
+                return {schema.name}
+            return set()
 
         if schema.kind == "list" and schema.element is not None:
-            self._collect_alias_dependencies(schema.element, dependencies)
+            return self._schema_named_dependencies(schema.element)
 
-    def _sorted_alias_types(self) -> List[str]:
+        return set()
+
+    def _build_type_graph(self) -> None:
         graph: Dict[str, Set[str]] = {}
 
-        for name in self.alias_types:
+        for alias_name, schema in self.alias_types.items():
+            deps = self._schema_named_dependencies(schema)
+            deps.discard(alias_name)
+            graph[alias_name] = deps
+
+        for object_name, fields in self.object_types.items():
             deps: Set[str] = set()
-            self._collect_alias_dependencies(self.alias_types[name], deps)
-            deps.discard(name)
-            graph[name] = deps
+            for field in fields:
+                deps.update(self._schema_named_dependencies(field.schema))
+            deps.discard(object_name)
+            graph[object_name] = deps
 
-        ordered: List[str] = []
-        temporary: Set[str] = set()
-        permanent: Set[str] = set()
+        self.named_type_graph = graph
+        self.sccs, self.node_to_scc = self._tarjan_scc(graph)
 
-        def visit(node: str) -> None:
-            if node in permanent:
+        for index, nodes in enumerate(self.sccs):
+            if len(nodes) > 1:
+                self.cyclic_sccs.add(index)
+                continue
+            node = nodes[0]
+            if node in graph.get(node, set()):
+                self.cyclic_sccs.add(index)
+
+        self.ordered_scc_indices = self._topo_sort_sccs()
+
+    def _tarjan_scc(self, graph: Dict[str, Set[str]]) -> Tuple[List[List[str]], Dict[str, int]]:
+        index = 0
+        stack: List[str] = []
+        on_stack: Set[str] = set()
+        indices: Dict[str, int] = {}
+        lowlinks: Dict[str, int] = {}
+        sccs: List[List[str]] = []
+        node_to_scc: Dict[str, int] = {}
+
+        def strong_connect(node: str) -> None:
+            nonlocal index
+            indices[node] = index
+            lowlinks[node] = index
+            index += 1
+            stack.append(node)
+            on_stack.add(node)
+
+            for dependency in sorted(graph.get(node, set())):
+                if dependency not in indices:
+                    strong_connect(dependency)
+                    lowlinks[node] = min(lowlinks[node], lowlinks[dependency])
+                elif dependency in on_stack:
+                    lowlinks[node] = min(lowlinks[node], indices[dependency])
+
+            if lowlinks[node] != indices[node]:
                 return
-            if node in temporary:
-                raise ValueError(f"Cyclic alias dependency detected for type {node}")
-            temporary.add(node)
-            for dependency in sorted(graph[node]):
-                visit(dependency)
-            temporary.remove(node)
-            permanent.add(node)
-            ordered.append(node)
+
+            scc_index = len(sccs)
+            component: List[str] = []
+            while True:
+                member = stack.pop()
+                on_stack.remove(member)
+                node_to_scc[member] = scc_index
+                component.append(member)
+                if member == node:
+                    break
+            sccs.append(sorted(component))
 
         for node in sorted(graph.keys()):
-            visit(node)
+            if node not in indices:
+                strong_connect(node)
+
+        return sccs, node_to_scc
+
+    def _topo_sort_sccs(self) -> List[int]:
+        scc_graph: Dict[int, Set[int]] = {index: set() for index in range(len(self.sccs))}
+        indegree: Dict[int, int] = {index: 0 for index in range(len(self.sccs))}
+
+        for node, dependencies in self.named_type_graph.items():
+            node_scc = self.node_to_scc[node]
+            for dependency in dependencies:
+                dependency_scc = self.node_to_scc[dependency]
+                if node_scc == dependency_scc:
+                    continue
+                if node_scc not in scc_graph[dependency_scc]:
+                    scc_graph[dependency_scc].add(node_scc)
+                    indegree[node_scc] += 1
+
+        available = sorted(
+            [index for index, degree in indegree.items() if degree == 0],
+            key=lambda index: tuple(self.sccs[index]),
+        )
+        ordered: List[int] = []
+
+        while available:
+            current = available.pop(0)
+            ordered.append(current)
+            for dependent in sorted(scc_graph[current], key=lambda index: tuple(self.sccs[index])):
+                indegree[dependent] -= 1
+                if indegree[dependent] == 0:
+                    available.append(dependent)
+                    available.sort(key=lambda index: tuple(self.sccs[index]))
+
+        if len(ordered) != len(self.sccs):
+            raise ValueError("Failed to topologically sort generated type graph")
 
         return ordered
 
-    def _cpp_type(self, schema: Schema) -> str:
+    def _requires_indirection(self, owner_name: Optional[str], target_name: str) -> bool:
+        if owner_name is None:
+            return False
+        if owner_name not in self.node_to_scc or target_name not in self.node_to_scc:
+            return False
+        owner_scc = self.node_to_scc[owner_name]
+        target_scc = self.node_to_scc[target_name]
+        return owner_scc == target_scc and owner_scc in self.cyclic_sccs
+
+    def _sorted_alias_types(self) -> List[str]:
+        return [name for name in sorted(self.alias_types.keys())]
+
+    def _cpp_type(self, schema: Schema, owner_name: Optional[str] = None) -> str:
         if schema.kind == "primitive":
             return PRIMITIVE_CPP_TYPES.get(schema.name or "", "QJsonValue")
 
@@ -438,15 +532,23 @@ class ApiGenerator:
             if schema.name is None:
                 return "QJsonValue"
             if schema.name in self.object_types:
-                return f"QSharedPointer<{schema.name}>"
+                if self._requires_indirection(owner_name, schema.name):
+                    return f"QSharedPointer<{schema.name}>"
+                return schema.name
             return schema.name
 
         if schema.kind == "list" and schema.element is not None:
-            return f"QList<{self._cpp_type(schema.element)}>"
+            return f"QList<{self._cpp_type(schema.element, owner_name)}>"
 
         return "QJsonValue"
 
-    def _decode_schema(self, schema: Schema, expr: str, seen_aliases: Optional[Set[str]] = None) -> str:
+    def _decode_schema(
+        self,
+        schema: Schema,
+        expr: str,
+        owner_name: Optional[str] = None,
+        seen_aliases: Optional[Set[str]] = None,
+    ) -> str:
         if seen_aliases is None:
             seen_aliases = set()
 
@@ -481,8 +583,8 @@ class ApiGenerator:
             return expr
 
         if schema.kind == "list" and schema.element is not None:
-            element_type = self._cpp_type(schema.element)
-            element_decode = self._decode_schema(schema.element, "item", seen_aliases)
+            element_type = self._cpp_type(schema.element, owner_name)
+            element_decode = self._decode_schema(schema.element, "item", owner_name, seen_aliases)
             return (
                 "([&]() { "
                 f"QList<{element_type}> list; "
@@ -495,19 +597,28 @@ class ApiGenerator:
             if ref_name in self.enum_values:
                 return f"parse{ref_name}({expr})"
             if ref_name in self.object_types:
-                return f"QSharedPointer<{ref_name}>::create({ref_name}::fromJson(({expr}).toObject()))"
+                if self._requires_indirection(owner_name, ref_name):
+                    return f"QSharedPointer<{ref_name}>::create({ref_name}::fromJson(({expr}).toObject()))"
+                return f"{ref_name}::fromJson(({expr}).toObject())"
             if ref_name in self.alias_types:
                 if ref_name in seen_aliases:
                     return "{}"
                 return self._decode_schema(
                     self.alias_types[ref_name],
                     expr,
-                    seen_aliases | {ref_name},
+                    owner_name=ref_name,
+                    seen_aliases=seen_aliases | {ref_name},
                 )
 
         return expr
 
-    def _encode_schema(self, schema: Schema, expr: str, seen_aliases: Optional[Set[str]] = None) -> str:
+    def _encode_schema(
+        self,
+        schema: Schema,
+        expr: str,
+        owner_name: Optional[str] = None,
+        seen_aliases: Optional[Set[str]] = None,
+    ) -> str:
         if seen_aliases is None:
             seen_aliases = set()
 
@@ -534,7 +645,7 @@ class ApiGenerator:
             return f"QJsonValue({expr})"
 
         if schema.kind == "list" and schema.element is not None:
-            element_encode = self._encode_schema(schema.element, "item", seen_aliases)
+            element_encode = self._encode_schema(schema.element, "item", owner_name, seen_aliases)
             return (
                 "([&]() { "
                 "QJsonArray array; "
@@ -547,14 +658,17 @@ class ApiGenerator:
             if ref_name in self.enum_values:
                 return f"QJsonValue(toString({expr}))"
             if ref_name in self.object_types:
-                return f"(({expr}) ? QJsonValue(({expr})->toJson()) : QJsonValue(QJsonObject{{}}))"
+                if self._requires_indirection(owner_name, ref_name):
+                    return f"(({expr}) ? QJsonValue(({expr})->toJson()) : QJsonValue(QJsonObject{{}}))"
+                return f"QJsonValue(({expr}).toJson())"
             if ref_name in self.alias_types:
                 if ref_name in seen_aliases:
                     return "QJsonValue()"
                 return self._encode_schema(
                     self.alias_types[ref_name],
                     expr,
-                    seen_aliases | {ref_name},
+                    owner_name=ref_name,
+                    seen_aliases=seen_aliases | {ref_name},
                 )
 
         return f"QJsonValue({expr})"
@@ -570,9 +684,7 @@ class ApiGenerator:
         lines.append(f"inline QString toString({enum_name} value) {{")
         lines.append("    switch (value) {")
         for wire, cpp_value in values:
-            lines.append(
-                f"    case {enum_name}::{cpp_value}: return QStringLiteral(\"{wire}\");"
-            )
+            lines.append(f"    case {enum_name}::{cpp_value}: return QStringLiteral(\"{wire}\");")
         default_wire = values[0][0] if values else ""
         lines.append("    }")
         lines.append(f"    return QStringLiteral(\"{default_wire}\");")
@@ -582,9 +694,7 @@ class ApiGenerator:
         lines.append(f"inline {enum_name} parse{enum_name}(const QJsonValue &value) {{")
         lines.append("    const QString token = value.toString();")
         for wire, cpp_value in values:
-            lines.append(
-                f"    if (token == QStringLiteral(\"{wire}\")) return {enum_name}::{cpp_value};"
-            )
+            lines.append(f"    if (token == QStringLiteral(\"{wire}\")) return {enum_name}::{cpp_value};")
         default_cpp = self.enum_default_value.get(enum_name, values[0][1] if values else "")
         lines.append(f"    return {enum_name}::{default_cpp};")
         lines.append("}")
@@ -592,10 +702,10 @@ class ApiGenerator:
 
         return lines
 
-    def _render_struct_declaration(self, struct_name: str, fields: List[FieldDef]) -> List[str]:
-        lines: List[str] = [f"struct {struct_name} {{"]
+    def _render_class_declaration(self, class_name: str, fields: List[FieldDef]) -> List[str]:
+        lines: List[str] = [f"class {class_name} {{", "public:"]
         for field in fields:
-            field_type = self._cpp_type(field.schema)
+            field_type = self._cpp_type(field.schema, class_name)
             if field.optional:
                 declaration = f"std::optional<{field_type}> {field.cpp_name};"
             else:
@@ -610,53 +720,48 @@ class ApiGenerator:
                 markers.append("deprecated")
 
             marker_comment = ", ".join(markers) if markers else "field"
-            lines.append(
-                f"    // wire: '{field.wire_name}' ({marker_comment})"
-            )
+            lines.append(f"    // wire: '{field.wire_name}' ({marker_comment})")
             lines.append(f"    {declaration}")
 
         lines.append("")
-        lines.append(f"    static {struct_name} fromJson(const QJsonObject &object);")
+        lines.append(f"    static {class_name} fromJson(const QJsonObject &object);")
         lines.append("    QJsonObject toJson() const;")
         lines.append("};")
         lines.append("")
         return lines
 
-    def _render_struct_definition(self, struct_name: str, fields: List[FieldDef]) -> List[str]:
+    def _render_class_definitions(self, class_name: str, fields: List[FieldDef]) -> List[str]:
         lines: List[str] = [
-            f"inline {struct_name} {struct_name}::fromJson(const QJsonObject &object) {{",
-            f"    {struct_name} value;",
+            f"inline {class_name} {class_name}::fromJson(const QJsonObject &object) {{",
+            f"    {class_name} value;",
         ]
 
         for field in fields:
-            decode_expr = self._decode_schema(field.schema, f'object.value(QStringLiteral("{field.wire_name}"))')
+            decode_expr = self._decode_schema(
+                field.schema,
+                f'object.value(QStringLiteral("{field.wire_name}"))',
+                owner_name=class_name,
+            )
             lines.append(f"    if (object.contains(QStringLiteral(\"{field.wire_name}\"))) {{")
-            if field.optional:
-                lines.append(f"        value.{field.cpp_name} = {decode_expr};")
-            else:
-                lines.append(f"        value.{field.cpp_name} = {decode_expr};")
+            lines.append(f"        value.{field.cpp_name} = {decode_expr};")
             lines.append("    }")
 
         lines.append("    return value;")
         lines.append("}")
         lines.append("")
 
-        lines.append(f"inline QJsonObject {struct_name}::toJson() const {{")
+        lines.append(f"inline QJsonObject {class_name}::toJson() const {{")
         lines.append("    QJsonObject object;")
 
         for field in fields:
             if field.optional:
-                encode_expr = self._encode_schema(field.schema, f"*{field.cpp_name}")
+                encode_expr = self._encode_schema(field.schema, f"*{field.cpp_name}", owner_name=class_name)
                 lines.append(f"    if ({field.cpp_name}.has_value()) {{")
-                lines.append(
-                    f"        object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});"
-                )
+                lines.append(f"        object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});")
                 lines.append("    }")
             else:
-                encode_expr = self._encode_schema(field.schema, field.cpp_name)
-                lines.append(
-                    f"    object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});"
-                )
+                encode_expr = self._encode_schema(field.schema, field.cpp_name, owner_name=class_name)
+                lines.append(f"    object.insert(QStringLiteral(\"{field.wire_name}\"), {encode_expr});")
 
         lines.append("    return object;")
         lines.append("}")
@@ -664,7 +769,7 @@ class ApiGenerator:
         return lines
 
     def _render_alias(self, alias_name: str, schema: Schema) -> List[str]:
-        return [f"using {alias_name} = {self._cpp_type(schema)};", ""]
+        return [f"using {alias_name} = {self._cpp_type(schema, owner_name=alias_name)};", ""]
 
     def _render_method_descriptor(self, method: MethodDef) -> List[str]:
         return [
@@ -696,10 +801,10 @@ class ApiGenerator:
             "#include <QJsonArray>",
             "#include <QJsonObject>",
             "#include <QJsonValue>",
-            "#include <QString>",
-            "#include <QStringList>",
             "#include <QList>",
             "#include <QSharedPointer>",
+            "#include <QString>",
+            "#include <QStringList>",
             "#include <QUuid>",
             "#include <QtGlobal>",
             "",
@@ -714,19 +819,39 @@ class ApiGenerator:
         for enum_name in sorted(self.enum_values.keys()):
             lines.extend(self._render_enum(enum_name))
 
-        lines.append("// Forward declarations for generated object types.")
-        for object_name in sorted(self.object_types.keys()):
-            lines.append(f"struct {object_name};")
-        lines.append("")
+        cyclic_object_names = sorted(
+            name
+            for scc_index in self.ordered_scc_indices
+            if scc_index in self.cyclic_sccs
+            for name in self.sccs[scc_index]
+            if name in self.object_types
+        )
+        if cyclic_object_names:
+            lines.append("// Forward declarations for recursive object types.")
+            for object_name in cyclic_object_names:
+                lines.append(f"class {object_name};")
+            lines.append("")
 
-        for alias_name in self._sorted_alias_types():
-            lines.extend(self._render_alias(alias_name, self.alias_types[alias_name]))
+        for scc_index in self.ordered_scc_indices:
+            names = sorted(self.sccs[scc_index])
+            alias_names = [name for name in names if name in self.alias_types]
+            object_names = [name for name in names if name in self.object_types]
 
-        for object_name in sorted(self.object_types.keys()):
-            lines.extend(self._render_struct_declaration(object_name, self.object_types[object_name]))
+            if scc_index in self.cyclic_sccs:
+                for alias_name in alias_names:
+                    lines.extend(self._render_alias(alias_name, self.alias_types[alias_name]))
+                for object_name in object_names:
+                    lines.extend(self._render_class_declaration(object_name, self.object_types[object_name]))
+                for object_name in object_names:
+                    lines.extend(self._render_class_definitions(object_name, self.object_types[object_name]))
+                continue
 
-        for object_name in sorted(self.object_types.keys()):
-            lines.extend(self._render_struct_definition(object_name, self.object_types[object_name]))
+            for name in names:
+                if name in self.alias_types:
+                    lines.extend(self._render_alias(name, self.alias_types[name]))
+                else:
+                    lines.extend(self._render_class_declaration(name, self.object_types[name]))
+                    lines.extend(self._render_class_definitions(name, self.object_types[name]))
 
         for method in self.method_defs:
             lines.extend(self._render_method_descriptor(method))

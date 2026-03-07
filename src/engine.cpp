@@ -1,12 +1,114 @@
 #include "engine.h"
 
+#include "generated/nymeaapigenerated.h"
+
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocale>
 
 #include <array>
+#include <initializer_list>
+#include <string_view>
 #include <utility>
+#include <vector>
 
 namespace nymea {
+
+namespace {
+
+std::string firstNonEmpty(std::initializer_list<std::string_view> candidates)
+{
+    for (const std::string_view candidate : candidates) {
+        if (!candidate.empty()) {
+            return std::string(candidate);
+        }
+    }
+
+    return {};
+}
+
+std::string optionalQStringToStd(const std::optional<QString>& value)
+{
+    return value.has_value() ? value->toStdString() : std::string();
+}
+
+std::string uuidToStd(const QUuid& value)
+{
+    return value.toString(QUuid::WithoutBraces).toStdString();
+}
+
+void appendField(std::vector<std::string>& fields, const std::string& key, const std::string& value)
+{
+    if (!value.empty()) {
+        fields.push_back(key + "=" + value);
+    }
+}
+
+std::string jsonValueToString(const QJsonValue& value)
+{
+    if (value.isString()) {
+        return value.toString().toStdString();
+    }
+
+    if (value.isBool()) {
+        return value.toBool() ? "true" : "false";
+    }
+
+    if (value.isDouble()) {
+        return QString::number(value.toDouble()).toStdString();
+    }
+
+    if (value.isNull()) {
+        return "null";
+    }
+
+    if (value.isUndefined()) {
+        return "<undefined>";
+    }
+
+    if (value.isArray()) {
+        return QJsonDocument(value.toArray()).toJson(QJsonDocument::Compact).toStdString();
+    }
+
+    if (value.isObject()) {
+        return QJsonDocument(value.toObject()).toJson(QJsonDocument::Compact).toStdString();
+    }
+
+    return "<invalid>";
+}
+
+std::string optionalJsonValueToString(const std::optional<QJsonValue>& value)
+{
+    return value.has_value() ? jsonValueToString(*value) : std::string();
+}
+
+std::string optionalJsonValuesToString(const std::optional<QList<QJsonValue>>& values)
+{
+    if (!values.has_value()) {
+        return {};
+    }
+
+    QJsonArray array;
+    for (const QJsonValue& value : *values) {
+        array.append(value);
+    }
+    return QJsonDocument(array).toJson(QJsonDocument::Compact).toStdString();
+}
+
+std::string joinFields(const std::vector<std::string>& fields)
+{
+    std::string result;
+    for (std::size_t index = 0; index < fields.size(); ++index) {
+        if (index > 0) {
+            result += " | ";
+        }
+        result += fields.at(index);
+    }
+    return result;
+}
+
+} // namespace
 
 Engine::Engine(EngineOptions options)
     : m_options(std::move(options))
@@ -320,7 +422,74 @@ bool Engine::fetchThings()
         return false;
     }
 
+    if (!fetchThingClasses()) {
+        return false;
+    }
+
+    if (m_thingManager.things().empty()) {
+        m_selectedThingIndex = 0;
+    } else if (m_selectedThingIndex >= static_cast<int>(m_thingManager.things().size())) {
+        m_selectedThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
+    } else if (m_selectedThingIndex < 0) {
+        m_selectedThingIndex = 0;
+    }
+
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
+    return true;
+}
+
+bool Engine::fetchThingClasses()
+{
+    const std::vector<std::string> thingClassIds = m_thingManager.thingClassIds();
+    if (thingClassIds.empty()) {
+        return true;
+    }
+
+    api::IntegrationsGetThingClassesParams params;
+    QList<QUuid> ids;
+    for (const std::string& thingClassId : thingClassIds) {
+        ids.append(QUuid(QString::fromStdString(thingClassId)));
+    }
+    params.thingClassIds = ids;
+
+    const int requestId = m_client.sendRequest(QStringLiteral("Integrations.GetThingClasses"), params.toJson());
+    if (requestId < 0) {
+        m_thingManager.setStatus("Thing list loaded, but fetching thing classes failed: " + m_client.lastError().toStdString());
+        return true;
+    }
+
+    auto message = m_client.waitForMessage(m_options.timeoutMs);
+    if (!message.has_value()) {
+        m_thingManager.setStatus("Thing list loaded, but no reply for Integrations.GetThingClasses: " + m_client.lastError().toStdString());
+        return true;
+    }
+
+    const QString status = message->value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_thingManager.setStatus("Integrations.GetThingClasses unauthorized.");
+        return false;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_thingManager.setStatus("Thing list loaded, but Integrations.GetThingClasses returned error.");
+        return true;
+    }
+
+    std::string errorMessage;
+    if (!m_thingManager.updateThingClassesFromReply(message.value(), errorMessage)) {
+        m_thingManager.setStatus("Thing list loaded, but thing class metadata is unavailable: " + errorMessage);
+        return true;
+    }
+
+    m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) and enriched them with type metadata (request id " + std::to_string(requestId)
+                             + ").");
     return true;
 }
 
@@ -429,10 +598,158 @@ ftxui::Element Engine::renderMainMenu() const
         if (m_focusArea == FocusArea::MainMenu && selected) {
             entry = entry | ftxui::color(ftxui::Color::CyanLight);
         }
+        if (selected) {
+            entry = entry | ftxui::focus;
+        }
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)));
+    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
+}
+
+ftxui::Element Engine::renderThingList() const
+{
+    ftxui::Elements lines;
+    lines.push_back(ftxui::text(m_thingManager.status()));
+    lines.push_back(ftxui::separator());
+
+    if (m_thingManager.things().empty()) {
+        lines.push_back(ftxui::text("No things found."));
+    } else {
+        for (int index = 0; index < static_cast<int>(m_thingManager.things().size()); ++index) {
+            const api::Thing& thing = m_thingManager.things().at(index);
+            const std::string thingName = thing.name.has_value() && !thing.name->isEmpty() ? thing.name->toStdString() : std::string("<unnamed>");
+            auto entry = ftxui::text(std::string(" ") + thingName + " ");
+            if (index == m_selectedThingIndex) {
+                entry = entry | ftxui::bold | ftxui::inverted;
+            }
+            if (m_focusArea == FocusArea::ThingList && index == m_selectedThingIndex) {
+                entry = entry | ftxui::color(ftxui::Color::CyanLight);
+            }
+            if (index == m_selectedThingIndex) {
+                entry = entry | ftxui::focus;
+            }
+            lines.push_back(entry);
+        }
+    }
+
+    return ftxui::window(ftxui::text("Things"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame);
+}
+
+ftxui::Element Engine::renderThingDetails() const
+{
+    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    if (thing == nullptr) {
+        return ftxui::window(ftxui::text("Thing details"), ftxui::text("No thing selected."));
+    }
+
+    const api::ThingClass* thingClass = m_thingManager.thingClassForThing(*thing);
+    const std::string thingClassLabel = [&] {
+        if (thingClass == nullptr) {
+            return firstNonEmpty({uuidToStd(thing->thingClassId), "<unknown thing class>"});
+        }
+
+        const std::string displayName = firstNonEmpty({thingClass->displayName.toStdString(), thingClass->name.toStdString()});
+        if (displayName.empty()) {
+            return firstNonEmpty({uuidToStd(thing->thingClassId), "<unknown thing class>"});
+        }
+        if (thingClass->name.isEmpty() || thingClass->name.toStdString() == displayName) {
+            return displayName;
+        }
+        return displayName + " (" + thingClass->name.toStdString() + ")";
+    }();
+
+    ftxui::Elements metadata;
+    metadata.push_back(ftxui::text("Name: " + firstNonEmpty({optionalQStringToStd(thing->name), "<unnamed>"})));
+    metadata.push_back(ftxui::text("Id: " + uuidToStd(thing->id)));
+    metadata.push_back(ftxui::text("Thing class: " + thingClassLabel));
+    metadata.push_back(ftxui::text("Thing class id: " + uuidToStd(thing->thingClassId)));
+    metadata.push_back(ftxui::text("Setup status: " + api::toString(thing->setupStatus).toStdString()));
+    metadata.push_back(ftxui::text("Setup error: " + api::toString(thing->setupError).toStdString()));
+    metadata.push_back(ftxui::text("Setup complete: " + std::string(thing->setupComplete ? "true" : "false")));
+    if (thing->parentId.has_value()) {
+        metadata.push_back(ftxui::text("Parent id: " + uuidToStd(*thing->parentId)));
+    }
+    if (thing->setupDisplayMessage.has_value()) {
+        metadata.push_back(ftxui::paragraph("Setup message: " + thing->setupDisplayMessage->toStdString()));
+    }
+
+    ftxui::Elements params;
+    if (thing->params.empty()) {
+        params.push_back(ftxui::text("No params."));
+    } else {
+        for (const api::Param& param : thing->params) {
+            const api::ParamType* paramType = m_thingManager.paramTypeForThing(*thing, param);
+            const std::string label = [&] {
+                if (paramType != nullptr) {
+                    return firstNonEmpty({paramType->displayName.toStdString(), paramType->name.toStdString()});
+                }
+                if (param.paramTypeId.has_value()) {
+                    return uuidToStd(*param.paramTypeId);
+                }
+                return std::string("<unknown param>");
+            }();
+            std::vector<std::string> fields;
+            appendField(fields, "value", jsonValueToString(param.value));
+            if (paramType != nullptr) {
+                appendField(fields, "type", api::toString(paramType->type).toStdString());
+                appendField(fields, "unit", paramType->unit.has_value() ? api::toString(*paramType->unit).toStdString() : std::string());
+                appendField(fields, "input", paramType->inputType.has_value() ? api::toString(*paramType->inputType).toStdString() : std::string());
+                appendField(fields, "min", optionalJsonValueToString(paramType->minValue));
+                appendField(fields, "max", optionalJsonValueToString(paramType->maxValue));
+                appendField(fields, "allowed", optionalJsonValuesToString(paramType->allowedValues));
+            }
+
+            params.push_back(ftxui::paragraph(label + ": " + joinFields(fields)));
+            if (param.paramTypeId.has_value()) {
+                params.push_back(ftxui::text("  id: " + uuidToStd(*param.paramTypeId)) | ftxui::dim);
+            }
+        }
+    }
+
+    ftxui::Elements states;
+    if (thing->states.empty()) {
+        states.push_back(ftxui::text("No states."));
+    } else {
+        for (const api::State& state : thing->states) {
+            const api::StateType* stateType = m_thingManager.stateTypeForThing(*thing, state);
+            const std::string label = [&] {
+                if (stateType != nullptr) {
+                    return firstNonEmpty({stateType->displayName.toStdString(), stateType->name.toStdString()});
+                }
+                return firstNonEmpty({uuidToStd(state.stateTypeId), "<unknown state>"});
+            }();
+            std::vector<std::string> fields;
+            appendField(fields, "value", jsonValueToString(state.value));
+            if (stateType != nullptr) {
+                appendField(fields, "type", api::toString(stateType->type).toStdString());
+                appendField(fields, "unit", stateType->unit.has_value() ? api::toString(*stateType->unit).toStdString() : std::string());
+                appendField(fields, "io", stateType->ioType.has_value() ? api::toString(*stateType->ioType).toStdString() : std::string());
+            }
+            appendField(fields, "filter", api::toString(state.filter).toStdString());
+            appendField(fields,
+                        "min",
+                        firstNonEmpty({optionalJsonValueToString(state.minValue), stateType != nullptr ? optionalJsonValueToString(stateType->minValue) : std::string()}));
+            appendField(fields,
+                        "max",
+                        firstNonEmpty({optionalJsonValueToString(state.maxValue), stateType != nullptr ? optionalJsonValueToString(stateType->maxValue) : std::string()}));
+            appendField(fields,
+                        "allowed",
+                        firstNonEmpty(
+                            {optionalJsonValuesToString(state.possibleValues), stateType != nullptr ? optionalJsonValuesToString(stateType->possibleValues) : std::string()}));
+
+            states.push_back(ftxui::paragraph(label + ": " + joinFields(fields)));
+            states.push_back(ftxui::text("  id: " + uuidToStd(state.stateTypeId)) | ftxui::dim);
+        }
+    }
+
+    return ftxui::window(ftxui::text("Thing details"),
+                         ftxui::vbox({
+                             ftxui::window(ftxui::text("Overview"), ftxui::vbox(std::move(metadata))),
+                             ftxui::window(ftxui::text("Params"), ftxui::vbox(std::move(params))),
+                             ftxui::window(ftxui::text("States"), ftxui::vbox(std::move(states))) | ftxui::flex,
+                         }) | ftxui::vscroll_indicator
+                             | ftxui::frame);
 }
 
 ftxui::Element Engine::renderSettingsMenu() const
@@ -449,10 +766,13 @@ ftxui::Element Engine::renderSettingsMenu() const
         if (m_focusArea == FocusArea::SettingsMenu && selected) {
             entry = entry | ftxui::color(ftxui::Color::CyanLight);
         }
+        if (selected) {
+            entry = entry | ftxui::focus;
+        }
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)));
+    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
 }
 
 ftxui::Element Engine::renderSettingsDetails() const
@@ -479,28 +799,16 @@ ftxui::Element Engine::renderSettingsDetails() const
         lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
     }
 
-    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)));
+    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame);
 }
 
 ftxui::Element Engine::renderThings() const
 {
-    ftxui::Elements lines;
-    lines.push_back(ftxui::text(m_thingManager.status()));
-    lines.push_back(ftxui::separator());
-
-    if (m_thingManager.things().empty()) {
-        lines.push_back(ftxui::text("No things found."));
-    } else {
-        for (const Thing& thing : m_thingManager.things()) {
-            std::string line = "- " + thing.name;
-            if (!thing.id.empty()) {
-                line += " [" + thing.id + "]";
-            }
-            lines.push_back(ftxui::text(line));
-        }
-    }
-
-    return ftxui::vbox(std::move(lines));
+    return ftxui::hbox({
+               renderThingList() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 36),
+               renderThingDetails() | ftxui::flex,
+           })
+           | ftxui::flex;
 }
 
 ftxui::Element Engine::renderUi() const
@@ -581,6 +889,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     if (event == ftxui::Event::ArrowRight) {
         if (m_showLoginForm) {
             m_focusArea = FocusArea::LoginForm;
+        } else if (m_mainView == MainView::Things) {
+            m_focusArea = FocusArea::ThingList;
         } else if (m_mainView == MainView::Settings) {
             m_focusArea = FocusArea::SettingsMenu;
         }
@@ -600,6 +910,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::ArrowUp) {
+        if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
+            m_selectedThingIndex = (m_selectedThingIndex + static_cast<int>(m_thingManager.things().size()) - 1) % static_cast<int>(m_thingManager.things().size());
+            return true;
+        }
+
         if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
             m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
             return true;
@@ -612,6 +927,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::ArrowDown) {
+        if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
+            m_selectedThingIndex = (m_selectedThingIndex + 1) % static_cast<int>(m_thingManager.things().size());
+            return true;
+        }
+
         if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
             m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
             return true;
