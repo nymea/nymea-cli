@@ -1,6 +1,15 @@
 #include "engine.h"
 
-#include "generated/nymeaapigenerated.h"
+#include "generated/actiontype.h"
+#include "generated/apiutils.h"
+#include "generated/integrationsexecuteactionparams.h"
+#include "generated/integrationsexecuteactionresponse.h"
+#include "generated/integrationsgetthingclassesparams.h"
+#include "generated/param.h"
+#include "generated/state.h"
+#include "generated/statetype.h"
+#include "generated/thing.h"
+#include "generated/thingclass.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -1240,7 +1249,7 @@ ftxui::Element Engine::renderThingDetails() const
 {
     const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
     if (thing == nullptr) {
-        return ftxui::window(ftxui::text("Thing details"), ftxui::text("No thing selected."));
+        return ftxui::text("No thing selected.");
     }
 
     const api::ThingClass* thingClass = m_thingManager.thingClassForThing(*thing);
@@ -1279,9 +1288,6 @@ ftxui::Element Engine::renderThingDetails() const
     }
 
     ftxui::Elements browserRows;
-    browserRows.push_back(ftxui::text("Press Right to browse values/actions. Space shows metadata. Enter executes actions.") | ftxui::dim);
-    browserRows.push_back(ftxui::separator());
-
     browserRows.push_back(ftxui::text("Params") | ftxui::bold);
     if (thing->params.empty()) {
         browserRows.push_back(ftxui::text("No params."));
@@ -1446,7 +1452,7 @@ ftxui::Element Engine::renderThingDetails() const
         detailContent.push_back(detailBrowser);
     }
 
-    return ftxui::window(ftxui::text("Thing details"), ftxui::vbox(std::move(detailContent)) | ftxui::flex);
+    return ftxui::vbox(std::move(detailContent)) | ftxui::flex;
 }
 
 ftxui::Element Engine::renderSettingsMenu() const
@@ -1536,7 +1542,7 @@ ftxui::Element Engine::renderUi() const
 
     ftxui::Element rightPanel;
     if (m_mainView == MainView::Things) {
-        rightPanel = ftxui::window(ftxui::text("Things from server"), renderThings()) | ftxui::flex;
+        rightPanel = renderThings() | ftxui::flex;
     } else {
         rightPanel = ftxui::vbox({
                          renderSettingsMenu(),

@@ -1,6 +1,12 @@
 #pragma once
 
-#include "generated/nymeaapigenerated.h"
+#include "generated/actiontype.h"
+#include "generated/param.h"
+#include "generated/paramtype.h"
+#include "generated/state.h"
+#include "generated/statetype.h"
+#include "generated/thing.h"
+#include "generated/thingclass.h"
 
 #include <QJsonObject>
 

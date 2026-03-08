@@ -1,6 +1,7 @@
 #pragma once
 
 #include "connectionsettings.h"
+#include "generated/paramtype.h"
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
@@ -11,6 +12,7 @@
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
 
+#include <chrono>
 #include <optional>
 #include <string>
 
@@ -63,6 +65,7 @@ private:
     bool openSelectedActionDialog();
     void closeActionDialog();
     bool executeCurrentAction();
+    void showTransientActionStatus(std::string message, bool warning);
 
     bool connectToServer();
     bool sendHello();
@@ -115,6 +118,9 @@ private:
     int m_actionDialogSelectedParamIndex = 0;
     std::vector<api::ParamType> m_actionDialogParamTypes;
     std::vector<std::string> m_actionDialogParamValues;
+    std::string m_transientActionStatus;
+    std::optional<std::chrono::steady_clock::time_point> m_transientActionStatusExpiresAt;
+    bool m_transientActionStatusWarning = false;
     MainView m_mainView = MainView::Things;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;

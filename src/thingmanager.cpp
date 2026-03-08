@@ -1,5 +1,8 @@
 #include "thingmanager.h"
 
+#include "generated/integrationsgetthingclassesresponse.h"
+#include "generated/integrationsgetthingsresponse.h"
+
 #include <set>
 #include <utility>
 
