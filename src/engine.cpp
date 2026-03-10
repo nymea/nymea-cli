@@ -5,6 +5,13 @@
 #include "generated/integrationsexecuteactionparams.h"
 #include "generated/integrationsexecuteactionresponse.h"
 #include "generated/integrationsgetthingclassesparams.h"
+#include "generated/integrationsstatechangednotificationparams.h"
+#include "generated/integrationsthingaddednotificationparams.h"
+#include "generated/integrationsthingchangednotificationparams.h"
+#include "generated/integrationsthingremovednotificationparams.h"
+#include "generated/integrationsthingsettingchangednotificationparams.h"
+#include "generated/jsonrpcsetnotificationstatusparams.h"
+#include "generated/jsonrpcsetnotificationstatusresponse.h"
 #include "generated/param.h"
 #include "generated/state.h"
 #include "generated/statetype.h"
@@ -15,6 +22,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocale>
+#include <QMetaObject>
 
 #include <array>
 #include <initializer_list>
@@ -153,6 +161,18 @@ std::string joinFields(const std::vector<std::string>& fields)
     return result;
 }
 
+std::string joinCommaSeparated(const std::vector<std::string>& values)
+{
+    std::string result;
+    for (std::size_t index = 0; index < values.size(); ++index) {
+        if (index > 0) {
+            result += ", ";
+        }
+        result += values.at(index);
+    }
+    return result;
+}
+
 std::string optionalBoolToString(const std::optional<bool>& value)
 {
     if (!value.has_value()) {
@@ -174,6 +194,53 @@ std::string optionalStringListToString(const std::optional<QStringList>& value)
     }
 
     return "[" + value->join(QStringLiteral(", ")).toStdString() + "]";
+}
+
+std::string normalizedActionDialogValue(const api::ParamType& paramType, const std::string& rawValue);
+
+std::string thingErrorLabel(api::ThingError error)
+{
+    std::string value = api::toString(error).toStdString();
+    constexpr std::string_view prefix = "ThingError";
+    if (value.rfind(prefix.data(), 0) == 0) {
+        value.erase(0, prefix.size());
+    }
+    return value;
+}
+
+std::string formatActionInvocation(const std::string& actionName, const std::vector<api::ParamType>& paramTypes, const std::vector<std::string>& paramValues)
+{
+    std::vector<std::string> values;
+    values.reserve(paramTypes.size());
+    for (int index = 0; index < static_cast<int>(paramTypes.size()) && index < static_cast<int>(paramValues.size()); ++index) {
+        const api::ParamType& paramType = paramTypes.at(index);
+        const std::string label = firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "param"});
+        const std::string value = normalizedActionDialogValue(paramType, paramValues.at(index));
+        values.push_back(label + "=" + (value.empty() ? std::string("<empty>") : value));
+    }
+    return actionName + "(" + joinCommaSeparated(values) + ")";
+}
+
+std::string formatActionExecutionStatus(int requestId, const std::string& actionInvocation, const std::string& result)
+{
+    return std::to_string(requestId) + " : " + actionInvocation + ": " + result;
+}
+
+std::string busyIndicator(std::chrono::steady_clock::time_point startedAt)
+{
+    static constexpr std::array<std::string_view, 4> frames = {"|", "/", "-", "\\"};
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startedAt).count();
+    const std::size_t index = static_cast<std::size_t>((elapsed / 150) % static_cast<long long>(frames.size()));
+    return std::string(frames.at(index));
+}
+
+std::string thingLabel(const api::Thing* thing)
+{
+    if (thing == nullptr) {
+        return std::string("<unknown thing>");
+    }
+
+    return firstNonEmpty({optionalQStringToStd(thing->name), uuidToStd(thing->id), "<unknown thing>"});
 }
 
 std::string prettyUnit(api::Unit unit)
@@ -558,6 +625,7 @@ Engine::Engine(EngineOptions options)
     , m_username(m_options.username)
     , m_password(m_options.password)
 {
+    m_client.setNotificationHandler([this](const QJsonObject& message) { enqueueUiTask([this, message]() { handleNotification(message); }); });
     m_passwordInputOption.password = true;
     m_usernameInput = ftxui::Input(&m_username, "Username");
     m_passwordInput = ftxui::Input(&m_password, "Password", m_passwordInputOption);
@@ -566,16 +634,18 @@ Engine::Engine(EngineOptions options)
 
 int Engine::run()
 {
+    auto screen = ftxui::ScreenInteractive::Fullscreen();
+    m_screen = &screen;
+    auto ui = ftxui::Renderer([this] { return renderUi(); });
+    auto withKeyHandler = ftxui::CatchEvent(ui, [&](ftxui::Event event) { return handleEvent(event, screen); });
+
     connectToServer();
     if (m_client.isConnected()) {
         runHandshakeAndLoadThings();
     }
 
-    auto screen = ftxui::ScreenInteractive::Fullscreen();
-    auto ui = ftxui::Renderer([this] { return renderUi(); });
-    auto withKeyHandler = ftxui::CatchEvent(ui, [&](ftxui::Event event) { return handleEvent(event, screen); });
-
     screen.Loop(withKeyHandler);
+    m_screen = nullptr;
     return 0;
 }
 
@@ -618,6 +688,24 @@ SavedConnection Engine::currentConnection(bool allowFingerprintUpdate) const
     }
 
     return connection;
+}
+
+void Engine::clampThingSelection()
+{
+    if (m_thingManager.things().empty()) {
+        m_selectedThingIndex = 0;
+        m_showThingDetailInspector = false;
+        if (m_focusArea == FocusArea::ThingDetails) {
+            m_focusArea = FocusArea::ThingList;
+        }
+        return;
+    }
+
+    if (m_selectedThingIndex < 0) {
+        m_selectedThingIndex = 0;
+    } else if (m_selectedThingIndex >= static_cast<int>(m_thingManager.things().size())) {
+        m_selectedThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
+    }
 }
 
 int Engine::thingDetailEntryCount() const
@@ -678,6 +766,7 @@ bool Engine::openSelectedActionDialog()
     m_showActionDialog = true;
     m_focusArea = FocusArea::ActionDialog;
     m_actionDialogActionIndex = selectedEntry.index;
+    m_actionDialogThingId = thing->id;
     m_actionDialogSelectedParamIndex = 0;
     m_actionDialogActionName = firstNonEmpty({actionType->displayName.toStdString(), actionType->name.toStdString(), "Action"});
     m_actionDialogParamTypes.assign(actionType->paramTypes.begin(), actionType->paramTypes.end());
@@ -686,7 +775,12 @@ bool Engine::openSelectedActionDialog()
     for (const api::ParamType& paramType : m_actionDialogParamTypes) {
         m_actionDialogParamValues.push_back(normalizedActionDialogValue(paramType, {}));
     }
+    m_actionExecutionPending = false;
+    m_pendingActionRequestId = -1;
+    m_pendingActionInvocation.clear();
     m_actionDialogStatus = "Edit action params and press Enter to execute.";
+    m_lastActionExecutionStatus.clear();
+    m_lastActionExecutionStatusWarning = false;
     return true;
 }
 
@@ -696,9 +790,15 @@ void Engine::closeActionDialog()
     m_actionDialogStatus.clear();
     m_actionDialogActionName.clear();
     m_actionDialogActionIndex = -1;
+    m_actionDialogThingId = QUuid();
     m_actionDialogSelectedParamIndex = 0;
     m_actionDialogParamTypes.clear();
     m_actionDialogParamValues.clear();
+    m_actionExecutionPending = false;
+    m_pendingActionRequestId = -1;
+    m_pendingActionInvocation.clear();
+    m_lastActionExecutionStatus.clear();
+    m_lastActionExecutionStatusWarning = false;
     if (m_focusArea == FocusArea::ActionDialog) {
         m_focusArea = FocusArea::ThingDetails;
     }
@@ -706,8 +806,11 @@ void Engine::closeActionDialog()
 
 bool Engine::executeCurrentAction()
 {
-    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
-    if (!m_showActionDialog || thing == nullptr || m_actionDialogActionIndex < 0) {
+    const api::Thing* thing = m_thingManager.thingById(m_actionDialogThingId);
+    if (!m_showActionDialog || thing == nullptr || m_actionDialogActionIndex < 0 || m_actionExecutionPending) {
+        if (m_showActionDialog && thing == nullptr) {
+            m_actionDialogStatus = "Selected thing is no longer available.";
+        }
         return false;
     }
 
@@ -740,55 +843,215 @@ bool Engine::executeCurrentAction()
         request.params = params;
     }
 
-    const int requestId = m_client.sendRequest(QStringLiteral("Integrations.ExecuteAction"), request.toJson());
-    if (requestId < 0) {
+    JsonRpcReply* reply = m_client.sendRequest(QStringLiteral("Integrations.ExecuteAction"), request.toJson());
+    if (reply == nullptr) {
         m_actionDialogStatus = "Failed to send action request: " + m_client.lastError().toStdString();
         return false;
     }
 
-    auto message = m_client.waitForMessage(m_options.timeoutMs);
-    if (!message.has_value()) {
-        m_actionDialogStatus = "No reply for action request: " + m_client.lastError().toStdString();
-        return false;
-    }
-
-    const QString status = message->value(QStringLiteral("status")).toString();
-    if (status == QStringLiteral("unauthorized")) {
-        clearStoredToken();
-        m_client.clearAuthToken();
-        m_isAuthenticationRequired = true;
-        m_isAuthenticated = false;
-        m_showLoginForm = true;
-        m_focusArea = FocusArea::LoginForm;
-        m_authStatus = "Authentication required. Please login.";
-        m_actionDialogStatus = "Action execution unauthorized.";
-        return false;
-    }
-
-    if (status == QStringLiteral("error")) {
-        m_actionDialogStatus = "Action execution returned transport error.";
-        return false;
-    }
-
-    const api::IntegrationsExecuteActionResponse response = api::IntegrationsExecuteActionResponse::fromJson(message->value(QStringLiteral("params")).toObject());
-    if (response.thingError != api::ThingError::ThingErrorNoError) {
-        m_actionDialogStatus = "Action failed: " + api::toString(response.thingError).toStdString();
-        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
-            m_actionDialogStatus += " - " + response.displayMessage->toStdString();
-        }
-        return false;
-    }
-
-    m_thingManager.setStatus("Executed action " + m_actionDialogActionName + " (request id " + std::to_string(requestId) + ").");
-    closeActionDialog();
-    fetchThings();
+    const int requestId = reply->requestId();
+    m_actionExecutionPending = true;
+    m_pendingActionRequestId = requestId;
+    m_pendingActionInvocation = formatActionInvocation(m_actionDialogActionName, m_actionDialogParamTypes, m_actionDialogParamValues);
+    m_pendingActionStartedAt = std::chrono::steady_clock::now();
+    m_actionDialogStatus = "Action sent. Waiting for response...";
+    m_lastActionExecutionStatus = formatActionExecutionStatus(requestId, m_pendingActionInvocation, busyIndicator(m_pendingActionStartedAt) + " Executing");
+    m_lastActionExecutionStatusWarning = false;
+    observeReply(reply, [this](const QJsonObject& message, const QString& transportError) { handleActionExecutionReply(message, transportError); });
     return true;
+}
+
+void Engine::observeReply(JsonRpcReply* reply, std::function<void(const QJsonObject&, const QString&)> handler)
+{
+    if (reply == nullptr) {
+        enqueueUiTask([handler = std::move(handler)]() mutable { handler(QJsonObject{}, QStringLiteral("Failed to create JSON-RPC reply.")); });
+        return;
+    }
+
+    auto dispatch = [this, reply, handler = std::move(handler)]() mutable {
+        const QJsonObject message = reply->message();
+        const QString transportError = reply->transportError();
+        enqueueUiTask([reply, handler = std::move(handler), message, transportError]() mutable {
+            handler(message, transportError);
+            QMetaObject::invokeMethod(reply, "deleteLater", Qt::QueuedConnection);
+        });
+    };
+
+    if (reply->isFinished()) {
+        dispatch();
+        return;
+    }
+
+    QObject::connect(reply, &JsonRpcReply::finished, [dispatch = std::move(dispatch)]() mutable { dispatch(); });
+}
+
+void Engine::handleActionExecutionReply(const QJsonObject& message, const QString& transportError)
+{
+    if (!transportError.isEmpty()) {
+        m_actionDialogStatus = "Action execution failed: " + transportError.toStdString();
+        m_lastActionExecutionStatus = formatActionExecutionStatus(m_pendingActionRequestId, m_pendingActionInvocation, transportError.toStdString());
+        m_lastActionExecutionStatusWarning = true;
+    } else {
+        const QString status = message.value(QStringLiteral("status")).toString();
+        if (status == QStringLiteral("unauthorized")) {
+            clearStoredToken();
+            m_client.clearAuthToken();
+            m_isAuthenticationRequired = true;
+            m_isAuthenticated = false;
+            m_notificationsEnabled = false;
+            m_showLoginForm = true;
+            m_focusArea = FocusArea::LoginForm;
+            m_authStatus = "Authentication required. Please login.";
+            m_actionDialogStatus = "Action execution unauthorized.";
+            m_lastActionExecutionStatus = formatActionExecutionStatus(m_pendingActionRequestId, m_pendingActionInvocation, "Unauthorized");
+            m_lastActionExecutionStatusWarning = true;
+        } else if (status == QStringLiteral("error")) {
+            const QString errorText = message.value(QStringLiteral("error")).toString();
+            const std::string renderedError = errorText.isEmpty() ? "Transport error" : errorText.toStdString();
+            m_actionDialogStatus = "Action execution returned JSON-RPC error.";
+            m_lastActionExecutionStatus = formatActionExecutionStatus(m_pendingActionRequestId, m_pendingActionInvocation, renderedError);
+            m_lastActionExecutionStatusWarning = true;
+        } else {
+            const api::IntegrationsExecuteActionResponse response = api::IntegrationsExecuteActionResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+            if (response.thingError != api::ThingError::ThingErrorNoError) {
+                m_actionDialogStatus = "Action failed: " + api::toString(response.thingError).toStdString();
+                if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+                    m_actionDialogStatus += " - " + response.displayMessage->toStdString();
+                }
+                std::string result = thingErrorLabel(response.thingError);
+                if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+                    result += " - " + response.displayMessage->toStdString();
+                }
+                m_lastActionExecutionStatus = formatActionExecutionStatus(m_pendingActionRequestId, m_pendingActionInvocation, result);
+                m_lastActionExecutionStatusWarning = true;
+            } else {
+                m_thingManager.setStatus("Executed action " + m_actionDialogActionName + " (request id " + std::to_string(m_pendingActionRequestId) + ").");
+                std::string result = "NoError";
+                if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+                    result += " - " + response.displayMessage->toStdString();
+                }
+                m_lastActionExecutionStatus = formatActionExecutionStatus(m_pendingActionRequestId, m_pendingActionInvocation, result);
+                m_lastActionExecutionStatusWarning = false;
+                m_actionDialogStatus = "Action executed. Press Enter to execute again or Esc to close.";
+            }
+        }
+    }
+
+    m_actionExecutionPending = false;
+    m_pendingActionRequestId = -1;
+    m_pendingActionInvocation.clear();
+}
+
+void Engine::handleNotification(const QJsonObject& message)
+{
+    const QString notificationName = message.value(QStringLiteral("notification")).toString();
+    const QJsonObject params = message.value(QStringLiteral("params")).toObject();
+
+    if (notificationName == api::IntegrationsStateChangedNotification::notificationName()) {
+        const api::IntegrationsStateChangedNotificationParams notification = api::IntegrationsStateChangedNotificationParams::fromJson(params);
+        if (m_thingManager
+                .updateThingState(notification.thingId, notification.stateTypeId, notification.value, notification.minValue, notification.maxValue, notification.possibleValues)) {
+            clampThingSelection();
+            clampThingDetailSelection();
+            m_thingManager.setStatus("Live update: state changed on " + thingLabel(m_thingManager.thingById(notification.thingId)) + ".");
+        }
+        return;
+    }
+
+    if (notificationName == api::IntegrationsThingAddedNotification::notificationName()) {
+        const api::IntegrationsThingAddedNotificationParams notification = api::IntegrationsThingAddedNotificationParams::fromJson(params);
+        m_thingManager.upsertThing(notification.thing);
+        clampThingSelection();
+        clampThingDetailSelection();
+
+        std::string status = "Live update: added " + thingLabel(m_thingManager.thingById(notification.thing.id)) + ".";
+        if (!m_thingManager.hasThingClass(notification.thing.thingClassId)) {
+            status += " Thing class metadata is not loaded yet.";
+            fetchThingClasses();
+        }
+        m_thingManager.setStatus(status);
+        return;
+    }
+
+    if (notificationName == api::IntegrationsThingChangedNotification::notificationName()) {
+        const api::IntegrationsThingChangedNotificationParams notification = api::IntegrationsThingChangedNotificationParams::fromJson(params);
+        m_thingManager.upsertThing(notification.thing);
+        clampThingSelection();
+        clampThingDetailSelection();
+
+        std::string status = "Live update: updated " + thingLabel(m_thingManager.thingById(notification.thing.id)) + ".";
+        if (!m_thingManager.hasThingClass(notification.thing.thingClassId)) {
+            status += " Thing class metadata is not loaded yet.";
+            fetchThingClasses();
+        }
+        m_thingManager.setStatus(status);
+        return;
+    }
+
+    if (notificationName == api::IntegrationsThingRemovedNotification::notificationName()) {
+        const api::IntegrationsThingRemovedNotificationParams notification = api::IntegrationsThingRemovedNotificationParams::fromJson(params);
+        if (m_thingManager.removeThing(notification.thingId)) {
+            if (m_showActionDialog && m_actionDialogThingId == notification.thingId) {
+                m_actionDialogStatus = "Thing was removed. Press Esc to close this dialog.";
+            }
+            clampThingSelection();
+            clampThingDetailSelection();
+            m_thingManager.setStatus("Live update: removed thing " + uuidToStd(notification.thingId) + ".");
+        }
+        return;
+    }
+
+    if (notificationName == api::IntegrationsThingSettingChangedNotification::notificationName()) {
+        const api::IntegrationsThingSettingChangedNotificationParams notification = api::IntegrationsThingSettingChangedNotificationParams::fromJson(params);
+        if (m_thingManager.updateThingSetting(notification.thingId, notification.paramTypeId, notification.value)) {
+            m_thingManager.setStatus("Live update: setting changed on " + thingLabel(m_thingManager.thingById(notification.thingId)) + ".");
+        }
+        return;
+    }
+
+    if (notificationName.startsWith(QStringLiteral("Integrations."))) {
+        m_thingManager.setStatus("Live update: " + notificationName.toStdString() + ".");
+    }
+}
+
+void Engine::enqueueUiTask(std::function<void()> task)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_uiTaskMutex);
+        m_uiTasks.push_back(std::move(task));
+    }
+
+    if (m_screen != nullptr) {
+        m_screen->PostEvent(ftxui::Event::Custom);
+    }
+}
+
+void Engine::drainUiTasks()
+{
+    std::vector<std::function<void()>> tasks;
+    {
+        std::lock_guard<std::mutex> lock(m_uiTaskMutex);
+        tasks.swap(m_uiTasks);
+    }
+
+    for (auto& task : tasks) {
+        task();
+    }
 }
 
 bool Engine::connectToServer()
 {
     m_client.clearAuthToken();
     loadSavedConnection();
+    m_helloPending = false;
+    m_authenticationPending = false;
+    m_notificationSetupPending = false;
+    m_fetchThingsPending = false;
+    m_fetchThingClassesPending = false;
+    m_actionExecutionPending = false;
+    m_pendingActionRequestId = -1;
+    m_pendingActionInvocation.clear();
+    m_notificationsEnabled = false;
     m_securityWarning.clear();
     m_settingsWarning.clear();
     m_serverVersion = "n/a";
@@ -813,47 +1076,36 @@ bool Engine::connectToServer()
     return false;
 }
 
-bool Engine::sendHello()
+void Engine::handleHelloReply(const QJsonObject& message, const QString& transportError)
 {
-    if (!m_client.isConnected()) {
-        m_thingManager.setStatus("Cannot send JSONRPC.Hello while disconnected.");
-        return false;
+    m_helloPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_thingManager.setStatus("No reply for JSONRPC.Hello: " + transportError.toStdString());
+        return;
     }
 
-    QJsonObject params;
-    params.insert(QStringLiteral("locale"), QLocale().name());
-
-    const int requestId = m_client.sendRequest(QStringLiteral("JSONRPC.Hello"), params);
-    if (requestId < 0) {
-        m_thingManager.setStatus("Failed to send JSONRPC.Hello: " + m_client.lastError().toStdString());
-        return false;
-    }
-
-    auto message = m_client.waitForMessage(m_options.timeoutMs);
-    if (!message.has_value()) {
-        m_thingManager.setStatus("No reply for JSONRPC.Hello: " + m_client.lastError().toStdString());
-        return false;
-    }
-
-    const QString status = message->value(QStringLiteral("status")).toString();
+    const QString status = message.value(QStringLiteral("status")).toString();
+    const int requestId = message.value(QStringLiteral("id")).toInt(-1);
     if (status == QStringLiteral("unauthorized")) {
         clearStoredToken();
         m_client.clearAuthToken();
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
+        m_notificationsEnabled = false;
         m_showLoginForm = true;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Stored token was rejected. Please login.";
         m_thingManager.setStatus("JSONRPC.Hello unauthorized (request id " + std::to_string(requestId) + ").");
-        return false;
+        return;
     }
 
     if (status == QStringLiteral("error")) {
         m_thingManager.setStatus("JSONRPC.Hello returned error (request id " + std::to_string(requestId) + ").");
-        return false;
+        return;
     }
 
-    const QJsonObject helloParams = message->value(QStringLiteral("params")).toObject();
+    const QJsonObject helloParams = message.value(QStringLiteral("params")).toObject();
     const QString serverNameValue = helloParams.value(QStringLiteral("name")).toString();
     if (!serverNameValue.isEmpty()) {
         m_serverName = serverNameValue;
@@ -874,7 +1126,7 @@ bool Engine::sendHello()
         serverApiVersionValue = helloParams.value(QStringLiteral("protocolVersion")).toString();
     }
     if (serverApiVersionValue.isEmpty()) {
-        serverApiVersionValue = message->value(QStringLiteral("jsonrpc")).toString();
+        serverApiVersionValue = message.value(QStringLiteral("jsonrpc")).toString();
     }
     if (!serverApiVersionValue.isEmpty()) {
         m_serverApiVersion = serverApiVersionValue.toStdString();
@@ -905,57 +1157,72 @@ bool Engine::sendHello()
 
     saveCurrentConnection(false);
     m_thingManager.setStatus("JSONRPC.Hello succeeded (request id " + std::to_string(requestId) + ").");
-    return true;
+
+    if (m_isAuthenticationRequired && !m_isAuthenticated) {
+        if (!m_username.empty() && !m_password.empty()) {
+            authenticate(m_username, m_password);
+        } else {
+            m_showLoginForm = true;
+            m_focusArea = FocusArea::LoginForm;
+            m_authStatus = "Authentication required. Enter username/password and press Enter.";
+        }
+        return;
+    }
+
+    enableNotifications(true);
 }
 
-bool Engine::authenticate(const std::string& username, const std::string& password)
+void Engine::sendHello()
 {
     if (!m_client.isConnected()) {
-        m_authStatus = "Cannot authenticate while disconnected.";
-        return false;
+        m_thingManager.setStatus("Cannot send JSONRPC.Hello while disconnected.");
+        return;
+    }
+    if (m_helloPending) {
+        return;
     }
 
-    if (username.empty() || password.empty()) {
-        m_authStatus = "Username and password are required.";
-        m_showLoginForm = true;
-        return false;
-    }
+    m_helloPending = true;
 
     QJsonObject params;
-    params.insert(QStringLiteral("username"), QString::fromStdString(username));
-    params.insert(QStringLiteral("password"), QString::fromStdString(password));
-    params.insert(QStringLiteral("deviceName"), QStringLiteral("nymea-cli"));
+    params.insert(QStringLiteral("locale"), QLocale().name());
 
-    const int requestId = m_client.sendRequest(QStringLiteral("JSONRPC.Authenticate"), params);
-    if (requestId < 0) {
-        m_authStatus = "Failed to send authenticate request: " + m_client.lastError().toStdString();
+    observeReply(m_client.sendRequest(QStringLiteral("JSONRPC.Hello"), params),
+                 [this](const QJsonObject& message, const QString& transportError) { handleHelloReply(message, transportError); });
+}
+
+void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& transportError)
+{
+    m_authenticationPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_authStatus = "No reply for authenticate request: " + transportError.toStdString();
         m_showLoginForm = true;
-        return false;
+        return;
     }
 
-    auto message = m_client.waitForMessage(m_options.timeoutMs);
-    if (!message.has_value()) {
-        m_authStatus = "No reply for authenticate request: " + m_client.lastError().toStdString();
-        m_showLoginForm = true;
-        return false;
-    }
-
-    const QString status = message->value(QStringLiteral("status")).toString();
+    const QString status = message.value(QStringLiteral("status")).toString();
+    const int requestId = message.value(QStringLiteral("id")).toInt(-1);
     if (status == QStringLiteral("error") || status == QStringLiteral("unauthorized")) {
+        if (status == QStringLiteral("unauthorized")) {
+            clearStoredToken();
+        }
         m_authStatus = "Authentication rejected by server.";
         m_showLoginForm = true;
         m_isAuthenticated = false;
+        m_notificationsEnabled = false;
         m_client.clearAuthToken();
-        return false;
+        return;
     }
 
-    const QJsonObject authParams = message->value(QStringLiteral("params")).toObject();
+    const QJsonObject authParams = message.value(QStringLiteral("params")).toObject();
     if (!authParams.value(QStringLiteral("success")).toBool()) {
         m_authStatus = "Authentication failed.";
         m_showLoginForm = true;
         m_isAuthenticated = false;
+        m_notificationsEnabled = false;
         m_client.clearAuthToken();
-        return false;
+        return;
     }
 
     const QString token = authParams.value(QStringLiteral("token")).toString();
@@ -963,96 +1230,253 @@ bool Engine::authenticate(const std::string& username, const std::string& passwo
         m_authStatus = "Authentication succeeded but no token was returned.";
         m_showLoginForm = true;
         m_isAuthenticated = false;
+        m_notificationsEnabled = false;
         m_client.clearAuthToken();
-        return false;
+        return;
     }
 
     m_client.setAuthToken(token);
     m_isAuthenticated = true;
     m_isAuthenticationRequired = false;
+    m_notificationsEnabled = false;
     m_showLoginForm = false;
     m_focusArea = FocusArea::MainMenu;
-    m_authStatus = "Authenticated as " + username + ".";
+    m_authStatus = "Authenticated as " + m_username + ".";
     saveCurrentConnection(true);
     m_thingManager.setStatus("Authentication succeeded (request id " + std::to_string(requestId) + ").");
-    return true;
+    enableNotifications(true);
 }
 
-bool Engine::fetchThings()
+void Engine::authenticate(const std::string& username, const std::string& password)
 {
+    if (!m_client.isConnected()) {
+        m_authStatus = "Cannot authenticate while disconnected.";
+        return;
+    }
+
+    if (username.empty() || password.empty()) {
+        m_authStatus = "Username and password are required.";
+        m_showLoginForm = true;
+        return;
+    }
+
+    if (m_authenticationPending) {
+        return;
+    }
+    m_authenticationPending = true;
+
+    QJsonObject params;
+    params.insert(QStringLiteral("username"), QString::fromStdString(username));
+    params.insert(QStringLiteral("password"), QString::fromStdString(password));
+    params.insert(QStringLiteral("deviceName"), QStringLiteral("nymea-cli"));
+
+    m_authStatus = "Authenticating...";
+    observeReply(m_client.sendRequest(QStringLiteral("JSONRPC.Authenticate"), params),
+                 [this](const QJsonObject& message, const QString& transportError) { handleAuthenticateReply(message, transportError); });
+}
+
+void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QString& transportError, bool fetchThingsAfterReply)
+{
+    m_notificationSetupPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_notificationsEnabled = false;
+        m_thingManager.setStatus("Failed to enable notifications: " + transportError.toStdString());
+        if (fetchThingsAfterReply) {
+            fetchThings();
+        }
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_thingManager.setStatus("Notification setup unauthorized.");
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_notificationsEnabled = false;
+        m_thingManager.setStatus("Notification setup returned error.");
+        if (fetchThingsAfterReply) {
+            fetchThings();
+        }
+        return;
+    }
+
+    const api::JSONRPCSetNotificationStatusResponse response = api::JSONRPCSetNotificationStatusResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_notificationsEnabled = response.enabled || response.namespaces.contains(QStringLiteral("Integrations"));
+    if (!m_notificationsEnabled) {
+        m_thingManager.setStatus("Server did not confirm Integrations notifications.");
+    } else {
+        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations.");
+    }
+
+    if (fetchThingsAfterReply) {
+        fetchThings();
+    }
+}
+
+void Engine::enableNotifications(bool fetchThingsAfterReply)
+{
+    if (m_notificationsEnabled || m_notificationSetupPending) {
+        if (fetchThingsAfterReply) {
+            fetchThings();
+        }
+        return;
+    }
+
+    if (!m_client.isConnected()) {
+        m_thingManager.setStatus("Cannot enable notifications while disconnected.");
+        if (fetchThingsAfterReply) {
+            fetchThings();
+        }
+        return;
+    }
+
+    if (m_isAuthenticationRequired && !m_isAuthenticated) {
+        m_thingManager.setStatus("Authentication required before enabling notifications.");
+        return;
+    }
+
+    m_notificationSetupPending = true;
+
+    api::JSONRPCSetNotificationStatusParams request;
+    request.enabled = true;
+    request.namespaces = QStringList{QStringLiteral("Integrations")};
+
+    observeReply(m_client.sendRequest(api::JSONRPCSetNotificationStatusMethod::methodName(), request.toJson()),
+                 [this, fetchThingsAfterReply](const QJsonObject& message, const QString& transportError) {
+                     handleEnableNotificationsReply(message, transportError, fetchThingsAfterReply);
+                 });
+}
+
+void Engine::handleFetchThingsReply(const QJsonObject& message, const QString& transportError)
+{
+    m_fetchThingsPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_thingManager.setStatus("No reply for Integrations.GetThings: " + transportError.toStdString());
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    const int requestId = message.value(QStringLiteral("id")).toInt(-1);
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_thingManager.setStatus("Integrations.GetThings unauthorized.");
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_thingManager.setStatus("Integrations.GetThings returned error.");
+        return;
+    }
+
+    std::string errorMessage;
+    if (!m_thingManager.updateFromReply(message, errorMessage)) {
+        m_thingManager.setStatus(errorMessage);
+        return;
+    }
+
+    clampThingSelection();
+    clampThingDetailSelection();
+    m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
+    fetchThingClasses();
+}
+
+void Engine::fetchThings()
+{
+    if (m_fetchThingsPending) {
+        return;
+    }
+
     m_thingManager.clear();
 
     if (!m_client.isConnected()) {
         m_thingManager.setStatus("Cannot fetch things while disconnected.");
-        return false;
+        return;
     }
 
     if (m_isAuthenticationRequired && !m_isAuthenticated) {
         m_thingManager.setStatus("Authentication required before fetching things.");
         m_showLoginForm = true;
         m_focusArea = FocusArea::LoginForm;
-        return false;
+        return;
     }
 
-    const int requestId = m_client.sendRequest(QStringLiteral("Integrations.GetThings"));
-    if (requestId < 0) {
-        m_thingManager.setStatus("Failed to send Integrations.GetThings: " + m_client.lastError().toStdString());
-        return false;
+    m_fetchThingsPending = true;
+    m_thingManager.setStatus("Loading things...");
+
+    observeReply(m_client.sendRequest(QStringLiteral("Integrations.GetThings"), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchThingsReply(message, transportError); });
+}
+
+void Engine::handleFetchThingClassesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_fetchThingClassesPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_thingManager.setStatus("Thing list loaded, but no reply for Integrations.GetThingClasses: " + transportError.toStdString());
+        return;
     }
 
-    auto message = m_client.waitForMessage(m_options.timeoutMs);
-    if (!message.has_value()) {
-        m_thingManager.setStatus("No reply for Integrations.GetThings: " + m_client.lastError().toStdString());
-        return false;
-    }
-
-    const QString status = message->value(QStringLiteral("status")).toString();
+    const QString status = message.value(QStringLiteral("status")).toString();
+    const int requestId = message.value(QStringLiteral("id")).toInt(-1);
     if (status == QStringLiteral("unauthorized")) {
         clearStoredToken();
         m_client.clearAuthToken();
         m_isAuthenticationRequired = true;
         m_isAuthenticated = false;
+        m_notificationsEnabled = false;
         m_showLoginForm = true;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
-        m_thingManager.setStatus("Integrations.GetThings unauthorized.");
-        return false;
+        m_thingManager.setStatus("Integrations.GetThingClasses unauthorized.");
+        return;
     }
 
     if (status == QStringLiteral("error")) {
-        m_thingManager.setStatus("Integrations.GetThings returned error.");
-        return false;
+        m_thingManager.setStatus("Thing list loaded, but Integrations.GetThingClasses returned error.");
+        return;
     }
 
     std::string errorMessage;
-    if (!m_thingManager.updateFromReply(message.value(), errorMessage)) {
-        m_thingManager.setStatus(errorMessage);
-        return false;
+    if (!m_thingManager.updateThingClassesFromReply(message, errorMessage)) {
+        m_thingManager.setStatus("Thing list loaded, but thing class metadata is unavailable: " + errorMessage);
+        return;
     }
 
-    if (!fetchThingClasses()) {
-        return false;
-    }
-
-    if (m_thingManager.things().empty()) {
-        m_selectedThingIndex = 0;
-    } else if (m_selectedThingIndex >= static_cast<int>(m_thingManager.things().size())) {
-        m_selectedThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
-    } else if (m_selectedThingIndex < 0) {
-        m_selectedThingIndex = 0;
-    }
-    clampThingDetailSelection();
-
-    m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
-    return true;
+    m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) and enriched them with type metadata (request id " + std::to_string(requestId)
+                             + ").");
 }
 
-bool Engine::fetchThingClasses()
+void Engine::fetchThingClasses()
 {
+    if (m_fetchThingClassesPending) {
+        return;
+    }
+
     const std::vector<std::string> thingClassIds = m_thingManager.thingClassIds();
     if (thingClassIds.empty()) {
-        return true;
+        return;
     }
+
+    m_fetchThingClassesPending = true;
 
     api::IntegrationsGetThingClassesParams params;
     QList<QUuid> ids;
@@ -1061,45 +1485,8 @@ bool Engine::fetchThingClasses()
     }
     params.thingClassIds = ids;
 
-    const int requestId = m_client.sendRequest(QStringLiteral("Integrations.GetThingClasses"), params.toJson());
-    if (requestId < 0) {
-        m_thingManager.setStatus("Thing list loaded, but fetching thing classes failed: " + m_client.lastError().toStdString());
-        return true;
-    }
-
-    auto message = m_client.waitForMessage(m_options.timeoutMs);
-    if (!message.has_value()) {
-        m_thingManager.setStatus("Thing list loaded, but no reply for Integrations.GetThingClasses: " + m_client.lastError().toStdString());
-        return true;
-    }
-
-    const QString status = message->value(QStringLiteral("status")).toString();
-    if (status == QStringLiteral("unauthorized")) {
-        clearStoredToken();
-        m_client.clearAuthToken();
-        m_isAuthenticationRequired = true;
-        m_isAuthenticated = false;
-        m_showLoginForm = true;
-        m_focusArea = FocusArea::LoginForm;
-        m_authStatus = "Authentication required. Please login.";
-        m_thingManager.setStatus("Integrations.GetThingClasses unauthorized.");
-        return false;
-    }
-
-    if (status == QStringLiteral("error")) {
-        m_thingManager.setStatus("Thing list loaded, but Integrations.GetThingClasses returned error.");
-        return true;
-    }
-
-    std::string errorMessage;
-    if (!m_thingManager.updateThingClassesFromReply(message.value(), errorMessage)) {
-        m_thingManager.setStatus("Thing list loaded, but thing class metadata is unavailable: " + errorMessage);
-        return true;
-    }
-
-    m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) and enriched them with type metadata (request id " + std::to_string(requestId)
-                             + ").");
-    return true;
+    observeReply(m_client.sendRequest(QStringLiteral("Integrations.GetThingClasses"), params.toJson()),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchThingClassesReply(message, transportError); });
 }
 
 void Engine::loadSavedConnection()
@@ -1173,24 +1560,7 @@ void Engine::saveCurrentConnection(bool allowFingerprintUpdate)
 
 void Engine::runHandshakeAndLoadThings()
 {
-    if (!sendHello()) {
-        return;
-    }
-
-    if (m_isAuthenticationRequired && !m_isAuthenticated) {
-        if (!m_username.empty() && !m_password.empty()) {
-            if (!authenticate(m_username, m_password)) {
-                return;
-            }
-        } else {
-            m_showLoginForm = true;
-            m_focusArea = FocusArea::LoginForm;
-            m_authStatus = "Authentication required. Enter username/password and press Enter.";
-            return;
-        }
-    }
-
-    fetchThings();
+    sendHello();
 }
 
 ftxui::Element Engine::renderMainMenu() const
@@ -1514,8 +1884,15 @@ ftxui::Element Engine::renderThings() const
            | ftxui::flex;
 }
 
-ftxui::Element Engine::renderUi() const
+ftxui::Element Engine::renderUi()
 {
+    drainUiTasks();
+    if (m_actionExecutionPending) {
+        if (ftxui::ScreenInteractive* screen = ftxui::ScreenInteractive::Active(); screen != nullptr) {
+            screen->RequestAnimationFrame();
+        }
+    }
+
     ftxui::Elements sections;
     if (!m_securityWarning.empty()) {
         sections.push_back(ftxui::window(ftxui::text("INSECURE WARNING"),
@@ -1558,38 +1935,54 @@ ftxui::Element Engine::renderUi() const
                        | ftxui::flex);
 
     if (m_showActionDialog) {
-        ftxui::Elements dialogRows;
-        dialogRows.push_back(ftxui::text("Action: " + m_actionDialogActionName));
-        dialogRows.push_back(ftxui::separator());
+        ftxui::Elements dialogBody;
+        dialogBody.push_back(ftxui::text("Action: " + m_actionDialogActionName));
+        dialogBody.push_back(ftxui::separator());
 
         if (m_actionDialogParamTypes.empty()) {
-            dialogRows.push_back(ftxui::text("This action has no params."));
+            dialogBody.push_back(ftxui::text("This action has no params."));
         } else {
             for (int index = 0; index < static_cast<int>(m_actionDialogParamTypes.size()); ++index) {
                 const api::ParamType& paramType = m_actionDialogParamTypes.at(index);
                 const std::string label = firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "<param>"});
-                dialogRows.push_back(renderTwoColumnRow(label,
+                dialogBody.push_back(renderTwoColumnRow(label,
                                                         renderActionDialogValueCell(paramType, m_actionDialogParamValues.at(index)),
                                                         index == m_actionDialogSelectedParamIndex,
                                                         m_focusArea == FocusArea::ActionDialog));
             }
         }
 
-        dialogRows.push_back(ftxui::separator());
-        dialogRows.push_back(ftxui::text(m_actionDialogStatus));
+        ftxui::Elements dialogFooter;
+        dialogFooter.push_back(ftxui::text(m_actionDialogStatus));
         if (!m_actionDialogParamTypes.empty() && m_actionDialogSelectedParamIndex >= 0 && m_actionDialogSelectedParamIndex < static_cast<int>(m_actionDialogParamTypes.size())) {
             const api::ParamType& selectedParamType = m_actionDialogParamTypes.at(m_actionDialogSelectedParamIndex);
             if (actionParamUsesSelector(selectedParamType)) {
-                dialogRows.push_back(ftxui::text("Up/Down select param, Left/Right/Space choose value, Enter execute, Esc close.") | ftxui::dim);
+                dialogFooter.push_back(ftxui::text("Up/Down select param, Left/Right/Space choose value, Enter execute, Esc close.") | ftxui::dim);
             } else {
-                dialogRows.push_back(ftxui::text("Type to edit, Up/Down select param, Enter execute, Esc close.") | ftxui::dim);
+                dialogFooter.push_back(ftxui::text("Type to edit, Up/Down select param, Enter execute, Esc close.") | ftxui::dim);
             }
         } else {
-            dialogRows.push_back(ftxui::text("Enter executes, Esc closes.") | ftxui::dim);
+            dialogFooter.push_back(ftxui::text("Enter executes, Esc closes.") | ftxui::dim);
+        }
+
+        if (!m_lastActionExecutionStatus.empty()) {
+            dialogFooter.push_back(ftxui::separator());
+            dialogFooter.push_back(
+                ftxui::hbox({
+                    ftxui::text(" " + m_lastActionExecutionStatus),
+                    ftxui::filler(),
+                })
+                | ftxui::bold | ftxui::color(ftxui::Color::Black)
+                | ftxui::bgcolor(m_actionExecutionPending ? ftxui::Color::CyanLight : (m_lastActionExecutionStatusWarning ? ftxui::Color::YellowLight : ftxui::Color::GreenLight)));
         }
 
         sections.push_back(ftxui::separator());
-        sections.push_back(ftxui::window(ftxui::text("Execute action"), ftxui::vbox(std::move(dialogRows)) | ftxui::vscroll_indicator | ftxui::frame)
+        sections.push_back(ftxui::window(ftxui::text("Execute action"),
+                                         ftxui::vbox({
+                                             ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
+                                             ftxui::separator(),
+                                             ftxui::vbox(std::move(dialogFooter)),
+                                         }))
                            | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
     }
 
@@ -1615,7 +2008,15 @@ ftxui::Element Engine::renderUi() const
 
 bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen)
 {
+    if (event == ftxui::Event::Custom) {
+        drainUiTasks();
+        return true;
+    }
+
     if (m_showActionDialog) {
+        if (m_actionExecutionPending) {
+            return true;
+        }
         if (event == ftxui::Event::Escape) {
             closeActionDialog();
             return true;
@@ -1654,6 +2055,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 return true;
             }
         }
+
+        return true;
     }
 
     if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
@@ -1689,9 +2092,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
     if (m_showLoginForm) {
         if (event == ftxui::Event::Return) {
-            if (authenticate(m_username, m_password)) {
-                fetchThings();
-            }
+            authenticate(m_username, m_password);
             return true;
         }
         if (m_loginForm->OnEvent(event)) {

@@ -5,6 +5,7 @@
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
+#include <QJsonObject>
 #include <QString>
 #include <QUuid>
 
@@ -13,8 +14,11 @@
 #include <ftxui/dom/elements.hpp>
 
 #include <chrono>
+#include <functional>
+#include <mutex>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace nymea {
 
@@ -59,19 +63,30 @@ private:
     std::string endpoint() const;
     std::string connectionDisplayName() const;
     SavedConnection currentConnection(bool allowFingerprintUpdate) const;
+    void clampThingSelection();
     int thingDetailEntryCount() const;
     void clampThingDetailSelection();
     void resetThingDetailSelection();
     bool openSelectedActionDialog();
     void closeActionDialog();
     bool executeCurrentAction();
-    void showTransientActionStatus(std::string message, bool warning);
+    void observeReply(JsonRpcReply* reply, std::function<void(const QJsonObject&, const QString&)> handler);
+    void handleHelloReply(const QJsonObject& message, const QString& transportError);
+    void handleAuthenticateReply(const QJsonObject& message, const QString& transportError);
+    void handleEnableNotificationsReply(const QJsonObject& message, const QString& transportError, bool fetchThingsAfterReply);
+    void handleFetchThingsReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchThingClassesReply(const QJsonObject& message, const QString& transportError);
+    void handleActionExecutionReply(const QJsonObject& message, const QString& transportError);
+    void handleNotification(const QJsonObject& message);
+    void enqueueUiTask(std::function<void()> task);
+    void drainUiTasks();
 
     bool connectToServer();
-    bool sendHello();
-    bool authenticate(const std::string& username, const std::string& password);
-    bool fetchThingClasses();
-    bool fetchThings();
+    void sendHello();
+    void authenticate(const std::string& username, const std::string& password);
+    void enableNotifications(bool fetchThingsAfterReply = true);
+    void fetchThingClasses();
+    void fetchThings();
     void loadSavedConnection();
     void updateCertificateWarning();
     void clearStoredToken();
@@ -84,7 +99,7 @@ private:
     ftxui::Element renderSettingsMenu() const;
     ftxui::Element renderSettingsDetails() const;
     ftxui::Element renderThings() const;
-    ftxui::Element renderUi() const;
+    ftxui::Element renderUi();
     bool handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen);
 
     EngineOptions m_options;
@@ -115,15 +130,28 @@ private:
     std::string m_actionDialogStatus;
     std::string m_actionDialogActionName;
     int m_actionDialogActionIndex = -1;
+    QUuid m_actionDialogThingId;
     int m_actionDialogSelectedParamIndex = 0;
     std::vector<api::ParamType> m_actionDialogParamTypes;
     std::vector<std::string> m_actionDialogParamValues;
-    std::string m_transientActionStatus;
-    std::optional<std::chrono::steady_clock::time_point> m_transientActionStatusExpiresAt;
-    bool m_transientActionStatusWarning = false;
+    bool m_helloPending = false;
+    bool m_authenticationPending = false;
+    bool m_notificationSetupPending = false;
+    bool m_fetchThingsPending = false;
+    bool m_fetchThingClassesPending = false;
+    bool m_actionExecutionPending = false;
+    int m_pendingActionRequestId = -1;
+    std::string m_pendingActionInvocation;
+    std::chrono::steady_clock::time_point m_pendingActionStartedAt{};
+    std::string m_lastActionExecutionStatus;
+    bool m_lastActionExecutionStatusWarning = false;
+    bool m_notificationsEnabled = false;
     MainView m_mainView = MainView::Things;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;
+    ftxui::ScreenInteractive* m_screen = nullptr;
+    std::mutex m_uiTaskMutex;
+    std::vector<std::function<void()>> m_uiTasks;
 
     ftxui::InputOption m_passwordInputOption;
     ftxui::Component m_usernameInput;

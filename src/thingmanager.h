@@ -24,6 +24,8 @@ public:
     const std::string& status() const;
     const api::Things& things() const;
     const api::Thing* thingAt(int index) const;
+    const api::Thing* thingById(const QUuid& thingId) const;
+    bool hasThingClass(const QUuid& thingClassId) const;
     const api::ThingClass* thingClassForThing(const api::Thing& thing) const;
     const api::ParamType* paramTypeForThing(const api::Thing& thing, const api::Param& param) const;
     const api::StateType* stateTypeForThing(const api::Thing& thing, const api::State& state) const;
@@ -33,8 +35,14 @@ public:
 
     bool updateFromReply(const QJsonObject& reply, std::string& errorMessage);
     bool updateThingClassesFromReply(const QJsonObject& reply, std::string& errorMessage);
+    bool upsertThing(const api::Thing& thing);
+    bool removeThing(const QUuid& thingId);
+    bool updateThingState(
+        const QUuid& thingId, const QUuid& stateTypeId, const QJsonValue& value, const QJsonValue& minValue, const QJsonValue& maxValue, const QList<QJsonValue>& possibleValues);
+    bool updateThingSetting(const QUuid& thingId, const QUuid& paramTypeId, const QJsonValue& value);
 
 private:
+    api::Thing* findThingById(const QUuid& thingId);
     const api::ThingClass* thingClassById(const QUuid& thingClassId) const;
 
     api::Things m_things;
