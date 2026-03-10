@@ -2,6 +2,8 @@
 
 #include "connectionsettings.h"
 #include "generated/paramtype.h"
+#include "generated/thingclass.h"
+#include "generated/thingdescriptor.h"
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
@@ -43,6 +45,7 @@ public:
 private:
     enum class MainView {
         Things,
+        ConfigureThings,
         Settings,
     };
 
@@ -56,19 +59,63 @@ private:
         ThingList,
         ThingDetails,
         ActionDialog,
+        ConfigureMenu,
+        ConfigureThingClassSearch,
+        ConfigureThingClassList,
+        ConfigureThingSelection,
+        ConfigureDialog,
         SettingsMenu,
         LoginForm,
+    };
+
+    enum class ConfigureThingsView {
+        AddThing,
+        RemoveThing,
+        ReconfigureThing,
+        RenameThing,
+    };
+
+    enum class ConfigureDialogMode {
+        None,
+        AddChooseCreateMethod,
+        AddManualParams,
+        AddDiscoveryParams,
+        AddDiscoveryResults,
+        AddPairingConfirmation,
+        RemoveThingConfirm,
+        RenameThing,
+        ReconfigureThingInfo,
     };
 
     std::string endpoint() const;
     std::string connectionDisplayName() const;
     SavedConnection currentConnection(bool allowFingerprintUpdate) const;
     void clampThingSelection();
+    void clampConfigureThingClassSelection();
+    void clampConfigureThingSelection();
     int thingDetailEntryCount() const;
     void clampThingDetailSelection();
     void resetThingDetailSelection();
     bool openSelectedActionDialog();
     void closeActionDialog();
+    std::vector<api::ThingClass> filteredConfigThingClasses() const;
+    const api::ThingClass* selectedConfigThingClass() const;
+    const api::Thing* selectedConfigureThing() const;
+    void closeConfigureDialog();
+    void openAddThingDialog();
+    void openRemoveThingDialog();
+    void openRenameThingDialog();
+    void openReconfigureThingDialog();
+    void startAddThingFlow(api::CreateMethod createMethod);
+    bool submitConfigureDialog();
+    void fetchAllThingClasses();
+    void handleFetchAllThingClassesReply(const QJsonObject& message, const QString& transportError);
+    void handleDiscoverThingsReply(const QJsonObject& message, const QString& transportError);
+    void handleAddThingReply(const QJsonObject& message, const QString& transportError);
+    void handlePairThingReply(const QJsonObject& message, const QString& transportError);
+    void handleConfirmPairingReply(const QJsonObject& message, const QString& transportError);
+    void handleRemoveThingReply(const QJsonObject& message, const QString& transportError);
+    void handleRenameThingReply(const QJsonObject& message, const QString& transportError);
     bool executeCurrentAction();
     void observeReply(JsonRpcReply* reply, std::function<void(const QJsonObject&, const QString&)> handler);
     void handleHelloReply(const QJsonObject& message, const QString& transportError);
@@ -96,6 +143,8 @@ private:
     ftxui::Element renderMainMenu() const;
     ftxui::Element renderThingList() const;
     ftxui::Element renderThingDetails() const;
+    ftxui::Element renderConfigureMenu() const;
+    ftxui::Element renderConfigureDetails() const;
     ftxui::Element renderSettingsMenu() const;
     ftxui::Element renderSettingsDetails() const;
     ftxui::Element renderThings() const;
@@ -147,8 +196,43 @@ private:
     bool m_lastActionExecutionStatusWarning = false;
     bool m_notificationsEnabled = false;
     MainView m_mainView = MainView::Things;
+    ConfigureThingsView m_configureThingsView = ConfigureThingsView::AddThing;
+    ConfigureDialogMode m_configureDialogMode = ConfigureDialogMode::None;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;
+    std::string m_configureThingSearch;
+    int m_selectedConfigureThingClassIndex = 0;
+    int m_selectedConfigureThingIndex = 0;
+    bool m_fetchAllThingClassesPending = false;
+    bool m_haveAllThingClasses = false;
+    bool m_showConfigureDialog = false;
+    bool m_configureRequestPending = false;
+    bool m_configureFlowComplete = false;
+    int m_configurePendingRequestId = -1;
+    std::chrono::steady_clock::time_point m_configurePendingStartedAt{};
+    std::string m_pendingConfigureInvocation;
+    std::string m_lastConfigureExecutionStatus;
+    bool m_lastConfigureExecutionStatusWarning = false;
+    std::string m_configureDialogTitle;
+    std::string m_configureDialogStatus;
+    QUuid m_configureThingClassId;
+    QUuid m_configureTargetThingId;
+    std::vector<api::CreateMethod> m_configureCreateMethodOptions;
+    int m_configureCreateMethodIndex = 0;
+    std::optional<api::CreateMethod> m_configureCreateMethod;
+    std::string m_configureThingName;
+    std::vector<api::ParamType> m_configureParamTypes;
+    std::vector<std::string> m_configureParamValues;
+    int m_configureParamSelectionIndex = 0;
+    std::vector<api::ThingDescriptor> m_configureThingDescriptors;
+    int m_configureThingDescriptorIndex = 0;
+    std::optional<api::SetupMethod> m_configureSetupMethod;
+    QUuid m_configurePairingTransactionId;
+    std::string m_configurePairingDisplayMessage;
+    std::string m_configurePairingOauthUrl;
+    std::string m_configurePairingPin;
+    std::string m_configurePairingUsername;
+    std::string m_configurePairingSecret;
     ftxui::ScreenInteractive* m_screen = nullptr;
     std::mutex m_uiTaskMutex;
     std::vector<std::function<void()>> m_uiTasks;

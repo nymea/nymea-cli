@@ -3,6 +3,7 @@
 #include "generated/integrationsgetthingclassesresponse.h"
 #include "generated/integrationsgetthingsresponse.h"
 
+#include <algorithm>
 #include <set>
 #include <utility>
 
@@ -78,6 +79,22 @@ const api::Thing* ThingManager::thingById(const QUuid& thingId) const
 bool ThingManager::hasThingClass(const QUuid& thingClassId) const
 {
     return thingClassById(thingClassId) != nullptr;
+}
+
+std::vector<api::ThingClass> ThingManager::thingClasses() const
+{
+    std::vector<api::ThingClass> classes;
+    classes.reserve(m_thingClasses.size());
+    for (const auto& entry : m_thingClasses) {
+        classes.push_back(entry.second);
+    }
+
+    std::sort(classes.begin(), classes.end(), [](const api::ThingClass& left, const api::ThingClass& right) {
+        const QString leftLabel = !left.displayName.isEmpty() ? left.displayName : left.name;
+        const QString rightLabel = !right.displayName.isEmpty() ? right.displayName : right.name;
+        return QString::localeAwareCompare(leftLabel, rightLabel) < 0;
+    });
+    return classes;
 }
 
 const api::ThingClass* ThingManager::thingClassById(const QUuid& thingClassId) const
@@ -171,7 +188,6 @@ bool ThingManager::updateFromReply(const QJsonObject& reply, std::string& errorM
     }
 
     m_things = response.things.value_or(api::Things{});
-    m_thingClasses.clear();
     m_status = "Loaded " + std::to_string(m_things.size()) + " thing(s).";
     return true;
 }
@@ -186,10 +202,9 @@ bool ThingManager::updateThingClassesFromReply(const QJsonObject& reply, std::st
         return false;
     }
 
-    m_thingClasses.clear();
     if (response.thingClasses.has_value()) {
         for (const api::ThingClass& thingClass : *response.thingClasses) {
-            m_thingClasses.emplace(uuidKey(thingClass.id), thingClass);
+            m_thingClasses.insert_or_assign(uuidKey(thingClass.id), thingClass);
         }
     }
 

@@ -2,9 +2,21 @@
 
 #include "generated/actiontype.h"
 #include "generated/apiutils.h"
+#include "generated/integrationsaddthingparams.h"
+#include "generated/integrationsaddthingresponse.h"
+#include "generated/integrationsconfirmpairingparams.h"
+#include "generated/integrationsconfirmpairingresponse.h"
+#include "generated/integrationsdiscoverthingsparams.h"
+#include "generated/integrationsdiscoverthingsresponse.h"
+#include "generated/integrationseditthingparams.h"
+#include "generated/integrationseditthingresponse.h"
 #include "generated/integrationsexecuteactionparams.h"
 #include "generated/integrationsexecuteactionresponse.h"
 #include "generated/integrationsgetthingclassesparams.h"
+#include "generated/integrationspairthingparams.h"
+#include "generated/integrationspairthingresponse.h"
+#include "generated/integrationsremovethingparams.h"
+#include "generated/integrationsremovethingresponse.h"
 #include "generated/integrationsstatechangednotificationparams.h"
 #include "generated/integrationsthingaddednotificationparams.h"
 #include "generated/integrationsthingchangednotificationparams.h"
@@ -24,6 +36,7 @@
 #include <QLocale>
 #include <QMetaObject>
 
+#include <algorithm>
 #include <array>
 #include <initializer_list>
 #include <string_view>
@@ -206,6 +219,51 @@ std::string thingErrorLabel(api::ThingError error)
         value.erase(0, prefix.size());
     }
     return value;
+}
+
+std::string createMethodLabel(api::CreateMethod createMethod)
+{
+    std::string value = api::toString(createMethod).toStdString();
+    constexpr std::string_view prefix = "CreateMethod";
+    if (value.rfind(prefix.data(), 0) == 0) {
+        value.erase(0, prefix.size());
+    }
+    return value;
+}
+
+std::string setupMethodLabel(api::SetupMethod setupMethod)
+{
+    std::string value = api::toString(setupMethod).toStdString();
+    constexpr std::string_view prefix = "SetupMethod";
+    if (value.rfind(prefix.data(), 0) == 0) {
+        value.erase(0, prefix.size());
+    }
+    return value;
+}
+
+std::string thingClassLabel(const api::ThingClass& thingClass)
+{
+    return firstNonEmpty({thingClass.displayName.toStdString(), thingClass.name.toStdString(), uuidToStd(thingClass.id), "<unknown thing class>"});
+}
+
+std::string descriptorLabel(const api::ThingDescriptor& descriptor)
+{
+    return firstNonEmpty({descriptor.title.toStdString(), descriptor.description.toStdString(), uuidToStd(descriptor.id), "<unknown discovery result>"});
+}
+
+bool containsCreateMethod(const api::ThingClass& thingClass, api::CreateMethod createMethod)
+{
+    return std::find(thingClass.createMethods.begin(), thingClass.createMethods.end(), createMethod) != thingClass.createMethods.end();
+}
+
+bool isThingClassAddable(const api::ThingClass& thingClass)
+{
+    return containsCreateMethod(thingClass, api::CreateMethod::CreateMethodUser) || containsCreateMethod(thingClass, api::CreateMethod::CreateMethodDiscovery);
+}
+
+bool caseInsensitiveContains(const QString& value, const QString& needle)
+{
+    return needle.trimmed().isEmpty() || value.contains(needle, Qt::CaseInsensitive);
 }
 
 std::string formatActionInvocation(const std::string& actionName, const std::vector<api::ParamType>& paramTypes, const std::vector<std::string>& paramValues)
@@ -537,6 +595,29 @@ std::optional<QJsonValue> parseActionInputValue(const std::string& input, api::B
     return QJsonValue(trimmed);
 }
 
+bool buildParamList(const std::vector<api::ParamType>& paramTypes, const std::vector<std::string>& rawValues, api::ParamList& params, std::string& errorMessage)
+{
+    params.clear();
+    errorMessage.clear();
+
+    for (int index = 0; index < static_cast<int>(paramTypes.size()) && index < static_cast<int>(rawValues.size()); ++index) {
+        const api::ParamType& paramType = paramTypes.at(index);
+        const std::string rawValue = normalizedActionDialogValue(paramType, rawValues.at(index));
+        const std::optional<QJsonValue> parsedValue = parseActionInputValue(rawValue, paramType.type);
+        if (!parsedValue.has_value()) {
+            errorMessage = "Invalid value for " + firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "param"}) + ".";
+            return false;
+        }
+
+        api::Param param;
+        param.paramTypeId = paramType.id;
+        param.value = *parsedValue;
+        params.append(param);
+    }
+
+    return true;
+}
+
 std::vector<QJsonValue> selectableValuesForParamType(const api::ParamType& paramType)
 {
     if (paramType.allowedValues.has_value() && !paramType.allowedValues->empty()) {
@@ -708,6 +789,41 @@ void Engine::clampThingSelection()
     }
 }
 
+void Engine::clampConfigureThingClassSelection()
+{
+    const std::vector<api::ThingClass> thingClasses = filteredConfigThingClasses();
+    if (thingClasses.empty()) {
+        m_selectedConfigureThingClassIndex = 0;
+        if (m_focusArea == FocusArea::ConfigureThingClassList) {
+            m_focusArea = FocusArea::ConfigureThingClassSearch;
+        }
+        return;
+    }
+
+    if (m_selectedConfigureThingClassIndex < 0) {
+        m_selectedConfigureThingClassIndex = 0;
+    } else if (m_selectedConfigureThingClassIndex >= static_cast<int>(thingClasses.size())) {
+        m_selectedConfigureThingClassIndex = static_cast<int>(thingClasses.size()) - 1;
+    }
+}
+
+void Engine::clampConfigureThingSelection()
+{
+    if (m_thingManager.things().empty()) {
+        m_selectedConfigureThingIndex = 0;
+        if (m_focusArea == FocusArea::ConfigureThingSelection) {
+            m_focusArea = FocusArea::ConfigureMenu;
+        }
+        return;
+    }
+
+    if (m_selectedConfigureThingIndex < 0) {
+        m_selectedConfigureThingIndex = 0;
+    } else if (m_selectedConfigureThingIndex >= static_cast<int>(m_thingManager.things().size())) {
+        m_selectedConfigureThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
+    }
+}
+
 int Engine::thingDetailEntryCount() const
 {
     const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
@@ -802,6 +918,418 @@ void Engine::closeActionDialog()
     if (m_focusArea == FocusArea::ActionDialog) {
         m_focusArea = FocusArea::ThingDetails;
     }
+}
+
+std::vector<api::ThingClass> Engine::filteredConfigThingClasses() const
+{
+    const QString search = QString::fromStdString(m_configureThingSearch).trimmed();
+    std::vector<api::ThingClass> filtered;
+    for (const api::ThingClass& thingClass : m_thingManager.thingClasses()) {
+        if (!isThingClassAddable(thingClass)) {
+            continue;
+        }
+        if (!search.isEmpty() && !caseInsensitiveContains(thingClass.displayName, search) && !caseInsensitiveContains(thingClass.name, search)) {
+            continue;
+        }
+        filtered.push_back(thingClass);
+    }
+    return filtered;
+}
+
+const api::ThingClass* Engine::selectedConfigThingClass() const
+{
+    const std::vector<api::ThingClass> thingClasses = filteredConfigThingClasses();
+    if (m_selectedConfigureThingClassIndex < 0 || m_selectedConfigureThingClassIndex >= static_cast<int>(thingClasses.size())) {
+        return nullptr;
+    }
+
+    return m_thingManager.thingClassById(thingClasses.at(m_selectedConfigureThingClassIndex).id);
+}
+
+const api::Thing* Engine::selectedConfigureThing() const
+{
+    return m_thingManager.thingAt(m_selectedConfigureThingIndex);
+}
+
+void Engine::closeConfigureDialog()
+{
+    m_showConfigureDialog = false;
+    m_configureDialogMode = ConfigureDialogMode::None;
+    m_configureRequestPending = false;
+    m_configureFlowComplete = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+    m_lastConfigureExecutionStatus.clear();
+    m_lastConfigureExecutionStatusWarning = false;
+    m_configureDialogTitle.clear();
+    m_configureDialogStatus.clear();
+    m_configureThingClassId = QUuid();
+    m_configureTargetThingId = QUuid();
+    m_configureCreateMethodOptions.clear();
+    m_configureCreateMethodIndex = 0;
+    m_configureCreateMethod.reset();
+    m_configureThingName.clear();
+    m_configureParamTypes.clear();
+    m_configureParamValues.clear();
+    m_configureParamSelectionIndex = 0;
+    m_configureThingDescriptors.clear();
+    m_configureThingDescriptorIndex = 0;
+    m_configureSetupMethod.reset();
+    m_configurePairingTransactionId = QUuid();
+    m_configurePairingDisplayMessage.clear();
+    m_configurePairingOauthUrl.clear();
+    m_configurePairingPin.clear();
+    m_configurePairingUsername.clear();
+    m_configurePairingSecret.clear();
+    if (m_focusArea == FocusArea::ConfigureDialog) {
+        if (m_mainView == MainView::ConfigureThings) {
+            m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassList : FocusArea::ConfigureThingSelection;
+        } else {
+            m_focusArea = FocusArea::MainMenu;
+        }
+    }
+}
+
+void Engine::openAddThingDialog()
+{
+    const api::ThingClass* thingClass = selectedConfigThingClass();
+    if (thingClass == nullptr) {
+        return;
+    }
+
+    closeConfigureDialog();
+    m_showConfigureDialog = true;
+    m_focusArea = FocusArea::ConfigureDialog;
+    m_configureThingClassId = thingClass->id;
+    m_configureDialogTitle = "Add thing";
+    m_configureThingName = thingClassLabel(*thingClass);
+    m_configureCreateMethodOptions.clear();
+    for (const api::CreateMethod createMethod : thingClass->createMethods) {
+        if (createMethod == api::CreateMethod::CreateMethodUser || createMethod == api::CreateMethod::CreateMethodDiscovery) {
+            m_configureCreateMethodOptions.push_back(createMethod);
+        }
+    }
+
+    if (m_configureCreateMethodOptions.empty()) {
+        m_configureDialogMode = ConfigureDialogMode::ReconfigureThingInfo;
+        m_configureDialogStatus = "This thing class cannot be created manually from the CLI.";
+        return;
+    }
+
+    if (m_configureCreateMethodOptions.size() == 1) {
+        startAddThingFlow(m_configureCreateMethodOptions.front());
+        return;
+    }
+
+    m_configureDialogMode = ConfigureDialogMode::AddChooseCreateMethod;
+    m_configureDialogStatus = "Select how the thing should be created and press Enter.";
+}
+
+void Engine::openRemoveThingDialog()
+{
+    const api::Thing* thing = selectedConfigureThing();
+    if (thing == nullptr) {
+        return;
+    }
+
+    closeConfigureDialog();
+    m_showConfigureDialog = true;
+    m_focusArea = FocusArea::ConfigureDialog;
+    m_configureDialogMode = ConfigureDialogMode::RemoveThingConfirm;
+    m_configureDialogTitle = "Remove thing";
+    m_configureTargetThingId = thing->id;
+    m_configureDialogStatus = "Press Enter to remove " + thingLabel(thing) + ".";
+}
+
+void Engine::openRenameThingDialog()
+{
+    const api::Thing* thing = selectedConfigureThing();
+    if (thing == nullptr) {
+        return;
+    }
+
+    closeConfigureDialog();
+    m_showConfigureDialog = true;
+    m_focusArea = FocusArea::ConfigureDialog;
+    m_configureDialogMode = ConfigureDialogMode::RenameThing;
+    m_configureDialogTitle = "Rename thing";
+    m_configureTargetThingId = thing->id;
+    m_configureThingName = optionalQStringToStd(thing->name);
+    m_configureDialogStatus = "Edit the thing name and press Enter.";
+}
+
+void Engine::openReconfigureThingDialog()
+{
+    const api::Thing* thing = selectedConfigureThing();
+    if (thing == nullptr) {
+        return;
+    }
+
+    closeConfigureDialog();
+    m_showConfigureDialog = true;
+    m_focusArea = FocusArea::ConfigureDialog;
+    m_configureDialogMode = ConfigureDialogMode::ReconfigureThingInfo;
+    m_configureTargetThingId = thing->id;
+    m_configureDialogTitle = "Reconfigure thing";
+    m_configureDialogStatus = "Reconfigure flow is not implemented yet in this CLI.";
+}
+
+void Engine::startAddThingFlow(api::CreateMethod createMethod)
+{
+    const api::ThingClass* thingClass = m_thingManager.thingClassById(m_configureThingClassId);
+    if (thingClass == nullptr) {
+        closeConfigureDialog();
+        return;
+    }
+
+    m_showConfigureDialog = true;
+    m_focusArea = FocusArea::ConfigureDialog;
+    m_configureCreateMethod = createMethod;
+    m_configureThingDescriptors.clear();
+    m_configureThingDescriptorIndex = 0;
+    m_configureSetupMethod.reset();
+    m_configureFlowComplete = false;
+    m_configurePairingTransactionId = QUuid();
+    m_configurePairingDisplayMessage.clear();
+    m_configurePairingOauthUrl.clear();
+    m_configurePairingPin.clear();
+    m_configurePairingUsername.clear();
+    m_configurePairingSecret.clear();
+    m_pendingConfigureInvocation.clear();
+    m_lastConfigureExecutionStatus.clear();
+    m_lastConfigureExecutionStatusWarning = false;
+
+    if (createMethod == api::CreateMethod::CreateMethodDiscovery) {
+        m_configureDialogMode = ConfigureDialogMode::AddDiscoveryParams;
+        m_configureParamTypes.assign(thingClass->discoveryParamTypes.begin(), thingClass->discoveryParamTypes.end());
+        m_configureParamValues.clear();
+        m_configureParamValues.reserve(m_configureParamTypes.size());
+        for (const api::ParamType& paramType : m_configureParamTypes) {
+            m_configureParamValues.push_back(normalizedActionDialogValue(paramType, {}));
+        }
+        m_configureParamSelectionIndex = 0;
+        m_configureDialogStatus = m_configureParamTypes.empty() ? "Press Enter to start discovery." : "Edit discovery params and press Enter to search.";
+        return;
+    }
+
+    m_configureDialogMode = ConfigureDialogMode::AddManualParams;
+    m_configureParamTypes.assign(thingClass->paramTypes.begin(), thingClass->paramTypes.end());
+    m_configureParamValues.clear();
+    m_configureParamValues.reserve(m_configureParamTypes.size());
+    for (const api::ParamType& paramType : m_configureParamTypes) {
+        m_configureParamValues.push_back(normalizedActionDialogValue(paramType, {}));
+    }
+    m_configureParamSelectionIndex = 0;
+    if (thingClass->setupMethod == api::SetupMethod::SetupMethodJustAdd) {
+        m_configureDialogStatus = "Edit the name and params, then press Enter to add the thing.";
+    } else {
+        m_configureDialogStatus = "Edit the optional name and params, then press Enter to start pairing.";
+    }
+}
+
+bool Engine::submitConfigureDialog()
+{
+    if (!m_showConfigureDialog || m_configureRequestPending) {
+        return false;
+    }
+
+    const api::ThingClass* thingClass = m_configureThingClassId.isNull() ? nullptr : m_thingManager.thingClassById(m_configureThingClassId);
+    auto sendReply = [&](JsonRpcReply* reply, const std::string& invocation, const std::string& waitingStatus, auto&& handler) -> bool {
+        if (reply == nullptr) {
+            m_configureDialogStatus = "Failed to send request: " + m_client.lastError().toStdString();
+            return false;
+        }
+        m_configureFlowComplete = false;
+        m_configureRequestPending = true;
+        m_configurePendingRequestId = reply->requestId();
+        m_configurePendingStartedAt = std::chrono::steady_clock::now();
+        m_pendingConfigureInvocation = invocation;
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(m_configurePendingRequestId,
+                                                                     m_pendingConfigureInvocation,
+                                                                     busyIndicator(m_configurePendingStartedAt) + " Processing");
+        m_lastConfigureExecutionStatusWarning = false;
+        m_configureDialogStatus = waitingStatus;
+        observeReply(reply, std::forward<decltype(handler)>(handler));
+        return true;
+    };
+
+    switch (m_configureDialogMode) {
+    case ConfigureDialogMode::AddChooseCreateMethod:
+        if (m_configureCreateMethodIndex < 0 || m_configureCreateMethodIndex >= static_cast<int>(m_configureCreateMethodOptions.size())) {
+            return false;
+        }
+        startAddThingFlow(m_configureCreateMethodOptions.at(m_configureCreateMethodIndex));
+        return true;
+    case ConfigureDialogMode::AddManualParams: {
+        if (thingClass == nullptr) {
+            m_configureDialogStatus = "The selected thing class is no longer available.";
+            return false;
+        }
+
+        api::ParamList params;
+        std::string errorMessage;
+        if (!buildParamList(m_configureParamTypes, m_configureParamValues, params, errorMessage)) {
+            m_configureDialogStatus = errorMessage;
+            return false;
+        }
+
+        const QString name = QString::fromStdString(m_configureThingName).trimmed();
+        if (thingClass->setupMethod == api::SetupMethod::SetupMethodJustAdd) {
+            if (name.isEmpty()) {
+                m_configureDialogStatus = "A name is required.";
+                return false;
+            }
+
+            api::IntegrationsAddThingParams request;
+            request.name = name;
+            request.thingClassId = thingClass->id;
+            if (!params.empty()) {
+                request.thingParams = params;
+            }
+            return sendReply(m_client.sendRequest(api::IntegrationsAddThingMethod::methodName(), request.toJson()),
+                             "AddThing(name=" + name.toStdString() + ", thingClass=" + thingClassLabel(*thingClass) + ")",
+                             "Adding thing...",
+                             [this](const QJsonObject& message, const QString& transportError) { handleAddThingReply(message, transportError); });
+        }
+
+        api::IntegrationsPairThingParams request;
+        if (!name.isEmpty()) {
+            request.name = name;
+        }
+        request.thingClassId = thingClass->id;
+        if (!params.empty()) {
+            request.thingParams = params;
+        }
+        return sendReply(m_client.sendRequest(api::IntegrationsPairThingMethod::methodName(), request.toJson()),
+                         "PairThing(thingClass=" + thingClassLabel(*thingClass) + (name.isEmpty() ? std::string() : ", name=" + name.toStdString()) + ")",
+                         "Starting pairing...",
+                         [this](const QJsonObject& message, const QString& transportError) { handlePairThingReply(message, transportError); });
+    }
+    case ConfigureDialogMode::AddDiscoveryParams: {
+        if (thingClass == nullptr) {
+            m_configureDialogStatus = "The selected thing class is no longer available.";
+            return false;
+        }
+
+        api::ParamList discoveryParams;
+        std::string errorMessage;
+        if (!buildParamList(m_configureParamTypes, m_configureParamValues, discoveryParams, errorMessage)) {
+            m_configureDialogStatus = errorMessage;
+            return false;
+        }
+
+        api::IntegrationsDiscoverThingsParams request;
+        request.thingClassId = thingClass->id;
+        if (!discoveryParams.empty()) {
+            request.discoveryParams = discoveryParams;
+        }
+
+        return sendReply(m_client.sendRequest(api::IntegrationsDiscoverThingsMethod::methodName(), request.toJson()),
+                         "DiscoverThings(thingClass=" + thingClassLabel(*thingClass) + ")",
+                         "Discovering things...",
+                         [this](const QJsonObject& message, const QString& transportError) { handleDiscoverThingsReply(message, transportError); });
+    }
+    case ConfigureDialogMode::AddDiscoveryResults: {
+        if (thingClass == nullptr) {
+            m_configureDialogStatus = "The selected thing class is no longer available.";
+            return false;
+        }
+        if (m_configureThingDescriptorIndex < 0 || m_configureThingDescriptorIndex >= static_cast<int>(m_configureThingDescriptors.size())) {
+            return false;
+        }
+
+        const api::ThingDescriptor& descriptor = m_configureThingDescriptors.at(m_configureThingDescriptorIndex);
+        if (thingClass->setupMethod == api::SetupMethod::SetupMethodJustAdd) {
+            api::IntegrationsAddThingParams request;
+            request.name = !descriptor.title.isEmpty() ? descriptor.title : QString::fromStdString(thingClassLabel(*thingClass));
+            request.thingDescriptorId = descriptor.id;
+            return sendReply(m_client.sendRequest(api::IntegrationsAddThingMethod::methodName(), request.toJson()),
+                             "AddThing(descriptor=" + descriptorLabel(descriptor) + ")",
+                             "Adding discovered thing...",
+                             [this](const QJsonObject& message, const QString& transportError) { handleAddThingReply(message, transportError); });
+        }
+
+        api::IntegrationsPairThingParams request;
+        if (!descriptor.title.isEmpty()) {
+            request.name = descriptor.title;
+        }
+        request.thingDescriptorId = descriptor.id;
+        return sendReply(m_client.sendRequest(api::IntegrationsPairThingMethod::methodName(), request.toJson()),
+                         "PairThing(descriptor=" + descriptorLabel(descriptor) + ")",
+                         "Starting pairing...",
+                         [this](const QJsonObject& message, const QString& transportError) { handlePairThingReply(message, transportError); });
+    }
+    case ConfigureDialogMode::AddPairingConfirmation: {
+        if (m_configurePairingTransactionId.isNull()) {
+            m_configureDialogStatus = "Missing pairing transaction id.";
+            return false;
+        }
+
+        api::IntegrationsConfirmPairingParams request;
+        request.pairingTransactionId = m_configurePairingTransactionId;
+        if (m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword) {
+            const QString username = QString::fromStdString(m_configurePairingUsername).trimmed();
+            const QString secret = QString::fromStdString(m_configurePairingSecret);
+            if (username.isEmpty() || secret.isEmpty()) {
+                m_configureDialogStatus = "Username and password are required.";
+                return false;
+            }
+            request.username = username;
+            request.secret = secret;
+        } else if (m_configureSetupMethod == api::SetupMethod::SetupMethodEnterPin || m_configureSetupMethod == api::SetupMethod::SetupMethodDisplayPin
+                   || m_configureSetupMethod == api::SetupMethod::SetupMethodOAuth) {
+            const QString secret = QString::fromStdString(m_configurePairingSecret).trimmed();
+            if (secret.isEmpty()) {
+                m_configureDialogStatus = "A confirmation value is required.";
+                return false;
+            }
+            request.secret = secret;
+        }
+
+        return sendReply(m_client.sendRequest(api::IntegrationsConfirmPairingMethod::methodName(), request.toJson()),
+                         "ConfirmPairing(setup=" + setupMethodLabel(m_configureSetupMethod.value_or(api::SetupMethod::SetupMethodPushButton)) + ")",
+                         "Confirming pairing...",
+                         [this](const QJsonObject& message, const QString& transportError) { handleConfirmPairingReply(message, transportError); });
+    }
+    case ConfigureDialogMode::RemoveThingConfirm: {
+        if (m_configureTargetThingId.isNull()) {
+            return false;
+        }
+
+        api::IntegrationsRemoveThingParams request;
+        request.thingId = m_configureTargetThingId;
+        return sendReply(m_client.sendRequest(api::IntegrationsRemoveThingMethod::methodName(), request.toJson()),
+                         "RemoveThing(thing=" + thingLabel(m_thingManager.thingById(m_configureTargetThingId)) + ")",
+                         "Removing thing...",
+                         [this](const QJsonObject& message, const QString& transportError) { handleRemoveThingReply(message, transportError); });
+    }
+    case ConfigureDialogMode::RenameThing: {
+        if (m_configureTargetThingId.isNull()) {
+            return false;
+        }
+
+        const QString name = QString::fromStdString(m_configureThingName).trimmed();
+        if (name.isEmpty()) {
+            m_configureDialogStatus = "A name is required.";
+            return false;
+        }
+
+        api::IntegrationsEditThingParams request;
+        request.thingId = m_configureTargetThingId;
+        request.name = name;
+        return sendReply(m_client.sendRequest(api::IntegrationsEditThingMethod::methodName(), request.toJson()),
+                         "RenameThing(name=" + name.toStdString() + ")",
+                         "Renaming thing...",
+                         [this](const QJsonObject& message, const QString& transportError) { handleRenameThingReply(message, transportError); });
+    }
+    case ConfigureDialogMode::ReconfigureThingInfo:
+        closeConfigureDialog();
+        return true;
+    case ConfigureDialogMode::None:
+        break;
+    }
+
+    return false;
 }
 
 bool Engine::executeCurrentAction()
@@ -942,6 +1470,438 @@ void Engine::handleActionExecutionReply(const QJsonObject& message, const QStrin
     m_pendingActionInvocation.clear();
 }
 
+void Engine::handleFetchAllThingClassesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_fetchAllThingClassesPending = false;
+
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Thing class catalog unavailable: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Thing class catalog request was unauthorized.";
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Thing class catalog request returned an error.";
+        return;
+    }
+
+    std::string errorMessage;
+    if (!m_thingManager.updateThingClassesFromReply(message, errorMessage)) {
+        m_settingsWarning = errorMessage;
+        return;
+    }
+
+    m_haveAllThingClasses = true;
+    clampConfigureThingClassSelection();
+    m_settingsWarning.clear();
+}
+
+void Engine::handleDiscoverThingsReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+
+    if (!transportError.isEmpty()) {
+        m_configureDialogStatus = "Discovery failed: " + transportError.toStdString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_configureDialogStatus = "Discovery unauthorized.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Unauthorized");
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_configureDialogStatus = "Discovery returned a JSON-RPC error.";
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    const api::IntegrationsDiscoverThingsResponse response = api::IntegrationsDiscoverThingsResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        m_configureDialogStatus = "Discovery failed: " + thingErrorLabel(response.thingError);
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            m_configureDialogStatus += " - " + response.displayMessage->toStdString();
+        }
+        std::string result = thingErrorLabel(response.thingError);
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            result += " - " + response.displayMessage->toStdString();
+        }
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    m_configureThingDescriptors.clear();
+    if (response.thingDescriptors.has_value()) {
+        m_configureThingDescriptors.assign(response.thingDescriptors->begin(), response.thingDescriptors->end());
+    }
+    m_configureThingDescriptorIndex = 0;
+
+    if (m_configureThingDescriptors.empty()) {
+        m_configureDialogStatus = response.displayMessage.has_value() && !response.displayMessage->isEmpty() ? response.displayMessage->toStdString()
+                                                                                                             : "No discovery results found.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "No results");
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    m_configureDialogMode = ConfigureDialogMode::AddDiscoveryResults;
+    m_configureDialogStatus = "Select a discovery result and press Enter to continue.";
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "NoError - " + std::to_string(m_configureThingDescriptors.size()) + " result(s)");
+    m_lastConfigureExecutionStatusWarning = false;
+}
+
+void Engine::handleAddThingReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+    m_configureFlowComplete = true;
+
+    if (!transportError.isEmpty()) {
+        m_configureDialogStatus = "Add thing failed: " + transportError.toStdString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Add thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_configureDialogStatus = "Add thing unauthorized.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Unauthorized");
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Add thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Add thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const api::IntegrationsAddThingResponse response = api::IntegrationsAddThingResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        std::string result = thingErrorLabel(response.thingError);
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            result += " - " + response.displayMessage->toStdString();
+        }
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Add thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    std::string result = "NoError";
+    if (response.thingId.has_value()) {
+        result += " - " + uuidToStd(*response.thingId);
+    }
+    if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+        result += " - " + response.displayMessage->toStdString();
+    }
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+    m_lastConfigureExecutionStatusWarning = false;
+    m_configureDialogStatus = "Add thing finished. Press Enter or Esc to close.";
+    m_thingManager.setStatus("Added thing" + std::string(response.thingId.has_value() ? " " + uuidToStd(*response.thingId) : "."));
+    fetchThings();
+}
+
+void Engine::handlePairThingReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+
+    if (!transportError.isEmpty()) {
+        m_configureDialogStatus = "Pairing failed: " + transportError.toStdString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_configureDialogStatus = "Pairing unauthorized.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Unauthorized");
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Pairing returned a JSON-RPC error.";
+        return;
+    }
+
+    const api::IntegrationsPairThingResponse response = api::IntegrationsPairThingResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        std::string result = thingErrorLabel(response.thingError);
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            result += " - " + response.displayMessage->toStdString();
+        }
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Pairing failed: " + result;
+        return;
+    }
+
+    if (!response.pairingTransactionId.has_value()) {
+        m_configureDialogStatus = "Pairing started but no transaction id was returned.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Missing pairing transaction id");
+        m_lastConfigureExecutionStatusWarning = true;
+        return;
+    }
+
+    m_configurePairingTransactionId = *response.pairingTransactionId;
+    m_configureSetupMethod = response.setupMethod;
+    m_configurePairingDisplayMessage = response.displayMessage.has_value() ? response.displayMessage->toStdString() : std::string();
+    m_configurePairingOauthUrl = response.oAuthUrl.has_value() ? response.oAuthUrl->toStdString() : std::string();
+    m_configurePairingPin = response.pin.has_value() ? response.pin->toStdString() : std::string();
+    m_configurePairingUsername.clear();
+    m_configurePairingSecret.clear();
+    m_configureParamSelectionIndex = 0;
+    if (m_configureSetupMethod == api::SetupMethod::SetupMethodEnterPin && !m_configurePairingPin.empty()) {
+        m_configurePairingSecret = m_configurePairingPin;
+    }
+    std::string result = "NoError - " + setupMethodLabel(m_configureSetupMethod.value_or(api::SetupMethod::SetupMethodPushButton));
+    if (!m_configurePairingDisplayMessage.empty()) {
+        result += " - " + m_configurePairingDisplayMessage;
+    }
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+    m_lastConfigureExecutionStatusWarning = false;
+
+    m_configureDialogMode = ConfigureDialogMode::AddPairingConfirmation;
+    switch (m_configureSetupMethod.value_or(api::SetupMethod::SetupMethodPushButton)) {
+    case api::SetupMethod::SetupMethodDisplayPin:
+        m_configureDialogStatus = "Enter the PIN shown on the device and press Enter.";
+        break;
+    case api::SetupMethod::SetupMethodEnterPin:
+        m_configureDialogStatus = "Show the PIN on the target device, then press Enter to confirm.";
+        break;
+    case api::SetupMethod::SetupMethodPushButton:
+        m_configureDialogStatus = "Follow the pairing instructions and press Enter when ready.";
+        break;
+    case api::SetupMethod::SetupMethodUserAndPassword:
+        m_configureDialogStatus = "Enter the username and password, then press Enter.";
+        break;
+    case api::SetupMethod::SetupMethodOAuth:
+        m_configureDialogStatus = "Open the OAuth URL, complete login, then paste the redirect URL and press Enter.";
+        break;
+    case api::SetupMethod::SetupMethodJustAdd:
+        m_configureDialogStatus = "Press Enter to confirm.";
+        break;
+    }
+}
+
+void Engine::handleConfirmPairingReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+    m_configureFlowComplete = true;
+
+    if (!transportError.isEmpty()) {
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Setup finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Unauthorized");
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Setup finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Setup finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const api::IntegrationsConfirmPairingResponse response = api::IntegrationsConfirmPairingResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        std::string result = thingErrorLabel(response.thingError);
+        if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+            result += " - " + response.displayMessage->toStdString();
+        }
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Setup finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    std::string result = "NoError";
+    if (response.thingId.has_value()) {
+        result += " - " + uuidToStd(*response.thingId);
+    }
+    if (response.displayMessage.has_value() && !response.displayMessage->isEmpty()) {
+        result += " - " + response.displayMessage->toStdString();
+    }
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, result);
+    m_lastConfigureExecutionStatusWarning = false;
+    m_configureDialogStatus = "Setup finished. Press Enter or Esc to close.";
+    m_thingManager.setStatus("Pairing completed successfully.");
+    fetchThings();
+}
+
+void Engine::handleRemoveThingReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+    m_configureFlowComplete = true;
+
+    if (!transportError.isEmpty()) {
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Remove thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("error") || status == QStringLiteral("unauthorized")) {
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId,
+                                                                     invocation,
+                                                                     status == QStringLiteral("unauthorized") ? "Unauthorized"
+                                                                                                              : (errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString()));
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Remove thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const api::IntegrationsRemoveThingResponse response = api::IntegrationsRemoveThingResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, thingErrorLabel(response.thingError));
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Remove thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "NoError");
+    m_lastConfigureExecutionStatusWarning = false;
+    m_configureDialogStatus = "Remove thing finished. Press Enter or Esc to close.";
+    m_thingManager.setStatus("Removed thing " + uuidToStd(m_configureTargetThingId) + ".");
+    fetchThings();
+}
+
+void Engine::handleRenameThingReply(const QJsonObject& message, const QString& transportError)
+{
+    const int requestId = m_configurePendingRequestId;
+    const std::string invocation = m_pendingConfigureInvocation;
+    m_configureRequestPending = false;
+    m_configurePendingRequestId = -1;
+    m_pendingConfigureInvocation.clear();
+    m_configureFlowComplete = true;
+
+    if (!transportError.isEmpty()) {
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, transportError.toStdString());
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Rename thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("error") || status == QStringLiteral("unauthorized")) {
+        const QString errorText = message.value(QStringLiteral("error")).toString();
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId,
+                                                                     invocation,
+                                                                     status == QStringLiteral("unauthorized") ? "Unauthorized"
+                                                                                                              : (errorText.isEmpty() ? "JSON-RPC error" : errorText.toStdString()));
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Rename thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    const api::IntegrationsEditThingResponse response = api::IntegrationsEditThingResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.thingError != api::ThingError::ThingErrorNoError) {
+        m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, thingErrorLabel(response.thingError));
+        m_lastConfigureExecutionStatusWarning = true;
+        m_configureDialogStatus = "Rename thing finished with an error. Press Enter or Esc to close.";
+        return;
+    }
+
+    m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "NoError");
+    m_lastConfigureExecutionStatusWarning = false;
+    m_configureDialogStatus = "Rename thing finished. Press Enter or Esc to close.";
+    m_thingManager.setStatus("Renamed thing " + uuidToStd(m_configureTargetThingId) + ".");
+    fetchThings();
+}
+
 void Engine::handleNotification(const QJsonObject& message)
 {
     const QString notificationName = message.value(QStringLiteral("notification")).toString();
@@ -963,6 +1923,7 @@ void Engine::handleNotification(const QJsonObject& message)
         m_thingManager.upsertThing(notification.thing);
         clampThingSelection();
         clampThingDetailSelection();
+        clampConfigureThingSelection();
 
         std::string status = "Live update: added " + thingLabel(m_thingManager.thingById(notification.thing.id)) + ".";
         if (!m_thingManager.hasThingClass(notification.thing.thingClassId)) {
@@ -978,6 +1939,7 @@ void Engine::handleNotification(const QJsonObject& message)
         m_thingManager.upsertThing(notification.thing);
         clampThingSelection();
         clampThingDetailSelection();
+        clampConfigureThingSelection();
 
         std::string status = "Live update: updated " + thingLabel(m_thingManager.thingById(notification.thing.id)) + ".";
         if (!m_thingManager.hasThingClass(notification.thing.thingClassId)) {
@@ -996,6 +1958,7 @@ void Engine::handleNotification(const QJsonObject& message)
             }
             clampThingSelection();
             clampThingDetailSelection();
+            clampConfigureThingSelection();
             m_thingManager.setStatus("Live update: removed thing " + uuidToStd(notification.thingId) + ".");
         }
         return;
@@ -1048,16 +2011,19 @@ bool Engine::connectToServer()
     m_notificationSetupPending = false;
     m_fetchThingsPending = false;
     m_fetchThingClassesPending = false;
+    m_fetchAllThingClassesPending = false;
     m_actionExecutionPending = false;
     m_pendingActionRequestId = -1;
     m_pendingActionInvocation.clear();
     m_notificationsEnabled = false;
+    m_haveAllThingClasses = false;
     m_securityWarning.clear();
     m_settingsWarning.clear();
     m_serverVersion = "n/a";
     m_serverApiVersion = "n/a";
     m_serverUuid = QUuid();
     m_serverName.clear();
+    closeConfigureDialog();
 
     const NymeaJsonRpcClient::TransportSecurity security = m_options.useSsl ? NymeaJsonRpcClient::TransportSecurity::SslTls : NymeaJsonRpcClient::TransportSecurity::PlainTcp;
     if (m_client.connectToHost(m_options.host, static_cast<quint16>(m_options.port), security, m_options.timeoutMs)) {
@@ -1395,6 +2361,7 @@ void Engine::handleFetchThingsReply(const QJsonObject& message, const QString& t
 
     clampThingSelection();
     clampThingDetailSelection();
+    clampConfigureThingSelection();
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
     fetchThingClasses();
 }
@@ -1406,6 +2373,7 @@ void Engine::fetchThings()
     }
 
     m_thingManager.clear();
+    m_haveAllThingClasses = false;
 
     if (!m_client.isConnected()) {
         m_thingManager.setStatus("Cannot fetch things while disconnected.");
@@ -1463,6 +2431,9 @@ void Engine::handleFetchThingClassesReply(const QJsonObject& message, const QStr
 
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) and enriched them with type metadata (request id " + std::to_string(requestId)
                              + ").");
+    if (!m_haveAllThingClasses) {
+        fetchAllThingClasses();
+    }
 }
 
 void Engine::fetchThingClasses()
@@ -1487,6 +2458,25 @@ void Engine::fetchThingClasses()
 
     observeReply(m_client.sendRequest(QStringLiteral("Integrations.GetThingClasses"), params.toJson()),
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchThingClassesReply(message, transportError); });
+}
+
+void Engine::fetchAllThingClasses()
+{
+    if (m_fetchAllThingClassesPending || m_haveAllThingClasses) {
+        return;
+    }
+
+    if (!m_client.isConnected()) {
+        return;
+    }
+
+    if (m_isAuthenticationRequired && !m_isAuthenticated) {
+        return;
+    }
+
+    m_fetchAllThingClassesPending = true;
+    observeReply(m_client.sendRequest(api::IntegrationsGetThingClassesMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchAllThingClassesReply(message, transportError); });
 }
 
 void Engine::loadSavedConnection()
@@ -1565,11 +2555,12 @@ void Engine::runHandshakeAndLoadThings()
 
 ftxui::Element Engine::renderMainMenu() const
 {
-    constexpr std::array<const char*, 2> menuItems = {"Things", "Settings"};
+    constexpr std::array<const char*, 3> menuItems = {"Things", "Configure things", "Settings"};
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
-        const bool selected = (m_mainView == MainView::Things && index == 0) || (m_mainView == MainView::Settings && index == 1);
+        const bool selected = (m_mainView == MainView::Things && index == 0) || (m_mainView == MainView::ConfigureThings && index == 1)
+                              || (m_mainView == MainView::Settings && index == 2);
         auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
         if (selected) {
             entry = entry | ftxui::bold | ftxui::inverted;
@@ -1825,6 +2816,130 @@ ftxui::Element Engine::renderThingDetails() const
     return ftxui::vbox(std::move(detailContent)) | ftxui::flex;
 }
 
+ftxui::Element Engine::renderConfigureMenu() const
+{
+    constexpr std::array<const char*, 4> menuItems = {"Add thing", "Remove thing", "Reconfigure thing", "Rename thing"};
+
+    ftxui::Elements entries;
+    for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
+        const bool selected = (m_configureThingsView == ConfigureThingsView::AddThing && index == 0) || (m_configureThingsView == ConfigureThingsView::RemoveThing && index == 1)
+                              || (m_configureThingsView == ConfigureThingsView::ReconfigureThing && index == 2)
+                              || (m_configureThingsView == ConfigureThingsView::RenameThing && index == 3);
+        auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
+        if (selected) {
+            entry = entry | ftxui::bold | ftxui::inverted;
+        }
+        if (m_focusArea == FocusArea::ConfigureMenu && selected) {
+            entry = entry | ftxui::color(ftxui::Color::CyanLight);
+        }
+        if (selected) {
+            entry = entry | ftxui::focus;
+        }
+        entries.push_back(entry);
+    }
+
+    return ftxui::window(ftxui::text("Configure"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
+}
+
+ftxui::Element Engine::renderConfigureDetails() const
+{
+    if (m_configureThingsView == ConfigureThingsView::AddThing) {
+        ftxui::Elements content;
+
+        auto search = ftxui::text("Search: " + (m_configureThingSearch.empty() ? std::string("<type to filter>") : m_configureThingSearch));
+        if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
+            search = search | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+        }
+        content.push_back(search);
+        content.push_back(ftxui::separator());
+
+        if (m_fetchAllThingClassesPending && !m_haveAllThingClasses) {
+            content.push_back(ftxui::text("Loading thing classes..."));
+        } else {
+            const std::vector<api::ThingClass> thingClasses = filteredConfigThingClasses();
+            if (thingClasses.empty()) {
+                content.push_back(ftxui::text("No addable thing classes match the current filter."));
+            } else {
+                for (int index = 0; index < static_cast<int>(thingClasses.size()); ++index) {
+                    const api::ThingClass& thingClass = thingClasses.at(index);
+                    auto row = ftxui::text(" " + thingClassLabel(thingClass) + " ");
+                    if (index == m_selectedConfigureThingClassIndex) {
+                        row = row | ftxui::bold | ftxui::inverted;
+                    }
+                    if (m_focusArea == FocusArea::ConfigureThingClassList && index == m_selectedConfigureThingClassIndex) {
+                        row = row | ftxui::color(ftxui::Color::CyanLight);
+                    }
+                    if (index == m_selectedConfigureThingClassIndex) {
+                        row = row | ftxui::focus;
+                    }
+                    content.push_back(row);
+                }
+            }
+
+            if (const api::ThingClass* thingClass = selectedConfigThingClass(); thingClass != nullptr) {
+                content.push_back(ftxui::separator());
+                content.push_back(ftxui::text("Selected class") | ftxui::bold);
+                content.push_back(ftxui::text("Setup: " + setupMethodLabel(thingClass->setupMethod)));
+
+                std::vector<std::string> createMethods;
+                for (const api::CreateMethod method : thingClass->createMethods) {
+                    createMethods.push_back(createMethodLabel(method));
+                }
+                content.push_back(ftxui::text("Create methods: " + joinCommaSeparated(createMethods)));
+                content.push_back(ftxui::text("Thing params: " + std::to_string(thingClass->paramTypes.size())));
+                content.push_back(ftxui::text("Discovery params: " + std::to_string(thingClass->discoveryParamTypes.size())));
+                if (!thingClass->interfaces.isEmpty()) {
+                    content.push_back(ftxui::paragraph("Interfaces: " + thingClass->interfaces.join(QStringLiteral(", ")).toStdString()));
+                }
+            }
+        }
+
+        content.push_back(ftxui::separator());
+        content.push_back(ftxui::text("Enter opens the setup flow.") | ftxui::dim);
+        return ftxui::window(ftxui::text("Add thing"), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame);
+    }
+
+    ftxui::Elements content;
+    if (m_thingManager.things().empty()) {
+        content.push_back(ftxui::text("No configured things available."));
+    } else {
+        for (int index = 0; index < static_cast<int>(m_thingManager.things().size()); ++index) {
+            const api::Thing& thing = m_thingManager.things().at(index);
+            auto row = ftxui::text(" " + thingLabel(&thing) + " ");
+            if (index == m_selectedConfigureThingIndex) {
+                row = row | ftxui::bold | ftxui::inverted;
+            }
+            if (m_focusArea == FocusArea::ConfigureThingSelection && index == m_selectedConfigureThingIndex) {
+                row = row | ftxui::color(ftxui::Color::CyanLight);
+            }
+            if (index == m_selectedConfigureThingIndex) {
+                row = row | ftxui::focus;
+            }
+            content.push_back(row);
+        }
+    }
+
+    content.push_back(ftxui::separator());
+    switch (m_configureThingsView) {
+    case ConfigureThingsView::RemoveThing:
+        content.push_back(ftxui::text("Enter opens a remove confirmation.") | ftxui::dim);
+        break;
+    case ConfigureThingsView::ReconfigureThing:
+        content.push_back(ftxui::text("Enter shows the current reconfigure status.") | ftxui::dim);
+        break;
+    case ConfigureThingsView::RenameThing:
+        content.push_back(ftxui::text("Enter opens the rename dialog.") | ftxui::dim);
+        break;
+    case ConfigureThingsView::AddThing:
+        break;
+    }
+
+    const char* title = m_configureThingsView == ConfigureThingsView::RemoveThing
+                            ? "Remove thing"
+                            : (m_configureThingsView == ConfigureThingsView::ReconfigureThing ? "Reconfigure thing" : "Rename thing");
+    return ftxui::window(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame);
+}
+
 ftxui::Element Engine::renderSettingsMenu() const
 {
     constexpr std::array<const char*, 2> menuItems = {"General", "About"};
@@ -1887,7 +3002,7 @@ ftxui::Element Engine::renderThings() const
 ftxui::Element Engine::renderUi()
 {
     drainUiTasks();
-    if (m_actionExecutionPending) {
+    if (m_actionExecutionPending || m_configureRequestPending) {
         if (ftxui::ScreenInteractive* screen = ftxui::ScreenInteractive::Active(); screen != nullptr) {
             screen->RequestAnimationFrame();
         }
@@ -1910,8 +3025,9 @@ ftxui::Element Engine::renderUi()
                            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
-    sections.push_back(ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, Space inspector, c reconnect, h hello, t refresh things, Enter login, q/Esc quit")
-                       | ftxui::dim);
+    sections.push_back(
+        ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, Space inspector, c reconnect, h hello, t refresh things, Enter opens actions/setup, q/Esc quit")
+        | ftxui::dim);
     if (!m_settingsWarning.empty()) {
         sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
     }
@@ -1920,6 +3036,12 @@ ftxui::Element Engine::renderUi()
     ftxui::Element rightPanel;
     if (m_mainView == MainView::Things) {
         rightPanel = renderThings() | ftxui::flex;
+    } else if (m_mainView == MainView::ConfigureThings) {
+        rightPanel = ftxui::hbox({
+                         renderConfigureMenu() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 28),
+                         renderConfigureDetails() | ftxui::flex,
+                     })
+                     | ftxui::flex;
     } else {
         rightPanel = ftxui::vbox({
                          renderSettingsMenu(),
@@ -1978,6 +3100,145 @@ ftxui::Element Engine::renderUi()
 
         sections.push_back(ftxui::separator());
         sections.push_back(ftxui::window(ftxui::text("Execute action"),
+                                         ftxui::vbox({
+                                             ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
+                                             ftxui::separator(),
+                                             ftxui::vbox(std::move(dialogFooter)),
+                                         }))
+                           | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
+    }
+
+    if (m_showConfigureDialog) {
+        ftxui::Elements dialogBody;
+        if (const api::ThingClass* thingClass = m_configureThingClassId.isNull() ? nullptr : m_thingManager.thingClassById(m_configureThingClassId); thingClass != nullptr) {
+            dialogBody.push_back(ftxui::text("Thing class: " + thingClassLabel(*thingClass)));
+            dialogBody.push_back(ftxui::separator());
+        }
+
+        switch (m_configureDialogMode) {
+        case ConfigureDialogMode::AddChooseCreateMethod:
+            for (int index = 0; index < static_cast<int>(m_configureCreateMethodOptions.size()); ++index) {
+                const bool selected = index == m_configureCreateMethodIndex;
+                auto row = ftxui::text(" " + createMethodLabel(m_configureCreateMethodOptions.at(index)) + " ");
+                if (selected) {
+                    row = row | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+                }
+                dialogBody.push_back(row);
+            }
+            break;
+        case ConfigureDialogMode::AddManualParams: {
+            dialogBody.push_back(renderTwoColumnRow("Name",
+                                                    ftxui::text(m_configureThingName.empty() ? std::string("<empty>") : m_configureThingName),
+                                                    m_configureParamSelectionIndex == 0,
+                                                    m_focusArea == FocusArea::ConfigureDialog));
+            for (int index = 0; index < static_cast<int>(m_configureParamTypes.size()); ++index) {
+                const api::ParamType& paramType = m_configureParamTypes.at(index);
+                dialogBody.push_back(renderTwoColumnRow(firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "<param>"}),
+                                                        renderActionDialogValueCell(paramType, m_configureParamValues.at(index)),
+                                                        m_configureParamSelectionIndex == index + 1,
+                                                        m_focusArea == FocusArea::ConfigureDialog));
+            }
+            break;
+        }
+        case ConfigureDialogMode::AddDiscoveryParams:
+            if (m_configureParamTypes.empty()) {
+                dialogBody.push_back(ftxui::text("No discovery params required."));
+            } else {
+                for (int index = 0; index < static_cast<int>(m_configureParamTypes.size()); ++index) {
+                    const api::ParamType& paramType = m_configureParamTypes.at(index);
+                    dialogBody.push_back(renderTwoColumnRow(firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "<param>"}),
+                                                            renderActionDialogValueCell(paramType, m_configureParamValues.at(index)),
+                                                            m_configureParamSelectionIndex == index,
+                                                            m_focusArea == FocusArea::ConfigureDialog));
+                }
+            }
+            break;
+        case ConfigureDialogMode::AddDiscoveryResults:
+            for (int index = 0; index < static_cast<int>(m_configureThingDescriptors.size()); ++index) {
+                const api::ThingDescriptor& descriptor = m_configureThingDescriptors.at(index);
+                auto row = ftxui::text(" " + descriptorLabel(descriptor) + " ");
+                if (index == m_configureThingDescriptorIndex) {
+                    row = row | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+                }
+                dialogBody.push_back(row);
+                if (!descriptor.description.isEmpty()) {
+                    dialogBody.push_back(ftxui::paragraph("  " + descriptor.description.toStdString()) | ftxui::dim);
+                }
+            }
+            break;
+        case ConfigureDialogMode::AddPairingConfirmation: {
+            if (!m_configurePairingDisplayMessage.empty()) {
+                dialogBody.push_back(ftxui::paragraph(m_configurePairingDisplayMessage));
+                dialogBody.push_back(ftxui::separator());
+            }
+            if (!m_configurePairingPin.empty()) {
+                dialogBody.push_back(ftxui::text("PIN: " + m_configurePairingPin));
+            }
+            if (!m_configurePairingOauthUrl.empty()) {
+                dialogBody.push_back(ftxui::paragraph("OAuth URL: " + m_configurePairingOauthUrl));
+            }
+
+            int fieldIndex = 0;
+            if (m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword) {
+                dialogBody.push_back(renderTwoColumnRow("Username",
+                                                        ftxui::text(m_configurePairingUsername.empty() ? std::string("<empty>") : m_configurePairingUsername),
+                                                        m_configureParamSelectionIndex == fieldIndex++,
+                                                        m_focusArea == FocusArea::ConfigureDialog));
+            }
+            if (m_configureSetupMethod == api::SetupMethod::SetupMethodDisplayPin || m_configureSetupMethod == api::SetupMethod::SetupMethodEnterPin
+                || m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword || m_configureSetupMethod == api::SetupMethod::SetupMethodOAuth) {
+                const std::string label = m_configureSetupMethod == api::SetupMethod::SetupMethodOAuth
+                                              ? "Redirect URL"
+                                              : (m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword ? "Password" : "Secret");
+                dialogBody.push_back(renderTwoColumnRow(label,
+                                                        ftxui::text(m_configurePairingSecret.empty() ? std::string("<empty>") : m_configurePairingSecret),
+                                                        m_configureParamSelectionIndex == fieldIndex,
+                                                        m_focusArea == FocusArea::ConfigureDialog));
+            } else if (m_configureSetupMethod == api::SetupMethod::SetupMethodPushButton) {
+                dialogBody.push_back(ftxui::text("No additional input required."));
+            }
+            break;
+        }
+        case ConfigureDialogMode::RemoveThingConfirm:
+            dialogBody.push_back(ftxui::paragraph("Remove thing " + uuidToStd(m_configureTargetThingId) + "?"));
+            break;
+        case ConfigureDialogMode::RenameThing:
+            dialogBody.push_back(renderTwoColumnRow("Name",
+                                                    ftxui::text(m_configureThingName.empty() ? std::string("<empty>") : m_configureThingName),
+                                                    true,
+                                                    m_focusArea == FocusArea::ConfigureDialog));
+            break;
+        case ConfigureDialogMode::ReconfigureThingInfo:
+            dialogBody.push_back(ftxui::paragraph(m_configureDialogStatus));
+            break;
+        case ConfigureDialogMode::None:
+            break;
+        }
+
+        ftxui::Elements dialogFooter;
+        const std::string status = m_configureRequestPending ? busyIndicator(m_configurePendingStartedAt) + " " + m_configureDialogStatus : m_configureDialogStatus;
+        if (!status.empty()) {
+            dialogFooter.push_back(ftxui::text(status));
+        }
+        if (m_configureFlowComplete) {
+            dialogFooter.push_back(ftxui::text("Enter or Esc closes this wizard.") | ftxui::dim);
+        } else {
+            dialogFooter.push_back(ftxui::text(m_configureRequestPending ? "Waiting for server reply..." : "Enter confirms, Esc closes.") | ftxui::dim);
+        }
+
+        if (!m_lastConfigureExecutionStatus.empty()) {
+            dialogFooter.push_back(ftxui::separator());
+            dialogFooter.push_back(ftxui::hbox({
+                                       ftxui::text(" " + m_lastConfigureExecutionStatus),
+                                       ftxui::filler(),
+                                   })
+                                   | ftxui::bold | ftxui::color(ftxui::Color::Black)
+                                   | ftxui::bgcolor(m_configureRequestPending ? ftxui::Color::CyanLight
+                                                                              : (m_lastConfigureExecutionStatusWarning ? ftxui::Color::YellowLight : ftxui::Color::GreenLight)));
+        }
+
+        sections.push_back(ftxui::separator());
+        sections.push_back(ftxui::window(ftxui::text(m_configureDialogTitle.empty() ? "Configure thing" : m_configureDialogTitle),
                                          ftxui::vbox({
                                              ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
                                              ftxui::separator(),
@@ -2059,6 +3320,159 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (m_showConfigureDialog) {
+        if (m_configureRequestPending) {
+            return true;
+        }
+
+        if (event == ftxui::Event::Escape) {
+            closeConfigureDialog();
+            return true;
+        }
+
+        if (m_configureFlowComplete) {
+            if (event == ftxui::Event::Return) {
+                closeConfigureDialog();
+            }
+            return true;
+        }
+
+        if (event == ftxui::Event::Return) {
+            return submitConfigureDialog();
+        }
+
+        auto editText = [&](std::string& value) {
+            if (event == ftxui::Event::Backspace && !value.empty()) {
+                value.pop_back();
+                return true;
+            }
+            if (event.is_character()) {
+                value += event.character();
+                return true;
+            }
+            return false;
+        };
+
+        switch (m_configureDialogMode) {
+        case ConfigureDialogMode::AddChooseCreateMethod:
+            if (event == ftxui::Event::ArrowUp && !m_configureCreateMethodOptions.empty()) {
+                m_configureCreateMethodIndex = (m_configureCreateMethodIndex + static_cast<int>(m_configureCreateMethodOptions.size()) - 1)
+                                               % static_cast<int>(m_configureCreateMethodOptions.size());
+                return true;
+            }
+            if (event == ftxui::Event::ArrowDown && !m_configureCreateMethodOptions.empty()) {
+                m_configureCreateMethodIndex = (m_configureCreateMethodIndex + 1) % static_cast<int>(m_configureCreateMethodOptions.size());
+                return true;
+            }
+            break;
+        case ConfigureDialogMode::AddManualParams: {
+            const int rowCount = 1 + static_cast<int>(m_configureParamTypes.size());
+            if (event == ftxui::Event::ArrowUp && rowCount > 0) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + rowCount - 1) % rowCount;
+                return true;
+            }
+            if (event == ftxui::Event::ArrowDown && rowCount > 0) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + 1) % rowCount;
+                return true;
+            }
+            if (m_configureParamSelectionIndex == 0) {
+                return editText(m_configureThingName);
+            }
+
+            if (m_configureParamSelectionIndex - 1 >= 0 && m_configureParamSelectionIndex - 1 < static_cast<int>(m_configureParamTypes.size())) {
+                const api::ParamType& currentParamType = m_configureParamTypes.at(m_configureParamSelectionIndex - 1);
+                std::string& currentValue = m_configureParamValues.at(m_configureParamSelectionIndex - 1);
+                if (actionParamUsesSelector(currentParamType)) {
+                    if (event == ftxui::Event::ArrowLeft) {
+                        currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
+                        return true;
+                    }
+                    if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+                        currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
+                        return true;
+                    }
+                }
+                if (!actionParamUsesSelector(currentParamType)) {
+                    return editText(currentValue);
+                }
+            }
+            return true;
+        }
+        case ConfigureDialogMode::AddDiscoveryParams:
+            if (event == ftxui::Event::ArrowUp && !m_configureParamTypes.empty()) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + static_cast<int>(m_configureParamTypes.size()) - 1)
+                                                 % static_cast<int>(m_configureParamTypes.size());
+                return true;
+            }
+            if (event == ftxui::Event::ArrowDown && !m_configureParamTypes.empty()) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + 1) % static_cast<int>(m_configureParamTypes.size());
+                return true;
+            }
+            if (!m_configureParamTypes.empty()) {
+                const api::ParamType& currentParamType = m_configureParamTypes.at(m_configureParamSelectionIndex);
+                std::string& currentValue = m_configureParamValues.at(m_configureParamSelectionIndex);
+                if (actionParamUsesSelector(currentParamType)) {
+                    if (event == ftxui::Event::ArrowLeft) {
+                        currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
+                        return true;
+                    }
+                    if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+                        currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
+                        return true;
+                    }
+                }
+                if (!actionParamUsesSelector(currentParamType)) {
+                    return editText(currentValue);
+                }
+            }
+            return true;
+        case ConfigureDialogMode::AddDiscoveryResults:
+            if (event == ftxui::Event::ArrowUp && !m_configureThingDescriptors.empty()) {
+                m_configureThingDescriptorIndex = (m_configureThingDescriptorIndex + static_cast<int>(m_configureThingDescriptors.size()) - 1)
+                                                  % static_cast<int>(m_configureThingDescriptors.size());
+                return true;
+            }
+            if (event == ftxui::Event::ArrowDown && !m_configureThingDescriptors.empty()) {
+                m_configureThingDescriptorIndex = (m_configureThingDescriptorIndex + 1) % static_cast<int>(m_configureThingDescriptors.size());
+                return true;
+            }
+            return true;
+        case ConfigureDialogMode::AddPairingConfirmation: {
+            int fieldCount = 0;
+            const bool needsUsername = m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword;
+            const bool needsSecret = m_configureSetupMethod == api::SetupMethod::SetupMethodDisplayPin || m_configureSetupMethod == api::SetupMethod::SetupMethodEnterPin
+                                     || m_configureSetupMethod == api::SetupMethod::SetupMethodUserAndPassword || m_configureSetupMethod == api::SetupMethod::SetupMethodOAuth;
+            if (needsUsername) {
+                ++fieldCount;
+            }
+            if (needsSecret) {
+                ++fieldCount;
+            }
+            if (fieldCount > 0 && event == ftxui::Event::ArrowUp) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + fieldCount - 1) % fieldCount;
+                return true;
+            }
+            if (fieldCount > 0 && event == ftxui::Event::ArrowDown) {
+                m_configureParamSelectionIndex = (m_configureParamSelectionIndex + 1) % fieldCount;
+                return true;
+            }
+            if (needsUsername && m_configureParamSelectionIndex == 0) {
+                return editText(m_configurePairingUsername);
+            }
+            if (needsSecret && ((!needsUsername && m_configureParamSelectionIndex == 0) || (needsUsername && m_configureParamSelectionIndex == 1))) {
+                return editText(m_configurePairingSecret);
+            }
+            return true;
+        }
+        case ConfigureDialogMode::RenameThing:
+            return editText(m_configureThingName);
+        case ConfigureDialogMode::RemoveThingConfirm:
+        case ConfigureDialogMode::ReconfigureThingInfo:
+        case ConfigureDialogMode::None:
+            return true;
+        }
+    }
+
     if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
         m_client.disconnectFromHost();
         screen.ExitLoopClosure()();
@@ -2069,6 +3483,14 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (m_focusArea == FocusArea::ThingDetails) {
             m_focusArea = FocusArea::ThingList;
             m_showThingDetailInspector = false;
+            return true;
+        }
+        if (m_focusArea == FocusArea::ConfigureThingClassList) {
+            m_focusArea = FocusArea::ConfigureThingClassSearch;
+            return true;
+        }
+        if (m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingSelection || m_focusArea == FocusArea::ConfigureMenu) {
+            m_focusArea = FocusArea::MainMenu;
             return true;
         }
         m_focusArea = FocusArea::MainMenu;
@@ -2083,6 +3505,17 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 m_focusArea = FocusArea::ThingDetails;
             } else {
                 m_focusArea = FocusArea::ThingList;
+            }
+        } else if (m_mainView == MainView::ConfigureThings) {
+            if (!m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
+            if (m_focusArea == FocusArea::ConfigureMenu) {
+                m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassSearch : FocusArea::ConfigureThingSelection;
+            } else if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
+                m_focusArea = FocusArea::ConfigureThingClassList;
+            } else {
+                m_focusArea = FocusArea::ConfigureMenu;
             }
         } else if (m_mainView == MainView::Settings) {
             m_focusArea = FocusArea::SettingsMenu;
@@ -2117,8 +3550,41 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
+        if (m_focusArea == FocusArea::ConfigureMenu && m_mainView == MainView::ConfigureThings) {
+            if (m_configureThingsView == ConfigureThingsView::AddThing) {
+                m_configureThingsView = ConfigureThingsView::RenameThing;
+            } else {
+                m_configureThingsView = static_cast<ConfigureThingsView>(static_cast<int>(m_configureThingsView) - 1);
+            }
+            if (m_configureThingsView == ConfigureThingsView::AddThing && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::ConfigureThingClassList && !filteredConfigThingClasses().empty()) {
+            const int count = static_cast<int>(filteredConfigThingClasses().size());
+            m_selectedConfigureThingClassIndex = (m_selectedConfigureThingClassIndex + count - 1) % count;
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::ConfigureThingSelection && !m_thingManager.things().empty()) {
+            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + static_cast<int>(m_thingManager.things().size()) - 1)
+                                            % static_cast<int>(m_thingManager.things().size());
+            return true;
+        }
+
         if (m_focusArea == FocusArea::MainMenu) {
-            m_mainView = m_mainView == MainView::Things ? MainView::Settings : MainView::Things;
+            if (m_mainView == MainView::Things) {
+                m_mainView = MainView::Settings;
+            } else if (m_mainView == MainView::ConfigureThings) {
+                m_mainView = MainView::Things;
+            } else {
+                m_mainView = MainView::ConfigureThings;
+            }
+            if (m_mainView == MainView::ConfigureThings && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
             return true;
         }
     }
@@ -2140,8 +3606,40 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
+        if (m_focusArea == FocusArea::ConfigureMenu && m_mainView == MainView::ConfigureThings) {
+            if (m_configureThingsView == ConfigureThingsView::RenameThing) {
+                m_configureThingsView = ConfigureThingsView::AddThing;
+            } else {
+                m_configureThingsView = static_cast<ConfigureThingsView>(static_cast<int>(m_configureThingsView) + 1);
+            }
+            if (m_configureThingsView == ConfigureThingsView::AddThing && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::ConfigureThingClassList && !filteredConfigThingClasses().empty()) {
+            const int count = static_cast<int>(filteredConfigThingClasses().size());
+            m_selectedConfigureThingClassIndex = (m_selectedConfigureThingClassIndex + 1) % count;
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::ConfigureThingSelection && !m_thingManager.things().empty()) {
+            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + 1) % static_cast<int>(m_thingManager.things().size());
+            return true;
+        }
+
         if (m_focusArea == FocusArea::MainMenu) {
-            m_mainView = m_mainView == MainView::Things ? MainView::Settings : MainView::Things;
+            if (m_mainView == MainView::Things) {
+                m_mainView = MainView::ConfigureThings;
+            } else if (m_mainView == MainView::ConfigureThings) {
+                m_mainView = MainView::Settings;
+            } else {
+                m_mainView = MainView::Things;
+            }
+            if (m_mainView == MainView::ConfigureThings && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
             return true;
         }
     }
@@ -2156,6 +3654,39 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     if (event == ftxui::Event::Return) {
         if (m_focusArea == FocusArea::ThingDetails) {
             return openSelectedActionDialog();
+        }
+        if (m_focusArea == FocusArea::ConfigureThingClassList && m_mainView == MainView::ConfigureThings && m_configureThingsView == ConfigureThingsView::AddThing) {
+            openAddThingDialog();
+            return true;
+        }
+        if (m_focusArea == FocusArea::ConfigureThingSelection && m_mainView == MainView::ConfigureThings) {
+            switch (m_configureThingsView) {
+            case ConfigureThingsView::RemoveThing:
+                openRemoveThingDialog();
+                break;
+            case ConfigureThingsView::ReconfigureThing:
+                openReconfigureThingDialog();
+                break;
+            case ConfigureThingsView::RenameThing:
+                openRenameThingDialog();
+                break;
+            case ConfigureThingsView::AddThing:
+                break;
+            }
+            return true;
+        }
+    }
+
+    if (m_focusArea == FocusArea::ConfigureThingClassSearch && m_mainView == MainView::ConfigureThings && m_configureThingsView == ConfigureThingsView::AddThing) {
+        if (event == ftxui::Event::Backspace && !m_configureThingSearch.empty()) {
+            m_configureThingSearch.pop_back();
+            clampConfigureThingClassSelection();
+            return true;
+        }
+        if (event.is_character()) {
+            m_configureThingSearch += event.character();
+            clampConfigureThingClassSelection();
+            return true;
         }
     }
 
