@@ -2,7 +2,7 @@
 
 ## Project scope
 
-`nymea-cli` is a terminal-only Qt6 + FTXUI client for `nymead`.
+`nymea-cli` is a terminal-only Qt5/Qt6 + FTXUI client for `nymead`.
 It connects to nymea over JSON-RPC using plain TCP or SSL/TLS and renders a fullscreen terminal UI for browsing and executing server-side functionality.
 
 ## Architecture

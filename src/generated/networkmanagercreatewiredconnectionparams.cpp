@@ -20,7 +20,7 @@ NetworkManagerCreateWiredConnectionParams NetworkManagerCreateWiredConnectionPar
         value.ip = (object.value(QStringLiteral("ip"))).toString();
     }
     if (object.contains(QStringLiteral("prefix"))) {
-        value.prefix = static_cast<quint64>((object.value(QStringLiteral("prefix"))).toInteger());
+        value.prefix = jsonValueToUnsignedInteger(object.value(QStringLiteral("prefix")));
     }
     if (object.contains(QStringLiteral("type"))) {
         value.type = parseWiredNetworkConnectionType(object.value(QStringLiteral("type")));

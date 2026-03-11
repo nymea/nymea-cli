@@ -11,10 +11,10 @@ ZigbeeAddNetworkParams ZigbeeAddNetworkParams::fromJson(const QJsonObject &objec
         value.backend = (object.value(QStringLiteral("backend"))).toString();
     }
     if (object.contains(QStringLiteral("baudRate"))) {
-        value.baudRate = static_cast<quint64>((object.value(QStringLiteral("baudRate"))).toInteger());
+        value.baudRate = jsonValueToUnsignedInteger(object.value(QStringLiteral("baudRate")));
     }
     if (object.contains(QStringLiteral("channelMask"))) {
-        value.channelMask = static_cast<quint64>((object.value(QStringLiteral("channelMask"))).toInteger());
+        value.channelMask = jsonValueToUnsignedInteger(object.value(QStringLiteral("channelMask")));
     }
     if (object.contains(QStringLiteral("serialPort"))) {
         value.serialPort = (object.value(QStringLiteral("serialPort"))).toString();

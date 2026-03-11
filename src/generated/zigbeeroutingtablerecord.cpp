@@ -8,7 +8,7 @@ namespace nymea::api {
 ZigbeeRoutingTableRecord ZigbeeRoutingTableRecord::fromJson(const QJsonObject &object) {
     ZigbeeRoutingTableRecord value;
     if (object.contains(QStringLiteral("destinationAddress"))) {
-        value.destinationAddress = static_cast<quint64>((object.value(QStringLiteral("destinationAddress"))).toInteger());
+        value.destinationAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("destinationAddress")));
     }
     if (object.contains(QStringLiteral("manyToOne"))) {
         value.manyToOne = (object.value(QStringLiteral("manyToOne"))).toBool();
@@ -17,7 +17,7 @@ ZigbeeRoutingTableRecord ZigbeeRoutingTableRecord::fromJson(const QJsonObject &o
         value.memoryConstrained = (object.value(QStringLiteral("memoryConstrained"))).toBool();
     }
     if (object.contains(QStringLiteral("nextHopAddress"))) {
-        value.nextHopAddress = static_cast<quint64>((object.value(QStringLiteral("nextHopAddress"))).toInteger());
+        value.nextHopAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("nextHopAddress")));
     }
     if (object.contains(QStringLiteral("status"))) {
         value.status = parseZigbeeNodeRouteStatus(object.value(QStringLiteral("status")));

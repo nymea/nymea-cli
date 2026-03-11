@@ -14,7 +14,7 @@ JSONRPCPushButtonAuthFinishedNotificationParams JSONRPCPushButtonAuthFinishedNot
         value.success = (object.value(QStringLiteral("success"))).toBool();
     }
     if (object.contains(QStringLiteral("transactionId"))) {
-        value.transactionId = static_cast<qint64>((object.value(QStringLiteral("transactionId"))).toInteger());
+        value.transactionId = jsonValueToInteger(object.value(QStringLiteral("transactionId")));
     }
     return value;
 }

@@ -8,7 +8,7 @@ namespace nymea::api {
 ZWaveNetwork ZWaveNetwork::fromJson(const QJsonObject &object) {
     ZWaveNetwork value;
     if (object.contains(QStringLiteral("homeId"))) {
-        value.homeId = static_cast<quint64>((object.value(QStringLiteral("homeId"))).toInteger());
+        value.homeId = jsonValueToUnsignedInteger(object.value(QStringLiteral("homeId")));
     }
     if (object.contains(QStringLiteral("isBridgeController"))) {
         value.isBridgeController = (object.value(QStringLiteral("isBridgeController"))).toBool();

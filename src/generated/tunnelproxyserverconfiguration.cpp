@@ -20,7 +20,7 @@ TunnelProxyServerConfiguration TunnelProxyServerConfiguration::fromJson(const QJ
         value.ignoreSslErrors = (object.value(QStringLiteral("ignoreSslErrors"))).toBool();
     }
     if (object.contains(QStringLiteral("port"))) {
-        value.port = static_cast<quint64>((object.value(QStringLiteral("port"))).toInteger());
+        value.port = jsonValueToUnsignedInteger(object.value(QStringLiteral("port")));
     }
     if (object.contains(QStringLiteral("sslEnabled"))) {
         value.sslEnabled = (object.value(QStringLiteral("sslEnabled"))).toBool();

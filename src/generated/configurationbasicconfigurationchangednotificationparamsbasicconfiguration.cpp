@@ -14,7 +14,7 @@ ConfigurationBasicConfigurationChangedNotificationParamsBasicConfiguration Confi
         value.location = ConfigurationBasicConfigurationChangedNotificationParamsBasicConfigurationLocation::fromJson((object.value(QStringLiteral("location"))).toObject());
     }
     if (object.contains(QStringLiteral("serverTime"))) {
-        value.serverTime = static_cast<quint64>((object.value(QStringLiteral("serverTime"))).toInteger());
+        value.serverTime = jsonValueToUnsignedInteger(object.value(QStringLiteral("serverTime")));
     }
     if (object.contains(QStringLiteral("timeZone"))) {
         value.timeZone = (object.value(QStringLiteral("timeZone"))).toString();

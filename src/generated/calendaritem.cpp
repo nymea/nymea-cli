@@ -8,16 +8,16 @@ namespace nymea::api {
 CalendarItem CalendarItem::fromJson(const QJsonObject &object) {
     CalendarItem value;
     if (object.contains(QStringLiteral("duration"))) {
-        value.duration = static_cast<quint64>((object.value(QStringLiteral("duration"))).toInteger());
+        value.duration = jsonValueToUnsignedInteger(object.value(QStringLiteral("duration")));
     }
     if (object.contains(QStringLiteral("datetime"))) {
-        value.datetime = static_cast<quint64>((object.value(QStringLiteral("datetime"))).toInteger());
+        value.datetime = jsonValueToUnsignedInteger(object.value(QStringLiteral("datetime")));
     }
     if (object.contains(QStringLiteral("repeating"))) {
         value.repeating = RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject());
     }
     if (object.contains(QStringLiteral("startTime"))) {
-        value.startTime = static_cast<qint64>((object.value(QStringLiteral("startTime"))).toInteger());
+        value.startTime = jsonValueToInteger(object.value(QStringLiteral("startTime")));
     }
     return value;
 }

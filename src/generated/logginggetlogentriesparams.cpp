@@ -11,16 +11,16 @@ LoggingGetLogEntriesParams LoggingGetLogEntriesParams::fromJson(const QJsonObjec
         value.columns = ([&]() { QList<QString> list; for (const QJsonValue &item : (object.value(QStringLiteral("columns"))).toArray()) { list.append((item).toString()); } return list; }());
     }
     if (object.contains(QStringLiteral("endTime"))) {
-        value.endTime = static_cast<quint64>((object.value(QStringLiteral("endTime"))).toInteger());
+        value.endTime = jsonValueToUnsignedInteger(object.value(QStringLiteral("endTime")));
     }
     if (object.contains(QStringLiteral("filter"))) {
         value.filter = object.value(QStringLiteral("filter"));
     }
     if (object.contains(QStringLiteral("limit"))) {
-        value.limit = static_cast<qint64>((object.value(QStringLiteral("limit"))).toInteger());
+        value.limit = jsonValueToInteger(object.value(QStringLiteral("limit")));
     }
     if (object.contains(QStringLiteral("offset"))) {
-        value.offset = static_cast<qint64>((object.value(QStringLiteral("offset"))).toInteger());
+        value.offset = jsonValueToInteger(object.value(QStringLiteral("offset")));
     }
     if (object.contains(QStringLiteral("sampleRate"))) {
         value.sampleRate = parseSampleRate(object.value(QStringLiteral("sampleRate")));
@@ -29,7 +29,7 @@ LoggingGetLogEntriesParams LoggingGetLogEntriesParams::fromJson(const QJsonObjec
         value.sortOrder = parseSortOrder(object.value(QStringLiteral("sortOrder")));
     }
     if (object.contains(QStringLiteral("startTime"))) {
-        value.startTime = static_cast<quint64>((object.value(QStringLiteral("startTime"))).toInteger());
+        value.startTime = jsonValueToUnsignedInteger(object.value(QStringLiteral("startTime")));
     }
     if (object.contains(QStringLiteral("sources"))) {
         value.sources = ([&]() { QList<QString> list; for (const QJsonValue &item : (object.value(QStringLiteral("sources"))).toArray()) { list.append((item).toString()); } return list; }());

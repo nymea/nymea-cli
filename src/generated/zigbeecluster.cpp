@@ -8,7 +8,7 @@ namespace nymea::api {
 ZigbeeCluster ZigbeeCluster::fromJson(const QJsonObject &object) {
     ZigbeeCluster value;
     if (object.contains(QStringLiteral("clusterId"))) {
-        value.clusterId = static_cast<quint64>((object.value(QStringLiteral("clusterId"))).toInteger());
+        value.clusterId = jsonValueToUnsignedInteger(object.value(QStringLiteral("clusterId")));
     }
     if (object.contains(QStringLiteral("direction"))) {
         value.direction = parseZigbeeClusterDirection(object.value(QStringLiteral("direction")));

@@ -11,7 +11,7 @@ ActionType ActionType::fromJson(const QJsonObject &object) {
         value.displayName = (object.value(QStringLiteral("displayName"))).toString();
     }
     if (object.contains(QStringLiteral("index"))) {
-        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
+        value.index = jsonValueToInteger(object.value(QStringLiteral("index")));
     }
     if (object.contains(QStringLiteral("name"))) {
         value.name = (object.value(QStringLiteral("name"))).toString();

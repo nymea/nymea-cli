@@ -8,13 +8,13 @@ namespace nymea::api {
 TimeEventItem TimeEventItem::fromJson(const QJsonObject &object) {
     TimeEventItem value;
     if (object.contains(QStringLiteral("datetime"))) {
-        value.datetime = static_cast<quint64>((object.value(QStringLiteral("datetime"))).toInteger());
+        value.datetime = jsonValueToUnsignedInteger(object.value(QStringLiteral("datetime")));
     }
     if (object.contains(QStringLiteral("repeating"))) {
         value.repeating = RepeatingOption::fromJson((object.value(QStringLiteral("repeating"))).toObject());
     }
     if (object.contains(QStringLiteral("time"))) {
-        value.time = static_cast<qint64>((object.value(QStringLiteral("time"))).toInteger());
+        value.time = jsonValueToInteger(object.value(QStringLiteral("time")));
     }
     return value;
 }

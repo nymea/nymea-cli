@@ -8,6 +8,7 @@
 #include <QSslCertificate>
 #include <QSslSocket>
 #include <QThread>
+#include <QtGlobal>
 
 #include <utility>
 
@@ -130,7 +131,11 @@ public:
     {
         connect(m_socket, &QSslSocket::readyRead, this, &NymeaJsonRpcClientWorker::onReadyRead);
         connect(m_socket, &QSslSocket::disconnected, this, &NymeaJsonRpcClientWorker::onDisconnected);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
         connect(m_socket, &QSslSocket::errorOccurred, this, &NymeaJsonRpcClientWorker::onSocketErrorOccurred);
+#else
+        connect(m_socket, static_cast<void (QSslSocket::*)(QAbstractSocket::SocketError)>(&QSslSocket::error), this, &NymeaJsonRpcClientWorker::onSocketErrorOccurred);
+#endif
         connect(m_socket, &QSslSocket::encrypted, this, &NymeaJsonRpcClientWorker::emitStateChanged);
     }
 

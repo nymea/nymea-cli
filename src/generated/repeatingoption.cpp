@@ -11,10 +11,10 @@ RepeatingOption RepeatingOption::fromJson(const QJsonObject &object) {
         value.mode = parseRepeatingMode(object.value(QStringLiteral("mode")));
     }
     if (object.contains(QStringLiteral("monthDays"))) {
-        value.monthDays = ([&]() { QList<qint64> list; for (const QJsonValue &item : (object.value(QStringLiteral("monthDays"))).toArray()) { list.append(static_cast<qint64>((item).toInteger())); } return list; }());
+        value.monthDays = ([&]() { QList<qint64> list; for (const QJsonValue &item : (object.value(QStringLiteral("monthDays"))).toArray()) { list.append(jsonValueToInteger(item)); } return list; }());
     }
     if (object.contains(QStringLiteral("weekDays"))) {
-        value.weekDays = ([&]() { QList<qint64> list; for (const QJsonValue &item : (object.value(QStringLiteral("weekDays"))).toArray()) { list.append(static_cast<qint64>((item).toInteger())); } return list; }());
+        value.weekDays = ([&]() { QList<qint64> list; for (const QJsonValue &item : (object.value(QStringLiteral("weekDays"))).toArray()) { list.append(jsonValueToInteger(item)); } return list; }());
     }
     return value;
 }

@@ -17,10 +17,10 @@ ZigbeeNode ZigbeeNode::fromJson(const QJsonObject &object) {
         value.ieeeAddress = (object.value(QStringLiteral("ieeeAddress"))).toString();
     }
     if (object.contains(QStringLiteral("lastSeen"))) {
-        value.lastSeen = static_cast<quint64>((object.value(QStringLiteral("lastSeen"))).toInteger());
+        value.lastSeen = jsonValueToUnsignedInteger(object.value(QStringLiteral("lastSeen")));
     }
     if (object.contains(QStringLiteral("lqi"))) {
-        value.lqi = static_cast<quint64>((object.value(QStringLiteral("lqi"))).toInteger());
+        value.lqi = jsonValueToUnsignedInteger(object.value(QStringLiteral("lqi")));
     }
     if (object.contains(QStringLiteral("manufacturer"))) {
         value.manufacturer = (object.value(QStringLiteral("manufacturer"))).toString();
@@ -32,7 +32,7 @@ ZigbeeNode ZigbeeNode::fromJson(const QJsonObject &object) {
         value.neighborTableRecords = ([&]() { QList<ZigbeeNeighborTableRecord> list; for (const QJsonValue &item : (object.value(QStringLiteral("neighborTableRecords"))).toArray()) { list.append(ZigbeeNeighborTableRecord::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("networkAddress"))) {
-        value.networkAddress = static_cast<quint64>((object.value(QStringLiteral("networkAddress"))).toInteger());
+        value.networkAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("networkAddress")));
     }
     if (object.contains(QStringLiteral("networkUuid"))) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());

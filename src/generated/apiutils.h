@@ -10,6 +10,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <QVariant>
 #include <QUuid>
 #include <QtGlobal>
 
@@ -18,6 +19,22 @@
 namespace nymea::api {
 
 inline constexpr auto kNymeaApiVersion = "8.5";
+
+inline qint64 jsonValueToInteger(const QJsonValue &value) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return value.toInteger();
+#else
+    return value.toVariant().toLongLong();
+#endif
+}
+
+inline quint64 jsonValueToUnsignedInteger(const QJsonValue &value) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return static_cast<quint64>(value.toInteger());
+#else
+    return value.toVariant().toULongLong();
+#endif
+}
 
 enum class BasicType {
     Uuid,

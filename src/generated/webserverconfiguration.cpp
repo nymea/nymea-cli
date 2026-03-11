@@ -17,7 +17,7 @@ WebServerConfiguration WebServerConfiguration::fromJson(const QJsonObject &objec
         value.id = (object.value(QStringLiteral("id"))).toString();
     }
     if (object.contains(QStringLiteral("port"))) {
-        value.port = static_cast<quint64>((object.value(QStringLiteral("port"))).toInteger());
+        value.port = jsonValueToUnsignedInteger(object.value(QStringLiteral("port")));
     }
     if (object.contains(QStringLiteral("publicFolder"))) {
         value.publicFolder = (object.value(QStringLiteral("publicFolder"))).toString();

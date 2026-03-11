@@ -11,7 +11,7 @@ ZigbeeAdapter ZigbeeAdapter::fromJson(const QJsonObject &object) {
         value.backend = (object.value(QStringLiteral("backend"))).toString();
     }
     if (object.contains(QStringLiteral("baudRate"))) {
-        value.baudRate = static_cast<qint64>((object.value(QStringLiteral("baudRate"))).toInteger());
+        value.baudRate = jsonValueToInteger(object.value(QStringLiteral("baudRate")));
     }
     if (object.contains(QStringLiteral("description"))) {
         value.description = (object.value(QStringLiteral("description"))).toString();

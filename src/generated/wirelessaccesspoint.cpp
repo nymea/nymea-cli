@@ -17,7 +17,7 @@ WirelessAccessPoint WirelessAccessPoint::fromJson(const QJsonObject &object) {
         value.protectedValue = (object.value(QStringLiteral("protected"))).toBool();
     }
     if (object.contains(QStringLiteral("signalStrength"))) {
-        value.signalStrength = static_cast<qint64>((object.value(QStringLiteral("signalStrength"))).toInteger());
+        value.signalStrength = jsonValueToInteger(object.value(QStringLiteral("signalStrength")));
     }
     if (object.contains(QStringLiteral("ssid"))) {
         value.ssid = (object.value(QStringLiteral("ssid"))).toString();

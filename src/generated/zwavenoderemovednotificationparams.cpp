@@ -11,7 +11,7 @@ ZWaveNodeRemovedNotificationParams ZWaveNodeRemovedNotificationParams::fromJson(
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("nodeId"))) {
-        value.nodeId = static_cast<quint64>((object.value(QStringLiteral("nodeId"))).toInteger());
+        value.nodeId = jsonValueToUnsignedInteger(object.value(QStringLiteral("nodeId")));
     }
     return value;
 }

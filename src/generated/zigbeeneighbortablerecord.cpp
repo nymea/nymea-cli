@@ -8,13 +8,13 @@ namespace nymea::api {
 ZigbeeNeighborTableRecord ZigbeeNeighborTableRecord::fromJson(const QJsonObject &object) {
     ZigbeeNeighborTableRecord value;
     if (object.contains(QStringLiteral("depth"))) {
-        value.depth = static_cast<quint64>((object.value(QStringLiteral("depth"))).toInteger());
+        value.depth = jsonValueToUnsignedInteger(object.value(QStringLiteral("depth")));
     }
     if (object.contains(QStringLiteral("lqi"))) {
-        value.lqi = static_cast<quint64>((object.value(QStringLiteral("lqi"))).toInteger());
+        value.lqi = jsonValueToUnsignedInteger(object.value(QStringLiteral("lqi")));
     }
     if (object.contains(QStringLiteral("networkAddress"))) {
-        value.networkAddress = static_cast<quint64>((object.value(QStringLiteral("networkAddress"))).toInteger());
+        value.networkAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("networkAddress")));
     }
     if (object.contains(QStringLiteral("permitJoining"))) {
         value.permitJoining = (object.value(QStringLiteral("permitJoining"))).toBool();

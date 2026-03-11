@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate Qt6/C++ API representation classes from nymea api.json."""
+"""Generate Qt/C++ API representation classes from nymea api.json."""
 
 from __future__ import annotations
 
@@ -583,9 +583,9 @@ class ApiGenerator:
                     "return list; }())"
                 )
             if primitive == "Int":
-                return f"static_cast<qint64>(({expr}).toInteger())"
+                return f"jsonValueToInteger({expr})"
             if primitive == "Uint":
-                return f"static_cast<quint64>(({expr}).toInteger())"
+                return f"jsonValueToUnsignedInteger({expr})"
             if primitive == "Double":
                 return f"({expr}).toDouble()"
             if primitive == "Bool":
@@ -597,7 +597,7 @@ class ApiGenerator:
             if primitive == "Color":
                 return f"({expr}).toString()"
             if primitive == "Time":
-                return f"static_cast<qint64>(({expr}).toInteger())"
+                return f"jsonValueToInteger({expr})"
             return expr
 
         if schema.kind == "list" and schema.element is not None:
@@ -906,6 +906,7 @@ class ApiGenerator:
             "#include <QSharedPointer>",
             "#include <QString>",
             "#include <QStringList>",
+            "#include <QVariant>",
             "#include <QUuid>",
             "#include <QtGlobal>",
             "",
@@ -914,6 +915,22 @@ class ApiGenerator:
             "namespace nymea::api {",
             "",
             f"inline constexpr auto kNymeaApiVersion = \"{self.api_version}\";",
+            "",
+            "inline qint64 jsonValueToInteger(const QJsonValue &value) {",
+            "#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)",
+            "    return value.toInteger();",
+            "#else",
+            "    return value.toVariant().toLongLong();",
+            "#endif",
+            "}",
+            "",
+            "inline quint64 jsonValueToUnsignedInteger(const QJsonValue &value) {",
+            "#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)",
+            "    return static_cast<quint64>(value.toInteger());",
+            "#else",
+            "    return value.toVariant().toULongLong();",
+            "#endif",
+            "}",
             "",
         ]
 

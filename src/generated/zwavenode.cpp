@@ -26,10 +26,10 @@ ZWaveNode ZWaveNode::fromJson(const QJsonObject &object) {
         value.isZWavePlusDevice = (object.value(QStringLiteral("isZWavePlusDevice"))).toBool();
     }
     if (object.contains(QStringLiteral("linkQuality"))) {
-        value.linkQuality = static_cast<quint64>((object.value(QStringLiteral("linkQuality"))).toInteger());
+        value.linkQuality = jsonValueToUnsignedInteger(object.value(QStringLiteral("linkQuality")));
     }
     if (object.contains(QStringLiteral("manufacturerId"))) {
-        value.manufacturerId = static_cast<quint64>((object.value(QStringLiteral("manufacturerId"))).toInteger());
+        value.manufacturerId = jsonValueToUnsignedInteger(object.value(QStringLiteral("manufacturerId")));
     }
     if (object.contains(QStringLiteral("manufacturerName"))) {
         value.manufacturerName = (object.value(QStringLiteral("manufacturerName"))).toString();
@@ -38,19 +38,19 @@ ZWaveNode ZWaveNode::fromJson(const QJsonObject &object) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("nodeId"))) {
-        value.nodeId = static_cast<quint64>((object.value(QStringLiteral("nodeId"))).toInteger());
+        value.nodeId = jsonValueToUnsignedInteger(object.value(QStringLiteral("nodeId")));
     }
     if (object.contains(QStringLiteral("nodeType"))) {
         value.nodeType = parseZWaveNodeType(object.value(QStringLiteral("nodeType")));
     }
     if (object.contains(QStringLiteral("productId"))) {
-        value.productId = static_cast<quint64>((object.value(QStringLiteral("productId"))).toInteger());
+        value.productId = jsonValueToUnsignedInteger(object.value(QStringLiteral("productId")));
     }
     if (object.contains(QStringLiteral("productName"))) {
         value.productName = (object.value(QStringLiteral("productName"))).toString();
     }
     if (object.contains(QStringLiteral("productType"))) {
-        value.productType = static_cast<quint64>((object.value(QStringLiteral("productType"))).toInteger());
+        value.productType = jsonValueToUnsignedInteger(object.value(QStringLiteral("productType")));
     }
     if (object.contains(QStringLiteral("reachable"))) {
         value.reachable = (object.value(QStringLiteral("reachable"))).toBool();
@@ -59,7 +59,7 @@ ZWaveNode ZWaveNode::fromJson(const QJsonObject &object) {
         value.role = parseZWaveNodeRole(object.value(QStringLiteral("role")));
     }
     if (object.contains(QStringLiteral("securityMode"))) {
-        value.securityMode = static_cast<quint64>((object.value(QStringLiteral("securityMode"))).toInteger());
+        value.securityMode = jsonValueToUnsignedInteger(object.value(QStringLiteral("securityMode")));
     }
     if (object.contains(QStringLiteral("sleeping"))) {
         value.sleeping = (object.value(QStringLiteral("sleeping"))).toBool();

@@ -8,7 +8,7 @@ namespace nymea::api {
 ModbusRtuReconfigureModbusRtuMasterParams ModbusRtuReconfigureModbusRtuMasterParams::fromJson(const QJsonObject &object) {
     ModbusRtuReconfigureModbusRtuMasterParams value;
     if (object.contains(QStringLiteral("baudrate"))) {
-        value.baudrate = static_cast<quint64>((object.value(QStringLiteral("baudrate"))).toInteger());
+        value.baudrate = jsonValueToUnsignedInteger(object.value(QStringLiteral("baudrate")));
     }
     if (object.contains(QStringLiteral("dataBits"))) {
         value.dataBits = parseSerialPortDataBits(object.value(QStringLiteral("dataBits")));
@@ -17,7 +17,7 @@ ModbusRtuReconfigureModbusRtuMasterParams ModbusRtuReconfigureModbusRtuMasterPar
         value.modbusUuid = QUuid((object.value(QStringLiteral("modbusUuid"))).toString());
     }
     if (object.contains(QStringLiteral("numberOfRetries"))) {
-        value.numberOfRetries = static_cast<quint64>((object.value(QStringLiteral("numberOfRetries"))).toInteger());
+        value.numberOfRetries = jsonValueToUnsignedInteger(object.value(QStringLiteral("numberOfRetries")));
     }
     if (object.contains(QStringLiteral("parity"))) {
         value.parity = parseSerialPortParity(object.value(QStringLiteral("parity")));
@@ -29,7 +29,7 @@ ModbusRtuReconfigureModbusRtuMasterParams ModbusRtuReconfigureModbusRtuMasterPar
         value.stopBits = parseSerialPortStopBits(object.value(QStringLiteral("stopBits")));
     }
     if (object.contains(QStringLiteral("timeout"))) {
-        value.timeout = static_cast<quint64>((object.value(QStringLiteral("timeout"))).toInteger());
+        value.timeout = jsonValueToUnsignedInteger(object.value(QStringLiteral("timeout")));
     }
     return value;
 }

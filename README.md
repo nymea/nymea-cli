@@ -1,11 +1,11 @@
 # nymea-cli
 
-`nymea-cli` is a Qt6 + FTXUI terminal client for `nymead`.
+`nymea-cli` is a Qt5/Qt6 + FTXUI terminal client for `nymead`.
 It connects to the nymea JSON-RPC API over plain TCP or SSL/TLS and renders a fullscreen terminal UI for browsing things, states, params, and actions.
 
 ## Stack
 
-- Qt6 Core + Network
+- Qt5 or Qt6 Core + Network
 - FTXUI
 - CMake
 - Generated Qt/C++ API model from nymea `api.json`
@@ -48,6 +48,16 @@ It connects to the nymea JSON-RPC API over plain TCP or SSL/TLS and renders a fu
 ```bash
 cmake -S . -B build
 cmake --build build
+```
+
+To force a specific Qt version, point CMake at that installation explicitly. Examples:
+
+```bash
+cmake -S . -B build-qt5 -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5
+cmake --build build-qt5
+
+cmake -S . -B build-qt6 -DCMAKE_PREFIX_PATH=/usr/local/Qt/6.10.1/gcc_64
+cmake --build build-qt6
 ```
 
 ## Run

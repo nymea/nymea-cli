@@ -8,7 +8,7 @@ namespace nymea::api {
 TokenInfo TokenInfo::fromJson(const QJsonObject &object) {
     TokenInfo value;
     if (object.contains(QStringLiteral("creationTime"))) {
-        value.creationTime = static_cast<quint64>((object.value(QStringLiteral("creationTime"))).toInteger());
+        value.creationTime = jsonValueToUnsignedInteger(object.value(QStringLiteral("creationTime")));
     }
     if (object.contains(QStringLiteral("deviceName"))) {
         value.deviceName = (object.value(QStringLiteral("deviceName"))).toString();

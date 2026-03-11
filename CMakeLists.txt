@@ -4,19 +4,20 @@ project(nymea-cli VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 find_package(Python3 COMPONENTS Interpreter)
 
 include(FetchContent)
 FetchContent_Declare(
     ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
-    GIT_TAG v5.0.0
+    GIT_TAG v6.1.9
 )
 FetchContent_MakeAvailable(ftxui)
-
-qt_standard_project_setup()
 
 set(NYMEA_API_JSON "${CMAKE_SOURCE_DIR}/api/api.json" CACHE FILEPATH "Path to nymea api.json")
 set(NYMEA_API_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_nymea_api.py")
@@ -33,7 +34,7 @@ if (Python3_Interpreter_FOUND)
     )
 endif()
 
-qt_add_executable(nymea-cli
+add_executable(nymea-cli
     main.cpp
     src/connectionsettings.cpp
     src/connectionsettings.h
@@ -59,8 +60,8 @@ target_include_directories(nymea-cli
 
 target_link_libraries(nymea-cli
     PRIVATE
-        Qt::Core
-        Qt::Network
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Network
         ftxui::component
         ftxui::dom
         ftxui::screen
@@ -78,3 +79,7 @@ install(TARGETS nymea-cli
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if (QT_VERSION_MAJOR EQUAL 6 AND COMMAND qt_finalize_executable)
+    qt_finalize_executable(nymea-cli)
+endif()

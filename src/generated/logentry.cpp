@@ -11,7 +11,7 @@ LogEntry LogEntry::fromJson(const QJsonObject &object) {
         value.source = (object.value(QStringLiteral("source"))).toString();
     }
     if (object.contains(QStringLiteral("timestamp"))) {
-        value.timestamp = static_cast<quint64>((object.value(QStringLiteral("timestamp"))).toInteger());
+        value.timestamp = jsonValueToUnsignedInteger(object.value(QStringLiteral("timestamp")));
     }
     if (object.contains(QStringLiteral("values"))) {
         value.values = (object.value(QStringLiteral("values"))).toObject();

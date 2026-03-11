@@ -20,7 +20,7 @@ EventType EventType::fromJson(const QJsonObject &object) {
         value.id = QUuid((object.value(QStringLiteral("id"))).toString());
     }
     if (object.contains(QStringLiteral("index"))) {
-        value.index = static_cast<qint64>((object.value(QStringLiteral("index"))).toInteger());
+        value.index = jsonValueToInteger(object.value(QStringLiteral("index")));
     }
     return value;
 }

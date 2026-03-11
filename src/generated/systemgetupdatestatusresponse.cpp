@@ -11,7 +11,7 @@ SystemGetUpdateStatusResponse SystemGetUpdateStatusResponse::fromJson(const QJso
         value.busy = (object.value(QStringLiteral("busy"))).toBool();
     }
     if (object.contains(QStringLiteral("updateProgress"))) {
-        value.updateProgress = static_cast<qint64>((object.value(QStringLiteral("updateProgress"))).toInteger());
+        value.updateProgress = jsonValueToInteger(object.value(QStringLiteral("updateProgress")));
     }
     if (object.contains(QStringLiteral("updateRunning"))) {
         value.updateRunning = (object.value(QStringLiteral("updateRunning"))).toBool();

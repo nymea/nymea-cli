@@ -11,13 +11,13 @@ ZigbeeNetwork ZigbeeNetwork::fromJson(const QJsonObject &object) {
         value.backend = (object.value(QStringLiteral("backend"))).toString();
     }
     if (object.contains(QStringLiteral("baudRate"))) {
-        value.baudRate = static_cast<quint64>((object.value(QStringLiteral("baudRate"))).toInteger());
+        value.baudRate = jsonValueToUnsignedInteger(object.value(QStringLiteral("baudRate")));
     }
     if (object.contains(QStringLiteral("channel"))) {
-        value.channel = static_cast<quint64>((object.value(QStringLiteral("channel"))).toInteger());
+        value.channel = jsonValueToUnsignedInteger(object.value(QStringLiteral("channel")));
     }
     if (object.contains(QStringLiteral("channelMask"))) {
-        value.channelMask = static_cast<quint64>((object.value(QStringLiteral("channelMask"))).toInteger());
+        value.channelMask = jsonValueToUnsignedInteger(object.value(QStringLiteral("channelMask")));
     }
     if (object.contains(QStringLiteral("enabled"))) {
         value.enabled = (object.value(QStringLiteral("enabled"))).toBool();
@@ -35,16 +35,16 @@ ZigbeeNetwork ZigbeeNetwork::fromJson(const QJsonObject &object) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("panId"))) {
-        value.panId = static_cast<quint64>((object.value(QStringLiteral("panId"))).toInteger());
+        value.panId = jsonValueToUnsignedInteger(object.value(QStringLiteral("panId")));
     }
     if (object.contains(QStringLiteral("permitJoiningDuration"))) {
-        value.permitJoiningDuration = static_cast<quint64>((object.value(QStringLiteral("permitJoiningDuration"))).toInteger());
+        value.permitJoiningDuration = jsonValueToUnsignedInteger(object.value(QStringLiteral("permitJoiningDuration")));
     }
     if (object.contains(QStringLiteral("permitJoiningEnabled"))) {
         value.permitJoiningEnabled = (object.value(QStringLiteral("permitJoiningEnabled"))).toBool();
     }
     if (object.contains(QStringLiteral("permitJoiningRemaining"))) {
-        value.permitJoiningRemaining = static_cast<quint64>((object.value(QStringLiteral("permitJoiningRemaining"))).toInteger());
+        value.permitJoiningRemaining = jsonValueToUnsignedInteger(object.value(QStringLiteral("permitJoiningRemaining")));
     }
     if (object.contains(QStringLiteral("serialPort"))) {
         value.serialPort = (object.value(QStringLiteral("serialPort"))).toString();

@@ -11,7 +11,7 @@ SystemSetTimeParams SystemSetTimeParams::fromJson(const QJsonObject &object) {
         value.automaticTime = (object.value(QStringLiteral("automaticTime"))).toBool();
     }
     if (object.contains(QStringLiteral("time"))) {
-        value.time = static_cast<quint64>((object.value(QStringLiteral("time"))).toInteger());
+        value.time = jsonValueToUnsignedInteger(object.value(QStringLiteral("time")));
     }
     if (object.contains(QStringLiteral("timeZone"))) {
         value.timeZone = (object.value(QStringLiteral("timeZone"))).toString();

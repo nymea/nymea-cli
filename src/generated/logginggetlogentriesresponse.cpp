@@ -8,13 +8,13 @@ namespace nymea::api {
 LoggingGetLogEntriesResponse LoggingGetLogEntriesResponse::fromJson(const QJsonObject &object) {
     LoggingGetLogEntriesResponse value;
     if (object.contains(QStringLiteral("count"))) {
-        value.count = static_cast<qint64>((object.value(QStringLiteral("count"))).toInteger());
+        value.count = jsonValueToInteger(object.value(QStringLiteral("count")));
     }
     if (object.contains(QStringLiteral("logEntries"))) {
         value.logEntries = ([&]() { QList<LogEntry> list; for (const QJsonValue &item : (object.value(QStringLiteral("logEntries"))).toArray()) { list.append(LogEntry::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("offset"))) {
-        value.offset = static_cast<qint64>((object.value(QStringLiteral("offset"))).toInteger());
+        value.offset = jsonValueToInteger(object.value(QStringLiteral("offset")));
     }
     return value;
 }

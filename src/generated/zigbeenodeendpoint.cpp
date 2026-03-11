@@ -8,7 +8,7 @@ namespace nymea::api {
 ZigbeeNodeEndpoint ZigbeeNodeEndpoint::fromJson(const QJsonObject &object) {
     ZigbeeNodeEndpoint value;
     if (object.contains(QStringLiteral("endpointId"))) {
-        value.endpointId = static_cast<quint64>((object.value(QStringLiteral("endpointId"))).toInteger());
+        value.endpointId = jsonValueToUnsignedInteger(object.value(QStringLiteral("endpointId")));
     }
     if (object.contains(QStringLiteral("inputClusters"))) {
         value.inputClusters = ([&]() { QList<ZigbeeCluster> list; for (const QJsonValue &item : (object.value(QStringLiteral("inputClusters"))).toArray()) { list.append(ZigbeeCluster::fromJson((item).toObject())); } return list; }());

@@ -8,13 +8,13 @@ namespace nymea::api {
 ZigbeeSetPermitJoinParams ZigbeeSetPermitJoinParams::fromJson(const QJsonObject &object) {
     ZigbeeSetPermitJoinParams value;
     if (object.contains(QStringLiteral("duration"))) {
-        value.duration = static_cast<quint64>((object.value(QStringLiteral("duration"))).toInteger());
+        value.duration = jsonValueToUnsignedInteger(object.value(QStringLiteral("duration")));
     }
     if (object.contains(QStringLiteral("networkUuid"))) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
     }
     if (object.contains(QStringLiteral("shortAddress"))) {
-        value.shortAddress = static_cast<quint64>((object.value(QStringLiteral("shortAddress"))).toInteger());
+        value.shortAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("shortAddress")));
     }
     return value;
 }

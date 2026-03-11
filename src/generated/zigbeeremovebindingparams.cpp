@@ -8,7 +8,7 @@ namespace nymea::api {
 ZigbeeRemoveBindingParams ZigbeeRemoveBindingParams::fromJson(const QJsonObject &object) {
     ZigbeeRemoveBindingParams value;
     if (object.contains(QStringLiteral("clusterId"))) {
-        value.clusterId = static_cast<quint64>((object.value(QStringLiteral("clusterId"))).toInteger());
+        value.clusterId = jsonValueToUnsignedInteger(object.value(QStringLiteral("clusterId")));
     }
     if (object.contains(QStringLiteral("networkUuid"))) {
         value.networkUuid = QUuid((object.value(QStringLiteral("networkUuid"))).toString());
@@ -17,16 +17,16 @@ ZigbeeRemoveBindingParams ZigbeeRemoveBindingParams::fromJson(const QJsonObject 
         value.destinationAddress = (object.value(QStringLiteral("destinationAddress"))).toString();
     }
     if (object.contains(QStringLiteral("destinationEndpointId"))) {
-        value.destinationEndpointId = static_cast<quint64>((object.value(QStringLiteral("destinationEndpointId"))).toInteger());
+        value.destinationEndpointId = jsonValueToUnsignedInteger(object.value(QStringLiteral("destinationEndpointId")));
     }
     if (object.contains(QStringLiteral("destinationGroupAddress"))) {
-        value.destinationGroupAddress = static_cast<quint64>((object.value(QStringLiteral("destinationGroupAddress"))).toInteger());
+        value.destinationGroupAddress = jsonValueToUnsignedInteger(object.value(QStringLiteral("destinationGroupAddress")));
     }
     if (object.contains(QStringLiteral("sourceAddress"))) {
         value.sourceAddress = (object.value(QStringLiteral("sourceAddress"))).toString();
     }
     if (object.contains(QStringLiteral("sourceEndpointId"))) {
-        value.sourceEndpointId = static_cast<quint64>((object.value(QStringLiteral("sourceEndpointId"))).toInteger());
+        value.sourceEndpointId = jsonValueToUnsignedInteger(object.value(QStringLiteral("sourceEndpointId")));
     }
     return value;
 }
