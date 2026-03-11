@@ -165,3 +165,10 @@ Format before finishing changes:
 ```bash
 clang-format -i main.cpp src/*.h src/*.cpp
 ```
+
+## License
+
+This project is licensed under `GPL-3.0-or-later`.
+The generated `.h` and `.cpp` files carry the same SPDX identifier and warn
+that manual changes in `src/generated/` will be lost the next time the API
+model is regenerated.

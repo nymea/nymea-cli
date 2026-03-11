@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "engine.h"
 
 #include "generated/actiontype.h"
@@ -30,11 +32,13 @@
 #include "generated/thing.h"
 #include "generated/thingclass.h"
 
+#include <QCoreApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocale>
 #include <QMetaObject>
+#include <QtGlobal>
 
 #include <algorithm>
 #include <array>
@@ -46,6 +50,14 @@
 namespace nymea {
 
 namespace {
+
+#ifndef APP_LICENSE_SPDX
+#define APP_LICENSE_SPDX "GPL-3.0-or-later"
+#endif
+
+#ifndef FTXUI_VERSION
+#define FTXUI_VERSION "unknown"
+#endif
 
 struct ThingDetailEntry
 {
@@ -2981,10 +2993,20 @@ ftxui::Element Engine::renderSettingsDetails() const
         lines.push_back(ftxui::text("nymea-cli"));
         lines.push_back(ftxui::separator());
         lines.push_back(ftxui::text("Application version: " + m_options.appVersion));
+        lines.push_back(ftxui::text("Project license: " APP_LICENSE_SPDX));
         lines.push_back(ftxui::text("Server version: " + m_serverVersion));
         lines.push_back(ftxui::text("Server API version: " + m_serverApiVersion));
         lines.push_back(ftxui::text("Purpose: terminal client for nymead"));
         lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
+        lines.push_back(ftxui::separator());
+        lines.push_back(ftxui::text("Open source components"));
+        lines.push_back(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
+        lines.push_back(ftxui::paragraph("Qt licensing reference: https://www.qt.io/licensing/"));
+        lines.push_back(ftxui::paragraph("Qt project reference: https://www.qt.io/"));
+        lines.push_back(ftxui::text("FTXUI version: " FTXUI_VERSION));
+        lines.push_back(ftxui::text("FTXUI license: MIT"));
+        lines.push_back(ftxui::paragraph("FTXUI project reference: https://github.com/ArthurSonzogni/FTXUI"));
+        lines.push_back(ftxui::paragraph("FTXUI license reference: https://github.com/ArthurSonzogni/FTXUI/blob/" FTXUI_VERSION "/LICENSE"));
     }
 
     return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame);

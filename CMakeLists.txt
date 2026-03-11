@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(FTXUI_GIT_TAG "v6.1.9")
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
@@ -15,7 +16,7 @@ include(FetchContent)
 FetchContent_Declare(
     ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
-    GIT_TAG v6.1.9
+    GIT_TAG ${FTXUI_GIT_TAG}
 )
 FetchContent_MakeAvailable(ftxui)
 
@@ -70,6 +71,8 @@ target_link_libraries(nymea-cli
 target_compile_definitions(nymea-cli
     PRIVATE
         APP_VERSION="${PROJECT_VERSION}"
+        APP_LICENSE_SPDX="GPL-3.0-or-later"
+        FTXUI_VERSION="${FTXUI_GIT_TAG}"
 )
 
 include(GNUInstallDirs)
