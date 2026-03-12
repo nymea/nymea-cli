@@ -1,0 +1,13 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-DQt5_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/Qt5 \
+		-DNYMEA_USE_SYSTEM_FTXUI=OFF \
+		-DNYMEA_ALLOW_FETCHCONTENT_FTXUI=ON

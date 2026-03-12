@@ -7,18 +7,36 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(FTXUI_GIT_TAG "v6.1.9")
+option(NYMEA_USE_SYSTEM_FTXUI "Prefer a system-installed FTXUI package over FetchContent." ON)
+option(NYMEA_ALLOW_FETCHCONTENT_FTXUI "Allow downloading FTXUI with FetchContent when no system package is available." ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 find_package(Python3 COMPONENTS Interpreter)
 
-include(FetchContent)
-FetchContent_Declare(
-    ftxui
-    GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
-    GIT_TAG ${FTXUI_GIT_TAG}
-)
-FetchContent_MakeAvailable(ftxui)
+set(NYMEA_FTXUI_VERSION "${FTXUI_GIT_TAG}")
+if (NYMEA_USE_SYSTEM_FTXUI)
+    find_package(ftxui CONFIG QUIET)
+    if (TARGET ftxui::component AND TARGET ftxui::dom AND TARGET ftxui::screen)
+        if (DEFINED ftxui_VERSION AND NOT "${ftxui_VERSION}" STREQUAL "")
+            set(NYMEA_FTXUI_VERSION "${ftxui_VERSION}")
+        endif()
+    endif()
+endif()
+
+if (NOT (TARGET ftxui::component AND TARGET ftxui::dom AND TARGET ftxui::screen))
+    if (NOT NYMEA_ALLOW_FETCHCONTENT_FTXUI)
+        message(FATAL_ERROR "FTXUI was not found as a system package and NYMEA_ALLOW_FETCHCONTENT_FTXUI is OFF.")
+    endif()
+
+    include(FetchContent)
+    FetchContent_Declare(
+        ftxui
+        GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+        GIT_TAG ${FTXUI_GIT_TAG}
+    )
+    FetchContent_MakeAvailable(ftxui)
+endif()
 
 set(NYMEA_API_JSON "${CMAKE_SOURCE_DIR}/api/api.json" CACHE FILEPATH "Path to nymea api.json")
 set(NYMEA_API_GENERATOR "${CMAKE_SOURCE_DIR}/scripts/generate_nymea_api.py")
@@ -72,7 +90,7 @@ target_compile_definitions(nymea-cli
     PRIVATE
         APP_VERSION="${PROJECT_VERSION}"
         APP_LICENSE_SPDX="GPL-3.0-or-later"
-        FTXUI_VERSION="${FTXUI_GIT_TAG}"
+        FTXUI_VERSION="${NYMEA_FTXUI_VERSION}"
 )
 
 include(GNUInstallDirs)

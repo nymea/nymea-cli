@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+include /usr/share/dpkg/architecture.mk
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+cmake_configure_args = \
+	-Dftxui_DIR=/usr/lib/cmake/ftxui \
+	-DQt6_DIR=/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/Qt6 \
+	-DNYMEA_USE_SYSTEM_FTXUI=ON \
+	-DNYMEA_ALLOW_FETCHCONTENT_FTXUI=OFF
+
+ifneq ($(DEB_BUILD_ARCH),$(DEB_HOST_ARCH))
+cmake_configure_args += \
+	-DQT_HOST_PATH=/usr \
+	-DQT_HOST_PATH_CMAKE_DIR=/usr/lib/$(DEB_BUILD_MULTIARCH)/cmake \
+	-DQT_BUILD_TOOLS_WHEN_CROSSCOMPILING=ON
+endif
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(cmake_configure_args)
