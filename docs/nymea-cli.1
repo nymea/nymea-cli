@@ -1,0 +1,147 @@
+.\" SPDX-License-Identifier: GPL-3.0-or-later
+.\"
+.TH NYMEA-CLI 1 "March 2026" "nymea-cli 0.1.0" "User Commands"
+.SH NAME
+nymea-cli \- terminal client for nymead
+.SH SYNOPSIS
+.B nymea-cli
+[\fB\-H\fR \fIhost\fR]
+[\fB\-s\fR]
+[\fB\-p\fR \fIport\fR]
+[\fB\-t\fR \fIms\fR]
+[\fB\-u\fR \fIusername\fR]
+[\fB\-w\fR \fIpassword\fR]
+[\fB\-\-help\fR]
+[\fB\-\-version\fR]
+.SH DESCRIPTION
+.B nymea-cli
+is a fullscreen terminal client for
+.BR nymead .
+It connects to the nymea JSON-RPC API over plain TCP or SSL/TLS and
+provides a keyboard-driven interface for browsing things, inspecting
+metadata, and executing actions.
+.PP
+The default nymea ports are 2223 for plain TCP and 2222 for SSL/TLS.
+Stored authentication tokens are reused across restarts. TLS connections
+store the peer certificate fingerprint and warn if it changes later.
+.SH OPTIONS
+.TP
+.BR \-H ", " \-\-host " " \fIhost\fR
+nymead host to connect to. The default is
+.BR 127.0.0.1 .
+.TP
+.BR \-s ", " \-\-ssl
+Use SSL/TLS via
+.BR QSslSocket .
+This changes the default port to 2222.
+.TP
+.BR \-p ", " \-\-port " " \fIport\fR
+Connect to the given TCP port. If omitted, the default is 2222 with
+.B \-\-ssl
+or 2223 otherwise.
+.TP
+.BR \-t ", " \-\-timeout " " \fIms\fR
+Timeout in milliseconds for connection and reply waits. The default is
+.BR 5000 .
+.TP
+.BR \-u ", " \-\-username " " \fIusername\fR
+Username for JSONRPC.Authenticate.
+.TP
+.BR \-w ", " \-\-password " " \fIpassword\fR
+Password for JSONRPC.Authenticate.
+.TP
+.BR \-\-help
+Show command line help and exit.
+.TP
+.BR \-\-version
+Show the program version and exit.
+.SH INTERFACE
+Global keys:
+.TP
+.B q
+Quit the application.
+.TP
+.B Esc
+Quit the application or close the active dialog.
+.TP
+.B c
+Reconnect to the configured nymea server.
+.TP
+.B h
+Run the JSONRPC.Hello handshake again.
+.TP
+.B t
+Refresh the thing list.
+.PP
+Main layout keys:
+.TP
+.B Up / Down
+Move inside the focused list.
+.TP
+.B Left / Right
+Switch focus between panels.
+.TP
+.B Space
+Open or close the metadata inspector for the selected param, state, or
+action.
+.TP
+.B Enter
+Open the selected action or setup flow.
+.PP
+Action dialog keys:
+.TP
+.B Up / Down
+Select the current parameter.
+.TP
+.B Left / Right / Space
+Cycle selector values for boolean or allowed-values parameters.
+.TP
+.B Enter
+Execute the action.
+.TP
+.B Esc
+Close the dialog without executing.
+.SH FILES
+.TP
+.I /var/lib/nymea/nymea-cli.conf
+Settings file used when running as root.
+.TP
+.I ~/.config/nymea/nymea-cli.conf
+Settings file used for non-root users.
+.PP
+Saved connections are keyed by nymea host UUID and store the host,
+selected port, SSL flag, authentication token, and TLS fingerprint.
+.SH EXAMPLES
+.TP
+Connect to a local nymea instance using plain TCP:
+.IP
+.EX
+nymea-cli
+.EE
+.TP
+Connect to a remote host with TLS:
+.IP
+.EX
+nymea-cli --ssl --host nymea.example.org
+.EE
+.TP
+Authenticate with explicit credentials:
+.IP
+.EX
+nymea-cli --host 192.0.2.10 --username admin --password secret
+.EE
+.SH EXIT STATUS
+.TP
+.B 0
+Success.
+.TP
+.B 1
+Invalid command line arguments or application failure.
+.SH SECURITY
+Passing a password on the command line can expose it to other local users
+through process listings. Prefer interactive authentication when possible.
+.SH LICENSE
+This project is licensed under
+.BR GPL-3.0-or-later .
+.SH SEE ALSO
+.BR nymead (8)

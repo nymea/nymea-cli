@@ -66,6 +66,12 @@ cmake --build build-qt6
 ./build/nymea-cli
 ```
 
+Installed packages also provide:
+
+```bash
+man nymea-cli
+```
+
 ## Command line
 
 ```bash
