@@ -42,6 +42,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <initializer_list>
 #include <string_view>
 #include <utility>
@@ -70,6 +71,17 @@ struct ThingDetailEntry
 
     Type type = Type::None;
     int index = -1;
+};
+
+struct NumericRangeInputSpec
+{
+    double minValue = 0.0;
+    double maxValue = 0.0;
+    double stepSize = 0.0;
+    double displayScale = 1.0;
+    bool integral = false;
+    int decimals = 0;
+    int displayDecimals = 0;
 };
 
 std::vector<ThingDetailEntry> buildThingDetailEntries(const api::Thing* thing, const api::ThingClass* thingClass)
@@ -222,6 +234,430 @@ std::string optionalStringListToString(const std::optional<QStringList>& value)
 }
 
 std::string normalizedActionDialogValue(const api::ParamType& paramType, const std::string& rawValue);
+bool actionParamUsesSelector(const api::ParamType& paramType);
+std::string cycleSelectableValue(const api::ParamType& paramType, const std::string& rawValue, int delta);
+std::string prettyUnit(api::Unit unit);
+
+bool isNumericRangeType(api::BasicType type)
+{
+    switch (type) {
+    case api::BasicType::Int:
+    case api::BasicType::Uint:
+    case api::BasicType::Double:
+    case api::BasicType::Time:
+        return true;
+    case api::BasicType::Bool:
+    case api::BasicType::String:
+    case api::BasicType::Color:
+    case api::BasicType::Uuid:
+    case api::BasicType::StringList:
+    case api::BasicType::Object:
+    case api::BasicType::Variant:
+        return false;
+    }
+
+    return false;
+}
+
+bool isIntegralNumericType(api::BasicType type)
+{
+    return type == api::BasicType::Int || type == api::BasicType::Uint || type == api::BasicType::Time;
+}
+
+std::optional<double> parseNumericString(const QString& rawValue, api::BasicType type)
+{
+    const QString trimmed = rawValue.trimmed();
+    if (trimmed.isEmpty()) {
+        return std::nullopt;
+    }
+
+    switch (type) {
+    case api::BasicType::Int:
+    case api::BasicType::Time: {
+        bool ok = false;
+        const qint64 value = trimmed.toLongLong(&ok);
+        return ok ? std::optional<double>(static_cast<double>(value)) : std::nullopt;
+    }
+    case api::BasicType::Uint: {
+        bool ok = false;
+        const quint64 value = trimmed.toULongLong(&ok);
+        return ok ? std::optional<double>(static_cast<double>(value)) : std::nullopt;
+    }
+    case api::BasicType::Double: {
+        bool ok = false;
+        const double value = trimmed.toDouble(&ok);
+        return ok ? std::optional<double>(value) : std::nullopt;
+    }
+    case api::BasicType::Bool:
+    case api::BasicType::String:
+    case api::BasicType::Color:
+    case api::BasicType::Uuid:
+    case api::BasicType::StringList:
+    case api::BasicType::Object:
+    case api::BasicType::Variant:
+        return std::nullopt;
+    }
+
+    return std::nullopt;
+}
+
+std::optional<double> parseNumericJsonValue(const QJsonValue& value, api::BasicType type)
+{
+    if (value.isDouble()) {
+        return value.toDouble();
+    }
+    if (value.isString()) {
+        return parseNumericString(value.toString(), type);
+    }
+
+    return std::nullopt;
+}
+
+double defaultNumericRangeStepSize(const NumericRangeInputSpec& spec)
+{
+    if (spec.integral) {
+        return 1.0;
+    }
+
+    const double span = std::abs(spec.maxValue - spec.minValue);
+    if (span <= 1.0) {
+        return 0.01;
+    }
+    if (span <= 10.0) {
+        return 0.1;
+    }
+    return 1.0;
+}
+
+int numericRangeFractionalDigits(double stepSize)
+{
+    if (stepSize <= 0.0) {
+        return 0;
+    }
+
+    QString text = QString::number(stepSize, 'f', 6);
+    while (text.endsWith(QLatin1Char('0'))) {
+        text.chop(1);
+    }
+    if (text.endsWith(QLatin1Char('.'))) {
+        text.chop(1);
+    }
+
+    const int dotIndex = text.indexOf(QLatin1Char('.'));
+    return dotIndex >= 0 ? text.size() - dotIndex - 1 : 0;
+}
+
+bool shouldScaleRangeDisplayAsPercentage(const api::ParamType& paramType, double minValue, double maxValue)
+{
+    return paramType.unit.has_value() && *paramType.unit == api::Unit::UnitPercentage && minValue >= 0.0 && maxValue > 0.0 && maxValue <= 1.0 + 1e-9;
+}
+
+QString trimTrailingZeros(QString value)
+{
+    while (value.endsWith(QLatin1Char('0'))) {
+        value.chop(1);
+    }
+    if (value.endsWith(QLatin1Char('.'))) {
+        value.chop(1);
+    }
+    if (value == QStringLiteral("-0")) {
+        return QStringLiteral("0");
+    }
+    return value;
+}
+
+std::optional<NumericRangeInputSpec> numericRangeInputSpec(const api::ParamType& paramType)
+{
+    if (!isNumericRangeType(paramType.type)) {
+        return std::nullopt;
+    }
+    if (!paramType.minValue.has_value() || !paramType.maxValue.has_value()) {
+        return std::nullopt;
+    }
+    if (paramType.allowedValues.has_value() && !paramType.allowedValues->empty()) {
+        return std::nullopt;
+    }
+
+    const std::optional<double> minValue = parseNumericJsonValue(*paramType.minValue, paramType.type);
+    const std::optional<double> maxValue = parseNumericJsonValue(*paramType.maxValue, paramType.type);
+    if (!minValue.has_value() || !maxValue.has_value()) {
+        return std::nullopt;
+    }
+
+    NumericRangeInputSpec spec;
+    spec.minValue = std::min(*minValue, *maxValue);
+    spec.maxValue = std::max(*minValue, *maxValue);
+    spec.integral = isIntegralNumericType(paramType.type);
+    spec.stepSize = paramType.stepSize.value_or(0.0);
+    if (spec.stepSize <= 0.0) {
+        spec.stepSize = defaultNumericRangeStepSize(spec);
+    }
+    if (shouldScaleRangeDisplayAsPercentage(paramType, spec.minValue, spec.maxValue)) {
+        spec.displayScale = 100.0;
+    }
+    spec.decimals = spec.integral ? 0 : numericRangeFractionalDigits(spec.stepSize);
+    spec.displayDecimals = numericRangeFractionalDigits(spec.stepSize * spec.displayScale);
+    return spec;
+}
+
+double clampAndSnapNumericRangeValue(const NumericRangeInputSpec& spec, double value)
+{
+    value = std::clamp(value, spec.minValue, spec.maxValue);
+
+    if (spec.stepSize > 0.0) {
+        const double stepCount = std::round((value - spec.minValue) / spec.stepSize);
+        value = spec.minValue + stepCount * spec.stepSize;
+        value = std::clamp(value, spec.minValue, spec.maxValue);
+    }
+
+    if (spec.integral) {
+        value = std::round(value);
+    }
+
+    if (std::abs(value) < 1e-9) {
+        value = 0.0;
+    }
+
+    return value;
+}
+
+double rawNumericRangeValueToDisplay(const NumericRangeInputSpec& spec, double rawValue)
+{
+    return rawValue * spec.displayScale;
+}
+
+double displayNumericRangeValueToRaw(const NumericRangeInputSpec& spec, double displayValue)
+{
+    return displayValue / spec.displayScale;
+}
+
+std::string formatRawNumericRangeValue(const api::ParamType& paramType, const NumericRangeInputSpec& spec, double value)
+{
+    const double clampedValue = clampAndSnapNumericRangeValue(spec, value);
+    if (isIntegralNumericType(paramType.type)) {
+        return std::to_string(static_cast<long long>(std::llround(clampedValue)));
+    }
+
+    return trimTrailingZeros(QString::number(clampedValue, 'f', std::max(spec.decimals, 1))).toStdString();
+}
+
+std::string formatNumericRangeValue(const api::ParamType& paramType, const NumericRangeInputSpec& spec, double rawValue)
+{
+    const double clampedValue = clampAndSnapNumericRangeValue(spec, rawValue);
+    const double displayValue = rawNumericRangeValueToDisplay(spec, clampedValue);
+    if (isIntegralNumericType(paramType.type) && spec.displayScale == 1.0) {
+        return std::to_string(static_cast<long long>(std::llround(displayValue)));
+    }
+
+    return trimTrailingZeros(QString::number(displayValue, 'f', spec.displayDecimals)).toStdString();
+}
+
+std::optional<double> parseDisplayedNumericString(const QString& rawValue, const NumericRangeInputSpec& spec, api::BasicType type)
+{
+    const QString trimmed = rawValue.trimmed();
+    if (trimmed.isEmpty()) {
+        return std::nullopt;
+    }
+
+    if (spec.displayScale != 1.0 || type == api::BasicType::Double) {
+        bool ok = false;
+        const double value = trimmed.toDouble(&ok);
+        return ok ? std::optional<double>(value) : std::nullopt;
+    }
+
+    return parseNumericString(trimmed, type);
+}
+
+std::optional<double> currentNumericRangeValue(const api::ParamType& paramType, const NumericRangeInputSpec& spec, const std::string& rawValue)
+{
+    if (!rawValue.empty()) {
+        const std::optional<double> parsedDisplayValue = parseDisplayedNumericString(QString::fromStdString(rawValue), spec, paramType.type);
+        if (!parsedDisplayValue.has_value()) {
+            return std::nullopt;
+        }
+        return clampAndSnapNumericRangeValue(spec, displayNumericRangeValueToRaw(spec, *parsedDisplayValue));
+    }
+
+    if (paramType.defaultValue.has_value()) {
+        const std::optional<double> defaultValue = parseNumericJsonValue(*paramType.defaultValue, paramType.type);
+        if (defaultValue.has_value()) {
+            return clampAndSnapNumericRangeValue(spec, *defaultValue);
+        }
+    }
+
+    return clampAndSnapNumericRangeValue(spec, spec.minValue);
+}
+
+std::string normalizedActionSubmissionValue(const api::ParamType& paramType, const std::string& rawValue)
+{
+    if (const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(paramType); rangeSpec.has_value()) {
+        const std::optional<double> currentValue = currentNumericRangeValue(paramType, *rangeSpec, rawValue);
+        if (currentValue.has_value()) {
+            return formatRawNumericRangeValue(paramType, *rangeSpec, *currentValue);
+        }
+        return rawValue;
+    }
+
+    return normalizedActionDialogValue(paramType, rawValue);
+}
+
+bool actionParamUsesRangeInput(const api::ParamType& paramType)
+{
+    return numericRangeInputSpec(paramType).has_value();
+}
+
+bool rangeInputAcceptsCharacter(const api::ParamType& paramType, const std::string& currentValue, const std::string& typedCharacter)
+{
+    if (typedCharacter.size() != 1) {
+        return false;
+    }
+
+    const char character = typedCharacter.front();
+    if (character >= '0' && character <= '9') {
+        return true;
+    }
+
+    if (character == '-' && paramType.type != api::BasicType::Uint) {
+        return currentValue.empty();
+    }
+
+    const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(paramType);
+    const bool acceptsDecimalPoint = paramType.type == api::BasicType::Double || (rangeSpec.has_value() && rangeSpec->displayScale != 1.0);
+    if (character == '.' && acceptsDecimalPoint) {
+        return currentValue.find('.') == std::string::npos;
+    }
+
+    return false;
+}
+
+std::string rangeInputUnitLabel(const api::ParamType& paramType)
+{
+    if (!paramType.unit.has_value()) {
+        return {};
+    }
+
+    return prettyUnit(*paramType.unit);
+}
+
+std::string rangeInputSummary(const api::ParamType& paramType)
+{
+    const std::optional<NumericRangeInputSpec> spec = numericRangeInputSpec(paramType);
+    if (!spec.has_value()) {
+        return {};
+    }
+
+    const std::string unitLabel = rangeInputUnitLabel(paramType);
+    std::string summary = "Range: " + formatNumericRangeValue(paramType, *spec, spec->minValue) + " .. " + formatNumericRangeValue(paramType, *spec, spec->maxValue);
+    if (!unitLabel.empty()) {
+        summary += " " + unitLabel;
+    }
+    summary += " | Step: " + formatNumericRangeValue(paramType, *spec, spec->stepSize);
+    if (!unitLabel.empty()) {
+        summary += " " + unitLabel;
+    }
+    return summary;
+}
+
+std::string cycleRangeValue(const api::ParamType& paramType, const std::string& rawValue, int delta)
+{
+    const std::optional<NumericRangeInputSpec> spec = numericRangeInputSpec(paramType);
+    if (!spec.has_value()) {
+        return rawValue;
+    }
+
+    const double currentValue = currentNumericRangeValue(paramType, *spec, rawValue).value_or(spec->minValue);
+    const double nextValue = currentValue + static_cast<double>(delta) * spec->stepSize;
+    return formatNumericRangeValue(paramType, *spec, nextValue);
+}
+
+std::string formatRangeDisplayValue(const api::ParamType& paramType, const NumericRangeInputSpec& spec, double value)
+{
+    std::string displayValue = formatNumericRangeValue(paramType, spec, value);
+    if (const std::string unitLabel = rangeInputUnitLabel(paramType); !unitLabel.empty()) {
+        displayValue += " " + unitLabel;
+    }
+    return displayValue;
+}
+
+ftxui::Element renderRangeValueCell(const api::ParamType& paramType, const std::string& rawValue)
+{
+    const std::optional<NumericRangeInputSpec> spec = numericRangeInputSpec(paramType);
+    if (!spec.has_value()) {
+        return ftxui::text(rawValue.empty() ? std::string("<empty>") : rawValue);
+    }
+
+    const std::optional<double> currentValue = currentNumericRangeValue(paramType, *spec, rawValue);
+    if (!currentValue.has_value()) {
+        return ftxui::text(rawValue + " (invalid)") | ftxui::color(ftxui::Color::YellowLight);
+    }
+
+    const double span = spec->maxValue - spec->minValue;
+    const double ratio = span <= 0.0 ? 1.0 : std::clamp((*currentValue - spec->minValue) / span, 0.0, 1.0);
+    constexpr int kBarWidth = 16;
+    const int filledCells = std::clamp(static_cast<int>(std::round(ratio * static_cast<double>(kBarWidth))), 0, kBarWidth);
+    const std::string bar = "[" + std::string(static_cast<std::size_t>(filledCells), '=') + std::string(static_cast<std::size_t>(kBarWidth - filledCells), '.') + "]";
+
+    return ftxui::hbox({
+        ftxui::text(formatRangeDisplayValue(paramType, *spec, *currentValue)),
+        ftxui::text(" "),
+        ftxui::text(bar) | ftxui::color(ftxui::Color::GreenLight),
+    });
+}
+
+bool handleParamValueEditEvent(const ftxui::Event& event, const api::ParamType& paramType, std::string& currentValue, bool& isRangeTextEditing)
+{
+    if (actionParamUsesSelector(paramType)) {
+        isRangeTextEditing = false;
+        if (event == ftxui::Event::ArrowLeft) {
+            currentValue = cycleSelectableValue(paramType, currentValue, -1);
+            return true;
+        }
+        if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+            currentValue = cycleSelectableValue(paramType, currentValue, 1);
+            return true;
+        }
+        return false;
+    }
+
+    if (actionParamUsesRangeInput(paramType)) {
+        if (event == ftxui::Event::ArrowLeft) {
+            currentValue = cycleRangeValue(paramType, currentValue, -1);
+            isRangeTextEditing = false;
+            return true;
+        }
+        if (event == ftxui::Event::ArrowRight) {
+            currentValue = cycleRangeValue(paramType, currentValue, 1);
+            isRangeTextEditing = false;
+            return true;
+        }
+        if (event == ftxui::Event::Backspace && !currentValue.empty()) {
+            isRangeTextEditing = true;
+            currentValue.pop_back();
+            return true;
+        }
+        if (event.is_character() && rangeInputAcceptsCharacter(paramType, currentValue, event.character())) {
+            if (!isRangeTextEditing) {
+                currentValue.clear();
+            }
+            isRangeTextEditing = true;
+            currentValue += event.character();
+            return true;
+        }
+        return false;
+    }
+
+    isRangeTextEditing = false;
+    if (event == ftxui::Event::Backspace && !currentValue.empty()) {
+        currentValue.pop_back();
+        return true;
+    }
+    if (event.is_character()) {
+        currentValue += event.character();
+        return true;
+    }
+
+    return false;
+}
 
 std::string thingErrorLabel(api::ThingError error)
 {
@@ -614,7 +1050,7 @@ bool buildParamList(const std::vector<api::ParamType>& paramTypes, const std::ve
 
     for (int index = 0; index < static_cast<int>(paramTypes.size()) && index < static_cast<int>(rawValues.size()); ++index) {
         const api::ParamType& paramType = paramTypes.at(index);
-        const std::string rawValue = normalizedActionDialogValue(paramType, rawValues.at(index));
+        const std::string rawValue = normalizedActionSubmissionValue(paramType, rawValues.at(index));
         const std::optional<QJsonValue> parsedValue = parseActionInputValue(rawValue, paramType.type);
         if (!parsedValue.has_value()) {
             errorMessage = "Invalid value for " + firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "param"}) + ".";
@@ -645,6 +1081,16 @@ std::vector<QJsonValue> selectableValuesForParamType(const api::ParamType& param
 
 std::string normalizedActionDialogValue(const api::ParamType& paramType, const std::string& rawValue)
 {
+    if (const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(paramType); rangeSpec.has_value()) {
+        const std::optional<double> currentValue = currentNumericRangeValue(paramType, *rangeSpec, rawValue);
+        if (currentValue.has_value()) {
+            return formatNumericRangeValue(paramType, *rangeSpec, *currentValue);
+        }
+        if (!rawValue.empty()) {
+            return rawValue;
+        }
+    }
+
     if (!rawValue.empty()) {
         return rawValue;
     }
@@ -656,6 +1102,10 @@ std::string normalizedActionDialogValue(const api::ParamType& paramType, const s
     const std::vector<QJsonValue> selectableValues = selectableValuesForParamType(paramType);
     if (!selectableValues.empty()) {
         return jsonValueToString(selectableValues.front());
+    }
+
+    if (const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(paramType); rangeSpec.has_value()) {
+        return formatNumericRangeValue(paramType, *rangeSpec, rangeSpec->minValue);
     }
 
     return {};
@@ -702,6 +1152,10 @@ ftxui::Element renderActionDialogValueCell(const api::ParamType& paramType, cons
     if (paramType.type == api::BasicType::Bool) {
         const std::optional<QJsonValue> parsedValue = parseActionInputValue(normalizedValue, api::BasicType::Bool);
         return renderBoolValue(parsedValue.has_value() ? parsedValue->toBool() : false);
+    }
+
+    if (actionParamUsesRangeInput(paramType)) {
+        return renderRangeValueCell(paramType, rawValue);
     }
 
     if (actionParamUsesSelector(paramType)) {
@@ -896,6 +1350,7 @@ bool Engine::openSelectedActionDialog()
     m_actionDialogActionIndex = selectedEntry.index;
     m_actionDialogThingId = thing->id;
     m_actionDialogSelectedParamIndex = 0;
+    m_actionDialogRangeEditIndex.reset();
     m_actionDialogActionName = firstNonEmpty({actionType->displayName.toStdString(), actionType->name.toStdString(), "Action"});
     m_actionDialogParamTypes.assign(actionType->paramTypes.begin(), actionType->paramTypes.end());
     m_actionDialogParamValues.clear();
@@ -920,6 +1375,7 @@ void Engine::closeActionDialog()
     m_actionDialogActionIndex = -1;
     m_actionDialogThingId = QUuid();
     m_actionDialogSelectedParamIndex = 0;
+    m_actionDialogRangeEditIndex.reset();
     m_actionDialogParamTypes.clear();
     m_actionDialogParamValues.clear();
     m_actionExecutionPending = false;
@@ -984,6 +1440,7 @@ void Engine::closeConfigureDialog()
     m_configureParamTypes.clear();
     m_configureParamValues.clear();
     m_configureParamSelectionIndex = 0;
+    m_configureRangeEditIndex.reset();
     m_configureThingDescriptors.clear();
     m_configureThingDescriptorIndex = 0;
     m_configureSetupMethod.reset();
@@ -1120,6 +1577,7 @@ void Engine::startAddThingFlow(api::CreateMethod createMethod)
             m_configureParamValues.push_back(normalizedActionDialogValue(paramType, {}));
         }
         m_configureParamSelectionIndex = 0;
+        m_configureRangeEditIndex.reset();
         m_configureDialogStatus = m_configureParamTypes.empty() ? "Press Enter to start discovery." : "Edit discovery params and press Enter to search.";
         return;
     }
@@ -1132,6 +1590,7 @@ void Engine::startAddThingFlow(api::CreateMethod createMethod)
         m_configureParamValues.push_back(normalizedActionDialogValue(paramType, {}));
     }
     m_configureParamSelectionIndex = 0;
+    m_configureRangeEditIndex.reset();
     if (thingClass->setupMethod == api::SetupMethod::SetupMethodJustAdd) {
         m_configureDialogStatus = "Edit the name and params, then press Enter to add the thing.";
     } else {
@@ -1363,7 +1822,7 @@ bool Engine::executeCurrentAction()
     api::ParamList params;
     for (int index = 0; index < static_cast<int>(m_actionDialogParamTypes.size()); ++index) {
         const api::ParamType& paramType = m_actionDialogParamTypes.at(index);
-        const std::string rawValue = normalizedActionDialogValue(paramType, m_actionDialogParamValues.at(index));
+        const std::string rawValue = normalizedActionSubmissionValue(paramType, m_actionDialogParamValues.at(index));
         std::optional<QJsonValue> parsedValue = parseActionInputValue(rawValue, paramType.type);
         if (!parsedValue.has_value()) {
             m_actionDialogStatus = "Invalid value for " + firstNonEmpty({paramType.displayName.toStdString(), paramType.name.toStdString(), "param"}) + ".";
@@ -3102,6 +3561,15 @@ ftxui::Element Engine::renderUi()
             const api::ParamType& selectedParamType = m_actionDialogParamTypes.at(m_actionDialogSelectedParamIndex);
             if (actionParamUsesSelector(selectedParamType)) {
                 dialogFooter.push_back(ftxui::text("Up/Down select param, Left/Right/Space choose value, Enter execute, Esc close.") | ftxui::dim);
+            } else if (actionParamUsesRangeInput(selectedParamType)) {
+                dialogFooter.push_back(ftxui::text(rangeInputSummary(selectedParamType)));
+                if (const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(selectedParamType);
+                    rangeSpec.has_value() && !currentNumericRangeValue(selectedParamType, *rangeSpec, m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex)).has_value()
+                    && !m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex).empty()) {
+                    dialogFooter.push_back(ftxui::text("Current value is incomplete or invalid. Type a number or use Left/Right to snap into range.")
+                                           | ftxui::color(ftxui::Color::YellowLight));
+                }
+                dialogFooter.push_back(ftxui::text("Type a number, Left/Right adjust the bar, Up/Down select param, Enter execute, Esc close.") | ftxui::dim);
             } else {
                 dialogFooter.push_back(ftxui::text("Type to edit, Up/Down select param, Enter execute, Esc close.") | ftxui::dim);
             }
@@ -3310,31 +3778,24 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (event == ftxui::Event::ArrowUp && !m_actionDialogParamTypes.empty()) {
             m_actionDialogSelectedParamIndex = (m_actionDialogSelectedParamIndex + static_cast<int>(m_actionDialogParamTypes.size()) - 1)
                                                % static_cast<int>(m_actionDialogParamTypes.size());
+            m_actionDialogRangeEditIndex.reset();
             return true;
         }
         if (event == ftxui::Event::ArrowDown && !m_actionDialogParamTypes.empty()) {
             m_actionDialogSelectedParamIndex = (m_actionDialogSelectedParamIndex + 1) % static_cast<int>(m_actionDialogParamTypes.size());
+            m_actionDialogRangeEditIndex.reset();
             return true;
         }
         if (!m_actionDialogParamTypes.empty() && m_actionDialogSelectedParamIndex >= 0 && m_actionDialogSelectedParamIndex < static_cast<int>(m_actionDialogParamValues.size())) {
             const api::ParamType& currentParamType = m_actionDialogParamTypes.at(m_actionDialogSelectedParamIndex);
             std::string& currentValue = m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex);
-            if (actionParamUsesSelector(currentParamType)) {
-                if (event == ftxui::Event::ArrowLeft) {
-                    currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
-                    return true;
+            bool isRangeTextEditing = m_actionDialogRangeEditIndex.has_value() && *m_actionDialogRangeEditIndex == m_actionDialogSelectedParamIndex;
+            if (handleParamValueEditEvent(event, currentParamType, currentValue, isRangeTextEditing)) {
+                if (actionParamUsesRangeInput(currentParamType) && isRangeTextEditing) {
+                    m_actionDialogRangeEditIndex = m_actionDialogSelectedParamIndex;
+                } else {
+                    m_actionDialogRangeEditIndex.reset();
                 }
-                if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
-                    currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
-                    return true;
-                }
-            }
-            if (!actionParamUsesSelector(currentParamType) && event == ftxui::Event::Backspace && !currentValue.empty()) {
-                currentValue.pop_back();
-                return true;
-            }
-            if (!actionParamUsesSelector(currentParamType) && event.is_character()) {
-                currentValue += event.character();
                 return true;
             }
         }
@@ -3391,31 +3852,31 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             const int rowCount = 1 + static_cast<int>(m_configureParamTypes.size());
             if (event == ftxui::Event::ArrowUp && rowCount > 0) {
                 m_configureParamSelectionIndex = (m_configureParamSelectionIndex + rowCount - 1) % rowCount;
+                m_configureRangeEditIndex.reset();
                 return true;
             }
             if (event == ftxui::Event::ArrowDown && rowCount > 0) {
                 m_configureParamSelectionIndex = (m_configureParamSelectionIndex + 1) % rowCount;
+                m_configureRangeEditIndex.reset();
                 return true;
             }
             if (m_configureParamSelectionIndex == 0) {
+                m_configureRangeEditIndex.reset();
                 return editText(m_configureThingName);
             }
 
             if (m_configureParamSelectionIndex - 1 >= 0 && m_configureParamSelectionIndex - 1 < static_cast<int>(m_configureParamTypes.size())) {
                 const api::ParamType& currentParamType = m_configureParamTypes.at(m_configureParamSelectionIndex - 1);
                 std::string& currentValue = m_configureParamValues.at(m_configureParamSelectionIndex - 1);
-                if (actionParamUsesSelector(currentParamType)) {
-                    if (event == ftxui::Event::ArrowLeft) {
-                        currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
-                        return true;
+                const int currentParamIndex = m_configureParamSelectionIndex - 1;
+                bool isRangeTextEditing = m_configureRangeEditIndex.has_value() && *m_configureRangeEditIndex == currentParamIndex;
+                if (handleParamValueEditEvent(event, currentParamType, currentValue, isRangeTextEditing)) {
+                    if (actionParamUsesRangeInput(currentParamType) && isRangeTextEditing) {
+                        m_configureRangeEditIndex = currentParamIndex;
+                    } else {
+                        m_configureRangeEditIndex.reset();
                     }
-                    if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
-                        currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
-                        return true;
-                    }
-                }
-                if (!actionParamUsesSelector(currentParamType)) {
-                    return editText(currentValue);
+                    return true;
                 }
             }
             return true;
@@ -3424,27 +3885,25 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             if (event == ftxui::Event::ArrowUp && !m_configureParamTypes.empty()) {
                 m_configureParamSelectionIndex = (m_configureParamSelectionIndex + static_cast<int>(m_configureParamTypes.size()) - 1)
                                                  % static_cast<int>(m_configureParamTypes.size());
+                m_configureRangeEditIndex.reset();
                 return true;
             }
             if (event == ftxui::Event::ArrowDown && !m_configureParamTypes.empty()) {
                 m_configureParamSelectionIndex = (m_configureParamSelectionIndex + 1) % static_cast<int>(m_configureParamTypes.size());
+                m_configureRangeEditIndex.reset();
                 return true;
             }
             if (!m_configureParamTypes.empty()) {
                 const api::ParamType& currentParamType = m_configureParamTypes.at(m_configureParamSelectionIndex);
                 std::string& currentValue = m_configureParamValues.at(m_configureParamSelectionIndex);
-                if (actionParamUsesSelector(currentParamType)) {
-                    if (event == ftxui::Event::ArrowLeft) {
-                        currentValue = cycleSelectableValue(currentParamType, currentValue, -1);
-                        return true;
+                bool isRangeTextEditing = m_configureRangeEditIndex.has_value() && *m_configureRangeEditIndex == m_configureParamSelectionIndex;
+                if (handleParamValueEditEvent(event, currentParamType, currentValue, isRangeTextEditing)) {
+                    if (actionParamUsesRangeInput(currentParamType) && isRangeTextEditing) {
+                        m_configureRangeEditIndex = m_configureParamSelectionIndex;
+                    } else {
+                        m_configureRangeEditIndex.reset();
                     }
-                    if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
-                        currentValue = cycleSelectableValue(currentParamType, currentValue, 1);
-                        return true;
-                    }
-                }
-                if (!actionParamUsesSelector(currentParamType)) {
-                    return editText(currentValue);
+                    return true;
                 }
             }
             return true;

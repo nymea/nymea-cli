@@ -183,6 +183,7 @@ private:
     int m_actionDialogActionIndex = -1;
     QUuid m_actionDialogThingId;
     int m_actionDialogSelectedParamIndex = 0;
+    std::optional<int> m_actionDialogRangeEditIndex;
     std::vector<api::ParamType> m_actionDialogParamTypes;
     std::vector<std::string> m_actionDialogParamValues;
     bool m_helloPending = false;
@@ -226,6 +227,7 @@ private:
     std::vector<api::ParamType> m_configureParamTypes;
     std::vector<std::string> m_configureParamValues;
     int m_configureParamSelectionIndex = 0;
+    std::optional<int> m_configureRangeEditIndex;
     std::vector<api::ThingDescriptor> m_configureThingDescriptors;
     int m_configureThingDescriptorIndex = 0;
     std::optional<api::SetupMethod> m_configureSetupMethod;
