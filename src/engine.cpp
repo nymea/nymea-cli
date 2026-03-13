@@ -33,6 +33,7 @@
 #include "generated/thingclass.h"
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -940,6 +941,29 @@ ftxui::Element renderColorValue(const std::string& colorString)
     });
 }
 
+std::optional<std::string> formatUnixTimestampValue(const QJsonValue& value)
+{
+    qint64 secondsSinceEpoch = 0;
+    if (value.isDouble()) {
+        secondsSinceEpoch = static_cast<qint64>(std::llround(value.toDouble()));
+    } else if (value.isString()) {
+        bool ok = false;
+        secondsSinceEpoch = value.toString().toLongLong(&ok);
+        if (!ok) {
+            return std::nullopt;
+        }
+    } else {
+        return std::nullopt;
+    }
+
+    const QDateTime dateTime = QDateTime::fromSecsSinceEpoch(secondsSinceEpoch);
+    if (!dateTime.isValid()) {
+        return std::nullopt;
+    }
+
+    return dateTime.toString(QStringLiteral("yyyy.MM.dd HH:mm:ss")).toStdString();
+}
+
 ftxui::Element renderValueCell(const QJsonValue& value, std::optional<api::BasicType> basicType, std::optional<api::Unit> unit)
 {
     if ((basicType.has_value() && *basicType == api::BasicType::Bool) || value.isBool()) {
@@ -948,6 +972,12 @@ ftxui::Element renderValueCell(const QJsonValue& value, std::optional<api::Basic
 
     if (basicType.has_value() && *basicType == api::BasicType::Color && value.isString()) {
         return renderColorValue(value.toString().toStdString());
+    }
+
+    if (unit.has_value() && *unit == api::Unit::UnitUnixTime) {
+        if (const std::optional<std::string> formattedTimestamp = formatUnixTimestampValue(value); formattedTimestamp.has_value()) {
+            return ftxui::text(*formattedTimestamp);
+        }
     }
 
     std::string renderedValue = jsonValueToString(value);
