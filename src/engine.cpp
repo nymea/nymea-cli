@@ -31,6 +31,8 @@
 #include "generated/statetype.h"
 #include "generated/thing.h"
 #include "generated/thingclass.h"
+#include "generated/usersremovetokenparams.h"
+#include "generated/usersremovetokenresponse.h"
 
 #include <QCoreApplication>
 #include <QDateTime>
@@ -44,6 +46,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <ftxui/component/mouse.hpp>
 #include <initializer_list>
 #include <string_view>
 #include <utility>
@@ -53,6 +56,7 @@ namespace nymea {
 
 namespace {
 
+#if 0
 #ifndef APP_LICENSE_SPDX
 #define APP_LICENSE_SPDX "GPL-3.0-or-later"
 #endif
@@ -715,6 +719,16 @@ bool caseInsensitiveContains(const QString& value, const QString& needle)
     return needle.trimmed().isEmpty() || value.contains(needle, Qt::CaseInsensitive);
 }
 
+bool caseInsensitiveContainsAny(const QString& value, std::initializer_list<const char*> needles)
+{
+    for (const char* needle : needles) {
+        if (value.contains(QString::fromLatin1(needle), Qt::CaseInsensitive)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string formatActionInvocation(const std::string& actionName, const std::vector<api::ParamType>& paramTypes, const std::vector<std::string>& paramValues)
 {
     std::vector<std::string> values;
@@ -1196,6 +1210,13 @@ ftxui::Element renderActionDialogValueCell(const api::ParamType& paramType, cons
 }
 
 } // namespace
+#endif
+} // namespace
+} // namespace nymea
+
+#include "engineutils.cpp"
+
+namespace nymea {
 
 Engine::Engine(EngineOptions options)
     : m_options(std::move(options))
@@ -1212,6 +1233,7 @@ Engine::Engine(EngineOptions options)
 int Engine::run()
 {
     auto screen = ftxui::ScreenInteractive::Fullscreen();
+    screen.TrackMouse();
     m_screen = &screen;
     auto ui = ftxui::Renderer([this] { return renderUi(); });
     auto withKeyHandler = ftxui::CatchEvent(ui, [&](ftxui::Event event) { return handleEvent(event, screen); });
@@ -1267,9 +1289,28 @@ SavedConnection Engine::currentConnection(bool allowFingerprintUpdate) const
     return connection;
 }
 
-void Engine::clampThingSelection()
+std::optional<QUuid> Engine::currentTokenId() const
 {
-    if (m_thingManager.things().empty()) {
+    const QUuid liveTokenId(m_client.authToken());
+    if (!liveTokenId.isNull()) {
+        return liveTokenId;
+    }
+
+    if (m_savedConnection.has_value()) {
+        const QUuid savedTokenId(m_savedConnection->token);
+        if (!savedTokenId.isNull()) {
+            return savedTokenId;
+        }
+    }
+
+    return std::nullopt;
+}
+
+#if 0
+void Engine::clampThingSelection(const QUuid& preferredThingId)
+{
+    const std::vector<const api::Thing*> things = filteredThings();
+    if (things.empty()) {
         m_selectedThingIndex = 0;
         m_showThingDetailInspector = false;
         if (m_focusArea == FocusArea::ThingDetails) {
@@ -1278,10 +1319,19 @@ void Engine::clampThingSelection()
         return;
     }
 
+    if (!preferredThingId.isNull()) {
+        for (int index = 0; index < static_cast<int>(things.size()); ++index) {
+            if (things.at(index)->id == preferredThingId) {
+                m_selectedThingIndex = index;
+                return;
+            }
+        }
+    }
+
     if (m_selectedThingIndex < 0) {
         m_selectedThingIndex = 0;
-    } else if (m_selectedThingIndex >= static_cast<int>(m_thingManager.things().size())) {
-        m_selectedThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
+    } else if (m_selectedThingIndex >= static_cast<int>(things.size())) {
+        m_selectedThingIndex = static_cast<int>(things.size()) - 1;
     }
 }
 
@@ -1322,7 +1372,7 @@ void Engine::clampConfigureThingSelection()
 
 int Engine::thingDetailEntryCount() const
 {
-    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    const api::Thing* thing = selectedThing();
     const api::ThingClass* thingClass = thing != nullptr ? m_thingManager.thingClassForThing(*thing) : nullptr;
     return static_cast<int>(buildThingDetailEntries(thing, thingClass).size());
 }
@@ -1353,7 +1403,7 @@ void Engine::resetThingDetailSelection()
 
 bool Engine::openSelectedActionDialog()
 {
-    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    const api::Thing* thing = selectedThing();
     if (thing == nullptr) {
         return false;
     }
@@ -1418,6 +1468,170 @@ void Engine::closeActionDialog()
     }
 }
 
+std::vector<const api::Thing*> Engine::filteredThings() const
+{
+    const QString search = QString::fromStdString(m_thingSearch).trimmed();
+    std::vector<const api::Thing*> things;
+    things.reserve(m_thingManager.things().size());
+
+    for (const api::Thing& thing : m_thingManager.things()) {
+        const api::ThingClass* thingClass = m_thingManager.thingClassForThing(thing);
+        const ThingCategory category = thingCategory(thing);
+        if (m_thingCategoryFilter != ThingCategory::All && category != m_thingCategoryFilter) {
+            continue;
+        }
+
+        if (!search.isEmpty()) {
+            const bool matchesThing = thing.name.has_value() && caseInsensitiveContains(*thing.name, search);
+            const bool matchesClass = thingClass != nullptr
+                                      && (caseInsensitiveContains(thingClass->displayName, search) || caseInsensitiveContains(thingClass->name, search)
+                                          || caseInsensitiveContains(thingClass->interfaces.join(QStringLiteral(" ")), search));
+            if (!matchesThing && !matchesClass) {
+                continue;
+            }
+        }
+
+        things.push_back(&thing);
+    }
+
+    if (m_thingSortMode == ThingSortMode::Alphabetical) {
+        std::stable_sort(things.begin(), things.end(), [](const api::Thing* left, const api::Thing* right) {
+            return QString::compare(QString::fromStdString(thingLabel(left)), QString::fromStdString(thingLabel(right)), Qt::CaseInsensitive) < 0;
+        });
+    } else if (m_thingSortMode == ThingSortMode::Grouped) {
+        std::stable_sort(things.begin(), things.end(), [this](const api::Thing* left, const api::Thing* right) {
+            const ThingCategory leftCategory = thingCategory(*left);
+            const ThingCategory rightCategory = thingCategory(*right);
+            if (leftCategory != rightCategory) {
+                return static_cast<int>(leftCategory) < static_cast<int>(rightCategory);
+            }
+            return QString::compare(QString::fromStdString(thingLabel(left)), QString::fromStdString(thingLabel(right)), Qt::CaseInsensitive) < 0;
+        });
+    }
+
+    return things;
+}
+
+const api::Thing* Engine::selectedThing() const
+{
+    const std::vector<const api::Thing*> things = filteredThings();
+    if (m_selectedThingIndex < 0 || m_selectedThingIndex >= static_cast<int>(things.size())) {
+        return nullptr;
+    }
+    return things.at(m_selectedThingIndex);
+}
+
+QUuid Engine::selectedThingId() const
+{
+    const api::Thing* thing = selectedThing();
+    return thing != nullptr ? thing->id : QUuid();
+}
+
+Engine::ThingCategory Engine::thingCategory(const api::Thing& thing) const
+{
+    const api::ThingClass* thingClass = m_thingManager.thingClassForThing(thing);
+    if (thingClass == nullptr) {
+        return ThingCategory::Other;
+    }
+
+    const QString interfaces = thingClass->interfaces.join(QStringLiteral(" "));
+    if (caseInsensitiveContainsAny(interfaces, {"light", "lamp", "dimmer"})) {
+        return ThingCategory::Lights;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"blind", "shading", "cover", "shutter"})) {
+        return ThingCategory::Blinds;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"media", "multimedia", "audio", "video", "player"})) {
+        return ThingCategory::Multimedia;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"powersocket", "power socket", "socket", "outlet", "plug"})) {
+        return ThingCategory::PowerSockets;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"thermostat", "heating", "climate"})) {
+        return ThingCategory::Thermostats;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"sensor"})) {
+        return ThingCategory::Sensors;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"smartmeter", "smart meter", "energymeter", "energy meter", "meter"})) {
+        return ThingCategory::SmartMeters;
+    }
+    if (caseInsensitiveContainsAny(interfaces, {"switch", "button"})) {
+        return ThingCategory::Switches;
+    }
+    return ThingCategory::Other;
+}
+
+std::string Engine::thingCategoryLabel(ThingCategory category) const
+{
+    switch (category) {
+    case ThingCategory::All:
+        return "All";
+    case ThingCategory::Lights:
+        return "Lights";
+    case ThingCategory::Blinds:
+        return "Blinds";
+    case ThingCategory::Multimedia:
+        return "Multimedia";
+    case ThingCategory::PowerSockets:
+        return "Power sockets";
+    case ThingCategory::Thermostats:
+        return "Thermostats";
+    case ThingCategory::Sensors:
+        return "Sensors";
+    case ThingCategory::SmartMeters:
+        return "Smart meters";
+    case ThingCategory::Switches:
+        return "Switches";
+    case ThingCategory::Other:
+        return "Other";
+    }
+    return "Other";
+}
+
+std::string Engine::thingSortModeLabel() const
+{
+    switch (m_thingSortMode) {
+    case ThingSortMode::Default:
+        return "Default";
+    case ThingSortMode::Alphabetical:
+        return "A-Z";
+    case ThingSortMode::Grouped:
+        return "Grouped";
+    }
+    return "Default";
+}
+
+void Engine::cycleThingSortMode()
+{
+    const QUuid selectedId = selectedThingId();
+    switch (m_thingSortMode) {
+    case ThingSortMode::Default:
+        m_thingSortMode = ThingSortMode::Alphabetical;
+        break;
+    case ThingSortMode::Alphabetical:
+        m_thingSortMode = ThingSortMode::Grouped;
+        break;
+    case ThingSortMode::Grouped:
+        m_thingSortMode = ThingSortMode::Default;
+        break;
+    }
+    clampThingSelection(selectedId);
+    resetThingDetailSelection();
+}
+
+void Engine::cycleThingCategoryFilter()
+{
+    const QUuid selectedId = selectedThingId();
+    if (m_thingCategoryFilter == ThingCategory::Other) {
+        m_thingCategoryFilter = ThingCategory::All;
+    } else {
+        m_thingCategoryFilter = static_cast<ThingCategory>(static_cast<int>(m_thingCategoryFilter) + 1);
+    }
+    clampThingSelection(selectedId);
+    resetThingDetailSelection();
+}
+
 std::vector<api::ThingClass> Engine::filteredConfigThingClasses() const
 {
     const QString search = QString::fromStdString(m_configureThingSearch).trimmed();
@@ -1448,6 +1662,13 @@ const api::Thing* Engine::selectedConfigureThing() const
 {
     return m_thingManager.thingAt(m_selectedConfigureThingIndex);
 }
+
+#endif
+} // namespace nymea
+
+#include "enginebrowse.cpp"
+
+namespace nymea {
 
 void Engine::closeConfigureDialog()
 {
@@ -1486,6 +1707,49 @@ void Engine::closeConfigureDialog()
         } else {
             m_focusArea = FocusArea::MainMenu;
         }
+    }
+}
+
+void Engine::openHelpView()
+{
+    if (m_mainView == MainView::Help) {
+        return;
+    }
+
+    m_previousMainView = m_mainView;
+    m_previousFocusArea = m_focusArea;
+    m_mainView = MainView::Help;
+    m_helpLineIndex = 0;
+    m_focusArea = FocusArea::MainMenu;
+}
+
+void Engine::closeHelpView()
+{
+    if (m_mainView != MainView::Help) {
+        return;
+    }
+
+    m_mainView = m_previousMainView;
+    m_focusArea = m_previousFocusArea;
+    switch (m_mainView) {
+    case MainView::Things:
+        clampThingSelection();
+        clampThingDetailSelection();
+        break;
+    case MainView::ConfigureThings:
+        clampConfigureThingClassSelection();
+        clampConfigureThingSelection();
+        break;
+    case MainView::ApiBrowser:
+        clampApiBrowserSelection();
+        clampApiBrowserReferenceSelection();
+        clampApiBrowserJsonSelection();
+        break;
+    case MainView::Settings:
+        clampSettingsDetailsSelection();
+        break;
+    case MainView::Help:
+        break;
     }
 }
 
@@ -2407,12 +2671,13 @@ void Engine::handleNotification(const QJsonObject& message)
 {
     const QString notificationName = message.value(QStringLiteral("notification")).toString();
     const QJsonObject params = message.value(QStringLiteral("params")).toObject();
+    const QUuid selectedId = selectedThingId();
 
     if (notificationName == api::IntegrationsStateChangedNotification::notificationName()) {
         const api::IntegrationsStateChangedNotificationParams notification = api::IntegrationsStateChangedNotificationParams::fromJson(params);
         if (m_thingManager
                 .updateThingState(notification.thingId, notification.stateTypeId, notification.value, notification.minValue, notification.maxValue, notification.possibleValues)) {
-            clampThingSelection();
+            clampThingSelection(selectedId);
             clampThingDetailSelection();
             m_thingManager.setStatus("Live update: state changed on " + thingLabel(m_thingManager.thingById(notification.thingId)) + ".");
         }
@@ -2422,7 +2687,7 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::IntegrationsThingAddedNotification::notificationName()) {
         const api::IntegrationsThingAddedNotificationParams notification = api::IntegrationsThingAddedNotificationParams::fromJson(params);
         m_thingManager.upsertThing(notification.thing);
-        clampThingSelection();
+        clampThingSelection(selectedId);
         clampThingDetailSelection();
         clampConfigureThingSelection();
 
@@ -2438,7 +2703,7 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::IntegrationsThingChangedNotification::notificationName()) {
         const api::IntegrationsThingChangedNotificationParams notification = api::IntegrationsThingChangedNotificationParams::fromJson(params);
         m_thingManager.upsertThing(notification.thing);
-        clampThingSelection();
+        clampThingSelection(selectedId);
         clampThingDetailSelection();
         clampConfigureThingSelection();
 
@@ -2457,7 +2722,7 @@ void Engine::handleNotification(const QJsonObject& message)
             if (m_showActionDialog && m_actionDialogThingId == notification.thingId) {
                 m_actionDialogStatus = "Thing was removed. Press Esc to close this dialog.";
             }
-            clampThingSelection();
+            clampThingSelection(selectedId);
             clampThingDetailSelection();
             clampConfigureThingSelection();
             m_thingManager.setStatus("Live update: removed thing " + uuidToStd(notification.thingId) + ".");
@@ -2503,10 +2768,12 @@ void Engine::drainUiTasks()
     }
 }
 
-bool Engine::connectToServer()
+bool Engine::connectToServer(bool shouldLoadSavedConnection)
 {
     m_client.clearAuthToken();
-    loadSavedConnection();
+    if (shouldLoadSavedConnection) {
+        loadSavedConnection();
+    }
     m_helloPending = false;
     m_authenticationPending = false;
     m_notificationSetupPending = false;
@@ -2520,6 +2787,18 @@ bool Engine::connectToServer()
     m_haveAllThingClasses = false;
     m_securityWarning.clear();
     m_settingsWarning.clear();
+    m_showLogoutConfirm = false;
+    m_logoutRequestPending = false;
+    m_logoutStatus.clear();
+    m_apiBrowserLoaded = false;
+    m_apiBrowserPending = false;
+    m_apiBrowserIntrospection = QJsonObject();
+    m_apiBrowserHistory.clear();
+    m_apiBrowserSelectedSection.clear();
+    m_apiBrowserSelectedName.clear();
+    m_apiBrowserSearch.clear();
+    m_apiBrowserSelectedReferenceIndex = 0;
+    m_apiBrowserStatus.clear();
     m_serverVersion = "n/a";
     m_serverApiVersion = "n/a";
     m_serverUuid = QUuid();
@@ -2562,6 +2841,14 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
         m_notificationsEnabled = false;
         m_showLoginForm = true;
         m_focusArea = FocusArea::LoginForm;
+        m_apiBrowserLoaded = false;
+        m_apiBrowserPending = false;
+        m_apiBrowserIntrospection = QJsonObject();
+        m_apiBrowserHistory.clear();
+        m_apiBrowserSelectedSection.clear();
+        m_apiBrowserSelectedName.clear();
+        m_apiBrowserSelectedReferenceIndex = 0;
+        m_apiBrowserStatus = "Stored token was rejected. Please login.";
         m_authStatus = "Stored token was rejected. Please login.";
         m_thingManager.setStatus("JSONRPC.Hello unauthorized (request id " + std::to_string(requestId) + ").");
         return;
@@ -2613,6 +2900,8 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
     const bool helloAuthenticated = helloParams.value(QStringLiteral("authenticated")).toBool();
     m_isAuthenticated = helloAuthenticated || !m_isAuthenticationRequired;
     m_showLoginForm = m_isAuthenticationRequired && !m_isAuthenticated;
+    const bool allowAutoAuthenticate = !m_skipNextAutoAuthenticate;
+    m_skipNextAutoAuthenticate = false;
 
     if (!m_isAuthenticationRequired) {
         m_authStatus = "Server does not require authentication.";
@@ -2621,12 +2910,16 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
     } else {
         m_authStatus = "Authentication required.";
     }
+    if (m_isAuthenticated || !m_isAuthenticationRequired) {
+        m_ignoreStoredToken = false;
+        m_logoutStatus.clear();
+    }
 
     saveCurrentConnection(false);
     m_thingManager.setStatus("JSONRPC.Hello succeeded (request id " + std::to_string(requestId) + ").");
 
     if (m_isAuthenticationRequired && !m_isAuthenticated) {
-        if (!m_username.empty() && !m_password.empty()) {
+        if (allowAutoAuthenticate && !m_username.empty() && !m_password.empty()) {
             authenticate(m_username, m_password);
         } else {
             m_showLoginForm = true;
@@ -2634,6 +2927,14 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
             m_authStatus = "Authentication required. Enter username/password and press Enter.";
         }
         return;
+    }
+
+    if (m_focusArea == FocusArea::LoginForm) {
+        m_focusArea = FocusArea::MainMenu;
+    }
+
+    if (m_mainView == MainView::ApiBrowser) {
+        ensureApiBrowserLoaded();
     }
 
     enableNotifications(true);
@@ -2679,6 +2980,15 @@ void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& 
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_client.clearAuthToken();
+        m_apiBrowserLoaded = false;
+        m_apiBrowserPending = false;
+        m_apiBrowserIntrospection = QJsonObject();
+        m_apiBrowserHistory.clear();
+        m_apiBrowserSelectedSection.clear();
+        m_apiBrowserSelectedName.clear();
+        m_apiBrowserSearch.clear();
+        m_apiBrowserSelectedReferenceIndex = 0;
+        m_apiBrowserStatus = "Authentication rejected by server.";
         return;
     }
 
@@ -2709,8 +3019,13 @@ void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& 
     m_showLoginForm = false;
     m_focusArea = FocusArea::MainMenu;
     m_authStatus = "Authenticated as " + m_username + ".";
+    m_ignoreStoredToken = false;
+    m_logoutStatus.clear();
     saveCurrentConnection(true);
     m_thingManager.setStatus("Authentication succeeded (request id " + std::to_string(requestId) + ").");
+    if (m_mainView == MainView::ApiBrowser) {
+        ensureApiBrowserLoaded();
+    }
     enableNotifications(true);
 }
 
@@ -2740,6 +3055,107 @@ void Engine::authenticate(const std::string& username, const std::string& passwo
     m_authStatus = "Authenticating...";
     observeReply(m_client.sendRequest(QStringLiteral("JSONRPC.Authenticate"), params),
                  [this](const QJsonObject& message, const QString& transportError) { handleAuthenticateReply(message, transportError); });
+}
+
+void Engine::logout()
+{
+    if (!m_client.isConnected() || !m_isAuthenticated) {
+        m_authStatus = "Logout is only available after authentication.";
+        return;
+    }
+
+    m_showLogoutConfirm = true;
+    m_logoutStatus = "This will revoke the current token and reconnect to the same server.";
+}
+
+void Engine::finalizeLogout()
+{
+    m_showLogoutConfirm = false;
+    m_logoutRequestPending = false;
+    m_skipNextAutoAuthenticate = true;
+    m_ignoreStoredToken = true;
+    m_mainView = MainView::Things;
+    m_selectedMainMenuEntry = MainMenuEntry::Things;
+    const bool storedTokenCleared = clearStoredToken();
+    if (!storedTokenCleared && !m_settingsWarning.empty() && !m_logoutStatus.empty()) {
+        m_logoutStatus += " " + m_settingsWarning;
+    }
+    if (!m_logoutStatus.empty()) {
+        m_authStatus = m_logoutStatus;
+    } else if (!m_settingsWarning.empty()) {
+        m_authStatus = m_settingsWarning;
+    } else {
+        m_authStatus = "Logging out...";
+    }
+    m_client.clearAuthToken();
+    m_isAuthenticationRequired = false;
+    m_isAuthenticated = false;
+    m_notificationsEnabled = false;
+    m_showLoginForm = true;
+    m_focusArea = FocusArea::LoginForm;
+    closeActionDialog();
+    closeConfigureDialog();
+    m_showThingDetailInspector = false;
+
+    m_client.disconnectFromHost();
+    if (!connectToServer(storedTokenCleared)) {
+        m_authStatus = m_connectionStatus;
+        m_showLoginForm = true;
+        m_focusArea = FocusArea::LoginForm;
+        return;
+    }
+
+    runHandshakeAndLoadThings();
+}
+
+void Engine::revokeCurrentTokenAndLogout()
+{
+    if (m_logoutRequestPending) {
+        return;
+    }
+
+    const std::optional<QUuid> tokenId = currentTokenId();
+    if (!tokenId.has_value()) {
+        m_logoutStatus = "Cannot revoke this token because its id is unavailable.";
+        finalizeLogout();
+        return;
+    }
+
+    if (!m_client.isConnected()) {
+        m_logoutStatus = "Cannot revoke the token while disconnected.";
+        finalizeLogout();
+        return;
+    }
+
+    m_logoutRequestPending = true;
+    m_logoutStatus = "Revoking token...";
+
+    api::UsersRemoveTokenParams params;
+    params.tokenId = *tokenId;
+    observeReply(m_client.sendRequest(api::UsersRemoveTokenMethod::methodName(), params.toJson()), [this](const QJsonObject& message, const QString& transportError) {
+        m_logoutRequestPending = false;
+
+        if (!transportError.isEmpty()) {
+            m_logoutStatus = "Token revocation failed: " + transportError.toStdString() + ". Logging out locally.";
+            finalizeLogout();
+            return;
+        }
+
+        const QString status = message.value(QStringLiteral("status")).toString();
+        if (status == QStringLiteral("error") || status == QStringLiteral("unauthorized")) {
+            m_logoutStatus = "Token revocation was rejected by the server. Logging out locally.";
+            finalizeLogout();
+            return;
+        }
+
+        const api::UsersRemoveTokenResponse response = api::UsersRemoveTokenResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+        if (response.error != api::UserError::UserErrorNoError) {
+            m_logoutStatus = "Token revocation returned " + api::toString(response.error).toStdString() + ". Logging out locally.";
+        } else {
+            m_logoutStatus = "Token revoked. Logging out...";
+        }
+        finalizeLogout();
+    });
 }
 
 void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QString& transportError, bool fetchThingsAfterReply)
@@ -2828,6 +3244,8 @@ void Engine::enableNotifications(bool fetchThingsAfterReply)
 void Engine::handleFetchThingsReply(const QJsonObject& message, const QString& transportError)
 {
     m_fetchThingsPending = false;
+    const QUuid selectedId = m_preferredThingSelectionId;
+    m_preferredThingSelectionId = QUuid();
 
     if (!transportError.isEmpty()) {
         m_thingManager.setStatus("No reply for Integrations.GetThings: " + transportError.toStdString());
@@ -2860,7 +3278,7 @@ void Engine::handleFetchThingsReply(const QJsonObject& message, const QString& t
         return;
     }
 
-    clampThingSelection();
+    clampThingSelection(selectedId);
     clampThingDetailSelection();
     clampConfigureThingSelection();
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) (request id " + std::to_string(requestId) + ").");
@@ -2873,6 +3291,7 @@ void Engine::fetchThings()
         return;
     }
 
+    m_preferredThingSelectionId = selectedThingId();
     m_thingManager.clear();
     m_haveAllThingClasses = false;
 
@@ -2898,6 +3317,7 @@ void Engine::fetchThings()
 void Engine::handleFetchThingClassesReply(const QJsonObject& message, const QString& transportError)
 {
     m_fetchThingClassesPending = false;
+    const QUuid selectedId = selectedThingId();
 
     if (!transportError.isEmpty()) {
         m_thingManager.setStatus("Thing list loaded, but no reply for Integrations.GetThingClasses: " + transportError.toStdString());
@@ -2930,6 +3350,8 @@ void Engine::handleFetchThingClassesReply(const QJsonObject& message, const QStr
         return;
     }
 
+    clampThingSelection(selectedId);
+    clampThingDetailSelection();
     m_thingManager.setStatus("Loaded " + std::to_string(m_thingManager.things().size()) + " thing(s) and enriched them with type metadata (request id " + std::to_string(requestId)
                              + ").");
     if (!m_haveAllThingClasses) {
@@ -2988,6 +3410,10 @@ void Engine::loadSavedConnection()
     }
 
     if (!m_savedConnection->token.isEmpty()) {
+        if (m_ignoreStoredToken) {
+            m_savedConnection->token.clear();
+            return;
+        }
         m_client.setAuthToken(m_savedConnection->token);
         m_authStatus = "Using stored token for " + connectionDisplayName() + ".";
     }
@@ -3014,7 +3440,7 @@ void Engine::updateCertificateWarning()
                         + " Current: " + currentFingerprint.toStdString() + ".";
 }
 
-void Engine::clearStoredToken()
+bool Engine::clearStoredToken()
 {
     QUuid hostUuid = m_serverUuid;
     if (hostUuid.isNull() && m_savedConnection.has_value()) {
@@ -3024,12 +3450,16 @@ void Engine::clearStoredToken()
     QString errorMessage;
     if (!m_connectionSettings.clearToken(hostUuid, errorMessage)) {
         m_settingsWarning = "Settings warning: " + errorMessage.toStdString();
-        return;
+        if (m_savedConnection.has_value() && m_savedConnection->hostUuid == hostUuid) {
+            m_savedConnection->token.clear();
+        }
+        return false;
     }
 
     if (m_savedConnection.has_value() && m_savedConnection->hostUuid == hostUuid) {
         m_savedConnection->token.clear();
     }
+    return true;
 }
 
 void Engine::saveCurrentConnection(bool allowFingerprintUpdate)
@@ -3056,41 +3486,62 @@ void Engine::runHandshakeAndLoadThings()
 
 ftxui::Element Engine::renderMainMenu() const
 {
-    constexpr std::array<const char*, 3> menuItems = {"Things", "Configure things", "Settings"};
+    constexpr std::array<const char*, 5> menuItems = {"Things", "Configure things", "API browser", "Settings", "Logout"};
+    const bool apiBrowserEnabled = m_client.isConnected() && (!m_isAuthenticationRequired || m_isAuthenticated);
+    const bool logoutEnabled = m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty();
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
-        const bool selected = (m_mainView == MainView::Things && index == 0) || (m_mainView == MainView::ConfigureThings && index == 1)
-                              || (m_mainView == MainView::Settings && index == 2);
+        const bool selected = (m_selectedMainMenuEntry == MainMenuEntry::Things && index == 0) || (m_selectedMainMenuEntry == MainMenuEntry::ConfigureThings && index == 1)
+                              || (m_selectedMainMenuEntry == MainMenuEntry::ApiBrowser && index == 2) || (m_selectedMainMenuEntry == MainMenuEntry::Settings && index == 3)
+                              || (m_selectedMainMenuEntry == MainMenuEntry::Logout && index == 4);
         auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
-        if (selected) {
+        if ((index == 2 && !apiBrowserEnabled) || (index == 4 && !logoutEnabled)) {
+            entry = entry | ftxui::dim;
+        }
+        if (selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
             entry = entry | ftxui::bold | ftxui::inverted;
         }
-        if (m_focusArea == FocusArea::MainMenu && selected) {
+        if (m_focusArea == FocusArea::MainMenu && selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
             entry = entry | ftxui::color(ftxui::Color::CyanLight);
         }
-        if (selected) {
+        if (selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
             entry = entry | ftxui::focus;
         }
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_mainMenuBox);
 }
 
 ftxui::Element Engine::renderThingList() const
 {
     ftxui::Elements lines;
     lines.push_back(ftxui::text(m_thingManager.status()));
+    auto search = ftxui::text("Search: " + (m_thingSearch.empty() ? std::string("<type to filter>") : m_thingSearch));
+    if (m_focusArea == FocusArea::ThingSearch) {
+        search = search | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+    }
+    lines.push_back(search);
+    lines.push_back(ftxui::text("Sort: " + thingSortModeLabel() + "  Filter: " + thingCategoryLabel(m_thingCategoryFilter)));
     lines.push_back(ftxui::separator());
 
+    const std::vector<const api::Thing*> things = filteredThings();
     if (m_thingManager.things().empty()) {
         lines.push_back(ftxui::text("No things found."));
+    } else if (things.empty()) {
+        lines.push_back(ftxui::text("No things match the current filter."));
     } else {
-        for (int index = 0; index < static_cast<int>(m_thingManager.things().size()); ++index) {
-            const api::Thing& thing = m_thingManager.things().at(index);
-            const std::string thingName = thing.name.has_value() && !thing.name->isEmpty() ? thing.name->toStdString() : std::string("<unnamed>");
-            auto entry = ftxui::text(std::string(" ") + thingName + " ");
+        ThingCategory lastCategory = ThingCategory::All;
+        for (int index = 0; index < static_cast<int>(things.size()); ++index) {
+            const api::Thing* thing = things.at(index);
+            const ThingCategory category = thingCategory(*thing);
+            if (m_thingSortMode == ThingSortMode::Grouped && category != lastCategory) {
+                lines.push_back(ftxui::text(thingCategoryLabel(category)) | ftxui::bold);
+                lastCategory = category;
+            }
+
+            auto entry = ftxui::text(" " + thingLabel(thing) + " ");
             if (index == m_selectedThingIndex) {
                 entry = entry | ftxui::bold | ftxui::inverted;
             }
@@ -3104,12 +3555,12 @@ ftxui::Element Engine::renderThingList() const
         }
     }
 
-    return ftxui::window(ftxui::text("Things"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text("Things"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_thingListBox);
 }
 
 ftxui::Element Engine::renderThingDetails() const
 {
-    const api::Thing* thing = m_thingManager.thingAt(m_selectedThingIndex);
+    const api::Thing* thing = selectedThing();
     if (thing == nullptr) {
         return ftxui::text("No thing selected.");
     }
@@ -3314,7 +3765,7 @@ ftxui::Element Engine::renderThingDetails() const
         detailContent.push_back(detailBrowser);
     }
 
-    return ftxui::vbox(std::move(detailContent)) | ftxui::flex;
+    return ftxui::vbox(std::move(detailContent)) | ftxui::reflect(m_thingDetailsBox) | ftxui::flex;
 }
 
 ftxui::Element Engine::renderConfigureMenu() const
@@ -3339,7 +3790,7 @@ ftxui::Element Engine::renderConfigureMenu() const
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Configure"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text("Configure"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_configureMenuBox);
 }
 
 ftxui::Element Engine::renderConfigureDetails() const
@@ -3438,7 +3889,7 @@ ftxui::Element Engine::renderConfigureDetails() const
     const char* title = m_configureThingsView == ConfigureThingsView::RemoveThing
                             ? "Remove thing"
                             : (m_configureThingsView == ConfigureThingsView::ReconfigureThing ? "Reconfigure thing" : "Rename thing");
-    return ftxui::window(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_configureDetailsBox);
 }
 
 ftxui::Element Engine::renderSettingsMenu() const
@@ -3461,44 +3912,79 @@ ftxui::Element Engine::renderSettingsMenu() const
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_settingsMenuBox);
 }
 
 ftxui::Element Engine::renderSettingsDetails() const
 {
     ftxui::Elements lines;
+    int lineIndex = 0;
+    auto pushLine = [&](ftxui::Element line) {
+        if (lineIndex == m_settingsDetailsLineIndex) {
+            line = line | ftxui::focus;
+        }
+        lines.push_back(std::move(line));
+        ++lineIndex;
+    };
 
     if (m_settingsView == SettingsView::General) {
         const QString fingerprint = m_client.peerCertificateFingerprint();
-        lines.push_back(ftxui::text("Connection: " + endpoint()));
-        lines.push_back(ftxui::text("Display name: " + connectionDisplayName()));
-        lines.push_back(ftxui::text("Settings path: " + m_connectionSettings.settingsPath().toStdString()));
-        lines.push_back(ftxui::text("Transport: " + std::string(m_options.useSsl ? "SSL/TLS" : "Plain TCP")));
-        lines.push_back(ftxui::text("Server uuid: " + m_serverUuid.toString(QUuid::WithoutBraces).toStdString()));
-        lines.push_back(ftxui::text("Authentication: " + m_authStatus));
-        lines.push_back(ftxui::text("Stored token: " + std::string(m_savedConnection.has_value() && !m_savedConnection->token.isEmpty() ? "available" : "none")));
-        lines.push_back(ftxui::text("TLS fingerprint: " + (fingerprint.isEmpty() ? std::string("n/a") : fingerprint.toStdString())));
+        pushLine(ftxui::text("Connection: " + endpoint()));
+        pushLine(ftxui::text("Display name: " + connectionDisplayName()));
+        pushLine(ftxui::text("Settings path: " + m_connectionSettings.settingsPath().toStdString()));
+        pushLine(ftxui::text("Transport: " + std::string(m_options.useSsl ? "SSL/TLS" : "Plain TCP")));
+        pushLine(ftxui::text("Server uuid: " + m_serverUuid.toString(QUuid::WithoutBraces).toStdString()));
+        pushLine(ftxui::text("Authentication: " + m_authStatus));
+        pushLine(ftxui::text("Stored token: " + std::string(m_savedConnection.has_value() && !m_savedConnection->token.isEmpty() ? "available" : "none")));
+        pushLine(ftxui::text("TLS fingerprint: " + (fingerprint.isEmpty() ? std::string("n/a") : fingerprint.toStdString())));
     } else {
-        lines.push_back(ftxui::text("nymea-cli"));
-        lines.push_back(ftxui::separator());
-        lines.push_back(ftxui::text("Application version: " + m_options.appVersion));
-        lines.push_back(ftxui::text("Project license: " APP_LICENSE_SPDX));
-        lines.push_back(ftxui::text("Server version: " + m_serverVersion));
-        lines.push_back(ftxui::text("Server API version: " + m_serverApiVersion));
-        lines.push_back(ftxui::text("Purpose: terminal client for nymead"));
-        lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
-        lines.push_back(ftxui::separator());
-        lines.push_back(ftxui::text("Open source components"));
-        lines.push_back(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
-        lines.push_back(ftxui::paragraph("Qt licensing reference: https://www.qt.io/licensing/"));
-        lines.push_back(ftxui::paragraph("Qt project reference: https://www.qt.io/"));
-        lines.push_back(ftxui::text("FTXUI version: " FTXUI_VERSION));
-        lines.push_back(ftxui::text("FTXUI license: MIT"));
-        lines.push_back(ftxui::paragraph("FTXUI project reference: https://github.com/ArthurSonzogni/FTXUI"));
-        lines.push_back(ftxui::paragraph("FTXUI license reference: https://github.com/ArthurSonzogni/FTXUI/blob/" FTXUI_VERSION "/LICENSE"));
+        pushLine(ftxui::text("nymea-cli"));
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Application version: " + m_options.appVersion));
+        pushLine(ftxui::text("Project license: " APP_LICENSE_SPDX));
+        pushLine(ftxui::text("Server version: " + m_serverVersion));
+        pushLine(ftxui::text("Server API version: " + m_serverApiVersion));
+        pushLine(ftxui::text("Purpose: terminal client for nymead"));
+        pushLine(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Open source components"));
+        pushLine(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
+        pushLine(ftxui::paragraph("Qt licensing reference: https://www.qt.io/licensing/"));
+        pushLine(ftxui::paragraph("Qt project reference: https://www.qt.io/"));
+        pushLine(ftxui::text("FTXUI version: " FTXUI_VERSION));
+        pushLine(ftxui::text("FTXUI license: MIT"));
+        pushLine(ftxui::paragraph("FTXUI project reference: https://github.com/ArthurSonzogni/FTXUI"));
+        pushLine(ftxui::paragraph("FTXUI license reference: https://github.com/ArthurSonzogni/FTXUI/blob/" FTXUI_VERSION "/LICENSE"));
     }
 
-    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame);
+    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame)
+           | ftxui::reflect(m_settingsDetailsBox);
+}
+
+int Engine::settingsDetailsLineCount() const
+{
+    switch (m_settingsView) {
+    case SettingsView::General:
+        return 8;
+    case SettingsView::About:
+        return 17;
+    }
+    return 0;
+}
+
+void Engine::clampSettingsDetailsSelection()
+{
+    const int lineCount = settingsDetailsLineCount();
+    if (lineCount <= 0) {
+        m_settingsDetailsLineIndex = 0;
+        return;
+    }
+
+    if (m_settingsDetailsLineIndex < 0) {
+        m_settingsDetailsLineIndex = 0;
+    } else if (m_settingsDetailsLineIndex >= lineCount) {
+        m_settingsDetailsLineIndex = lineCount - 1;
+    }
 }
 
 ftxui::Element Engine::renderThings() const
@@ -3513,10 +3999,61 @@ ftxui::Element Engine::renderThings() const
 ftxui::Element Engine::renderUi()
 {
     drainUiTasks();
+    if (m_mainView == MainView::Things) {
+        clampThingDetailSelection();
+    } else if (m_mainView == MainView::ConfigureThings) {
+        clampConfigureThingClassSelection();
+        clampConfigureThingSelection();
+    } else if (m_mainView == MainView::Settings) {
+        clampSettingsDetailsSelection();
+    } else if (m_mainView == MainView::ApiBrowser) {
+        clampApiBrowserSelection();
+        clampApiBrowserReferenceSelection();
+        clampApiBrowserJsonSelection();
+    } else if (m_mainView == MainView::Help) {
+        clampHelpSelection();
+    }
     if (m_actionExecutionPending || m_configureRequestPending) {
         if (ftxui::ScreenInteractive* screen = ftxui::ScreenInteractive::Active(); screen != nullptr) {
             screen->RequestAnimationFrame();
         }
+    }
+
+    const bool highlightInputFrame = (m_showActionDialog && !m_actionExecutionPending) || (m_showConfigureDialog && !m_configureRequestPending) || m_showLoginForm
+                                     || m_showLogoutConfirm || m_focusArea == FocusArea::ThingSearch || m_focusArea == FocusArea::ConfigureThingClassSearch
+                                     || m_focusArea == FocusArea::ApiBrowserSearch;
+
+    if (m_showLoginForm) {
+        ftxui::Elements sections;
+        sections.push_back(ftxui::hbox({
+                               ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
+                               ftxui::filler(),
+                               ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
+                           })
+                           | ftxui::border);
+        sections.push_back(ftxui::filler());
+        sections.push_back(ftxui::hbox({
+            ftxui::filler(),
+            ftxui::window(ftxui::text("Authentication required"),
+                          ftxui::vbox({
+                              ftxui::hbox({
+                                  ftxui::text("Username: "),
+                                  m_usernameInput->Render() | ftxui::xflex,
+                              }),
+                              ftxui::hbox({
+                                  ftxui::text("Password: "),
+                                  m_passwordInput->Render() | ftxui::xflex,
+                              }),
+                              ftxui::separator(),
+                              ftxui::text(m_authStatus),
+                              m_logoutStatus.empty() ? ftxui::text("") : (ftxui::paragraph(m_logoutStatus) | ftxui::dim),
+                              ftxui::text("Enter submits credentials, Esc quits.") | ftxui::dim,
+                          }))
+                | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 56),
+            ftxui::filler(),
+        }));
+        sections.push_back(ftxui::filler());
+        return ftxui::vbox(std::move(sections)) | ftxui::flex;
     }
 
     ftxui::Elements sections;
@@ -3536,12 +4073,20 @@ ftxui::Element Engine::renderUi()
                            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
-    sections.push_back(
-        ftxui::text("Keys: Up/Down navigate, Left/Right switch panels, Space inspector, c reconnect, h hello, t refresh things, Enter opens actions/setup, q/Esc quit")
-        | ftxui::dim);
     if (!m_settingsWarning.empty()) {
         sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
     }
+    if (m_mainView == MainView::Help) {
+        sections.push_back(renderHelp() | ftxui::flex);
+        return ftxui::vbox(std::move(sections)) | (highlightInputFrame ? ftxui::borderStyled(ftxui::Color::SteelBlue) : ftxui::border) | ftxui::flex;
+    }
+    std::string keyHintLine
+        = "Keys: Up/Down navigate, Left/Right switch panels, s sort, f filter, Space inspector, c reconnect, t refresh things, ?/h help, Enter opens actions/setup, q/Esc quit";
+    if (m_mainView == MainView::ApiBrowser) {
+        keyHintLine
+            = "Keys: Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh things, ?/h help, q/Esc quit";
+    }
+    sections.push_back(ftxui::text(keyHintLine) | ftxui::dim);
     sections.push_back(ftxui::separator());
 
     ftxui::Element rightPanel;
@@ -3553,6 +4098,8 @@ ftxui::Element Engine::renderUi()
                          renderConfigureDetails() | ftxui::flex,
                      })
                      | ftxui::flex;
+    } else if (m_mainView == MainView::ApiBrowser) {
+        rightPanel = renderApiBrowser() | ftxui::flex;
     } else {
         rightPanel = ftxui::vbox({
                          renderSettingsMenu(),
@@ -3566,6 +4113,21 @@ ftxui::Element Engine::renderUi()
                            rightPanel | ftxui::flex,
                        })
                        | ftxui::flex);
+
+    if (m_showLogoutConfirm) {
+        ftxui::Elements dialogBody;
+        dialogBody.push_back(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
+        dialogBody.push_back(ftxui::separator());
+        dialogBody.push_back(ftxui::paragraph("This will revoke the current token on the server, forget the saved token locally, and reconnect to the same endpoint."));
+        if (!m_logoutStatus.empty()) {
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text(m_logoutStatus));
+        }
+        dialogBody.push_back(ftxui::separator());
+        dialogBody.push_back(ftxui::text(m_logoutRequestPending ? "Revoking token and reconnecting..." : "Enter confirms logout, Esc cancels.") | ftxui::dim);
+        sections.push_back(ftxui::separator());
+        sections.push_back(ftxui::window(ftxui::text("Confirm logout"), ftxui::vbox(std::move(dialogBody))));
+    }
 
     if (m_showActionDialog) {
         ftxui::Elements dialogBody;
@@ -3594,7 +4156,8 @@ ftxui::Element Engine::renderUi()
             } else if (actionParamUsesRangeInput(selectedParamType)) {
                 dialogFooter.push_back(ftxui::text(rangeInputSummary(selectedParamType)));
                 if (const std::optional<NumericRangeInputSpec> rangeSpec = numericRangeInputSpec(selectedParamType);
-                    rangeSpec.has_value() && !currentNumericRangeValue(selectedParamType, *rangeSpec, m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex)).has_value()
+                    rangeSpec.has_value()
+                    && !::nymea::currentNumericRangeValueFromRaw(selectedParamType, *rangeSpec, m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex)).has_value()
                     && !m_actionDialogParamValues.at(m_actionDialogSelectedParamIndex).empty()) {
                     dialogFooter.push_back(ftxui::text("Current value is incomplete or invalid. Type a number or use Left/Right to snap into range.")
                                            | ftxui::color(ftxui::Color::YellowLight));
@@ -3767,30 +4330,64 @@ ftxui::Element Engine::renderUi()
                            | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
     }
 
-    if (m_showLoginForm) {
-        sections.push_back(ftxui::separator());
-        sections.push_back(ftxui::window(ftxui::text("Authentication required"),
-                                         ftxui::vbox({
-                                             ftxui::hbox({
-                                                 ftxui::text("Username: "),
-                                                 m_usernameInput->Render() | ftxui::xflex,
-                                             }),
-                                             ftxui::hbox({
-                                                 ftxui::text("Password: "),
-                                                 m_passwordInput->Render() | ftxui::xflex,
-                                             }),
-                                             ftxui::separator(),
-                                             ftxui::text(m_authStatus),
-                                         })));
-    }
-
-    return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
+    return ftxui::vbox(std::move(sections)) | (highlightInputFrame ? ftxui::borderStyled(ftxui::Color::SteelBlue) : ftxui::border) | ftxui::flex;
 }
 
 bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen)
 {
+    auto applyMainMenuSelection = [this](MainMenuEntry entry) {
+        m_selectedMainMenuEntry = entry;
+        switch (entry) {
+        case MainMenuEntry::Things:
+            m_mainView = MainView::Things;
+            break;
+        case MainMenuEntry::ConfigureThings:
+            m_mainView = MainView::ConfigureThings;
+            if (!m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
+                fetchAllThingClasses();
+            }
+            break;
+        case MainMenuEntry::ApiBrowser:
+            m_mainView = MainView::ApiBrowser;
+            m_focusArea = FocusArea::ApiBrowserSearch;
+            m_apiBrowserJsonLineIndex = 0;
+            ensureApiBrowserLoaded();
+            clampApiBrowserSelection();
+            clampApiBrowserReferenceSelection();
+            break;
+        case MainMenuEntry::Settings:
+            m_mainView = MainView::Settings;
+            m_settingsDetailsLineIndex = 0;
+            break;
+        case MainMenuEntry::Logout:
+            break;
+        }
+    };
+    auto syncMainMenuSelectionToCurrentView = [this]() {
+        switch (m_mainView) {
+        case MainView::Things:
+            m_selectedMainMenuEntry = MainMenuEntry::Things;
+            break;
+        case MainView::ConfigureThings:
+            m_selectedMainMenuEntry = MainMenuEntry::ConfigureThings;
+            break;
+        case MainView::ApiBrowser:
+            m_selectedMainMenuEntry = MainMenuEntry::ApiBrowser;
+            break;
+        case MainView::Settings:
+            m_selectedMainMenuEntry = MainMenuEntry::Settings;
+            break;
+        case MainView::Help:
+            break;
+        }
+    };
+
     if (event == ftxui::Event::Custom) {
         drainUiTasks();
+        return true;
+    }
+
+    if (handleMouseWheel(event)) {
         return true;
     }
 
@@ -3984,10 +4581,210 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (event == ftxui::Event::Escape && m_focusArea == FocusArea::ThingSearch && !m_thingSearch.empty()) {
+        const QUuid selectedId = selectedThingId();
+        m_thingSearch.clear();
+        clampThingSelection(selectedId);
+        resetThingDetailSelection();
+        return true;
+    }
+
+    if (m_showLogoutConfirm) {
+        if (m_logoutRequestPending) {
+            return true;
+        }
+        if (event == ftxui::Event::Escape) {
+            m_showLogoutConfirm = false;
+            m_logoutStatus.clear();
+            return true;
+        }
+        if (event == ftxui::Event::Return) {
+            revokeCurrentTokenAndLogout();
+            return true;
+        }
+        return true;
+    }
+
+    if (m_mainView == MainView::Help) {
+        if (event == ftxui::Event::Escape) {
+            closeHelpView();
+            return true;
+        }
+        if (event == ftxui::Event::ArrowUp) {
+            const int lineCount = helpLineCount();
+            if (lineCount > 0) {
+                m_helpLineIndex = (m_helpLineIndex + lineCount - 1) % lineCount;
+            }
+            return true;
+        }
+        if (event == ftxui::Event::ArrowDown) {
+            const int lineCount = helpLineCount();
+            if (lineCount > 0) {
+                m_helpLineIndex = (m_helpLineIndex + 1) % lineCount;
+            }
+            return true;
+        }
+        if (event == ftxui::Event::Character("q")) {
+            m_client.disconnectFromHost();
+            screen.ExitLoopClosure()();
+            return true;
+        }
+        return true;
+    }
+
     if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
         m_client.disconnectFromHost();
         screen.ExitLoopClosure()();
         return true;
+    }
+
+    if (m_showLoginForm) {
+        if (event == ftxui::Event::Return) {
+            authenticate(m_username, m_password);
+            return true;
+        }
+        if (m_loginForm->OnEvent(event)) {
+            return true;
+        }
+        return true;
+    }
+
+    if (m_mainView == MainView::ApiBrowser) {
+        const std::vector<ApiBrowserItem> items = buildApiBrowserItems(m_apiBrowserIntrospection);
+        const std::vector<ApiBrowserItem> filteredItems = filterApiBrowserItems(items, QString::fromStdString(m_apiBrowserSearch));
+        const int selectedVisibleIndex = apiBrowserItemIndex(filteredItems, m_apiBrowserSelectedSection, m_apiBrowserSelectedName);
+        const int currentIndex = apiBrowserItemIndex(items, m_apiBrowserSelectedSection, m_apiBrowserSelectedName);
+        const ApiBrowserItem* currentItem = currentIndex >= 0 ? &items.at(currentIndex) : nullptr;
+
+        auto followSelectedReference = [&]() {
+            if (currentItem == nullptr || currentItem->references.empty()) {
+                return true;
+            }
+            if (m_apiBrowserSelectedReferenceIndex < 0 || m_apiBrowserSelectedReferenceIndex >= static_cast<int>(currentItem->references.size())) {
+                return true;
+            }
+
+            const QString referenceName = currentItem->references.at(m_apiBrowserSelectedReferenceIndex).second;
+            const ApiBrowserItem* targetItem = nullptr;
+            for (const ApiBrowserItem& item : items) {
+                if ((item.kind == ApiBrowserKind::Type || item.kind == ApiBrowserKind::Enum) && item.name == referenceName) {
+                    targetItem = &item;
+                    break;
+                }
+            }
+            if (targetItem == nullptr) {
+                for (const ApiBrowserItem& item : items) {
+                    if (item.name == referenceName) {
+                        targetItem = &item;
+                        break;
+                    }
+                }
+            }
+
+            if (targetItem == nullptr) {
+                m_apiBrowserStatus = "Referenced item not found: " + referenceName.toStdString();
+                return true;
+            }
+
+            selectApiBrowserItem(targetItem->section, targetItem->name, true);
+            clampApiBrowserReferenceSelection();
+            return true;
+        };
+
+        if (event == ftxui::Event::Return) {
+            if (m_focusArea == FocusArea::ApiBrowserSearch) {
+                m_focusArea = FocusArea::ApiBrowserList;
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserReferences) {
+                return followSelectedReference();
+            }
+            return true;
+        }
+
+        if (event == ftxui::Event::ArrowRight) {
+            if (m_focusArea == FocusArea::ApiBrowserSearch) {
+                m_focusArea = FocusArea::ApiBrowserList;
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserList) {
+                m_focusArea = FocusArea::ApiBrowserReferences;
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserReferences) {
+                m_focusArea = FocusArea::ApiBrowserSearch;
+                return true;
+            }
+        }
+
+        if (event == ftxui::Event::ArrowLeft) {
+            if (!m_apiBrowserHistory.empty()) {
+                apiBrowserGoBack();
+                clampApiBrowserReferenceSelection();
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserReferences) {
+                m_focusArea = FocusArea::ApiBrowserList;
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserList) {
+                m_focusArea = FocusArea::ApiBrowserSearch;
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserSearch) {
+                syncMainMenuSelectionToCurrentView();
+                m_focusArea = FocusArea::MainMenu;
+                return true;
+            }
+        }
+
+        if (event == ftxui::Event::ArrowUp) {
+            if (m_focusArea == FocusArea::ApiBrowserList && !filteredItems.empty()) {
+                int index = selectedVisibleIndex;
+                if (index < 0) {
+                    index = static_cast<int>(filteredItems.size()) - 1;
+                } else {
+                    index = (index + static_cast<int>(filteredItems.size()) - 1) % static_cast<int>(filteredItems.size());
+                }
+                selectApiBrowserItem(filteredItems.at(index).section, filteredItems.at(index).name, false);
+                clampApiBrowserReferenceSelection();
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserReferences && currentItem != nullptr && !currentItem->references.empty()) {
+                m_apiBrowserSelectedReferenceIndex = (m_apiBrowserSelectedReferenceIndex + static_cast<int>(currentItem->references.size()) - 1)
+                                                     % static_cast<int>(currentItem->references.size());
+                return true;
+            }
+        }
+
+        if (event == ftxui::Event::ArrowDown) {
+            if (m_focusArea == FocusArea::ApiBrowserList && !filteredItems.empty()) {
+                int index = selectedVisibleIndex;
+                if (index < 0) {
+                    index = 0;
+                } else {
+                    index = (index + 1) % static_cast<int>(filteredItems.size());
+                }
+                selectApiBrowserItem(filteredItems.at(index).section, filteredItems.at(index).name, false);
+                clampApiBrowserReferenceSelection();
+                return true;
+            }
+            if (m_focusArea == FocusArea::ApiBrowserReferences && currentItem != nullptr && !currentItem->references.empty()) {
+                m_apiBrowserSelectedReferenceIndex = (m_apiBrowserSelectedReferenceIndex + 1) % static_cast<int>(currentItem->references.size());
+                return true;
+            }
+        }
+
+        if (m_focusArea == FocusArea::ApiBrowserSearch) {
+            if (event == ftxui::Event::Backspace && !m_apiBrowserSearch.empty()) {
+                m_apiBrowserSearch.pop_back();
+                return true;
+            }
+            if (event.is_character()) {
+                m_apiBrowserSearch += event.character();
+                return true;
+            }
+        }
     }
 
     if (event == ftxui::Event::ArrowLeft) {
@@ -3996,23 +4793,41 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             m_showThingDetailInspector = false;
             return true;
         }
+        if (m_focusArea == FocusArea::ThingList) {
+            m_focusArea = FocusArea::ThingSearch;
+            return true;
+        }
+        if (m_focusArea == FocusArea::ThingSearch) {
+            syncMainMenuSelectionToCurrentView();
+            m_focusArea = FocusArea::MainMenu;
+            return true;
+        }
         if (m_focusArea == FocusArea::ConfigureThingClassList) {
             m_focusArea = FocusArea::ConfigureThingClassSearch;
             return true;
         }
         if (m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingSelection || m_focusArea == FocusArea::ConfigureMenu) {
+            syncMainMenuSelectionToCurrentView();
+            m_focusArea = FocusArea::MainMenu;
+            return true;
+        }
+        if (m_focusArea == FocusArea::SettingsMenu) {
+            syncMainMenuSelectionToCurrentView();
             m_focusArea = FocusArea::MainMenu;
             return true;
         }
         m_focusArea = FocusArea::MainMenu;
+        syncMainMenuSelectionToCurrentView();
         return true;
     }
 
     if (event == ftxui::Event::ArrowRight) {
-        if (m_showLoginForm) {
-            m_focusArea = FocusArea::LoginForm;
-        } else if (m_mainView == MainView::Things) {
-            if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
+        if (m_mainView == MainView::Things) {
+            if (m_focusArea == FocusArea::MainMenu) {
+                m_focusArea = FocusArea::ThingSearch;
+            } else if (m_focusArea == FocusArea::ThingSearch) {
+                m_focusArea = FocusArea::ThingList;
+            } else if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
                 m_focusArea = FocusArea::ThingDetails;
             } else {
                 m_focusArea = FocusArea::ThingList;
@@ -4028,20 +4843,22 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             } else {
                 m_focusArea = FocusArea::ConfigureMenu;
             }
+        } else if (m_mainView == MainView::ApiBrowser) {
+            if (m_focusArea == FocusArea::MainMenu) {
+                m_focusArea = FocusArea::ApiBrowserSearch;
+            } else if (m_focusArea == FocusArea::ApiBrowserSearch) {
+                m_focusArea = FocusArea::ApiBrowserList;
+            } else if (m_focusArea == FocusArea::ApiBrowserList) {
+                m_focusArea = FocusArea::ApiBrowserReferences;
+            } else {
+                m_focusArea = FocusArea::ApiBrowserSearch;
+            }
         } else if (m_mainView == MainView::Settings) {
-            m_focusArea = FocusArea::SettingsMenu;
+            if (m_focusArea != FocusArea::SettingsMenu) {
+                m_focusArea = FocusArea::SettingsMenu;
+            }
         }
         return true;
-    }
-
-    if (m_showLoginForm) {
-        if (event == ftxui::Event::Return) {
-            authenticate(m_username, m_password);
-            return true;
-        }
-        if (m_loginForm->OnEvent(event)) {
-            return true;
-        }
     }
 
     if (event == ftxui::Event::ArrowUp) {
@@ -4050,8 +4867,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
-            m_selectedThingIndex = (m_selectedThingIndex + static_cast<int>(m_thingManager.things().size()) - 1) % static_cast<int>(m_thingManager.things().size());
+        if (m_focusArea == FocusArea::ThingList && !filteredThings().empty()) {
+            const int count = static_cast<int>(filteredThings().size());
+            m_selectedThingIndex = (m_selectedThingIndex + count - 1) % count;
             resetThingDetailSelection();
             return true;
         }
@@ -4085,16 +4903,36 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::MainMenu) {
-            if (m_mainView == MainView::Things) {
-                m_mainView = MainView::Settings;
-            } else if (m_mainView == MainView::ConfigureThings) {
-                m_mainView = MainView::Things;
-            } else {
-                m_mainView = MainView::ConfigureThings;
+        if (m_focusArea == FocusArea::ApiBrowserReferences) {
+            const std::vector<ApiBrowserItem> items = buildApiBrowserItems(m_apiBrowserIntrospection);
+            const int currentIndex = apiBrowserItemIndex(items, m_apiBrowserSelectedSection, m_apiBrowserSelectedName);
+            if (currentIndex >= 0) {
+                const ApiBrowserItem& currentItem = items.at(currentIndex);
+                if (!currentItem.references.empty()) {
+                    m_apiBrowserSelectedReferenceIndex = (m_apiBrowserSelectedReferenceIndex + static_cast<int>(currentItem.references.size()) - 1)
+                                                         % static_cast<int>(currentItem.references.size());
+                }
             }
-            if (m_mainView == MainView::ConfigureThings && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
-                fetchAllThingClasses();
+            return true;
+        }
+
+        if (m_focusArea == FocusArea::MainMenu) {
+            switch (m_selectedMainMenuEntry) {
+            case MainMenuEntry::Things:
+                applyMainMenuSelection(MainMenuEntry::Logout);
+                break;
+            case MainMenuEntry::ConfigureThings:
+                applyMainMenuSelection(MainMenuEntry::Things);
+                break;
+            case MainMenuEntry::ApiBrowser:
+                applyMainMenuSelection(MainMenuEntry::ConfigureThings);
+                break;
+            case MainMenuEntry::Settings:
+                applyMainMenuSelection(MainMenuEntry::ApiBrowser);
+                break;
+            case MainMenuEntry::Logout:
+                applyMainMenuSelection(MainMenuEntry::Settings);
+                break;
             }
             return true;
         }
@@ -4106,8 +4944,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::ThingList && !m_thingManager.things().empty()) {
-            m_selectedThingIndex = (m_selectedThingIndex + 1) % static_cast<int>(m_thingManager.things().size());
+        if (m_focusArea == FocusArea::ThingList && !filteredThings().empty()) {
+            const int count = static_cast<int>(filteredThings().size());
+            m_selectedThingIndex = (m_selectedThingIndex + 1) % count;
             resetThingDetailSelection();
             return true;
         }
@@ -4140,19 +4979,48 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::MainMenu) {
-            if (m_mainView == MainView::Things) {
-                m_mainView = MainView::ConfigureThings;
-            } else if (m_mainView == MainView::ConfigureThings) {
-                m_mainView = MainView::Settings;
-            } else {
-                m_mainView = MainView::Things;
-            }
-            if (m_mainView == MainView::ConfigureThings && !m_haveAllThingClasses && !m_fetchAllThingClassesPending) {
-                fetchAllThingClasses();
+        if (m_focusArea == FocusArea::ApiBrowserList) {
+            const std::vector<ApiBrowserItem> items = buildApiBrowserItems(m_apiBrowserIntrospection);
+            const std::vector<ApiBrowserItem> filteredItems = filterApiBrowserItems(items, QString::fromStdString(m_apiBrowserSearch));
+            const int visibleIndex = apiBrowserItemIndex(filteredItems, m_apiBrowserSelectedSection, m_apiBrowserSelectedName);
+            if (!filteredItems.empty()) {
+                const int nextIndex = visibleIndex < 0 ? 0 : (visibleIndex + 1) % static_cast<int>(filteredItems.size());
+                selectApiBrowserItem(filteredItems.at(nextIndex).section, filteredItems.at(nextIndex).name, false);
+                clampApiBrowserReferenceSelection();
             }
             return true;
         }
+
+        if (m_focusArea == FocusArea::MainMenu) {
+            switch (m_selectedMainMenuEntry) {
+            case MainMenuEntry::Things:
+                applyMainMenuSelection(MainMenuEntry::ConfigureThings);
+                break;
+            case MainMenuEntry::ConfigureThings:
+                applyMainMenuSelection(MainMenuEntry::ApiBrowser);
+                break;
+            case MainMenuEntry::ApiBrowser:
+                applyMainMenuSelection(MainMenuEntry::Settings);
+                break;
+            case MainMenuEntry::Settings:
+                applyMainMenuSelection(MainMenuEntry::Logout);
+                break;
+            case MainMenuEntry::Logout:
+                applyMainMenuSelection(MainMenuEntry::Things);
+                break;
+            }
+            return true;
+        }
+    }
+
+    if (m_focusArea == FocusArea::MainMenu && event == ftxui::Event::Return) {
+        if (m_selectedMainMenuEntry == MainMenuEntry::Logout) {
+            if (m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty()) {
+                logout();
+            }
+            return true;
+        }
+        return true;
     }
 
     if (event == ftxui::Event::Character(" ")) {
@@ -4188,6 +5056,23 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (m_focusArea == FocusArea::ThingSearch && m_mainView == MainView::Things) {
+        if (event == ftxui::Event::Backspace && !m_thingSearch.empty()) {
+            const QUuid selectedId = selectedThingId();
+            m_thingSearch.pop_back();
+            clampThingSelection(selectedId);
+            resetThingDetailSelection();
+            return true;
+        }
+        if (event.is_character()) {
+            const QUuid selectedId = selectedThingId();
+            m_thingSearch += event.character();
+            clampThingSelection(selectedId);
+            resetThingDetailSelection();
+            return true;
+        }
+    }
+
     if (m_focusArea == FocusArea::ConfigureThingClassSearch && m_mainView == MainView::ConfigureThings && m_configureThingsView == ConfigureThingsView::AddThing) {
         if (event == ftxui::Event::Backspace && !m_configureThingSearch.empty()) {
             m_configureThingSearch.pop_back();
@@ -4201,6 +5086,16 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (event == ftxui::Event::Character("s") && m_mainView == MainView::Things) {
+        cycleThingSortMode();
+        return true;
+    }
+
+    if (event == ftxui::Event::Character("f") && m_mainView == MainView::Things) {
+        cycleThingCategoryFilter();
+        return true;
+    }
+
     if (event == ftxui::Event::Character("c")) {
         connectToServer();
         if (m_client.isConnected()) {
@@ -4209,9 +5104,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
-    if (event == ftxui::Event::Character("h")) {
-        runHandshakeAndLoadThings();
-        return true;
+    if (event == ftxui::Event::Character("h") || event == ftxui::Event::Character("?")) {
+        if (m_focusArea != FocusArea::ThingSearch && m_focusArea != FocusArea::ConfigureThingClassSearch && m_focusArea != FocusArea::ApiBrowserSearch) {
+            openHelpView();
+            return true;
+        }
     }
 
     if (event == ftxui::Event::Character("t")) {

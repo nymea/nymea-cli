@@ -16,12 +16,14 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <ftxui/dom/elements.hpp>
+#include <ftxui/screen/box.hpp>
 
 #include <chrono>
 #include <functional>
 #include <mutex>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace nymea {
@@ -48,7 +50,9 @@ private:
     enum class MainView {
         Things,
         ConfigureThings,
+        ApiBrowser,
         Settings,
+        Help,
     };
 
     enum class SettingsView {
@@ -58,6 +62,7 @@ private:
 
     enum class FocusArea {
         MainMenu,
+        ThingSearch,
         ThingList,
         ThingDetails,
         ActionDialog,
@@ -66,8 +71,19 @@ private:
         ConfigureThingClassList,
         ConfigureThingSelection,
         ConfigureDialog,
+        ApiBrowserSearch,
+        ApiBrowserList,
+        ApiBrowserReferences,
         SettingsMenu,
         LoginForm,
+    };
+
+    enum class MainMenuEntry {
+        Things,
+        ConfigureThings,
+        ApiBrowser,
+        Settings,
+        Logout,
     };
 
     enum class ConfigureThingsView {
@@ -89,10 +105,30 @@ private:
         ReconfigureThingInfo,
     };
 
+    enum class ThingSortMode {
+        Default,
+        Alphabetical,
+        Grouped,
+    };
+
+    enum class ThingCategory {
+        All,
+        Lights,
+        Blinds,
+        Multimedia,
+        PowerSockets,
+        Thermostats,
+        Sensors,
+        SmartMeters,
+        Switches,
+        Other,
+    };
+
     std::string endpoint() const;
     std::string connectionDisplayName() const;
     SavedConnection currentConnection(bool allowFingerprintUpdate) const;
-    void clampThingSelection();
+    std::optional<QUuid> currentTokenId() const;
+    void clampThingSelection(const QUuid& preferredThingId = QUuid());
     void clampConfigureThingClassSelection();
     void clampConfigureThingSelection();
     int thingDetailEntryCount() const;
@@ -100,16 +136,38 @@ private:
     void resetThingDetailSelection();
     bool openSelectedActionDialog();
     void closeActionDialog();
+    std::vector<const api::Thing*> filteredThings() const;
+    const api::Thing* selectedThing() const;
+    QUuid selectedThingId() const;
+    ThingCategory thingCategory(const api::Thing& thing) const;
+    std::string thingCategoryLabel(ThingCategory category) const;
+    std::string thingSortModeLabel() const;
+    void cycleThingSortMode();
+    void cycleThingCategoryFilter();
     std::vector<api::ThingClass> filteredConfigThingClasses() const;
     const api::ThingClass* selectedConfigThingClass() const;
     const api::Thing* selectedConfigureThing() const;
     void closeConfigureDialog();
+    void openHelpView();
+    void closeHelpView();
     void openAddThingDialog();
     void openRemoveThingDialog();
     void openRenameThingDialog();
     void openReconfigureThingDialog();
     void startAddThingFlow(api::CreateMethod createMethod);
     bool submitConfigureDialog();
+    void ensureApiBrowserLoaded();
+    void handleApiBrowserIntrospectionReply(const QJsonObject& message, const QString& transportError);
+    void selectApiBrowserItem(const QString& section, const QString& name, bool addToHistory = false);
+    void apiBrowserGoBack();
+    void clampApiBrowserSelection();
+    void clampApiBrowserReferenceSelection();
+    void clampSettingsDetailsSelection();
+    void clampApiBrowserJsonSelection();
+    void clampHelpSelection();
+    int settingsDetailsLineCount() const;
+    int apiBrowserJsonLineCount() const;
+    int helpLineCount() const;
     void fetchAllThingClasses();
     void handleFetchAllThingClassesReply(const QJsonObject& message, const QString& transportError);
     void handleDiscoverThingsReply(const QJsonObject& message, const QString& transportError);
@@ -130,15 +188,18 @@ private:
     void enqueueUiTask(std::function<void()> task);
     void drainUiTasks();
 
-    bool connectToServer();
+    bool connectToServer(bool shouldLoadSavedConnection = true);
     void sendHello();
     void authenticate(const std::string& username, const std::string& password);
+    void logout();
+    void revokeCurrentTokenAndLogout();
+    void finalizeLogout();
     void enableNotifications(bool fetchThingsAfterReply = true);
     void fetchThingClasses();
     void fetchThings();
     void loadSavedConnection();
     void updateCertificateWarning();
-    void clearStoredToken();
+    bool clearStoredToken();
     void saveCurrentConnection(bool allowFingerprintUpdate);
     void runHandshakeAndLoadThings();
 
@@ -149,8 +210,11 @@ private:
     ftxui::Element renderConfigureDetails() const;
     ftxui::Element renderSettingsMenu() const;
     ftxui::Element renderSettingsDetails() const;
+    ftxui::Element renderApiBrowser() const;
+    ftxui::Element renderHelp() const;
     ftxui::Element renderThings() const;
     ftxui::Element renderUi();
+    bool handleMouseWheel(const ftxui::Event& event);
     bool handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen);
 
     EngineOptions m_options;
@@ -167,14 +231,34 @@ private:
     bool m_isAuthenticationRequired = false;
     bool m_isAuthenticated = false;
     bool m_showLoginForm = false;
+    bool m_skipNextAutoAuthenticate = false;
+    bool m_ignoreStoredToken = false;
+    bool m_showLogoutConfirm = false;
+    bool m_logoutRequestPending = false;
     std::string m_authStatus = "Not authenticated.";
+    std::string m_logoutStatus;
     std::string m_securityWarning;
     std::string m_settingsWarning;
 
     std::string m_username;
     std::string m_password;
     std::optional<SavedConnection> m_savedConnection;
+    MainMenuEntry m_selectedMainMenuEntry = MainMenuEntry::Things;
+    QString m_apiBrowserSelectedSection;
+    QString m_apiBrowserSelectedName;
+    std::string m_apiBrowserSearch;
+    std::vector<std::pair<QString, QString>> m_apiBrowserHistory;
+    bool m_apiBrowserLoaded = false;
+    bool m_apiBrowserPending = false;
+    int m_apiBrowserSelectedReferenceIndex = 0;
+    int m_apiBrowserJsonLineIndex = 0;
+    std::string m_apiBrowserStatus;
+    QJsonObject m_apiBrowserIntrospection;
     int m_selectedThingIndex = 0;
+    std::string m_thingSearch;
+    ThingSortMode m_thingSortMode = ThingSortMode::Default;
+    ThingCategory m_thingCategoryFilter = ThingCategory::All;
+    QUuid m_preferredThingSelectionId;
     int m_selectedThingDetailIndex = 0;
     bool m_showThingDetailInspector = false;
     bool m_showActionDialog = false;
@@ -199,10 +283,14 @@ private:
     bool m_lastActionExecutionStatusWarning = false;
     bool m_notificationsEnabled = false;
     MainView m_mainView = MainView::Things;
+    MainView m_previousMainView = MainView::Things;
     ConfigureThingsView m_configureThingsView = ConfigureThingsView::AddThing;
     ConfigureDialogMode m_configureDialogMode = ConfigureDialogMode::None;
     SettingsView m_settingsView = SettingsView::General;
     FocusArea m_focusArea = FocusArea::MainMenu;
+    FocusArea m_previousFocusArea = FocusArea::MainMenu;
+    int m_settingsDetailsLineIndex = 0;
+    int m_helpLineIndex = 0;
     std::string m_configureThingSearch;
     int m_selectedConfigureThingClassIndex = 0;
     int m_selectedConfigureThingIndex = 0;
@@ -237,6 +325,18 @@ private:
     std::string m_configurePairingPin;
     std::string m_configurePairingUsername;
     std::string m_configurePairingSecret;
+    mutable ftxui::Box m_mainMenuBox;
+    mutable ftxui::Box m_thingListBox;
+    mutable ftxui::Box m_thingDetailsBox;
+    mutable ftxui::Box m_configureMenuBox;
+    mutable ftxui::Box m_configureDetailsBox;
+    mutable ftxui::Box m_settingsMenuBox;
+    mutable ftxui::Box m_settingsDetailsBox;
+    mutable ftxui::Box m_apiBrowserListBox;
+    mutable ftxui::Box m_apiBrowserDetailsBox;
+    mutable ftxui::Box m_apiBrowserJsonBox;
+    mutable ftxui::Box m_apiBrowserReferencesBox;
+    mutable ftxui::Box m_helpBox;
     ftxui::ScreenInteractive* m_screen = nullptr;
     std::mutex m_uiTaskMutex;
     std::vector<std::function<void()>> m_uiTasks;
