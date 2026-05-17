@@ -367,6 +367,15 @@ NymeaJsonRpcClient::NymeaJsonRpcClient()
                              state.authToken = authToken;
                              state.lastError = lastError;
                          });
+
+                         StateHandler handler;
+                         {
+                             std::lock_guard<std::mutex> lock(m_stateHandlerMutex);
+                             handler = m_stateHandler;
+                         }
+                         if (handler) {
+                             handler(connected, encrypted, peerCertificateFingerprint, authToken, lastError);
+                         }
                      });
 
     QObject::connect(m_worker, &NymeaJsonRpcClientWorker::notificationReceived, [this](const QJsonObject& message) {
@@ -456,6 +465,12 @@ void NymeaJsonRpcClient::setNotificationHandler(NotificationHandler handler)
 {
     std::lock_guard<std::mutex> lock(m_notificationHandlerMutex);
     m_notificationHandler = std::move(handler);
+}
+
+void NymeaJsonRpcClient::setStateHandler(StateHandler handler)
+{
+    std::lock_guard<std::mutex> lock(m_stateHandlerMutex);
+    m_stateHandler = std::move(handler);
 }
 
 NymeaJsonRpcClient::State NymeaJsonRpcClient::stateSnapshot() const

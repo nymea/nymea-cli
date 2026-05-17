@@ -3,7 +3,11 @@
 #pragma once
 
 #include "connectionsettings.h"
+#include "generated/package.h"
 #include "generated/paramtype.h"
+#include "generated/systemgetcapabilitiesresponse.h"
+#include "generated/systemgettimeresponse.h"
+#include "generated/systemgetupdatestatusresponse.h"
 #include "generated/thingclass.h"
 #include "generated/thingdescriptor.h"
 #include "nymeajsonrpcclient.h"
@@ -11,6 +15,7 @@
 
 #include <QJsonObject>
 #include <QString>
+#include <QStringList>
 #include <QUuid>
 
 #include <ftxui/component/component.hpp>
@@ -52,12 +57,24 @@ private:
         ConfigureThings,
         ApiBrowser,
         Settings,
+        Logout,
+        About,
         Help,
     };
 
     enum class SettingsView {
-        General,
-        About,
+        ServerInfo,
+        Timezone,
+        Update,
+        Shutdown,
+        Restart,
+        Reboot,
+    };
+
+    enum class PowerAction {
+        Shutdown,
+        Restart,
+        Reboot,
     };
 
     enum class FocusArea {
@@ -75,6 +92,7 @@ private:
         ApiBrowserList,
         ApiBrowserReferences,
         SettingsMenu,
+        SettingsDetails,
         LoginForm,
     };
 
@@ -84,6 +102,7 @@ private:
         ApiBrowser,
         Settings,
         Logout,
+        About,
     };
 
     enum class ConfigureThingsView {
@@ -134,6 +153,12 @@ private:
     int thingDetailEntryCount() const;
     void clampThingDetailSelection();
     void resetThingDetailSelection();
+    void ensureSystemCapabilitiesLoaded();
+    void ensureSystemTimeLoaded();
+    void ensureSystemUpdateStatusLoaded();
+    void ensureSystemPackagesLoaded();
+    void ensureSystemTimeZonesLoaded();
+    QStringList filteredSystemTimeZones() const;
     bool openSelectedActionDialog();
     void closeActionDialog();
     std::vector<const api::Thing*> filteredThings() const;
@@ -180,17 +205,32 @@ private:
     void observeReply(JsonRpcReply* reply, std::function<void(const QJsonObject&, const QString&)> handler);
     void handleHelloReply(const QJsonObject& message, const QString& transportError);
     void handleAuthenticateReply(const QJsonObject& message, const QString& transportError);
+    void handleRequestPushButtonAuthReply(const QJsonObject& message, const QString& transportError);
+    void handlePushButtonAuthFinished(const QJsonObject& message);
     void handleEnableNotificationsReply(const QJsonObject& message, const QString& transportError, bool fetchThingsAfterReply);
     void handleFetchThingsReply(const QJsonObject& message, const QString& transportError);
     void handleFetchThingClassesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchSystemCapabilitiesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchSystemTimeReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchSystemUpdateStatusReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError);
+    void handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError);
+    void handleSetTimeZoneReply(const QJsonObject& message, const QString& transportError);
+    void handleUpdatePackagesReply(const QJsonObject& message, const QString& transportError);
+    void handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action);
     void handleActionExecutionReply(const QJsonObject& message, const QString& transportError);
     void handleNotification(const QJsonObject& message);
     void enqueueUiTask(std::function<void()> task);
     void drainUiTasks();
+    void handleClientStateChanged(bool connected, bool encrypted, const QString& peerCertificateFingerprint, const QString& authToken, const QString& lastError);
 
     bool connectToServer(bool shouldLoadSavedConnection = true);
     void sendHello();
     void authenticate(const std::string& username, const std::string& password);
+    void requestPushButtonAuth();
+    void enterAuthenticationRequiredState(const std::string& statusMessage, bool requestPushButtonAuth = false);
+    void completeAuthentication(const QString& token, const std::optional<QString>& username, const std::string& statusMessage);
     void logout();
     void revokeCurrentTokenAndLogout();
     void finalizeLogout();
@@ -202,6 +242,9 @@ private:
     bool clearStoredToken();
     void saveCurrentConnection(bool allowFingerprintUpdate);
     void runHandshakeAndLoadThings();
+    void openPowerActionConfirmDialog(PowerAction action);
+    void closePowerActionConfirmDialog();
+    void executePowerAction();
 
     ftxui::Element renderMainMenu() const;
     ftxui::Element renderThingList() const;
@@ -210,6 +253,9 @@ private:
     ftxui::Element renderConfigureDetails() const;
     ftxui::Element renderSettingsMenu() const;
     ftxui::Element renderSettingsDetails() const;
+    ftxui::Element renderLogout() const;
+    ftxui::Element renderAbout() const;
+    ftxui::Element renderConnectionLost() const;
     ftxui::Element renderApiBrowser() const;
     ftxui::Element renderHelp() const;
     ftxui::Element renderThings() const;
@@ -230,13 +276,21 @@ private:
 
     bool m_isAuthenticationRequired = false;
     bool m_isAuthenticated = false;
+    bool m_pushButtonAuthAvailable = false;
+    bool m_pushButtonAuthPending = false;
+    qint64 m_pushButtonAuthTransactionId = -1;
     bool m_showLoginForm = false;
+    int m_loginSelectedInputIndex = 0;
+    bool m_connectionLost = false;
     bool m_skipNextAutoAuthenticate = false;
     bool m_ignoreStoredToken = false;
     bool m_showLogoutConfirm = false;
     bool m_logoutRequestPending = false;
+    bool m_showSystemActionConfirm = false;
+    bool m_systemActionRequestPending = false;
     std::string m_authStatus = "Not authenticated.";
     std::string m_logoutStatus;
+    std::string m_systemActionStatus;
     std::string m_securityWarning;
     std::string m_settingsWarning;
 
@@ -256,7 +310,7 @@ private:
     QJsonObject m_apiBrowserIntrospection;
     int m_selectedThingIndex = 0;
     std::string m_thingSearch;
-    ThingSortMode m_thingSortMode = ThingSortMode::Default;
+    ThingSortMode m_thingSortMode = ThingSortMode::Alphabetical;
     ThingCategory m_thingCategoryFilter = ThingCategory::All;
     QUuid m_preferredThingSelectionId;
     int m_selectedThingDetailIndex = 0;
@@ -286,11 +340,12 @@ private:
     MainView m_previousMainView = MainView::Things;
     ConfigureThingsView m_configureThingsView = ConfigureThingsView::AddThing;
     ConfigureDialogMode m_configureDialogMode = ConfigureDialogMode::None;
-    SettingsView m_settingsView = SettingsView::General;
+    SettingsView m_settingsView = SettingsView::ServerInfo;
     FocusArea m_focusArea = FocusArea::MainMenu;
     FocusArea m_previousFocusArea = FocusArea::MainMenu;
     int m_settingsDetailsLineIndex = 0;
     int m_helpLineIndex = 0;
+    PowerAction m_systemAction = PowerAction::Shutdown;
     std::string m_configureThingSearch;
     int m_selectedConfigureThingClassIndex = 0;
     int m_selectedConfigureThingIndex = 0;
@@ -325,6 +380,22 @@ private:
     std::string m_configurePairingPin;
     std::string m_configurePairingUsername;
     std::string m_configurePairingSecret;
+    bool m_systemCapabilitiesLoaded = false;
+    bool m_systemCapabilitiesPending = false;
+    api::SystemGetCapabilitiesResponse m_systemCapabilities;
+    bool m_systemTimeLoaded = false;
+    bool m_systemTimePending = false;
+    api::SystemGetTimeResponse m_systemTime;
+    bool m_systemUpdateStatusLoaded = false;
+    bool m_systemUpdateStatusPending = false;
+    api::SystemGetUpdateStatusResponse m_systemUpdateStatus;
+    bool m_systemPackagesLoaded = false;
+    bool m_systemPackagesPending = false;
+    std::vector<api::Package> m_systemPackages;
+    bool m_systemTimeZonesLoaded = false;
+    bool m_systemTimeZonesPending = false;
+    QStringList m_systemTimeZones;
+    std::string m_systemTimeZoneSearch;
     mutable ftxui::Box m_mainMenuBox;
     mutable ftxui::Box m_thingListBox;
     mutable ftxui::Box m_thingDetailsBox;

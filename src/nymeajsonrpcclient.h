@@ -65,6 +65,7 @@ class NymeaJsonRpcClient
 {
 public:
     using NotificationHandler = std::function<void(const QJsonObject&)>;
+    using StateHandler = std::function<void(bool connected, bool encrypted, const QString& peerCertificateFingerprint, const QString& authToken, const QString& lastError)>;
 
     enum class TransportSecurity {
         PlainTcp,
@@ -88,6 +89,7 @@ public:
 
     JsonRpcReply* sendRequest(const QString& method, const QJsonObject& params = QJsonObject{});
     void setNotificationHandler(NotificationHandler handler);
+    void setStateHandler(StateHandler handler);
 
 private:
     class NymeaJsonRpcClientWorker;
@@ -110,5 +112,7 @@ private:
     State m_state;
     mutable std::mutex m_notificationHandlerMutex;
     NotificationHandler m_notificationHandler;
+    mutable std::mutex m_stateHandlerMutex;
+    StateHandler m_stateHandler;
 };
 } // namespace nymea

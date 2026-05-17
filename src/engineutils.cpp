@@ -35,12 +35,135 @@
 #include <cmath>
 #include <initializer_list>
 #include <string_view>
+#include <utility>
+
+#include <ftxui/dom/node.hpp>
 
 namespace nymea {
 
 #ifndef APP_LICENSE_SPDX
 #define APP_LICENSE_SPDX "GPL-3.0-or-later"
 #endif
+
+namespace {
+
+using Charset = std::array<std::string, 6>;
+using Charsets = std::array<Charset, 6>;
+
+static const Charsets simpleBorderCharset = {
+    Charset{"┌", "┐", "└", "┘", "─", "│"},
+    Charset{"┏", "┓", "┗", "┛", "╍", "╏"},
+    Charset{"┏", "┓", "┗", "┛", "━", "┃"},
+    Charset{"╔", "╗", "╚", "╝", "═", "║"},
+    Charset{"╭", "╮", "╰", "╯", "─", "│"},
+    Charset{" ", " ", " ", " ", " ", " "},
+};
+
+class ColoredWindow final : public ftxui::Node
+{
+public:
+    ColoredWindow(ftxui::Elements children, ftxui::BorderStyle style, std::optional<ftxui::Color> foregroundColor)
+        : ftxui::Node(std::move(children))
+        , m_charset(simpleBorderCharset[style])
+        , m_foregroundColor(foregroundColor)
+    {}
+
+    void ComputeRequirement() override
+    {
+        Node::ComputeRequirement();
+        requirement_ = children_[0]->requirement();
+        requirement_.min_x += 2;
+        requirement_.min_y += 2;
+        if (children_.size() == 2) {
+            requirement_.min_x = std::max(requirement_.min_x, children_[1]->requirement().min_x + 2);
+        }
+        requirement_.focused.box.x_min++;
+        requirement_.focused.box.x_max++;
+        requirement_.focused.box.y_min++;
+        requirement_.focused.box.y_max++;
+    }
+
+    void SetBox(ftxui::Box box) override
+    {
+        Node::SetBox(box);
+        if (children_.size() == 2) {
+            ftxui::Box titleBox;
+            titleBox.x_min = box.x_min + 1;
+            titleBox.x_max = std::min(box.x_max - 1, box.x_min + children_[1]->requirement().min_x);
+            titleBox.y_min = box.y_min;
+            titleBox.y_max = box.y_min;
+            children_[1]->SetBox(titleBox);
+        }
+        box.x_min++;
+        box.x_max--;
+        box.y_min++;
+        box.y_max--;
+        children_[0]->SetBox(box);
+    }
+
+    void Render(ftxui::Screen& screen) override
+    {
+        children_[0]->Render(screen);
+
+        if (box_.x_min >= box_.x_max || box_.y_min >= box_.y_max) {
+            return;
+        }
+
+        screen.at(box_.x_min, box_.y_min) = m_charset[0];
+        screen.at(box_.x_max, box_.y_min) = m_charset[1];
+        screen.at(box_.x_min, box_.y_max) = m_charset[2];
+        screen.at(box_.x_max, box_.y_max) = m_charset[3];
+
+        for (int x = box_.x_min + 1; x < box_.x_max; ++x) {
+            ftxui::Pixel& top = screen.PixelAt(x, box_.y_min);
+            ftxui::Pixel& bottom = screen.PixelAt(x, box_.y_max);
+            top.character = m_charset[4];
+            bottom.character = m_charset[4];
+            top.automerge = true;
+            bottom.automerge = true;
+        }
+        for (int y = box_.y_min + 1; y < box_.y_max; ++y) {
+            ftxui::Pixel& left = screen.PixelAt(box_.x_min, y);
+            ftxui::Pixel& right = screen.PixelAt(box_.x_max, y);
+            left.character = m_charset[5];
+            right.character = m_charset[5];
+            left.automerge = true;
+            right.automerge = true;
+        }
+
+        if (children_.size() == 2) {
+            children_[1]->Render(screen);
+        }
+
+        if (m_foregroundColor) {
+            for (int x = box_.x_min; x <= box_.x_max; ++x) {
+                screen.PixelAt(x, box_.y_min).foreground_color = *m_foregroundColor;
+                screen.PixelAt(x, box_.y_max).foreground_color = *m_foregroundColor;
+            }
+            for (int y = box_.y_min; y <= box_.y_max; ++y) {
+                screen.PixelAt(box_.x_min, y).foreground_color = *m_foregroundColor;
+                screen.PixelAt(box_.x_max, y).foreground_color = *m_foregroundColor;
+            }
+        }
+    }
+
+private:
+    Charset m_charset;
+    std::optional<ftxui::Color> m_foregroundColor;
+};
+
+ftxui::Element makeColoredWindow(ftxui::Element title, ftxui::Element body, bool focused)
+{
+    if (focused) {
+        title = std::move(title) | ftxui::color(ftxui::Color::SteelBlue);
+    }
+
+    return std::make_shared<ColoredWindow>(ftxui::Elements{std::move(body), std::move(title)},
+                                           ftxui::ROUNDED,
+                                           focused ? std::optional<ftxui::Color>(ftxui::Color::SteelBlue) : std::nullopt);
+}
+
+} // namespace
 
 std::optional<double> parseNumericString(const QString& rawValue, api::BasicType type)
 {
@@ -769,6 +892,24 @@ std::optional<ftxui::Color> parseHexColor(const std::string& value)
     }
 
     return ftxui::Color::RGB(*red, *green, *blue);
+}
+
+ftxui::Element renderActiveField(ftxui::Element element, bool focused, int minimumWidth)
+{
+    if (!focused) {
+        return element;
+    }
+
+    if (minimumWidth > 0) {
+        element = std::move(element) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, minimumWidth);
+    }
+
+    return std::move(element) | ftxui::focus;
+}
+
+ftxui::Element renderFocusedWindow(ftxui::Element title, ftxui::Element body, bool focused)
+{
+    return makeColoredWindow(std::move(title), std::move(body), focused);
 }
 
 ftxui::Element renderBoolValue(bool value)

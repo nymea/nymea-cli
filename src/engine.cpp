@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "engine.h"
+#include "engineutils.h"
 
 #include "generated/actiontype.h"
 #include "generated/apiutils.h"
+#include "generated/configurationsettimezoneparams.h"
+#include "generated/configurationsettimezoneresponse.h"
 #include "generated/integrationsaddthingparams.h"
 #include "generated/integrationsaddthingresponse.h"
 #include "generated/integrationsconfirmpairingparams.h"
@@ -24,11 +27,38 @@
 #include "generated/integrationsthingchangednotificationparams.h"
 #include "generated/integrationsthingremovednotificationparams.h"
 #include "generated/integrationsthingsettingchangednotificationparams.h"
+#include "generated/jsonrpcauthenticateresponse.h"
+#include "generated/jsonrpcpushbuttonauthfinishednotificationparams.h"
+#include "generated/jsonrpcrequestpushbuttonauthparams.h"
+#include "generated/jsonrpcrequestpushbuttonauthresponse.h"
 #include "generated/jsonrpcsetnotificationstatusparams.h"
 #include "generated/jsonrpcsetnotificationstatusresponse.h"
+#include "generated/package.h"
 #include "generated/param.h"
 #include "generated/state.h"
 #include "generated/statetype.h"
+#include "generated/systemcheckforupdatesparams.h"
+#include "generated/systemcheckforupdatesresponse.h"
+#include "generated/systemgetcapabilitiesparams.h"
+#include "generated/systemgetcapabilitiesresponse.h"
+#include "generated/systemgetpackagesparams.h"
+#include "generated/systemgetpackagesresponse.h"
+#include "generated/systemgettimeparams.h"
+#include "generated/systemgettimeresponse.h"
+#include "generated/systemgettimezonesparams.h"
+#include "generated/systemgettimezonesresponse.h"
+#include "generated/systemgetupdatestatusparams.h"
+#include "generated/systemgetupdatestatusresponse.h"
+#include "generated/systemrebootparams.h"
+#include "generated/systemrebootresponse.h"
+#include "generated/systemrestartparams.h"
+#include "generated/systemrestartresponse.h"
+#include "generated/systemshutdownparams.h"
+#include "generated/systemshutdownresponse.h"
+#include "generated/systemtimeconfigurationchangednotificationparams.h"
+#include "generated/systemupdatepackagesparams.h"
+#include "generated/systemupdatepackagesresponse.h"
+#include "generated/systemupdatestatuschangednotificationparams.h"
 #include "generated/thing.h"
 #include "generated/thingclass.h"
 #include "generated/usersremovetokenparams.h"
@@ -55,6 +85,9 @@
 namespace nymea {
 
 namespace {
+
+std::string settingsViewLabel(int view);
+std::string powerActionLabel(int action);
 
 #if 0
 #ifndef APP_LICENSE_SPDX
@@ -242,6 +275,8 @@ std::string normalizedActionDialogValue(const api::ParamType& paramType, const s
 bool actionParamUsesSelector(const api::ParamType& paramType);
 std::string cycleSelectableValue(const api::ParamType& paramType, const std::string& rawValue, int delta);
 std::string prettyUnit(api::Unit unit);
+std::string settingsViewLabel(int view);
+std::string powerActionLabel(int action);
 
 bool isNumericRangeType(api::BasicType type)
 {
@@ -694,6 +729,40 @@ std::string setupMethodLabel(api::SetupMethod setupMethod)
     return value;
 }
 
+std::string settingsViewLabel(int view)
+{
+    switch (view) {
+    case 0:
+        return "Server info";
+    case 1:
+        return "Timezone";
+    case 2:
+        return "Update";
+    case 3:
+        return "Shutdown";
+    case 4:
+        return "Restart";
+    case 5:
+        return "Reboot";
+    }
+
+    return "Settings";
+}
+
+std::string powerActionLabel(int action)
+{
+    switch (action) {
+    case 0:
+        return "Shutdown";
+    case 1:
+        return "Restart";
+    case 2:
+        return "Reboot";
+    }
+
+    return "Power action";
+}
+
 std::string thingClassLabel(const api::ThingClass& thingClass)
 {
     return firstNonEmpty({thingClass.displayName.toStdString(), thingClass.name.toStdString(), uuidToStd(thingClass.id), "<unknown thing class>"});
@@ -1007,6 +1076,10 @@ ftxui::Element renderValueCell(const QJsonValue& value, std::optional<api::Basic
 
 ftxui::Element renderTwoColumnRow(const std::string& name, ftxui::Element value, bool selected, bool focused)
 {
+    if (selected && focused) {
+        value = renderActiveField(std::move(value), true, 14);
+    }
+
     auto row = ftxui::hbox({
         ftxui::text(name) | ftxui::xflex,
         ftxui::text(" "),
@@ -1218,12 +1291,85 @@ ftxui::Element renderActionDialogValueCell(const api::ParamType& paramType, cons
 
 namespace nymea {
 
+namespace {
+
+std::string settingsViewLabel(int view)
+{
+    switch (view) {
+    case 0:
+        return "Server info";
+    case 1:
+        return "Timezone";
+    case 2:
+        return "Update";
+    case 3:
+        return "Shutdown";
+    case 4:
+        return "Restart";
+    case 5:
+        return "Reboot";
+    }
+
+    return "Settings";
+}
+
+std::string powerActionLabel(int action)
+{
+    switch (action) {
+    case 0:
+        return "Shutdown";
+    case 1:
+        return "Restart";
+    case 2:
+        return "Reboot";
+    }
+
+    return "Power action";
+}
+
+constexpr int timezoneSearchLineIndex = 4;
+constexpr int timezoneListStartLineIndex = 7;
+
+int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCount)
+{
+    if (filteredCount <= 0) {
+        return timezoneSearchLineIndex;
+    }
+
+    const int firstResultLineIndex = timezoneListStartLineIndex;
+    const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
+
+    if (currentIndex == timezoneSearchLineIndex) {
+        return direction > 0 ? firstResultLineIndex : lastResultLineIndex;
+    }
+
+    if (currentIndex < firstResultLineIndex) {
+        return direction > 0 ? firstResultLineIndex : timezoneSearchLineIndex;
+    }
+
+    if (currentIndex <= lastResultLineIndex) {
+        if (direction > 0) {
+            return currentIndex == lastResultLineIndex ? timezoneSearchLineIndex : currentIndex + 1;
+        }
+        return currentIndex == firstResultLineIndex ? timezoneSearchLineIndex : currentIndex - 1;
+    }
+
+    return direction > 0 ? timezoneSearchLineIndex : lastResultLineIndex;
+}
+
+} // namespace
+
 Engine::Engine(EngineOptions options)
     : m_options(std::move(options))
     , m_username(m_options.username)
     , m_password(m_options.password)
 {
     m_client.setNotificationHandler([this](const QJsonObject& message) { enqueueUiTask([this, message]() { handleNotification(message); }); });
+    m_client.setStateHandler([this](bool connected, bool encrypted, const QString& peerCertificateFingerprint, const QString& authToken, const QString& lastError) {
+        enqueueUiTask([this, connected, encrypted, peerCertificateFingerprint, authToken, lastError]() {
+            handleClientStateChanged(connected, encrypted, peerCertificateFingerprint, authToken, lastError);
+        });
+    });
     m_passwordInputOption.password = true;
     m_usernameInput = ftxui::Input(&m_username, "Username");
     m_passwordInput = ftxui::Input(&m_password, "Password", m_passwordInputOption);
@@ -1748,6 +1894,10 @@ void Engine::closeHelpView()
     case MainView::Settings:
         clampSettingsDetailsSelection();
         break;
+    case MainView::Logout:
+        break;
+    case MainView::About:
+        break;
     case MainView::Help:
         break;
     }
@@ -2178,6 +2328,125 @@ void Engine::observeReply(JsonRpcReply* reply, std::function<void(const QJsonObj
     QObject::connect(reply, &JsonRpcReply::finished, [dispatch = std::move(dispatch)]() mutable { dispatch(); });
 }
 
+void Engine::enterAuthenticationRequiredState(const std::string& statusMessage, bool startPushButtonAuth)
+{
+    m_isAuthenticationRequired = true;
+    m_isAuthenticated = false;
+    m_notificationsEnabled = false;
+    m_showLoginForm = true;
+    m_loginSelectedInputIndex = 0;
+    m_focusArea = FocusArea::LoginForm;
+    m_authenticationPending = false;
+    m_pushButtonAuthPending = false;
+    m_pushButtonAuthTransactionId = -1;
+
+    if (m_pushButtonAuthAvailable) {
+        m_authStatus = statusMessage;
+        if (startPushButtonAuth) {
+            requestPushButtonAuth();
+        }
+    } else {
+        m_authStatus = statusMessage;
+    }
+}
+
+void Engine::completeAuthentication(const QString& token, const std::optional<QString>& username, const std::string& statusMessage)
+{
+    if (username.has_value() && !username->isEmpty()) {
+        m_username = username->toStdString();
+    }
+
+    m_client.setAuthToken(token);
+    m_isAuthenticated = true;
+    m_isAuthenticationRequired = false;
+    m_notificationsEnabled = false;
+    m_showLoginForm = false;
+    m_focusArea = FocusArea::MainMenu;
+    m_authStatus = statusMessage;
+    m_ignoreStoredToken = false;
+    m_logoutStatus.clear();
+    m_pushButtonAuthPending = false;
+    m_pushButtonAuthTransactionId = -1;
+    saveCurrentConnection(true);
+    m_thingManager.setStatus("Authentication succeeded.");
+    if (m_mainView == MainView::ApiBrowser) {
+        ensureApiBrowserLoaded();
+    }
+    enableNotifications(true);
+}
+
+void Engine::requestPushButtonAuth()
+{
+    if (!m_client.isConnected() || !m_isAuthenticationRequired || m_isAuthenticated || !m_pushButtonAuthAvailable) {
+        return;
+    }
+    if (m_pushButtonAuthPending) {
+        return;
+    }
+
+    m_pushButtonAuthPending = true;
+    m_pushButtonAuthTransactionId = -1;
+    m_authStatus.clear();
+
+    QJsonObject params;
+    params.insert(QStringLiteral("deviceName"), QStringLiteral("nymea-cli"));
+    observeReply(m_client.sendRequest(api::JSONRPCRequestPushButtonAuthMethod::methodName(), params),
+                 [this](const QJsonObject& message, const QString& transportError) { handleRequestPushButtonAuthReply(message, transportError); });
+}
+
+void Engine::handleRequestPushButtonAuthReply(const QJsonObject& message, const QString& transportError)
+{
+    if (!m_pushButtonAuthPending) {
+        return;
+    }
+
+    if (!transportError.isEmpty()) {
+        m_pushButtonAuthPending = false;
+        m_pushButtonAuthTransactionId = -1;
+        enterAuthenticationRequiredState("No reply for push-button authentication request: " + transportError.toStdString(), false);
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("error") || status == QStringLiteral("unauthorized")) {
+        m_pushButtonAuthPending = false;
+        m_pushButtonAuthTransactionId = -1;
+        enterAuthenticationRequiredState("Push-button authentication could not be started.", false);
+        return;
+    }
+
+    const api::JSONRPCRequestPushButtonAuthResponse response = api::JSONRPCRequestPushButtonAuthResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (!response.success) {
+        m_pushButtonAuthPending = false;
+        m_pushButtonAuthTransactionId = -1;
+        enterAuthenticationRequiredState("Push-button authentication could not be started.", false);
+        return;
+    }
+
+    m_pushButtonAuthTransactionId = response.transactionId;
+    m_authStatus.clear();
+}
+
+void Engine::handlePushButtonAuthFinished(const QJsonObject& message)
+{
+    const api::JSONRPCPushButtonAuthFinishedNotificationParams notification = api::JSONRPCPushButtonAuthFinishedNotificationParams::fromJson(
+        message.value(QStringLiteral("params")).toObject());
+
+    if (m_pushButtonAuthPending && m_pushButtonAuthTransactionId >= 0 && notification.transactionId != m_pushButtonAuthTransactionId) {
+        return;
+    }
+
+    m_pushButtonAuthPending = false;
+    m_pushButtonAuthTransactionId = -1;
+
+    if (!notification.success || !notification.token.has_value() || notification.token->isEmpty()) {
+        enterAuthenticationRequiredState("Push-button authentication failed. Please press the push button again.", false);
+        return;
+    }
+
+    completeAuthentication(*notification.token, std::nullopt, "Authenticated using push-button auth.");
+}
+
 void Engine::handleActionExecutionReply(const QJsonObject& message, const QString& transportError)
 {
     if (!transportError.isEmpty()) {
@@ -2193,6 +2462,7 @@ void Engine::handleActionExecutionReply(const QJsonObject& message, const QStrin
             m_isAuthenticated = false;
             m_notificationsEnabled = false;
             m_showLoginForm = true;
+            m_loginSelectedInputIndex = 0;
             m_focusArea = FocusArea::LoginForm;
             m_authStatus = "Authentication required. Please login.";
             m_actionDialogStatus = "Action execution unauthorized.";
@@ -2252,6 +2522,7 @@ void Engine::handleFetchAllThingClassesReply(const QJsonObject& message, const Q
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_settingsWarning = "Thing class catalog request was unauthorized.";
@@ -2297,6 +2568,7 @@ void Engine::handleDiscoverThingsReply(const QJsonObject& message, const QString
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_configureDialogStatus = "Discovery unauthorized.";
@@ -2373,6 +2645,7 @@ void Engine::handleAddThingReply(const QJsonObject& message, const QString& tran
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_configureDialogStatus = "Add thing unauthorized.";
@@ -2439,6 +2712,7 @@ void Engine::handlePairThingReply(const QJsonObject& message, const QString& tra
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_configureDialogStatus = "Pairing unauthorized.";
@@ -2539,6 +2813,7 @@ void Engine::handleConfirmPairingReply(const QJsonObject& message, const QString
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_lastConfigureExecutionStatus = formatActionExecutionStatus(requestId, invocation, "Unauthorized");
@@ -2673,6 +2948,12 @@ void Engine::handleNotification(const QJsonObject& message)
     const QJsonObject params = message.value(QStringLiteral("params")).toObject();
     const QUuid selectedId = selectedThingId();
 
+    if (notificationName == api::JSONRPCPushButtonAuthFinishedNotification::notificationName()
+        || notificationName == api::UsersPushButtonAuthFinishedNotification::notificationName()) {
+        handlePushButtonAuthFinished(message);
+        return;
+    }
+
     if (notificationName == api::IntegrationsStateChangedNotification::notificationName()) {
         const api::IntegrationsStateChangedNotificationParams notification = api::IntegrationsStateChangedNotificationParams::fromJson(params);
         if (m_thingManager
@@ -2768,6 +3049,43 @@ void Engine::drainUiTasks()
     }
 }
 
+void Engine::handleClientStateChanged(bool connected, bool encrypted, const QString& peerCertificateFingerprint, const QString& authToken, const QString& lastError)
+{
+    Q_UNUSED(encrypted)
+    Q_UNUSED(peerCertificateFingerprint)
+    Q_UNUSED(authToken)
+    Q_UNUSED(lastError)
+
+    if (!connected) {
+        m_connectionLost = true;
+        m_connectionStatus = "Connection lost, try to reconnect.";
+        m_authStatus = m_connectionStatus;
+        m_thingManager.setStatus(m_connectionStatus);
+        m_showLogoutConfirm = false;
+        m_logoutRequestPending = false;
+        m_logoutStatus.clear();
+        closePowerActionConfirmDialog();
+        closeActionDialog();
+        closeConfigureDialog();
+        m_showThingDetailInspector = false;
+        m_helloPending = false;
+        m_authenticationPending = false;
+        m_pushButtonAuthAvailable = false;
+        m_pushButtonAuthPending = false;
+        m_pushButtonAuthTransactionId = -1;
+        m_notificationSetupPending = false;
+        m_fetchThingsPending = false;
+        m_fetchThingClassesPending = false;
+        m_actionExecutionPending = false;
+        m_pendingActionRequestId = -1;
+        m_pendingActionInvocation.clear();
+    } else {
+        m_connectionStatus = std::string(m_client.isEncrypted() ? "SSL connected to " : "TCP connected to ") + endpoint();
+        m_thingManager.setStatus(m_connectionStatus);
+        updateCertificateWarning();
+    }
+}
+
 bool Engine::connectToServer(bool shouldLoadSavedConnection)
 {
     m_client.clearAuthToken();
@@ -2785,11 +3103,33 @@ bool Engine::connectToServer(bool shouldLoadSavedConnection)
     m_pendingActionInvocation.clear();
     m_notificationsEnabled = false;
     m_haveAllThingClasses = false;
+    m_pushButtonAuthAvailable = false;
+    m_pushButtonAuthPending = false;
+    m_pushButtonAuthTransactionId = -1;
     m_securityWarning.clear();
     m_settingsWarning.clear();
     m_showLogoutConfirm = false;
     m_logoutRequestPending = false;
     m_logoutStatus.clear();
+    m_showSystemActionConfirm = false;
+    m_systemActionRequestPending = false;
+    m_systemActionStatus.clear();
+    m_systemCapabilitiesLoaded = false;
+    m_systemCapabilitiesPending = false;
+    m_systemCapabilities = api::SystemGetCapabilitiesResponse{};
+    m_systemTimeLoaded = false;
+    m_systemTimePending = false;
+    m_systemTime = api::SystemGetTimeResponse{};
+    m_systemUpdateStatusLoaded = false;
+    m_systemUpdateStatusPending = false;
+    m_systemUpdateStatus = api::SystemGetUpdateStatusResponse{};
+    m_systemPackagesLoaded = false;
+    m_systemPackagesPending = false;
+    m_systemPackages.clear();
+    m_systemTimeZonesLoaded = false;
+    m_systemTimeZonesPending = false;
+    m_systemTimeZones.clear();
+    m_systemTimeZoneSearch.clear();
     m_apiBrowserLoaded = false;
     m_apiBrowserPending = false;
     m_apiBrowserIntrospection = QJsonObject();
@@ -2812,11 +3152,15 @@ bool Engine::connectToServer(bool shouldLoadSavedConnection)
         return true;
     }
 
-    m_connectionStatus = "Connection failed: " + m_client.lastError().toStdString();
+    m_connectionLost = true;
+    m_connectionStatus = "Connection lost, try to reconnect.";
     m_isAuthenticationRequired = false;
     m_isAuthenticated = false;
+    m_pushButtonAuthAvailable = false;
+    m_pushButtonAuthPending = false;
+    m_pushButtonAuthTransactionId = -1;
     m_showLoginForm = false;
-    m_authStatus = "Not authenticated.";
+    m_authStatus = m_connectionStatus;
     m_thingManager.clear();
     m_thingManager.setStatus(m_connectionStatus);
     return false;
@@ -2827,38 +3171,15 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
     m_helloPending = false;
 
     if (!transportError.isEmpty()) {
+        m_connectionLost = true;
+        m_connectionStatus = "Connection lost, try to reconnect.";
         m_thingManager.setStatus("No reply for JSONRPC.Hello: " + transportError.toStdString());
         return;
     }
 
     const QString status = message.value(QStringLiteral("status")).toString();
     const int requestId = message.value(QStringLiteral("id")).toInt(-1);
-    if (status == QStringLiteral("unauthorized")) {
-        clearStoredToken();
-        m_client.clearAuthToken();
-        m_isAuthenticationRequired = true;
-        m_isAuthenticated = false;
-        m_notificationsEnabled = false;
-        m_showLoginForm = true;
-        m_focusArea = FocusArea::LoginForm;
-        m_apiBrowserLoaded = false;
-        m_apiBrowserPending = false;
-        m_apiBrowserIntrospection = QJsonObject();
-        m_apiBrowserHistory.clear();
-        m_apiBrowserSelectedSection.clear();
-        m_apiBrowserSelectedName.clear();
-        m_apiBrowserSelectedReferenceIndex = 0;
-        m_apiBrowserStatus = "Stored token was rejected. Please login.";
-        m_authStatus = "Stored token was rejected. Please login.";
-        m_thingManager.setStatus("JSONRPC.Hello unauthorized (request id " + std::to_string(requestId) + ").");
-        return;
-    }
-
-    if (status == QStringLiteral("error")) {
-        m_thingManager.setStatus("JSONRPC.Hello returned error (request id " + std::to_string(requestId) + ").");
-        return;
-    }
-
+    m_connectionLost = false;
     const QJsonObject helloParams = message.value(QStringLiteral("params")).toObject();
     const QString serverNameValue = helloParams.value(QStringLiteral("name")).toString();
     if (!serverNameValue.isEmpty()) {
@@ -2897,11 +3218,38 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
     updateCertificateWarning();
 
     m_isAuthenticationRequired = helloParams.value(QStringLiteral("authenticationRequired")).toBool();
+    m_pushButtonAuthAvailable = helloParams.value(QStringLiteral("pushButtonAuthAvailable")).toBool();
     const bool helloAuthenticated = helloParams.value(QStringLiteral("authenticated")).toBool();
-    m_isAuthenticated = helloAuthenticated || !m_isAuthenticationRequired;
-    m_showLoginForm = m_isAuthenticationRequired && !m_isAuthenticated;
     const bool allowAutoAuthenticate = !m_skipNextAutoAuthenticate;
     m_skipNextAutoAuthenticate = false;
+
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticated = false;
+        m_notificationsEnabled = false;
+        m_apiBrowserLoaded = false;
+        m_apiBrowserPending = false;
+        m_apiBrowserIntrospection = QJsonObject();
+        m_apiBrowserHistory.clear();
+        m_apiBrowserSelectedSection.clear();
+        m_apiBrowserSelectedName.clear();
+        m_apiBrowserSelectedReferenceIndex = 0;
+        m_apiBrowserStatus = "Stored token was rejected. Please login.";
+        enterAuthenticationRequiredState(m_pushButtonAuthAvailable ? std::string() : "Stored token was rejected. Please login.", true);
+        m_thingManager.setStatus("JSONRPC.Hello unauthorized (request id " + std::to_string(requestId) + ").");
+        return;
+    }
+
+    if (status == QStringLiteral("error")) {
+        m_connectionLost = true;
+        m_connectionStatus = "Connection lost, try to reconnect.";
+        m_thingManager.setStatus("JSONRPC.Hello returned error (request id " + std::to_string(requestId) + ").");
+        return;
+    }
+
+    m_isAuthenticated = helloAuthenticated || !m_isAuthenticationRequired;
+    m_showLoginForm = m_isAuthenticationRequired && !m_isAuthenticated;
 
     if (!m_isAuthenticationRequired) {
         m_authStatus = "Server does not require authentication.";
@@ -2919,12 +3267,12 @@ void Engine::handleHelloReply(const QJsonObject& message, const QString& transpo
     m_thingManager.setStatus("JSONRPC.Hello succeeded (request id " + std::to_string(requestId) + ").");
 
     if (m_isAuthenticationRequired && !m_isAuthenticated) {
-        if (allowAutoAuthenticate && !m_username.empty() && !m_password.empty()) {
+        if (m_pushButtonAuthAvailable) {
+            enterAuthenticationRequiredState("", true);
+        } else if (allowAutoAuthenticate && !m_username.empty() && !m_password.empty()) {
             authenticate(m_username, m_password);
         } else {
-            m_showLoginForm = true;
-            m_focusArea = FocusArea::LoginForm;
-            m_authStatus = "Authentication required. Enter username/password and press Enter.";
+            enterAuthenticationRequiredState("Authentication required. Enter username/password and press Enter.", false);
         }
         return;
     }
@@ -2965,7 +3313,7 @@ void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& 
 
     if (!transportError.isEmpty()) {
         m_authStatus = "No reply for authenticate request: " + transportError.toStdString();
-        m_showLoginForm = true;
+        enterAuthenticationRequiredState(m_authStatus, m_pushButtonAuthAvailable);
         return;
     }
 
@@ -2975,10 +3323,6 @@ void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& 
         if (status == QStringLiteral("unauthorized")) {
             clearStoredToken();
         }
-        m_authStatus = "Authentication rejected by server.";
-        m_showLoginForm = true;
-        m_isAuthenticated = false;
-        m_notificationsEnabled = false;
         m_client.clearAuthToken();
         m_apiBrowserLoaded = false;
         m_apiBrowserPending = false;
@@ -2989,44 +3333,28 @@ void Engine::handleAuthenticateReply(const QJsonObject& message, const QString& 
         m_apiBrowserSearch.clear();
         m_apiBrowserSelectedReferenceIndex = 0;
         m_apiBrowserStatus = "Authentication rejected by server.";
+        enterAuthenticationRequiredState("Authentication rejected by server.", true);
         return;
     }
 
-    const QJsonObject authParams = message.value(QStringLiteral("params")).toObject();
-    if (!authParams.value(QStringLiteral("success")).toBool()) {
-        m_authStatus = "Authentication failed.";
-        m_showLoginForm = true;
-        m_isAuthenticated = false;
-        m_notificationsEnabled = false;
+    const api::JSONRPCAuthenticateResponse response = api::JSONRPCAuthenticateResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (!response.success) {
         m_client.clearAuthToken();
+        enterAuthenticationRequiredState("Authentication failed.", true);
         return;
     }
 
-    const QString token = authParams.value(QStringLiteral("token")).toString();
+    const QString token = response.token.value_or(QString());
     if (token.isEmpty()) {
-        m_authStatus = "Authentication succeeded but no token was returned.";
-        m_showLoginForm = true;
-        m_isAuthenticated = false;
-        m_notificationsEnabled = false;
         m_client.clearAuthToken();
+        enterAuthenticationRequiredState("Authentication succeeded but no token was returned.", true);
         return;
     }
 
-    m_client.setAuthToken(token);
-    m_isAuthenticated = true;
-    m_isAuthenticationRequired = false;
-    m_notificationsEnabled = false;
-    m_showLoginForm = false;
-    m_focusArea = FocusArea::MainMenu;
-    m_authStatus = "Authenticated as " + m_username + ".";
-    m_ignoreStoredToken = false;
-    m_logoutStatus.clear();
-    saveCurrentConnection(true);
+    completeAuthentication(token,
+                           response.username,
+                           response.username.has_value() && !response.username->isEmpty() ? "Authenticated as " + response.username->toStdString() + "." : "Authenticated.");
     m_thingManager.setStatus("Authentication succeeded (request id " + std::to_string(requestId) + ").");
-    if (m_mainView == MainView::ApiBrowser) {
-        ensureApiBrowserLoaded();
-    }
-    enableNotifications(true);
 }
 
 void Engine::authenticate(const std::string& username, const std::string& password)
@@ -3039,6 +3367,7 @@ void Engine::authenticate(const std::string& username, const std::string& passwo
     if (username.empty() || password.empty()) {
         m_authStatus = "Username and password are required.";
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         return;
     }
 
@@ -3065,7 +3394,7 @@ void Engine::logout()
     }
 
     m_showLogoutConfirm = true;
-    m_logoutStatus = "This will revoke the current token and reconnect to the same server.";
+    m_logoutStatus = "Logout revokes the current token on the server, clears the saved token locally, and reconnects to the same server.";
 }
 
 void Engine::finalizeLogout()
@@ -3092,6 +3421,7 @@ void Engine::finalizeLogout()
     m_isAuthenticated = false;
     m_notificationsEnabled = false;
     m_showLoginForm = true;
+    m_loginSelectedInputIndex = 0;
     m_focusArea = FocusArea::LoginForm;
     closeActionDialog();
     closeConfigureDialog();
@@ -3101,6 +3431,7 @@ void Engine::finalizeLogout()
     if (!connectToServer(storedTokenCleared)) {
         m_authStatus = m_connectionStatus;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         return;
     }
@@ -3158,6 +3489,55 @@ void Engine::revokeCurrentTokenAndLogout()
     });
 }
 
+void Engine::openPowerActionConfirmDialog(PowerAction action)
+{
+    m_systemAction = action;
+    m_showSystemActionConfirm = true;
+    m_systemActionStatus = "Press Enter to confirm or Esc to cancel.";
+}
+
+void Engine::closePowerActionConfirmDialog()
+{
+    m_showSystemActionConfirm = false;
+    m_systemActionRequestPending = false;
+}
+
+void Engine::executePowerAction()
+{
+    if (!m_client.isConnected() || m_systemActionRequestPending) {
+        return;
+    }
+
+    m_systemActionRequestPending = true;
+    m_systemActionStatus = "Sending " + powerActionLabel(static_cast<int>(m_systemAction)) + " request...";
+
+    auto send = [&](const QString& method, auto params, auto handler) { observeReply(m_client.sendRequest(method, params.toJson()), handler); };
+
+    switch (m_systemAction) {
+    case PowerAction::Shutdown: {
+        api::SystemShutdownParams params;
+        send(api::SystemShutdownMethod::methodName(), params, [this](const QJsonObject& message, const QString& transportError) {
+            handlePowerActionReply(message, transportError, PowerAction::Shutdown);
+        });
+        break;
+    }
+    case PowerAction::Restart: {
+        api::SystemRestartParams params;
+        send(api::SystemRestartMethod::methodName(), params, [this](const QJsonObject& message, const QString& transportError) {
+            handlePowerActionReply(message, transportError, PowerAction::Restart);
+        });
+        break;
+    }
+    case PowerAction::Reboot: {
+        api::SystemRebootParams params;
+        send(api::SystemRebootMethod::methodName(), params, [this](const QJsonObject& message, const QString& transportError) {
+            handlePowerActionReply(message, transportError, PowerAction::Reboot);
+        });
+        break;
+    }
+    }
+}
+
 void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QString& transportError, bool fetchThingsAfterReply)
 {
     m_notificationSetupPending = false;
@@ -3179,6 +3559,7 @@ void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QS
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_thingManager.setStatus("Notification setup unauthorized.");
@@ -3261,6 +3642,7 @@ void Engine::handleFetchThingsReply(const QJsonObject& message, const QString& t
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_thingManager.setStatus("Integrations.GetThings unauthorized.");
@@ -3303,6 +3685,7 @@ void Engine::fetchThings()
     if (m_isAuthenticationRequired && !m_isAuthenticated) {
         m_thingManager.setStatus("Authentication required before fetching things.");
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         return;
     }
@@ -3333,6 +3716,7 @@ void Engine::handleFetchThingClassesReply(const QJsonObject& message, const QStr
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_authStatus = "Authentication required. Please login.";
         m_thingManager.setStatus("Integrations.GetThingClasses unauthorized.");
@@ -3400,6 +3784,405 @@ void Engine::fetchAllThingClasses()
     m_fetchAllThingClassesPending = true;
     observeReply(m_client.sendRequest(api::IntegrationsGetThingClassesMethod::methodName(), QJsonObject{}),
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchAllThingClassesReply(message, transportError); });
+}
+
+void Engine::ensureSystemCapabilitiesLoaded()
+{
+    if (m_systemCapabilitiesLoaded || m_systemCapabilitiesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_systemCapabilitiesPending = true;
+    observeReply(m_client.sendRequest(api::SystemGetCapabilitiesMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemCapabilitiesReply(message, transportError); });
+}
+
+void Engine::ensureSystemTimeLoaded()
+{
+    if (m_systemTimeLoaded || m_systemTimePending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_systemTimePending = true;
+    observeReply(m_client.sendRequest(api::SystemGetTimeMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemTimeReply(message, transportError); });
+}
+
+void Engine::ensureSystemUpdateStatusLoaded()
+{
+    if (m_systemUpdateStatusLoaded || m_systemUpdateStatusPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_systemUpdateStatusPending = true;
+    observeReply(m_client.sendRequest(api::SystemGetUpdateStatusMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemUpdateStatusReply(message, transportError); });
+}
+
+void Engine::ensureSystemPackagesLoaded()
+{
+    if (m_systemPackagesLoaded || m_systemPackagesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_systemPackagesPending = true;
+    observeReply(m_client.sendRequest(api::SystemGetPackagesMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemPackagesReply(message, transportError); });
+}
+
+void Engine::ensureSystemTimeZonesLoaded()
+{
+    if (m_systemTimeZonesLoaded || m_systemTimeZonesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_systemTimeZonesPending = true;
+    observeReply(m_client.sendRequest(api::SystemGetTimeZonesMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemTimeZonesReply(message, transportError); });
+}
+
+QStringList Engine::filteredSystemTimeZones() const
+{
+    if (m_systemTimeZoneSearch.empty()) {
+        return m_systemTimeZones;
+    }
+
+    QStringList filtered;
+    const QString search = QString::fromStdString(m_systemTimeZoneSearch);
+    for (const QString& timeZone : m_systemTimeZones) {
+        if (caseInsensitiveContains(timeZone, search)) {
+            filtered.append(timeZone);
+        }
+    }
+    return filtered;
+}
+
+void Engine::handleFetchSystemCapabilitiesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemCapabilitiesPending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load system capabilities: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: system capabilities request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: system capabilities request returned an error.";
+        return;
+    }
+
+    m_systemCapabilities = api::SystemGetCapabilitiesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_systemCapabilitiesLoaded = true;
+    m_settingsWarning.clear();
+}
+
+void Engine::handleFetchSystemTimeReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemTimePending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load system time: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: system time request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: system time request returned an error.";
+        return;
+    }
+
+    m_systemTime = api::SystemGetTimeResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_systemTimeLoaded = true;
+    m_settingsWarning.clear();
+}
+
+void Engine::handleFetchSystemUpdateStatusReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemUpdateStatusPending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load update status: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: update status request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: update status request returned an error.";
+        return;
+    }
+
+    m_systemUpdateStatus = api::SystemGetUpdateStatusResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_systemUpdateStatusLoaded = true;
+    m_settingsWarning.clear();
+}
+
+void Engine::handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemPackagesPending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load packages: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: package request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: package request returned an error.";
+        return;
+    }
+
+    const api::SystemGetPackagesResponse response = api::SystemGetPackagesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_systemPackages.clear();
+    m_systemPackages.reserve(response.packages.size());
+    for (const api::Package& package : response.packages) {
+        m_systemPackages.push_back(package);
+    }
+    m_systemPackagesLoaded = true;
+    m_settingsWarning.clear();
+}
+
+void Engine::handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemTimeZonesPending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load time zones: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: time zone request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: time zone request returned an error.";
+        return;
+    }
+
+    const api::SystemGetTimeZonesResponse response = api::SystemGetTimeZonesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_systemTimeZones = response.timeZones;
+    m_systemTimeZonesLoaded = true;
+    m_settingsWarning.clear();
+}
+
+void Engine::handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemActionRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_systemActionStatus = "Check for updates failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_systemActionStatus = "Check for updates was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_systemActionStatus = "Check for updates returned an error.";
+        return;
+    }
+
+    const api::SystemCheckForUpdatesResponse response = api::SystemCheckForUpdatesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (!response.success) {
+        m_systemActionStatus = "Check for updates failed.";
+        return;
+    }
+
+    m_systemActionStatus = "Update check started.";
+    m_settingsWarning.clear();
+    m_systemUpdateStatusLoaded = false;
+    m_systemPackagesLoaded = false;
+    ensureSystemUpdateStatusLoaded();
+    ensureSystemPackagesLoaded();
+}
+
+void Engine::handleSetTimeZoneReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemActionRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_systemActionStatus = "Failed to set time zone: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_systemActionStatus = "Setting the time zone was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_systemActionStatus = "Setting the time zone returned an error.";
+        return;
+    }
+
+    const api::ConfigurationSetTimeZoneResponse response = api::ConfigurationSetTimeZoneResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.configurationError != api::ConfigurationError::ConfigurationErrorNoError) {
+        m_systemActionStatus = "Setting the time zone failed: " + api::toString(response.configurationError).toStdString();
+        return;
+    }
+
+    m_systemActionStatus = "Time zone updated.";
+    m_settingsWarning.clear();
+    m_systemTimeLoaded = false;
+    ensureSystemTimeLoaded();
+}
+
+void Engine::handleUpdatePackagesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_systemActionRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_systemActionStatus = "Update request failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_systemActionStatus = "Updating packages was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_systemActionStatus = "Update request returned an error.";
+        return;
+    }
+
+    const api::SystemUpdatePackagesResponse response = api::SystemUpdatePackagesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (!response.success) {
+        m_systemActionStatus = "Update request failed.";
+        return;
+    }
+
+    m_systemActionStatus = "Update started.";
+    m_settingsWarning.clear();
+    m_systemUpdateStatusLoaded = false;
+    m_systemPackagesLoaded = false;
+    ensureSystemUpdateStatusLoaded();
+    ensureSystemPackagesLoaded();
+}
+
+void Engine::handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action)
+{
+    m_systemActionRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_systemActionStatus = powerActionLabel(static_cast<int>(action)) + " failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_systemActionStatus = powerActionLabel(static_cast<int>(action)) + " was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_systemActionStatus = powerActionLabel(static_cast<int>(action)) + " returned an error.";
+        return;
+    }
+
+    bool success = false;
+    switch (action) {
+    case PowerAction::Shutdown:
+        success = api::SystemShutdownResponse::fromJson(message.value(QStringLiteral("params")).toObject()).success;
+        break;
+    case PowerAction::Restart:
+        success = api::SystemRestartResponse::fromJson(message.value(QStringLiteral("params")).toObject()).success;
+        break;
+    case PowerAction::Reboot:
+        success = api::SystemRebootResponse::fromJson(message.value(QStringLiteral("params")).toObject()).success;
+        break;
+    }
+
+    if (!success) {
+        m_systemActionStatus = powerActionLabel(static_cast<int>(action)) + " request was rejected.";
+        return;
+    }
+
+    m_systemActionStatus = powerActionLabel(static_cast<int>(action)) + " requested.";
+    m_settingsWarning.clear();
+    closePowerActionConfirmDialog();
 }
 
 void Engine::loadSavedConnection()
@@ -3486,7 +4269,7 @@ void Engine::runHandshakeAndLoadThings()
 
 ftxui::Element Engine::renderMainMenu() const
 {
-    constexpr std::array<const char*, 5> menuItems = {"Things", "Configure things", "API browser", "Settings", "Logout"};
+    constexpr std::array<const char*, 6> menuItems = {"Things", "Configure things", "API browser", "Settings", "Logout", "About"};
     const bool apiBrowserEnabled = m_client.isConnected() && (!m_isAuthenticationRequired || m_isAuthenticated);
     const bool logoutEnabled = m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty();
 
@@ -3494,7 +4277,7 @@ ftxui::Element Engine::renderMainMenu() const
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
         const bool selected = (m_selectedMainMenuEntry == MainMenuEntry::Things && index == 0) || (m_selectedMainMenuEntry == MainMenuEntry::ConfigureThings && index == 1)
                               || (m_selectedMainMenuEntry == MainMenuEntry::ApiBrowser && index == 2) || (m_selectedMainMenuEntry == MainMenuEntry::Settings && index == 3)
-                              || (m_selectedMainMenuEntry == MainMenuEntry::Logout && index == 4);
+                              || (m_selectedMainMenuEntry == MainMenuEntry::Logout && index == 4) || (m_selectedMainMenuEntry == MainMenuEntry::About && index == 5);
         auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
         if ((index == 2 && !apiBrowserEnabled) || (index == 4 && !logoutEnabled)) {
             entry = entry | ftxui::dim;
@@ -3511,7 +4294,8 @@ ftxui::Element Engine::renderMainMenu() const
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_mainMenuBox);
+    return renderFocusedWindow(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::MainMenu)
+           | ftxui::reflect(m_mainMenuBox);
 }
 
 ftxui::Element Engine::renderThingList() const
@@ -3520,7 +4304,7 @@ ftxui::Element Engine::renderThingList() const
     lines.push_back(ftxui::text(m_thingManager.status()));
     auto search = ftxui::text("Search: " + (m_thingSearch.empty() ? std::string("<type to filter>") : m_thingSearch));
     if (m_focusArea == FocusArea::ThingSearch) {
-        search = search | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+        search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
     }
     lines.push_back(search);
     lines.push_back(ftxui::text("Sort: " + thingSortModeLabel() + "  Filter: " + thingCategoryLabel(m_thingCategoryFilter)));
@@ -3555,7 +4339,10 @@ ftxui::Element Engine::renderThingList() const
         }
     }
 
-    return ftxui::window(ftxui::text("Things"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_thingListBox);
+    return renderFocusedWindow(ftxui::text("Things"),
+                               ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame,
+                               m_focusArea == FocusArea::ThingSearch || m_focusArea == FocusArea::ThingList)
+           | ftxui::reflect(m_thingListBox);
 }
 
 ftxui::Element Engine::renderThingDetails() const
@@ -3659,7 +4446,10 @@ ftxui::Element Engine::renderThingDetails() const
         }
     }
 
-    auto detailBrowser = ftxui::window(ftxui::text("Values"), ftxui::vbox(std::move(browserRows)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::flex;
+    auto detailBrowser = renderFocusedWindow(ftxui::text("Values"),
+                                             ftxui::vbox(std::move(browserRows)) | ftxui::vscroll_indicator | ftxui::frame,
+                                             m_focusArea == FocusArea::ThingDetails)
+                         | ftxui::flex;
 
     ftxui::Element inspector = ftxui::text("");
     if (m_showThingDetailInspector && selectedEntry != nullptr) {
@@ -3790,7 +4580,8 @@ ftxui::Element Engine::renderConfigureMenu() const
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Configure"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_configureMenuBox);
+    return renderFocusedWindow(ftxui::text("Configure"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::ConfigureMenu)
+           | ftxui::reflect(m_configureMenuBox);
 }
 
 ftxui::Element Engine::renderConfigureDetails() const
@@ -3800,7 +4591,7 @@ ftxui::Element Engine::renderConfigureDetails() const
 
         auto search = ftxui::text("Search: " + (m_configureThingSearch.empty() ? std::string("<type to filter>") : m_configureThingSearch));
         if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
-            search = search | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
         }
         content.push_back(search);
         content.push_back(ftxui::separator());
@@ -3848,7 +4639,9 @@ ftxui::Element Engine::renderConfigureDetails() const
 
         content.push_back(ftxui::separator());
         content.push_back(ftxui::text("Enter opens the setup flow.") | ftxui::dim);
-        return ftxui::window(ftxui::text("Add thing"), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame);
+        return renderFocusedWindow(ftxui::text("Add thing"),
+                                   ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame,
+                                   m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingClassList);
     }
 
     ftxui::Elements content;
@@ -3889,21 +4682,24 @@ ftxui::Element Engine::renderConfigureDetails() const
     const char* title = m_configureThingsView == ConfigureThingsView::RemoveThing
                             ? "Remove thing"
                             : (m_configureThingsView == ConfigureThingsView::ReconfigureThing ? "Reconfigure thing" : "Rename thing");
-    return ftxui::window(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_configureDetailsBox);
+    return renderFocusedWindow(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::ConfigureThingSelection)
+           | ftxui::reflect(m_configureDetailsBox);
 }
 
 ftxui::Element Engine::renderSettingsMenu() const
 {
-    constexpr std::array<const char*, 2> menuItems = {"General", "About"};
+    constexpr std::array<const char*, 6> menuItems = {"Server info", "Timezone", "Update", "Shutdown", "Restart", "Reboot"};
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
-        const bool selected = (m_settingsView == SettingsView::General && index == 0) || (m_settingsView == SettingsView::About && index == 1);
+        const bool selected = static_cast<int>(m_settingsView) == index;
         auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
         if (selected) {
             entry = entry | ftxui::bold | ftxui::inverted;
         }
         if (m_focusArea == FocusArea::SettingsMenu && selected) {
+            entry = entry | ftxui::color(ftxui::Color::CyanLight);
+        } else if (m_focusArea == FocusArea::SettingsDetails && selected) {
             entry = entry | ftxui::color(ftxui::Color::CyanLight);
         }
         if (selected) {
@@ -3912,7 +4708,8 @@ ftxui::Element Engine::renderSettingsMenu() const
         entries.push_back(entry);
     }
 
-    return ftxui::window(ftxui::text("Settings"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_settingsMenuBox);
+    return renderFocusedWindow(ftxui::text("Settings"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::SettingsMenu)
+           | ftxui::reflect(m_settingsMenuBox);
 }
 
 ftxui::Element Engine::renderSettingsDetails() const
@@ -3920,14 +4717,18 @@ ftxui::Element Engine::renderSettingsDetails() const
     ftxui::Elements lines;
     int lineIndex = 0;
     auto pushLine = [&](ftxui::Element line) {
-        if (lineIndex == m_settingsDetailsLineIndex) {
-            line = line | ftxui::focus;
+        if (m_focusArea == FocusArea::SettingsDetails && lineIndex == m_settingsDetailsLineIndex) {
+            line = line | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
         }
         lines.push_back(std::move(line));
         ++lineIndex;
     };
+    auto pushSelectableLine = [&](ftxui::Element line, int minimumWidth = 0) {
+        const bool selected = m_focusArea == FocusArea::SettingsDetails && lineIndex == m_settingsDetailsLineIndex;
+        pushLine(renderActiveField(std::move(line), selected, minimumWidth));
+    };
 
-    if (m_settingsView == SettingsView::General) {
+    if (m_settingsView == SettingsView::ServerInfo) {
         const QString fingerprint = m_client.peerCertificateFingerprint();
         pushLine(ftxui::text("Connection: " + endpoint()));
         pushLine(ftxui::text("Display name: " + connectionDisplayName()));
@@ -3937,37 +4738,131 @@ ftxui::Element Engine::renderSettingsDetails() const
         pushLine(ftxui::text("Authentication: " + m_authStatus));
         pushLine(ftxui::text("Stored token: " + std::string(m_savedConnection.has_value() && !m_savedConnection->token.isEmpty() ? "available" : "none")));
         pushLine(ftxui::text("TLS fingerprint: " + (fingerprint.isEmpty() ? std::string("n/a") : fingerprint.toStdString())));
+    } else if (m_settingsView == SettingsView::Timezone) {
+        const QStringList filteredTimeZones = filteredSystemTimeZones();
+        pushLine(ftxui::text("Current time zone: " + (m_systemTimeLoaded ? m_systemTime.timeZone.toStdString() : std::string("<loading>"))));
+        pushLine(ftxui::text("Automatic time: " + (m_systemTimeLoaded ? std::string(m_systemTime.automaticTime ? "enabled" : "disabled") : std::string("n/a"))));
+        pushLine(ftxui::text("Automatic time available: " + (m_systemTimeLoaded ? std::string(m_systemTime.automaticTimeAvailable ? "yes" : "no") : std::string("n/a"))));
+        pushLine(ftxui::separator());
+        auto search = ftxui::text("Search: " + (m_systemTimeZoneSearch.empty() ? std::string("<type to filter>") : m_systemTimeZoneSearch));
+        if (m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
+            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 32);
+        }
+        pushLine(std::move(search));
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Available time zones") | ftxui::bold);
+        if (!m_systemTimeZonesLoaded) {
+            pushLine(ftxui::text("Loading time zones..."));
+        } else {
+            if (filteredTimeZones.isEmpty()) {
+                pushLine(ftxui::text("No time zones match the current filter."));
+            } else {
+                for (const QString& timeZone : filteredTimeZones) {
+                    pushSelectableLine(ftxui::text(" " + timeZone.toStdString() + " "), 24);
+                }
+            }
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Type to search, Up/Down move, Enter applies the selected time zone.") | ftxui::dim);
+    } else if (m_settingsView == SettingsView::Update) {
+        const std::string capabilityText = m_systemCapabilitiesLoaded ? std::string("Update management: ") + (m_systemCapabilities.updateManagement ? "available" : "unavailable")
+                                                                            + " (" + api::toString(m_systemCapabilities.updateManagementType).toStdString() + ")"
+                                                                      : std::string("Update management: loading...");
+        pushLine(ftxui::text(capabilityText));
+        if (m_systemUpdateStatusLoaded) {
+            std::string statusText = "Busy: ";
+            statusText += m_systemUpdateStatus.busy ? "yes" : "no";
+            statusText += " | Update running: ";
+            statusText += m_systemUpdateStatus.updateRunning ? "yes" : "no";
+            if (m_systemUpdateStatus.updateProgress.has_value()) {
+                statusText += " | Progress: " + std::to_string(*m_systemUpdateStatus.updateProgress) + "%";
+            }
+            pushLine(ftxui::text("Status: " + statusText));
+        } else {
+            pushLine(ftxui::text("Status: loading..."));
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Actions") | ftxui::bold);
+        pushSelectableLine(ftxui::text(" Check for updates "), 24);
+        const bool hasInstallablePackages = std::any_of(m_systemPackages.begin(), m_systemPackages.end(), [](const api::Package& package) {
+            return package.updateAvailable || package.installedVersion.isEmpty();
+        });
+        auto installRow = ftxui::text(hasInstallablePackages ? " Install available updates " : " Install available updates (none) ");
+        if (!hasInstallablePackages) {
+            installRow = installRow | ftxui::dim;
+        }
+        pushSelectableLine(std::move(installRow), 28);
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Packages") | ftxui::bold);
+        if (!m_systemPackagesLoaded) {
+            pushLine(ftxui::text("Loading packages..."));
+        } else if (m_systemPackages.empty()) {
+            pushLine(ftxui::text("No packages returned."));
+        } else {
+            for (const api::Package& package : m_systemPackages) {
+                std::string label = package.displayName.toStdString();
+                if (!package.installedVersion.isEmpty() || !package.candidateVersion.isEmpty()) {
+                    label += " (" + package.installedVersion.toStdString();
+                    if (!package.candidateVersion.isEmpty()) {
+                        label += " -> " + package.candidateVersion.toStdString();
+                    }
+                    label += ")";
+                }
+                if (package.updateAvailable) {
+                    label += " [update available]";
+                }
+                if (!package.summary.isEmpty()) {
+                    label += " - " + package.summary.toStdString();
+                }
+                pushLine(ftxui::paragraph(label));
+            }
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text(m_systemUpdateStatusPending ? "Loading update status..." : "Enter checks updates or installs all available updates.") | ftxui::dim);
     } else {
-        pushLine(ftxui::text("nymea-cli"));
+        pushLine(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
         pushLine(ftxui::separator());
-        pushLine(ftxui::text("Application version: " + m_options.appVersion));
-        pushLine(ftxui::text("Project license: " APP_LICENSE_SPDX));
-        pushLine(ftxui::text("Server version: " + m_serverVersion));
-        pushLine(ftxui::text("Server API version: " + m_serverApiVersion));
-        pushLine(ftxui::text("Purpose: terminal client for nymead"));
-        pushLine(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
-        pushLine(ftxui::separator());
-        pushLine(ftxui::text("Open source components"));
-        pushLine(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
-        pushLine(ftxui::paragraph("Qt licensing reference: https://www.qt.io/licensing/"));
-        pushLine(ftxui::paragraph("Qt project reference: https://www.qt.io/"));
-        pushLine(ftxui::text("FTXUI version: " FTXUI_VERSION));
-        pushLine(ftxui::text("FTXUI license: MIT"));
-        pushLine(ftxui::paragraph("FTXUI project reference: https://github.com/ArthurSonzogni/FTXUI"));
-        pushLine(ftxui::paragraph("FTXUI license reference: https://github.com/ArthurSonzogni/FTXUI/blob/" FTXUI_VERSION "/LICENSE"));
+        const std::string action = powerActionLabel(static_cast<int>(m_systemAction));
+        pushLine(ftxui::paragraph("This will request a " + action + " on the server."));
+        pushLine(ftxui::paragraph("Enter opens the confirmation dialog, and Left or Esc returns to the settings menu."));
+        if (!m_systemActionStatus.empty()) {
+            pushLine(ftxui::separator());
+            pushLine(ftxui::text(m_systemActionStatus));
+        }
     }
 
-    return ftxui::window(ftxui::text(m_settingsView == SettingsView::General ? "General" : "About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame)
+    return renderFocusedWindow(ftxui::text(settingsViewLabel(static_cast<int>(m_settingsView))),
+                               ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame,
+                               m_focusArea == FocusArea::SettingsDetails)
            | ftxui::reflect(m_settingsDetailsBox);
+}
+
+ftxui::Element Engine::renderLogout() const
+{
+    ftxui::Elements lines;
+    lines.push_back(ftxui::text("Logout"));
+    lines.push_back(ftxui::separator());
+    lines.push_back(ftxui::paragraph("Logout revokes the current token on the server, clears the saved token locally, and reconnects to the same server."));
+    lines.push_back(ftxui::separator());
+    lines.push_back(ftxui::text("Only execution option: Logout") | ftxui::bold);
+    lines.push_back(ftxui::text("Press Enter to logout, or Left to return to the menu.") | ftxui::dim);
+
+    return renderFocusedWindow(ftxui::text("Logout"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame, m_mainView == MainView::Logout) | ftxui::flex;
 }
 
 int Engine::settingsDetailsLineCount() const
 {
     switch (m_settingsView) {
-    case SettingsView::General:
+    case SettingsView::ServerInfo:
         return 8;
-    case SettingsView::About:
-        return 17;
+    case SettingsView::Timezone:
+        return m_systemTimeZonesLoaded ? 9 + std::max(1, static_cast<int>(filteredSystemTimeZones().size())) : 10;
+    case SettingsView::Update:
+        return m_systemPackagesLoaded ? 11 + static_cast<int>(m_systemPackages.size()) : 11;
+    case SettingsView::Shutdown:
+    case SettingsView::Restart:
+    case SettingsView::Reboot:
+        return 0;
     }
     return 0;
 }
@@ -3980,11 +4875,77 @@ void Engine::clampSettingsDetailsSelection()
         return;
     }
 
+    if (m_settingsView == SettingsView::Timezone) {
+        const int filteredCount = m_systemTimeZonesLoaded ? static_cast<int>(filteredSystemTimeZones().size()) : 0;
+        const int firstResultLineIndex = timezoneListStartLineIndex;
+        if (filteredCount <= 0) {
+            m_settingsDetailsLineIndex = timezoneSearchLineIndex;
+            return;
+        }
+
+        const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
+        if (m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
+            return;
+        }
+        if (m_settingsDetailsLineIndex < firstResultLineIndex) {
+            m_settingsDetailsLineIndex = timezoneSearchLineIndex;
+            return;
+        }
+        if (m_settingsDetailsLineIndex > lastResultLineIndex) {
+            m_settingsDetailsLineIndex = lastResultLineIndex;
+            return;
+        }
+    }
+
     if (m_settingsDetailsLineIndex < 0) {
         m_settingsDetailsLineIndex = 0;
     } else if (m_settingsDetailsLineIndex >= lineCount) {
         m_settingsDetailsLineIndex = lineCount - 1;
     }
+}
+
+ftxui::Element Engine::renderAbout() const
+{
+    ftxui::Elements lines;
+    lines.push_back(ftxui::text("nymea-cli"));
+    lines.push_back(ftxui::separator());
+    lines.push_back(ftxui::text("Application version: " + m_options.appVersion));
+    lines.push_back(ftxui::text("Project license: " APP_LICENSE_SPDX));
+    lines.push_back(ftxui::text("Server version: " + m_serverVersion));
+    lines.push_back(ftxui::text("Server API version: " + m_serverApiVersion));
+    lines.push_back(ftxui::text("Purpose: terminal client for nymead"));
+    lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
+    lines.push_back(ftxui::separator());
+    lines.push_back(ftxui::text("Open source components"));
+    lines.push_back(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
+    lines.push_back(ftxui::paragraph("Qt licensing reference: https://www.qt.io/licensing/"));
+    lines.push_back(ftxui::paragraph("Qt project reference: https://www.qt.io/"));
+    lines.push_back(ftxui::text("FTXUI version: " FTXUI_VERSION));
+    lines.push_back(ftxui::text("FTXUI license: MIT"));
+    lines.push_back(ftxui::paragraph("FTXUI project reference: https://github.com/ArthurSonzogni/FTXUI"));
+    lines.push_back(ftxui::paragraph("FTXUI license reference: https://github.com/ArthurSonzogni/FTXUI/blob/" FTXUI_VERSION "/LICENSE"));
+
+    return renderFocusedWindow(ftxui::text("About"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame, m_mainView == MainView::About) | ftxui::flex;
+}
+
+ftxui::Element Engine::renderConnectionLost() const
+{
+    return ftxui::vbox({
+               ftxui::filler(),
+               ftxui::hbox({
+                   ftxui::filler(),
+                   ftxui::window(ftxui::text("Connection lost"),
+                                 ftxui::vbox({
+                                     ftxui::text("Connection lost, try to reconnect."),
+                                     ftxui::separator(),
+                                     ftxui::text("Press c to reconnect, q or Esc to quit.") | ftxui::dim,
+                                 }))
+                       | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 44),
+                   ftxui::filler(),
+               }),
+               ftxui::filler(),
+           })
+           | ftxui::flex;
 }
 
 ftxui::Element Engine::renderThings() const
@@ -3999,6 +4960,10 @@ ftxui::Element Engine::renderThings() const
 ftxui::Element Engine::renderUi()
 {
     drainUiTasks();
+    if (m_connectionLost) {
+        return renderConnectionLost();
+    }
+
     if (m_mainView == MainView::Things) {
         clampThingDetailSelection();
     } else if (m_mainView == MainView::ConfigureThings) {
@@ -4019,10 +4984,6 @@ ftxui::Element Engine::renderUi()
         }
     }
 
-    const bool highlightInputFrame = (m_showActionDialog && !m_actionExecutionPending) || (m_showConfigureDialog && !m_configureRequestPending) || m_showLoginForm
-                                     || m_showLogoutConfirm || m_focusArea == FocusArea::ThingSearch || m_focusArea == FocusArea::ConfigureThingClassSearch
-                                     || m_focusArea == FocusArea::ApiBrowserSearch;
-
     if (m_showLoginForm) {
         ftxui::Elements sections;
         sections.push_back(ftxui::hbox({
@@ -4032,24 +4993,38 @@ ftxui::Element Engine::renderUi()
                            })
                            | ftxui::border);
         sections.push_back(ftxui::filler());
+        ftxui::Elements loginBody;
+        if (m_pushButtonAuthAvailable) {
+            loginBody.push_back(ftxui::text("Please press the push button for authentication.") | ftxui::bold);
+            loginBody.push_back(ftxui::separator());
+            if (!m_authStatus.empty()) {
+                loginBody.push_back(ftxui::text(m_authStatus));
+            }
+            if (m_pushButtonAuthPending) {
+                loginBody.push_back(ftxui::text("Waiting for push-button authentication to finish...") | ftxui::dim);
+            }
+            loginBody.push_back(ftxui::text("Enter requests push-button authentication again, Esc quits.") | ftxui::dim);
+        } else {
+            loginBody.push_back(ftxui::hbox({
+                ftxui::text("Username: "),
+                renderActiveField(m_usernameInput->Render() | ftxui::xflex, m_loginSelectedInputIndex == 0, 26),
+            }));
+            loginBody.push_back(ftxui::hbox({
+                ftxui::text("Password: "),
+                renderActiveField(m_passwordInput->Render() | ftxui::xflex, m_loginSelectedInputIndex == 1, 26),
+            }));
+            loginBody.push_back(ftxui::separator());
+            if (!m_authStatus.empty()) {
+                loginBody.push_back(ftxui::text(m_authStatus));
+            }
+            if (!m_logoutStatus.empty()) {
+                loginBody.push_back(ftxui::paragraph(m_logoutStatus) | ftxui::dim);
+            }
+            loginBody.push_back(ftxui::text("Enter submits credentials, Esc quits.") | ftxui::dim);
+        }
         sections.push_back(ftxui::hbox({
             ftxui::filler(),
-            ftxui::window(ftxui::text("Authentication required"),
-                          ftxui::vbox({
-                              ftxui::hbox({
-                                  ftxui::text("Username: "),
-                                  m_usernameInput->Render() | ftxui::xflex,
-                              }),
-                              ftxui::hbox({
-                                  ftxui::text("Password: "),
-                                  m_passwordInput->Render() | ftxui::xflex,
-                              }),
-                              ftxui::separator(),
-                              ftxui::text(m_authStatus),
-                              m_logoutStatus.empty() ? ftxui::text("") : (ftxui::paragraph(m_logoutStatus) | ftxui::dim),
-                              ftxui::text("Enter submits credentials, Esc quits.") | ftxui::dim,
-                          }))
-                | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 56),
+            renderFocusedWindow(ftxui::text("Authentication required"), ftxui::vbox(std::move(loginBody)) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 56), m_showLoginForm),
             ftxui::filler(),
         }));
         sections.push_back(ftxui::filler());
@@ -4078,13 +5053,20 @@ ftxui::Element Engine::renderUi()
     }
     if (m_mainView == MainView::Help) {
         sections.push_back(renderHelp() | ftxui::flex);
-        return ftxui::vbox(std::move(sections)) | (highlightInputFrame ? ftxui::borderStyled(ftxui::Color::SteelBlue) : ftxui::border) | ftxui::flex;
+        return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
     }
     std::string keyHintLine
         = "Keys: Up/Down navigate, Left/Right switch panels, s sort, f filter, Space inspector, c reconnect, t refresh things, ?/h help, Enter opens actions/setup, q/Esc quit";
     if (m_mainView == MainView::ApiBrowser) {
         keyHintLine
             = "Keys: Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh things, ?/h help, q/Esc quit";
+    } else if (m_mainView == MainView::Settings) {
+        keyHintLine = "Keys: Up/Down select settings sections, Right/Enter open the details panel, Enter applies the selected action or time zone, type to search time zones, Left "
+                      "returns to the menu, ?/h help, q/Esc quit";
+    } else if (m_mainView == MainView::Logout) {
+        keyHintLine = "Keys: Enter logs out, Left returns to the menu, ?/h help, q/Esc quit";
+    } else if (m_mainView == MainView::About) {
+        keyHintLine = "Keys: Left/Right switch panels, ?/h help, q/Esc quit";
     }
     sections.push_back(ftxui::text(keyHintLine) | ftxui::dim);
     sections.push_back(ftxui::separator());
@@ -4100,9 +5082,13 @@ ftxui::Element Engine::renderUi()
                      | ftxui::flex;
     } else if (m_mainView == MainView::ApiBrowser) {
         rightPanel = renderApiBrowser() | ftxui::flex;
+    } else if (m_mainView == MainView::Logout) {
+        rightPanel = renderLogout() | ftxui::flex;
+    } else if (m_mainView == MainView::About) {
+        rightPanel = renderAbout() | ftxui::flex;
     } else {
-        rightPanel = ftxui::vbox({
-                         renderSettingsMenu(),
+        rightPanel = ftxui::hbox({
+                         renderSettingsMenu() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 28),
                          renderSettingsDetails() | ftxui::flex,
                      })
                      | ftxui::flex;
@@ -4122,11 +5108,28 @@ ftxui::Element Engine::renderUi()
         if (!m_logoutStatus.empty()) {
             dialogBody.push_back(ftxui::separator());
             dialogBody.push_back(ftxui::text(m_logoutStatus));
+            dialogBody.push_back(ftxui::text("You will be returned to the login form if authentication is required.") | ftxui::dim);
         }
         dialogBody.push_back(ftxui::separator());
         dialogBody.push_back(ftxui::text(m_logoutRequestPending ? "Revoking token and reconnecting..." : "Enter confirms logout, Esc cancels.") | ftxui::dim);
         sections.push_back(ftxui::separator());
-        sections.push_back(ftxui::window(ftxui::text("Confirm logout"), ftxui::vbox(std::move(dialogBody))));
+        sections.push_back(renderFocusedWindow(ftxui::text("Confirm logout"), ftxui::vbox(std::move(dialogBody)), m_showLogoutConfirm));
+    }
+
+    if (m_showSystemActionConfirm) {
+        ftxui::Elements dialogBody;
+        dialogBody.push_back(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
+        dialogBody.push_back(ftxui::separator());
+        dialogBody.push_back(ftxui::paragraph("This will request a " + powerActionLabel(static_cast<int>(m_systemAction)) + " on the server."));
+        if (!m_systemActionStatus.empty()) {
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text(m_systemActionStatus));
+        }
+        dialogBody.push_back(ftxui::separator());
+        dialogBody.push_back(ftxui::text(m_systemActionRequestPending ? "Sending request..." : "Enter confirms, Esc or Left cancels.") | ftxui::dim);
+        sections.push_back(ftxui::separator());
+        sections.push_back(
+            renderFocusedWindow(ftxui::text(powerActionLabel(static_cast<int>(m_systemAction)) + " confirmation"), ftxui::vbox(std::move(dialogBody)), m_showSystemActionConfirm));
     }
 
     if (m_showActionDialog) {
@@ -4182,13 +5185,13 @@ ftxui::Element Engine::renderUi()
         }
 
         sections.push_back(ftxui::separator());
-        sections.push_back(ftxui::window(ftxui::text("Execute action"),
-                                         ftxui::vbox({
-                                             ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
-                                             ftxui::separator(),
-                                             ftxui::vbox(std::move(dialogFooter)),
-                                         }))
-                           | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
+        sections.push_back(renderFocusedWindow(ftxui::text("Execute action"),
+                                               ftxui::vbox({
+                                                   ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
+                                                   ftxui::separator(),
+                                                   ftxui::vbox(std::move(dialogFooter)),
+                                               }) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80),
+                                               m_showActionDialog && m_focusArea == FocusArea::ActionDialog));
     }
 
     if (m_showConfigureDialog) {
@@ -4321,16 +5324,16 @@ ftxui::Element Engine::renderUi()
         }
 
         sections.push_back(ftxui::separator());
-        sections.push_back(ftxui::window(ftxui::text(m_configureDialogTitle.empty() ? "Configure thing" : m_configureDialogTitle),
-                                         ftxui::vbox({
-                                             ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
-                                             ftxui::separator(),
-                                             ftxui::vbox(std::move(dialogFooter)),
-                                         }))
-                           | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80));
+        sections.push_back(renderFocusedWindow(ftxui::text(m_configureDialogTitle.empty() ? "Configure thing" : m_configureDialogTitle),
+                                               ftxui::vbox({
+                                                   ftxui::vbox(std::move(dialogBody)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex,
+                                                   ftxui::separator(),
+                                                   ftxui::vbox(std::move(dialogFooter)),
+                                               }) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80),
+                                               m_showConfigureDialog && m_focusArea == FocusArea::ConfigureDialog));
     }
 
-    return ftxui::vbox(std::move(sections)) | (highlightInputFrame ? ftxui::borderStyled(ftxui::Color::SteelBlue) : ftxui::border) | ftxui::flex;
+    return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
 }
 
 bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen)
@@ -4349,7 +5352,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             break;
         case MainMenuEntry::ApiBrowser:
             m_mainView = MainView::ApiBrowser;
-            m_focusArea = FocusArea::ApiBrowserSearch;
             m_apiBrowserJsonLineIndex = 0;
             ensureApiBrowserLoaded();
             clampApiBrowserSelection();
@@ -4358,8 +5360,20 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         case MainMenuEntry::Settings:
             m_mainView = MainView::Settings;
             m_settingsDetailsLineIndex = 0;
+            ensureSystemCapabilitiesLoaded();
+            ensureSystemTimeLoaded();
+            ensureSystemUpdateStatusLoaded();
+            if (m_settingsView == SettingsView::Timezone) {
+                ensureSystemTimeZonesLoaded();
+            } else if (m_settingsView == SettingsView::Update) {
+                ensureSystemPackagesLoaded();
+            }
             break;
         case MainMenuEntry::Logout:
+            m_mainView = MainView::Logout;
+            break;
+        case MainMenuEntry::About:
+            m_mainView = MainView::About;
             break;
         }
     };
@@ -4377,6 +5391,12 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         case MainView::Settings:
             m_selectedMainMenuEntry = MainMenuEntry::Settings;
             break;
+        case MainView::Logout:
+            m_selectedMainMenuEntry = MainMenuEntry::Logout;
+            break;
+        case MainView::About:
+            m_selectedMainMenuEntry = MainMenuEntry::About;
+            break;
         case MainView::Help:
             break;
         }
@@ -4388,6 +5408,22 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (handleMouseWheel(event)) {
+        return true;
+    }
+
+    if (m_connectionLost) {
+        if (event == ftxui::Event::Character("c")) {
+            connectToServer();
+            if (m_client.isConnected()) {
+                runHandshakeAndLoadThings();
+            }
+            return true;
+        }
+        if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
+            m_client.disconnectFromHost();
+            screen.ExitLoopClosure()();
+            return true;
+        }
         return true;
     }
 
@@ -4605,6 +5641,26 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (m_showSystemActionConfirm) {
+        if (m_systemActionRequestPending) {
+            return true;
+        }
+        if (event == ftxui::Event::Escape || event == ftxui::Event::ArrowLeft) {
+            closePowerActionConfirmDialog();
+            m_systemActionStatus.clear();
+            return true;
+        }
+        if (event == ftxui::Event::Return) {
+            executePowerAction();
+            return true;
+        }
+        return true;
+    }
+
+    if (m_mainView == MainView::Settings && m_systemActionRequestPending) {
+        return true;
+    }
+
     if (m_mainView == MainView::Help) {
         if (event == ftxui::Event::Escape) {
             closeHelpView();
@@ -4640,7 +5696,21 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
     if (m_showLoginForm) {
         if (event == ftxui::Event::Return) {
-            authenticate(m_username, m_password);
+            if (m_pushButtonAuthAvailable) {
+                requestPushButtonAuth();
+            } else {
+                authenticate(m_username, m_password);
+            }
+            return true;
+        }
+        if (!m_pushButtonAuthAvailable) {
+            if (event == ftxui::Event::ArrowUp) {
+                m_loginSelectedInputIndex = std::max(0, m_loginSelectedInputIndex - 1);
+            } else if (event == ftxui::Event::ArrowDown) {
+                m_loginSelectedInputIndex = std::min(1, m_loginSelectedInputIndex + 1);
+            }
+        }
+        if (m_pushButtonAuthAvailable) {
             return true;
         }
         if (m_loginForm->OnEvent(event)) {
@@ -4816,6 +5886,10 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             m_focusArea = FocusArea::MainMenu;
             return true;
         }
+        if (m_focusArea == FocusArea::SettingsDetails) {
+            m_focusArea = FocusArea::SettingsMenu;
+            return true;
+        }
         m_focusArea = FocusArea::MainMenu;
         syncMainMenuSelectionToCurrentView();
         return true;
@@ -4854,10 +5928,20 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 m_focusArea = FocusArea::ApiBrowserSearch;
             }
         } else if (m_mainView == MainView::Settings) {
-            if (m_focusArea != FocusArea::SettingsMenu) {
+            if (m_focusArea == FocusArea::SettingsMenu) {
+                m_focusArea = FocusArea::SettingsDetails;
+                clampSettingsDetailsSelection();
+            } else if (m_focusArea != FocusArea::SettingsDetails) {
                 m_focusArea = FocusArea::SettingsMenu;
             }
         }
+        return true;
+    }
+
+    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::Timezone
+        && (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown)) {
+        const int filteredCount = m_systemTimeZonesLoaded ? static_cast<int>(filteredSystemTimeZones().size()) : 0;
+        m_settingsDetailsLineIndex = nextTimezoneDetailsLineIndex(m_settingsDetailsLineIndex, event == ftxui::Event::ArrowDown ? 1 : -1, filteredCount);
         return true;
     }
 
@@ -4874,9 +5958,31 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
-            m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
-            return true;
+        if (m_mainView == MainView::Settings) {
+            if (m_focusArea == FocusArea::SettingsMenu) {
+                if (m_settingsView == SettingsView::Reboot) {
+                    m_settingsView = SettingsView::ServerInfo;
+                } else {
+                    m_settingsView = static_cast<SettingsView>(static_cast<int>(m_settingsView) - 1);
+                }
+                m_settingsDetailsLineIndex = 0;
+                ensureSystemCapabilitiesLoaded();
+                ensureSystemTimeLoaded();
+                ensureSystemUpdateStatusLoaded();
+                if (m_settingsView == SettingsView::Timezone) {
+                    ensureSystemTimeZonesLoaded();
+                } else if (m_settingsView == SettingsView::Update) {
+                    ensureSystemPackagesLoaded();
+                }
+                return true;
+            }
+            if (m_focusArea == FocusArea::SettingsDetails) {
+                const int lineCount = settingsDetailsLineCount();
+                if (lineCount > 0) {
+                    m_settingsDetailsLineIndex = (m_settingsDetailsLineIndex + lineCount - 1) % lineCount;
+                }
+                return true;
+            }
         }
 
         if (m_focusArea == FocusArea::ConfigureMenu && m_mainView == MainView::ConfigureThings) {
@@ -4919,7 +6025,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (m_focusArea == FocusArea::MainMenu) {
             switch (m_selectedMainMenuEntry) {
             case MainMenuEntry::Things:
-                applyMainMenuSelection(MainMenuEntry::Logout);
+                applyMainMenuSelection(MainMenuEntry::About);
                 break;
             case MainMenuEntry::ConfigureThings:
                 applyMainMenuSelection(MainMenuEntry::Things);
@@ -4932,6 +6038,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 break;
             case MainMenuEntry::Logout:
                 applyMainMenuSelection(MainMenuEntry::Settings);
+                break;
+            case MainMenuEntry::About:
+                applyMainMenuSelection(MainMenuEntry::Logout);
                 break;
             }
             return true;
@@ -4951,9 +6060,31 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::SettingsMenu && m_mainView == MainView::Settings) {
-            m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General;
-            return true;
+        if (m_mainView == MainView::Settings) {
+            if (m_focusArea == FocusArea::SettingsMenu) {
+                if (m_settingsView == SettingsView::Reboot) {
+                    m_settingsView = SettingsView::ServerInfo;
+                } else {
+                    m_settingsView = static_cast<SettingsView>(static_cast<int>(m_settingsView) + 1);
+                }
+                m_settingsDetailsLineIndex = 0;
+                ensureSystemCapabilitiesLoaded();
+                ensureSystemTimeLoaded();
+                ensureSystemUpdateStatusLoaded();
+                if (m_settingsView == SettingsView::Timezone) {
+                    ensureSystemTimeZonesLoaded();
+                } else if (m_settingsView == SettingsView::Update) {
+                    ensureSystemPackagesLoaded();
+                }
+                return true;
+            }
+            if (m_focusArea == FocusArea::SettingsDetails) {
+                const int lineCount = settingsDetailsLineCount();
+                if (lineCount > 0) {
+                    m_settingsDetailsLineIndex = (m_settingsDetailsLineIndex + 1) % lineCount;
+                }
+                return true;
+            }
         }
 
         if (m_focusArea == FocusArea::ConfigureMenu && m_mainView == MainView::ConfigureThings) {
@@ -5006,6 +6137,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 applyMainMenuSelection(MainMenuEntry::Logout);
                 break;
             case MainMenuEntry::Logout:
+                applyMainMenuSelection(MainMenuEntry::About);
+                break;
+            case MainMenuEntry::About:
                 applyMainMenuSelection(MainMenuEntry::Things);
                 break;
             }
@@ -5021,6 +6155,87 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         return true;
+    }
+
+    if (event == ftxui::Event::Return && m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsMenu) {
+        m_focusArea = FocusArea::SettingsDetails;
+        clampSettingsDetailsSelection();
+        return true;
+    }
+
+    if (event == ftxui::Event::Return && m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails) {
+        switch (m_settingsView) {
+        case SettingsView::ServerInfo:
+            return true;
+        case SettingsView::Timezone: {
+            if (!m_systemTimeZonesLoaded || m_systemActionRequestPending) {
+                return true;
+            }
+            const QStringList filteredTimeZones = filteredSystemTimeZones();
+            const int zoneCount = static_cast<int>(filteredTimeZones.size());
+            const int zoneIndex = m_settingsDetailsLineIndex - timezoneListStartLineIndex;
+            if (zoneIndex < 0 || zoneIndex >= zoneCount) {
+                return true;
+            }
+            const QString timeZone = filteredTimeZones.at(zoneIndex);
+            api::ConfigurationSetTimeZoneParams request;
+            request.timeZone = timeZone;
+            m_systemActionRequestPending = true;
+            m_systemActionStatus = "Setting time zone to " + timeZone.toStdString() + "...";
+            observeReply(m_client.sendRequest(api::ConfigurationSetTimeZoneMethod::methodName(), request.toJson()),
+                         [this](const QJsonObject& message, const QString& transportError) { handleSetTimeZoneReply(message, transportError); });
+            return true;
+        }
+        case SettingsView::Update: {
+            if (m_settingsDetailsLineIndex == 4) {
+                if (m_systemActionRequestPending) {
+                    return true;
+                }
+                m_systemActionRequestPending = true;
+                m_systemActionStatus = "Checking for updates...";
+                observeReply(m_client.sendRequest(api::SystemCheckForUpdatesMethod::methodName(), QJsonObject{}),
+                             [this](const QJsonObject& message, const QString& transportError) { handleCheckForUpdatesReply(message, transportError); });
+                return true;
+            }
+            if (m_settingsDetailsLineIndex == 5) {
+                if (!m_systemPackagesLoaded || m_systemActionRequestPending) {
+                    return true;
+                }
+                if (m_systemPackages.empty()) {
+                    m_systemActionStatus = "No packages are available for installation or update.";
+                    return true;
+                }
+                QList<QString> packageIds;
+                for (const api::Package& package : m_systemPackages) {
+                    if (package.updateAvailable || package.installedVersion.isEmpty()) {
+                        packageIds.append(package.id);
+                    }
+                }
+                if (packageIds.isEmpty()) {
+                    m_systemActionStatus = "No packages are available for installation or update.";
+                    return true;
+                }
+
+                api::SystemUpdatePackagesParams request;
+                request.packageIds = packageIds;
+                m_systemActionRequestPending = true;
+                m_systemActionStatus = "Starting package update...";
+                observeReply(m_client.sendRequest(api::SystemUpdatePackagesMethod::methodName(), request.toJson()),
+                             [this](const QJsonObject& message, const QString& transportError) { handleUpdatePackagesReply(message, transportError); });
+                return true;
+            }
+            return true;
+        }
+        case SettingsView::Shutdown:
+            openPowerActionConfirmDialog(PowerAction::Shutdown);
+            return true;
+        case SettingsView::Restart:
+            openPowerActionConfirmDialog(PowerAction::Restart);
+            return true;
+        case SettingsView::Reboot:
+            openPowerActionConfirmDialog(PowerAction::Reboot);
+            return true;
+        }
     }
 
     if (event == ftxui::Event::Character(" ")) {
@@ -5053,6 +6268,21 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 break;
             }
             return true;
+        }
+    }
+
+    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::Timezone) {
+        if (m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
+            if (event == ftxui::Event::Backspace && !m_systemTimeZoneSearch.empty()) {
+                m_systemTimeZoneSearch.pop_back();
+                clampSettingsDetailsSelection();
+                return true;
+            }
+            if (event.is_character()) {
+                m_systemTimeZoneSearch += event.character();
+                clampSettingsDetailsSelection();
+                return true;
+            }
         }
     }
 

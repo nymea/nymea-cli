@@ -599,6 +599,7 @@ void Engine::handleApiBrowserIntrospectionReply(const QJsonObject& message, cons
         m_isAuthenticated = false;
         m_notificationsEnabled = false;
         m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
         m_focusArea = FocusArea::LoginForm;
         m_apiBrowserLoaded = false;
         m_apiBrowserIntrospection = QJsonObject();
@@ -770,6 +771,11 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("s: cycle thing sort mode.")},
         {HelpRowKind::Text, QStringLiteral("f: cycle thing category filter.")},
         {HelpRowKind::Separator, {}},
+        {HelpRowKind::Heading, QStringLiteral("Main menu")},
+        {HelpRowKind::Text, QStringLiteral("Up / Down keeps focus on the main menu and updates the selected section.")},
+        {HelpRowKind::Text, QStringLiteral("Right enters the selected section; in API browser it enters the filter field.")},
+        {HelpRowKind::Text, QStringLiteral("About is a separate main-menu entry at the end.")},
+        {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Things view")},
         {HelpRowKind::Text, QStringLiteral("Left / Right: switch between search, list, and details.")},
         {HelpRowKind::Text, QStringLiteral("Enter on an action: open the action execution dialog.")},
@@ -780,7 +786,9 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("Type in search fields to filter thing classes.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Settings")},
-        {HelpRowKind::Text, QStringLiteral("Up / Down: switch between General and About.")},
+        {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Shutdown, Restart, or Reboot.")},
+        {HelpRowKind::Text, QStringLiteral("Right: open the settings details panel.")},
+        {HelpRowKind::Text, QStringLiteral("Enter: apply the selected time zone, start an update, or open a power confirmation. Left or Esc returns to the settings menu.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("API browser")},
         {HelpRowKind::Text, QStringLiteral("Type to filter methods, notifications, types, and enums.")},
@@ -834,7 +842,7 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
     auto moveMainMenu = [this, delta]() {
         switch (m_selectedMainMenuEntry) {
         case MainMenuEntry::Things:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Logout : MainMenuEntry::ConfigureThings;
+            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::About : MainMenuEntry::ConfigureThings;
             break;
         case MainMenuEntry::ConfigureThings:
             m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Things : MainMenuEntry::ApiBrowser;
@@ -846,7 +854,10 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
             m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::ApiBrowser : MainMenuEntry::Logout;
             break;
         case MainMenuEntry::Logout:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Settings : MainMenuEntry::Things;
+            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Settings : MainMenuEntry::About;
+            break;
+        case MainMenuEntry::About:
+            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Things : MainMenuEntry::Logout;
             break;
         }
     };
@@ -898,7 +909,25 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
         m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + static_cast<int>(m_thingManager.things().size()) + delta)
                                         % static_cast<int>(m_thingManager.things().size());
     };
-    auto moveSettingsMenu = [this]() { m_settingsView = m_settingsView == SettingsView::General ? SettingsView::About : SettingsView::General; };
+    auto moveSettingsMenu = [this, delta]() {
+        const int count = 6;
+        int next = static_cast<int>(m_settingsView) + delta;
+        if (next < 0) {
+            next = count - 1;
+        } else if (next >= count) {
+            next = 0;
+        }
+        m_settingsView = static_cast<SettingsView>(next);
+        m_settingsDetailsLineIndex = 0;
+        ensureSystemCapabilitiesLoaded();
+        ensureSystemTimeLoaded();
+        ensureSystemUpdateStatusLoaded();
+        if (m_settingsView == SettingsView::Timezone) {
+            ensureSystemTimeZonesLoaded();
+        } else if (m_settingsView == SettingsView::Update) {
+            ensureSystemPackagesLoaded();
+        }
+    };
     auto moveSettingsDetails = [this, delta]() {
         const int count = settingsDetailsLineCount();
         if (count <= 0) {
@@ -1053,6 +1082,7 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
             return true;
         }
         if (inside(m_settingsDetailsBox)) {
+            m_focusArea = FocusArea::SettingsDetails;
             moveSettingsDetails();
             return true;
         }
@@ -1092,7 +1122,7 @@ ftxui::Element Engine::renderApiBrowser() const
     ftxui::Elements leftPaneLines;
     auto searchRow = ftxui::text("Filter: " + (m_apiBrowserSearch.empty() ? std::string("<type to filter>") : m_apiBrowserSearch));
     if (m_focusArea == FocusArea::ApiBrowserSearch) {
-        searchRow = searchRow | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight) | ftxui::focus;
+        searchRow = renderActiveField(std::move(searchRow) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
     }
     leftPaneLines.push_back(searchRow);
     leftPaneLines.push_back(ftxui::text(m_apiBrowserStatus));
@@ -1125,7 +1155,9 @@ ftxui::Element Engine::renderApiBrowser() const
         leftPaneLines.push_back(ftxui::text("Selected item is hidden by the current filter.") | ftxui::dim);
     }
 
-    ftxui::Element leftPane = ftxui::window(ftxui::text("API browser"), ftxui::vbox(std::move(leftPaneLines)) | ftxui::vscroll_indicator | ftxui::frame)
+    ftxui::Element leftPane = renderFocusedWindow(ftxui::text("API browser"),
+                                                  ftxui::vbox(std::move(leftPaneLines)) | ftxui::vscroll_indicator | ftxui::frame,
+                                                  m_focusArea == FocusArea::ApiBrowserSearch || m_focusArea == FocusArea::ApiBrowserList)
                               | ftxui::reflect(m_apiBrowserListBox) | ftxui::flex;
 
     ftxui::Element detailsPanel;
@@ -1134,8 +1166,10 @@ ftxui::Element Engine::renderApiBrowser() const
         lines.push_back(ftxui::text("No API item selected."));
         lines.push_back(ftxui::separator());
         lines.push_back(ftxui::text("Press Enter on a reference to browse deeper.") | ftxui::dim);
-        detailsPanel = ftxui::window(ftxui::text("JSON"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame) | ftxui::reflect(m_apiBrowserDetailsBox)
-                       | ftxui::flex;
+        detailsPanel = renderFocusedWindow(ftxui::text("JSON"),
+                                           ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame,
+                                           m_focusArea == FocusArea::ApiBrowserReferences)
+                       | ftxui::reflect(m_apiBrowserDetailsBox) | ftxui::flex;
     } else {
         ftxui::Elements jsonLines;
         const QString json = apiBrowserPrettyJson(selectedItem->value);
@@ -1172,7 +1206,9 @@ ftxui::Element Engine::renderApiBrowser() const
             }
         }
 
-        ftxui::Element referenceWindow = ftxui::window(ftxui::text("References"), ftxui::vbox(std::move(referenceLines)) | ftxui::vscroll_indicator | ftxui::frame)
+        ftxui::Element referenceWindow = renderFocusedWindow(ftxui::text("References"),
+                                                             ftxui::vbox(std::move(referenceLines)) | ftxui::vscroll_indicator | ftxui::frame,
+                                                             m_focusArea == FocusArea::ApiBrowserReferences)
                                          | ftxui::reflect(m_apiBrowserReferencesBox) | ftxui::size(ftxui::HEIGHT, ftxui::GREATER_THAN, 7);
 
         detailsPanel = ftxui::vbox({

@@ -82,6 +82,8 @@ std::string busyIndicator(std::chrono::steady_clock::time_point startedAt);
 std::string thingLabel(const api::Thing* thing);
 std::string prettyUnit(api::Unit unit);
 std::optional<ftxui::Color> parseHexColor(const std::string& value);
+ftxui::Element renderFocusedWindow(ftxui::Element title, ftxui::Element body, bool focused);
+ftxui::Element renderActiveField(ftxui::Element element, bool focused, int minimumWidth = 0);
 ftxui::Element renderBoolValue(bool value);
 ftxui::Element renderColorValue(const std::string& colorString);
 std::optional<std::string> formatUnixTimestampValue(const QJsonValue& value);
