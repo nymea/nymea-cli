@@ -105,6 +105,10 @@ install(FILES docs/nymea-cli.1
     DESTINATION ${CMAKE_INSTALL_MANDIR}/man1
 )
 
+install(FILES completions/nymea-cli
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/bash-completion/completions
+)
+
 if (QT_VERSION_MAJOR EQUAL 6 AND COMMAND qt_finalize_executable)
     qt_finalize_executable(nymea-cli)
 endif()
