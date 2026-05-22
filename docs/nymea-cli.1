@@ -1,33 +1,44 @@
 .\" SPDX-License-Identifier: GPL-3.0-or-later
 .\"
-.TH NYMEA-CLI 1 "March 2026" "nymea-cli 0.1.0" "User Commands"
+.TH NYMEA-CLI 1 "May 2026" "nymea-cli 0.1.0" "User Commands"
 .SH NAME
-nymea-cli \- terminal client for nymead
+nymea-cli \- fullscreen terminal client for nymead
 .SH SYNOPSIS
 .B nymea-cli
 [\fB\-H\fR \fIhost\fR]
 [\fB\-s\fR]
 [\fB\-p\fR \fIport\fR]
-[\fB\-t\fR \fIms\fR]
+[\fB\-t\fR \fImilliseconds\fR]
 [\fB\-u\fR \fIusername\fR]
 [\fB\-w\fR \fIpassword\fR]
 [\fB\-\-help\fR]
 [\fB\-\-version\fR]
 .SH DESCRIPTION
 .B nymea-cli
-is a fullscreen terminal client for
+is a terminal-only Qt5/Qt6 + FTXUI client for
 .BR nymead .
-It connects to the nymea JSON-RPC API over plain TCP or SSL/TLS and
-provides a keyboard-driven interface for browsing things, inspecting
-metadata, and executing actions.
+It connects to the nymea newline-delimited JSON-RPC interface over plain
+TCP or SSL/TLS and presents a keyboard-driven fullscreen interface for
+browsing things, inspecting metadata, configuring devices, exploring the
+API model, and executing server-side actions.
+.PP
+At startup the client performs
+.BR JSONRPC.Hello ,
+shows the server name, server version, and API version in the header, and
+then authenticates with a stored token or with username/password
+credentials. Tokens are persisted per saved connection and reused across
+restarts. If a stored token is rejected, it is cleared and authentication
+is requested again.
 .PP
 The default nymea ports are 2223 for plain TCP and 2222 for SSL/TLS.
-Stored authentication tokens are reused across restarts. TLS connections
-store the peer certificate fingerprint and warn if it changes later.
+When TLS is enabled, the server certificate fingerprint is stored per
+connection and a warning is shown if it changes.
 .SH OPTIONS
 .TP
 .BR \-H ", " \-\-host " " \fIhost\fR
-nymead host to connect to. The default is
+Connect to the specified
+.BR nymead
+host. The default is
 .BR 127.0.0.1 .
 .TP
 .BR \-s ", " \-\-ssl
@@ -36,19 +47,25 @@ Use SSL/TLS via
 This changes the default port to 2222.
 .TP
 .BR \-p ", " \-\-port " " \fIport\fR
-Connect to the given TCP port. If omitted, the default is 2222 with
+Connect to the specified TCP port. If omitted, the default is 2222 when
 .B \-\-ssl
-or 2223 otherwise.
+is set and 2223 otherwise.
 .TP
-.BR \-t ", " \-\-timeout " " \fIms\fR
-Timeout in milliseconds for connection and reply waits. The default is
+.BR \-t ", " \-\-timeout " " \fImilliseconds\fR
+Set the timeout in milliseconds for connection and reply waits. The
+default is
 .BR 5000 .
+The value must be greater than zero.
 .TP
 .BR \-u ", " \-\-username " " \fIusername\fR
-Username for JSONRPC.Authenticate.
+Username to use for
+.BR JSONRPC.Authenticate .
+If authentication is required and a stored token is unavailable or
+rejected, the client attempts automatic login with this value.
 .TP
 .BR \-w ", " \-\-password " " \fIpassword\fR
-Password for JSONRPC.Authenticate.
+Password to use for
+.BR JSONRPC.Authenticate .
 .TP
 .BR \-\-help
 Show command line help and exit.
@@ -56,51 +73,109 @@ Show command line help and exit.
 .BR \-\-version
 Show the program version and exit.
 .SH INTERFACE
-Global keys:
+.SS Main Views
+The main menu provides access to the things browser, thing configuration
+flows, the API browser, settings, logout, and an about screen.
+.PP
+The things view contains a search field, a filtered thing list, and a
+details pane with overview, parameters, states, and actions. The
+configuration view is used for setup, rename, and remove flows. The API
+browser exposes methods, notifications, types, enums, and references from
+the generated nymea API model.
+.SS Global Keys
 .TP
 .B q
 Quit the application.
 .TP
 .B Esc
-Quit the application or close the active dialog.
+Quit the application, close the help screen, or close the active dialog,
+depending on the current context.
+.TP
+.B h, ?
+Open the help screen.
 .TP
 .B c
-Reconnect to the configured nymea server.
-.TP
-.B h
-Run the JSONRPC.Hello handshake again.
+Reconnect to the current server.
 .TP
 .B t
-Refresh the thing list.
-.PP
-Main layout keys:
+Refresh things from the server.
 .TP
 .B Up / Down
-Move inside the focused list.
+Move the selection in the focused list.
 .TP
 .B Left / Right
-Switch focus between panels.
+Switch panels or move between subviews.
+.TP
+.B Enter
+Activate the selected item.
 .TP
 .B Space
-Open or close the metadata inspector for the selected param, state, or
-action.
+Toggle the thing inspector when supported by the active view.
+.SS Things View
+.TP
+.B s
+Cycle the thing sort mode.
+.TP
+.B f
+Cycle the thing category filter.
+.TP
+.B Left / Right
+Switch between search, thing list, and details.
+.TP
+.B Space
+Open or close the inspector for the selected parameter, state, or action.
 .TP
 .B Enter
-Open the selected action or setup flow.
-.PP
-Action dialog keys:
+Open the selected action or follow the selected setup flow.
+.SS Configure Things
 .TP
 .B Up / Down
-Select the current parameter.
-.TP
-.B Left / Right / Space
-Cycle selector values for boolean or allowed-values parameters.
+Move between menu entries or list rows.
 .TP
 .B Enter
-Execute the action.
+Open the selected setup, rename, or remove flow.
 .TP
-.B Esc
-Close the dialog without executing.
+.B Typing
+Filter available thing classes in search fields.
+.SS Settings
+.TP
+.B Up / Down
+Select server info, time zone, update, shutdown, restart, or reboot.
+.TP
+.B Right, Enter
+Open the details pane or apply the selected action, depending on the
+current row.
+.TP
+.B Typing
+Filter time zones in the time zone view.
+.SS API Browser
+.TP
+.B Typing
+Filter methods, notifications, types, and enums.
+.TP
+.B Backspace
+Remove the last filter character.
+.TP
+.B Left
+Go back in API browser history.
+.TP
+.B Right
+Move between search, list, and references panes.
+.TP
+.B Enter
+Follow the selected referenced type.
+.SS Dialogs
+.TP
+.B Action dialog
+Use Up / Down to choose a parameter. Use Left / Right or Space for
+boolean and allowed-values selectors. Press Enter to execute or Esc to
+close.
+.TP
+.B Login dialog
+Press Enter to submit credentials. Esc quits the application.
+.TP
+.B Confirmation dialogs
+Press Enter to confirm and Esc to cancel.
 .SH FILES
 .TP
 .I /var/lib/nymea/nymea-cli.conf
@@ -109,20 +184,27 @@ Settings file used when running as root.
 .I ~/.config/nymea/nymea-cli.conf
 Settings file used for non-root users.
 .PP
-Saved connections are keyed by nymea host UUID and store the host,
-selected port, SSL flag, authentication token, and TLS fingerprint.
+Saved connections are keyed by nymea host UUID. Each entry stores the
+display name, host, port, SSL flag, authentication token, and TLS
+fingerprint.
 .SH EXAMPLES
 .TP
-Connect to a local nymea instance using plain TCP:
+Connect to a local nymea instance using the default plain TCP port:
 .IP
 .EX
 nymea-cli
 .EE
 .TP
-Connect to a remote host with TLS:
+Connect to a remote host with TLS and the default TLS port:
 .IP
 .EX
 nymea-cli --ssl --host nymea.example.org
+.EE
+.TP
+Use a custom timeout and explicit TCP port:
+.IP
+.EX
+nymea-cli --host 192.0.2.10 --port 2224 --timeout 10000
 .EE
 .TP
 Authenticate with explicit credentials:
@@ -139,7 +221,12 @@ Success.
 Invalid command line arguments or application failure.
 .SH SECURITY
 Passing a password on the command line can expose it to other local users
-through process listings. Prefer interactive authentication when possible.
+through process listings or shell history. Prefer interactive
+authentication when possible.
+.PP
+When a stored TLS fingerprint changes,
+.B nymea-cli
+shows a warning before continuing to use the connection.
 .SH LICENSE
 This project is licensed under
 .BR GPL-3.0-or-later .
