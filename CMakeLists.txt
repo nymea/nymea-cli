@@ -35,7 +35,12 @@ if (NOT (TARGET ftxui::component AND TARGET ftxui::dom AND TARGET ftxui::screen)
         GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
         GIT_TAG ${FTXUI_GIT_TAG}
     )
+    set(FTXUI_ENABLE_INSTALL OFF CACHE BOOL "Disable FTXUI install rules when vendored by nymea-cli" FORCE)
     FetchContent_MakeAvailable(ftxui)
+endif()
+
+if (NOT (TARGET ftxui::component AND TARGET ftxui::dom AND TARGET ftxui::screen))
+    message(FATAL_ERROR "FTXUI targets are unavailable. Install a system ftxui package or allow FetchContent to download it.")
 endif()
 
 set(NYMEA_API_JSON "${CMAKE_SOURCE_DIR}/api/api.json" CACHE FILEPATH "Path to nymea api.json")
