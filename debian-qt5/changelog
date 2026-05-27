@@ -1,3 +1,10 @@
+nymea-cli (1.16.0) noble; urgency=medium
+
+  [ Simon Stürz ]
+  * Recreate nymea-cli project using c++
+
+ -- jenkins <developer@nymea.io>  Wed, 27 May 2026 13:06:52 +0200
+
 nymea-cli (0.1.0) bookworm; urgency=medium
 
   * Initial Debian packaging for the Qt5 build.
