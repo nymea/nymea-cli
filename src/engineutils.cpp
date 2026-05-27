@@ -59,6 +59,18 @@ static const Charsets simpleBorderCharset = {
     Charset{" ", " ", " ", " ", " ", " "},
 };
 
+template<typename Requirement>
+auto shiftFocusedBoxForWindowBorder(Requirement& requirement)
+    -> decltype(requirement.focused.box.x_min, requirement.focused.box.x_max, requirement.focused.box.y_min, requirement.focused.box.y_max, void())
+{
+    requirement.focused.box.x_min++;
+    requirement.focused.box.x_max++;
+    requirement.focused.box.y_min++;
+    requirement.focused.box.y_max++;
+}
+
+void shiftFocusedBoxForWindowBorder(...) {}
+
 class ColoredWindow final : public ftxui::Node
 {
 public:
@@ -77,10 +89,7 @@ public:
         if (children_.size() == 2) {
             requirement_.min_x = std::max(requirement_.min_x, children_[1]->requirement().min_x + 2);
         }
-        requirement_.focused.box.x_min++;
-        requirement_.focused.box.x_max++;
-        requirement_.focused.box.y_min++;
-        requirement_.focused.box.y_max++;
+        shiftFocusedBoxForWindowBorder(requirement_);
     }
 
     void SetBox(ftxui::Box box) override
