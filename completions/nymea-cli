@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+_nymea_cli()
+{
+    local cur prev
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    case "${prev}" in
+        -H|--host|-u|--username|-w|--password)
+            return 0
+            ;;
+        -p|--port)
+            COMPREPLY=($(compgen -W "2222 2223" -- "${cur}"))
+            return 0
+            ;;
+        -t|--timeout)
+            COMPREPLY=($(compgen -W "1000 5000 10000 30000" -- "${cur}"))
+            return 0
+            ;;
+    esac
+
+    if [[ "${cur}" == -* ]]; then
+        COMPREPLY=($(compgen -W "-H --host -s --ssl -p --port -t --timeout -u --username -w --password --help --version" -- "${cur}"))
+        return 0
+    fi
+
+    COMPREPLY=()
+}
+
+complete -F _nymea_cli nymea-cli

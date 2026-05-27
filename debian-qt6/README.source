@@ -1,0 +1,9 @@
+The Debian 13 (Trixie) packaging uses the distro-provided libftxui-dev
+package and disables the FetchContent fallback path.
+
+The package rules pin CMake to Qt6 with Qt6_DIR so the build remains on the
+Qt6 stack even when multiple Qt major versions are installed locally.
+
+This packaging tree uses source format 3.0 (native) so crossbuilder can create
+its timestamped local source package without requiring an upstream orig tarball
+from an APT source repository.
