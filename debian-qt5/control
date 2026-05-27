@@ -8,7 +8,7 @@ Build-Depends:
  ca-certificates,
  cmake,
  git,
- python3,
+ python3:native,
  qtbase5-dev,
  qtbase5-dev-tools
 Standards-Version: 4.6.2
