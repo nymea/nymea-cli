@@ -1,0 +1,26 @@
+Source: nymea-cli
+Section: utils
+Priority: optional
+Maintainer: Simon Stuerz <simon.stuerz@nymea.io>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ libftxui-dev,
+ python3:native,
+ qt6-base-dev,
+ qt6-base-dev-tools
+Standards-Version: 4.6.2
+Homepage: https://github.com/nymea/nymea-cli
+Vcs-Browser: https://github.com/nymea/nymea-cli
+Vcs-Git: https://github.com/nymea/nymea-cli.git
+
+Package: nymea-cli
+Architecture: any
+Depends:
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: terminal-only client for nymea using Qt6 and FTXUI
+ nymea-cli connects to nymead over JSON-RPC using plain TCP or SSL/TLS
+ and provides a fullscreen keyboard-driven terminal UI for browsing
+ things, states, parameters, and actions.
