@@ -153,6 +153,7 @@ private:
     int thingDetailEntryCount() const;
     void clampThingDetailSelection();
     void resetThingDetailSelection();
+    void selectInitialThingDetailSection();
     void ensureSystemCapabilitiesLoaded();
     void ensureSystemTimeLoaded();
     void ensureSystemUpdateStatusLoaded();

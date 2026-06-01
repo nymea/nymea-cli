@@ -104,6 +104,31 @@ void Engine::resetThingDetailSelection()
     clampThingDetailSelection();
 }
 
+void Engine::selectInitialThingDetailSection()
+{
+    const api::Thing* thing = selectedThing();
+    const api::ThingClass* thingClass = thing != nullptr ? m_thingManager.thingClassForThing(*thing) : nullptr;
+    const std::vector<ThingDetailEntry> detailEntries = buildThingDetailEntries(thing, thingClass);
+
+    const auto selectFirstEntryOfType = [this, &detailEntries](ThingDetailEntry::Type type) {
+        for (int index = 0; index < static_cast<int>(detailEntries.size()); ++index) {
+            if (detailEntries.at(index).type == type) {
+                m_selectedThingDetailIndex = index;
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    if (!selectFirstEntryOfType(ThingDetailEntry::Type::Action) && !selectFirstEntryOfType(ThingDetailEntry::Type::State)) {
+        selectFirstEntryOfType(ThingDetailEntry::Type::Param);
+    }
+
+    m_showThingDetailInspector = false;
+    clampThingDetailSelection();
+}
+
 bool Engine::openSelectedActionDialog()
 {
     const api::Thing* thing = selectedThing();

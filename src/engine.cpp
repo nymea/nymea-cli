@@ -5902,6 +5902,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             } else if (m_focusArea == FocusArea::ThingSearch) {
                 m_focusArea = FocusArea::ThingList;
             } else if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
+                selectInitialThingDetailSection();
                 m_focusArea = FocusArea::ThingDetails;
             } else {
                 m_focusArea = FocusArea::ThingList;
