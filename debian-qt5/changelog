@@ -1,3 +1,10 @@
+nymea-cli (1.15.1) noble; urgency=medium
+
+  [ Simon Stürz ]
+  * Project reboot in c++ and ftxui
+
+ -- jenkins <developer@nymea.io>  Sun, 07 Jun 2026 09:33:32 +0200
+
 nymea-cli (0.1.0) bookworm; urgency=medium
 
   * Initial Debian packaging for the Qt5 build.
