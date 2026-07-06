@@ -174,6 +174,10 @@ private:
     void ensureSystemTimeZonesLoaded();
     void ensureLoggingCategoriesLoaded();
     void ensureModbusRtuLoaded();
+    void applySystemUpdateStatus(const api::SystemGetUpdateStatusResponse& status);
+    bool systemUpdateInteractionBusy() const;
+    std::vector<const api::Package*> updateAvailablePackages() const;
+    int updateActionCount() const;
     QStringList filteredSystemTimeZones() const;
     std::vector<api::LoggingCategory> filteredLoggingCategories() const;
     const api::ModbusRtuMaster* selectedModbusRtuMaster() const;
@@ -420,6 +424,7 @@ private:
     bool m_systemUpdateStatusLoaded = false;
     bool m_systemUpdateStatusPending = false;
     api::SystemGetUpdateStatusResponse m_systemUpdateStatus;
+    std::chrono::steady_clock::time_point m_systemUpdateStatusStartedAt{};
     bool m_systemPackagesLoaded = false;
     bool m_systemPackagesPending = false;
     std::vector<api::Package> m_systemPackages;

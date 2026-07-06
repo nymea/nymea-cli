@@ -1360,6 +1360,7 @@ constexpr int timezoneListStartLineIndex = 7;
 constexpr int loggingCategorySearchLineIndex = 2;
 constexpr int loggingCategoryListStartLineIndex = 5;
 constexpr int modbusRtuMasterListStartLineIndex = 4;
+constexpr int updateProgressBarWidth = 20;
 
 int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCount)
 {
@@ -1413,6 +1414,20 @@ int nextFilterListDetailsLineIndex(int currentIndex, int direction, int searchLi
     }
 
     return direction > 0 ? searchLineIndex : lastResultLineIndex;
+}
+
+std::string progressBar(qint64 progress)
+{
+    const qint64 clampedProgress = std::clamp<qint64>(progress, 0, 100);
+    const int filled = static_cast<int>((clampedProgress * updateProgressBarWidth) / 100);
+    std::string bar = "[";
+    for (int index = 0; index < updateProgressBarWidth; ++index) {
+        bar += index < filled ? "#" : "-";
+    }
+    bar += "] ";
+    bar += std::to_string(clampedProgress);
+    bar += "%";
+    return bar;
 }
 
 std::string loggingLevelLabel(api::LoggingLevel level)
@@ -3229,6 +3244,23 @@ void Engine::handleNotification(const QJsonObject& message)
         return;
     }
 
+    if (notificationName == api::SystemUpdateStatusChangedNotification::notificationName()) {
+        const bool wasActive = m_systemUpdateStatusLoaded && (m_systemUpdateStatus.busy || m_systemUpdateStatus.updateRunning);
+        const api::SystemUpdateStatusChangedNotificationParams notification = api::SystemUpdateStatusChangedNotificationParams::fromJson(params);
+        api::SystemGetUpdateStatusResponse status;
+        status.busy = notification.busy;
+        status.updateProgress = notification.updateProgress;
+        status.updateRunning = notification.updateRunning;
+        applySystemUpdateStatus(status);
+        const bool isActive = status.busy || status.updateRunning;
+        if (wasActive && !isActive) {
+            m_systemPackagesLoaded = false;
+            ensureSystemPackagesLoaded();
+        }
+        clampSettingsDetailsSelection();
+        return;
+    }
+
     if (notificationName == api::ModbusRtuModbusRtuMasterAddedNotification::notificationName()) {
         const api::ModbusRtuModbusRtuMasterAddedNotificationParams notification = api::ModbusRtuModbusRtuMasterAddedNotificationParams::fromJson(params);
         auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
@@ -3464,6 +3496,7 @@ bool Engine::connectToServer(bool shouldLoadSavedConnection)
     m_systemUpdateStatusLoaded = false;
     m_systemUpdateStatusPending = false;
     m_systemUpdateStatus = api::SystemGetUpdateStatusResponse{};
+    m_systemUpdateStatusStartedAt = std::chrono::steady_clock::now();
     m_systemPackagesLoaded = false;
     m_systemPackagesPending = false;
     m_systemPackages.clear();
@@ -4171,6 +4204,41 @@ void Engine::ensureSystemPackagesLoaded()
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemPackagesReply(message, transportError); });
 }
 
+void Engine::applySystemUpdateStatus(const api::SystemGetUpdateStatusResponse& status)
+{
+    const bool wasActive = m_systemUpdateStatusLoaded && (m_systemUpdateStatus.busy || m_systemUpdateStatus.updateRunning);
+    const bool isActive = status.busy || status.updateRunning;
+    m_systemUpdateStatus = status;
+    m_systemUpdateStatusLoaded = true;
+    if (isActive && !wasActive) {
+        m_systemUpdateStatusStartedAt = std::chrono::steady_clock::now();
+    }
+}
+
+bool Engine::systemUpdateInteractionBusy() const
+{
+    return m_systemUpdateStatusLoaded && (m_systemUpdateStatus.busy || m_systemUpdateStatus.updateRunning);
+}
+
+std::vector<const api::Package*> Engine::updateAvailablePackages() const
+{
+    std::vector<const api::Package*> packages;
+    for (const api::Package& package : m_systemPackages) {
+        if (package.updateAvailable) {
+            packages.push_back(&package);
+        }
+    }
+    return packages;
+}
+
+int Engine::updateActionCount() const
+{
+    if (systemUpdateInteractionBusy()) {
+        return 0;
+    }
+    return m_systemPackagesLoaded && !updateAvailablePackages().empty() ? 2 : 1;
+}
+
 void Engine::ensureSystemTimeZonesLoaded()
 {
     if (m_systemTimeZonesLoaded || m_systemTimeZonesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
@@ -4499,9 +4567,9 @@ void Engine::handleFetchSystemUpdateStatusReply(const QJsonObject& message, cons
         return;
     }
 
-    m_systemUpdateStatus = api::SystemGetUpdateStatusResponse::fromJson(message.value(QStringLiteral("params")).toObject());
-    m_systemUpdateStatusLoaded = true;
+    applySystemUpdateStatus(api::SystemGetUpdateStatusResponse::fromJson(message.value(QStringLiteral("params")).toObject()));
     m_settingsWarning.clear();
+    clampSettingsDetailsSelection();
 }
 
 void Engine::handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError)
@@ -4538,6 +4606,7 @@ void Engine::handleFetchSystemPackagesReply(const QJsonObject& message, const QS
     }
     m_systemPackagesLoaded = true;
     m_settingsWarning.clear();
+    clampSettingsDetailsSelection();
 }
 
 void Engine::handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError)
@@ -5551,6 +5620,10 @@ ftxui::Element Engine::renderSettingsDetails() const
         lines.push_back(std::move(line));
         ++lineIndex;
     };
+    auto pushStaticLine = [&](ftxui::Element line) {
+        lines.push_back(std::move(line));
+        ++lineIndex;
+    };
     auto pushSelectableLine = [&](ftxui::Element line, int minimumWidth = 0) {
         const bool selected = m_focusArea == FocusArea::SettingsDetails && lineIndex == m_settingsDetailsLineIndex;
         pushLine(renderActiveField(std::move(line), selected, minimumWidth));
@@ -5596,57 +5669,75 @@ ftxui::Element Engine::renderSettingsDetails() const
         const std::string capabilityText = m_systemCapabilitiesLoaded ? std::string("Update management: ") + (m_systemCapabilities.updateManagement ? "available" : "unavailable")
                                                                             + " (" + api::toString(m_systemCapabilities.updateManagementType).toStdString() + ")"
                                                                       : std::string("Update management: loading...");
-        pushLine(ftxui::text(capabilityText));
-        if (m_systemUpdateStatusLoaded) {
-            std::string statusText = "Busy: ";
-            statusText += m_systemUpdateStatus.busy ? "yes" : "no";
-            statusText += " | Update running: ";
-            statusText += m_systemUpdateStatus.updateRunning ? "yes" : "no";
-            if (m_systemUpdateStatus.updateProgress.has_value()) {
-                statusText += " | Progress: " + std::to_string(*m_systemUpdateStatus.updateProgress) + "%";
+        const std::vector<const api::Package*> updatePackages = updateAvailablePackages();
+        const bool updateRunning = m_systemUpdateStatusLoaded && m_systemUpdateStatus.updateRunning;
+        const bool updaterBusy = m_systemUpdateStatusLoaded && m_systemUpdateStatus.busy;
+        int updateActionIndex = 0;
+        auto pushUpdateAction = [&](ftxui::Element line, int minimumWidth = 0) {
+            const bool selected = m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == updateActionIndex;
+            if (selected) {
+                line = std::move(line) | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
             }
-            pushLine(ftxui::text("Status: " + statusText));
+            lines.push_back(renderActiveField(std::move(line), selected, minimumWidth));
+            ++lineIndex;
+            ++updateActionIndex;
+        };
+
+        pushStaticLine(ftxui::text(capabilityText));
+        if (m_systemUpdateStatusLoaded) {
+            std::string statusText;
+            if (updateRunning) {
+                statusText = "Update running: ";
+                statusText += m_systemUpdateStatus.updateProgress.has_value() ? progressBar(*m_systemUpdateStatus.updateProgress) : busyIndicator(m_systemUpdateStatusStartedAt);
+            } else if (updaterBusy) {
+                statusText = "Busy: " + busyIndicator(m_systemUpdateStatusStartedAt) + " Busy";
+            } else {
+                statusText = "Idle";
+            }
+            pushStaticLine(ftxui::text("Status: " + statusText));
         } else {
-            pushLine(ftxui::text("Status: loading..."));
+            pushStaticLine(ftxui::text("Status: loading..."));
         }
-        pushLine(ftxui::separator());
-        pushLine(ftxui::text("Actions") | ftxui::bold);
-        pushSelectableLine(ftxui::text(" Check for updates "), 24);
-        const bool hasInstallablePackages = std::any_of(m_systemPackages.begin(), m_systemPackages.end(), [](const api::Package& package) {
-            return package.updateAvailable || package.installedVersion.isEmpty();
-        });
-        auto installRow = ftxui::text(hasInstallablePackages ? " Install available updates " : " Install available updates (none) ");
-        if (!hasInstallablePackages) {
-            installRow = installRow | ftxui::dim;
+        if (!m_systemActionStatus.empty()) {
+            pushStaticLine(ftxui::text("Message: " + m_systemActionStatus));
         }
-        pushSelectableLine(std::move(installRow), 28);
-        pushLine(ftxui::separator());
-        pushLine(ftxui::text("Packages") | ftxui::bold);
+        pushStaticLine(ftxui::separator());
+        pushStaticLine(ftxui::text("Actions") | ftxui::bold);
+        if (systemUpdateInteractionBusy()) {
+            pushStaticLine(ftxui::text(updateRunning ? "Update is running." : "Updater is busy.") | ftxui::dim);
+        } else {
+            pushUpdateAction(ftxui::text(" Check for updates "), 24);
+            if (!updatePackages.empty()) {
+                pushUpdateAction(ftxui::text(" Perform update "), 24);
+            }
+        }
+        pushStaticLine(ftxui::separator());
+        pushStaticLine(ftxui::text("Packages with updates") | ftxui::bold);
         if (!m_systemPackagesLoaded) {
-            pushLine(ftxui::text("Loading packages..."));
-        } else if (m_systemPackages.empty()) {
-            pushLine(ftxui::text("No packages returned."));
+            pushStaticLine(ftxui::text("Loading packages..."));
+        } else if (updatePackages.empty()) {
+            pushStaticLine(ftxui::text("No updates available."));
         } else {
-            for (const api::Package& package : m_systemPackages) {
-                std::string label = package.displayName.toStdString();
-                if (!package.installedVersion.isEmpty() || !package.candidateVersion.isEmpty()) {
-                    label += " (" + package.installedVersion.toStdString();
-                    if (!package.candidateVersion.isEmpty()) {
-                        label += " -> " + package.candidateVersion.toStdString();
+            for (const api::Package* package : updatePackages) {
+                std::string label = package->displayName.toStdString();
+                if (!package->installedVersion.isEmpty() || !package->candidateVersion.isEmpty()) {
+                    label += " (" + package->installedVersion.toStdString();
+                    if (!package->candidateVersion.isEmpty()) {
+                        label += " -> " + package->candidateVersion.toStdString();
                     }
                     label += ")";
                 }
-                if (package.updateAvailable) {
-                    label += " [update available]";
+                label += " [update available]";
+                if (!package->summary.isEmpty()) {
+                    label += " - " + package->summary.toStdString();
                 }
-                if (!package.summary.isEmpty()) {
-                    label += " - " + package.summary.toStdString();
-                }
-                pushLine(ftxui::paragraph(label));
+                pushStaticLine(ftxui::paragraph(label));
             }
         }
-        pushLine(ftxui::separator());
-        pushLine(ftxui::text(m_systemUpdateStatusPending ? "Loading update status..." : "Enter checks updates or installs all available updates.") | ftxui::dim);
+        pushStaticLine(ftxui::separator());
+        pushStaticLine(ftxui::text(systemUpdateInteractionBusy() ? "Update actions are disabled until the updater is idle."
+                                                                 : (m_systemUpdateStatusPending ? "Loading update status..." : "Enter runs the selected update action."))
+                       | ftxui::dim);
     } else if (m_settingsView == SettingsView::LoggingCategories) {
         const std::vector<api::LoggingCategory> filteredCategories = filteredLoggingCategories();
         const std::string statusText = m_loggingCategoryStatus.empty() ? std::string("Status: ") + (m_loggingCategoriesPending ? "loading..." : "ready")
@@ -5760,7 +5851,7 @@ int Engine::settingsDetailsLineCount() const
     case SettingsView::Timezone:
         return m_systemTimeZonesLoaded ? 9 + std::max(1, static_cast<int>(filteredSystemTimeZones().size())) : 10;
     case SettingsView::Update:
-        return m_systemPackagesLoaded ? 11 + static_cast<int>(m_systemPackages.size()) : 11;
+        return updateActionCount();
     case SettingsView::LoggingCategories:
         return m_loggingCategoriesLoaded ? 7 + std::max(1, static_cast<int>(filteredLoggingCategories().size())) : 8;
     case SettingsView::ModbusRtu:
@@ -7385,32 +7476,31 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         case SettingsView::Update: {
-            if (m_settingsDetailsLineIndex == 4) {
-                if (m_systemActionRequestPending) {
-                    return true;
-                }
+            if (systemUpdateInteractionBusy() || m_systemActionRequestPending || m_settingsDetailsLineIndex < 0 || m_settingsDetailsLineIndex >= updateActionCount()) {
+                return true;
+            }
+            if (m_settingsDetailsLineIndex == 0) {
                 m_systemActionRequestPending = true;
                 m_systemActionStatus = "Checking for updates...";
                 observeReply(m_client.sendRequest(api::SystemCheckForUpdatesMethod::methodName(), QJsonObject{}),
                              [this](const QJsonObject& message, const QString& transportError) { handleCheckForUpdatesReply(message, transportError); });
                 return true;
             }
-            if (m_settingsDetailsLineIndex == 5) {
-                if (!m_systemPackagesLoaded || m_systemActionRequestPending) {
+            if (m_settingsDetailsLineIndex == 1) {
+                if (!m_systemPackagesLoaded) {
                     return true;
                 }
-                if (m_systemPackages.empty()) {
-                    m_systemActionStatus = "No packages are available for installation or update.";
+                const std::vector<const api::Package*> updatePackages = updateAvailablePackages();
+                if (updatePackages.empty()) {
+                    m_systemActionStatus = "No packages have updates available.";
                     return true;
                 }
                 QList<QString> packageIds;
-                for (const api::Package& package : m_systemPackages) {
-                    if (package.updateAvailable || package.installedVersion.isEmpty()) {
-                        packageIds.append(package.id);
-                    }
+                for (const api::Package* package : updatePackages) {
+                    packageIds.append(package->id);
                 }
                 if (packageIds.isEmpty()) {
-                    m_systemActionStatus = "No packages are available for installation or update.";
+                    m_systemActionStatus = "No packages have updates available.";
                     return true;
                 }
 
