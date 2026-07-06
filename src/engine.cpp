@@ -7,6 +7,11 @@
 #include "generated/apiutils.h"
 #include "generated/configurationsettimezoneparams.h"
 #include "generated/configurationsettimezoneresponse.h"
+#include "generated/debuggetloggingcategoriesparams.h"
+#include "generated/debuggetloggingcategoriesresponse.h"
+#include "generated/debugloggingcategorylevelchangednotificationparams.h"
+#include "generated/debugsetloggingcategorylevelparams.h"
+#include "generated/debugsetloggingcategorylevelresponse.h"
 #include "generated/integrationsaddthingparams.h"
 #include "generated/integrationsaddthingresponse.h"
 #include "generated/integrationsconfirmpairingparams.h"
@@ -739,10 +744,12 @@ std::string settingsViewLabel(int view)
     case 2:
         return "Update";
     case 3:
-        return "Shutdown";
+        return "Logging categories";
     case 4:
-        return "Restart";
+        return "Shutdown";
     case 5:
+        return "Restart";
+    case 6:
         return "Reboot";
     }
 
@@ -1303,10 +1310,12 @@ std::string settingsViewLabel(int view)
     case 2:
         return "Update";
     case 3:
-        return "Shutdown";
+        return "Logging categories";
     case 4:
-        return "Restart";
+        return "Shutdown";
     case 5:
+        return "Restart";
+    case 6:
         return "Reboot";
     }
 
@@ -1329,6 +1338,8 @@ std::string powerActionLabel(int action)
 
 constexpr int timezoneSearchLineIndex = 4;
 constexpr int timezoneListStartLineIndex = 7;
+constexpr int loggingCategorySearchLineIndex = 2;
+constexpr int loggingCategoryListStartLineIndex = 5;
 
 int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCount)
 {
@@ -1355,6 +1366,93 @@ int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCo
     }
 
     return direction > 0 ? timezoneSearchLineIndex : lastResultLineIndex;
+}
+
+int nextFilterListDetailsLineIndex(int currentIndex, int direction, int searchLineIndex, int listStartLineIndex, int filteredCount)
+{
+    if (filteredCount <= 0) {
+        return searchLineIndex;
+    }
+
+    const int firstResultLineIndex = listStartLineIndex;
+    const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
+
+    if (currentIndex == searchLineIndex) {
+        return direction > 0 ? firstResultLineIndex : lastResultLineIndex;
+    }
+
+    if (currentIndex < firstResultLineIndex) {
+        return direction > 0 ? firstResultLineIndex : searchLineIndex;
+    }
+
+    if (currentIndex <= lastResultLineIndex) {
+        if (direction > 0) {
+            return currentIndex == lastResultLineIndex ? searchLineIndex : currentIndex + 1;
+        }
+        return currentIndex == firstResultLineIndex ? searchLineIndex : currentIndex - 1;
+    }
+
+    return direction > 0 ? searchLineIndex : lastResultLineIndex;
+}
+
+std::string loggingLevelLabel(api::LoggingLevel level)
+{
+    switch (level) {
+    case api::LoggingLevel::LoggingLevelCritical:
+        return "critical";
+    case api::LoggingLevel::LoggingLevelWarning:
+        return "warning";
+    case api::LoggingLevel::LoggingLevelInfo:
+        return "info";
+    case api::LoggingLevel::LoggingLevelDebug:
+        return "debug";
+    }
+
+    return "critical";
+}
+
+ftxui::Color loggingLevelColor(api::LoggingLevel level)
+{
+    switch (level) {
+    case api::LoggingLevel::LoggingLevelCritical:
+        return ftxui::Color::RGB(220, 64, 64);
+    case api::LoggingLevel::LoggingLevelWarning:
+        return ftxui::Color::RGB(220, 156, 48);
+    case api::LoggingLevel::LoggingLevelInfo:
+        return ftxui::Color::RGB(72, 176, 112);
+    case api::LoggingLevel::LoggingLevelDebug:
+        return ftxui::Color::RGB(64, 168, 220);
+    }
+
+    return ftxui::Color::RGB(220, 64, 64);
+}
+
+api::LoggingLevel cycleLoggingLevel(api::LoggingLevel level, int delta)
+{
+    constexpr std::array<api::LoggingLevel, 4> levels = {
+        api::LoggingLevel::LoggingLevelCritical,
+        api::LoggingLevel::LoggingLevelWarning,
+        api::LoggingLevel::LoggingLevelInfo,
+        api::LoggingLevel::LoggingLevelDebug,
+    };
+
+    int index = 0;
+    for (int i = 0; i < static_cast<int>(levels.size()); ++i) {
+        if (levels.at(i) == level) {
+            index = i;
+            break;
+        }
+    }
+
+    index = (index + static_cast<int>(levels.size()) + delta) % static_cast<int>(levels.size());
+    return levels.at(index);
+}
+
+void sortLoggingCategories(std::vector<api::LoggingCategory>& categories)
+{
+    std::sort(categories.begin(), categories.end(), [](const api::LoggingCategory& left, const api::LoggingCategory& right) {
+        return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
+    });
 }
 
 } // namespace
@@ -2954,6 +3052,20 @@ void Engine::handleNotification(const QJsonObject& message)
         return;
     }
 
+    if (notificationName == api::DebugLoggingCategoryLevelChangedNotification::notificationName()) {
+        const api::DebugLoggingCategoryLevelChangedNotificationParams notification = api::DebugLoggingCategoryLevelChangedNotificationParams::fromJson(params);
+        for (api::LoggingCategory& category : m_loggingCategories) {
+            if (category.name == notification.name) {
+                category.level = notification.level;
+                sortLoggingCategories(m_loggingCategories);
+                clampSettingsDetailsSelection();
+                m_loggingCategoryStatus = "Logging category " + notification.name.toStdString() + " changed to " + loggingLevelLabel(notification.level) + ".";
+                break;
+            }
+        }
+        return;
+    }
+
     if (notificationName == api::IntegrationsStateChangedNotification::notificationName()) {
         const api::IntegrationsStateChangedNotificationParams notification = api::IntegrationsStateChangedNotificationParams::fromJson(params);
         if (m_thingManager
@@ -3580,7 +3692,7 @@ void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QS
     if (!m_notificationsEnabled) {
         m_thingManager.setStatus("Server did not confirm Integrations notifications.");
     } else {
-        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations.");
+        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations and Debug.");
     }
 
     if (fetchThingsAfterReply) {
@@ -3614,7 +3726,7 @@ void Engine::enableNotifications(bool fetchThingsAfterReply)
 
     api::JSONRPCSetNotificationStatusParams request;
     request.enabled = true;
-    request.namespaces = QStringList{QStringLiteral("Integrations")};
+    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug")};
 
     observeReply(m_client.sendRequest(api::JSONRPCSetNotificationStatusMethod::methodName(), request.toJson()),
                  [this, fetchThingsAfterReply](const QJsonObject& message, const QString& transportError) {
@@ -3841,6 +3953,17 @@ void Engine::ensureSystemTimeZonesLoaded()
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchSystemTimeZonesReply(message, transportError); });
 }
 
+void Engine::ensureLoggingCategoriesLoaded()
+{
+    if (m_loggingCategoriesLoaded || m_loggingCategoriesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_loggingCategoriesPending = true;
+    observeReply(m_client.sendRequest(api::DebugGetLoggingCategoriesMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchLoggingCategoriesReply(message, transportError); });
+}
+
 QStringList Engine::filteredSystemTimeZones() const
 {
     if (m_systemTimeZoneSearch.empty()) {
@@ -3852,6 +3975,22 @@ QStringList Engine::filteredSystemTimeZones() const
     for (const QString& timeZone : m_systemTimeZones) {
         if (caseInsensitiveContains(timeZone, search)) {
             filtered.append(timeZone);
+        }
+    }
+    return filtered;
+}
+
+std::vector<api::LoggingCategory> Engine::filteredLoggingCategories() const
+{
+    if (m_loggingCategorySearch.empty()) {
+        return m_loggingCategories;
+    }
+
+    std::vector<api::LoggingCategory> filtered;
+    const QString search = QString::fromStdString(m_loggingCategorySearch);
+    for (const api::LoggingCategory& category : m_loggingCategories) {
+        if (caseInsensitiveContains(category.name, search)) {
+            filtered.push_back(category);
         }
     }
     return filtered;
@@ -4018,6 +4157,45 @@ void Engine::handleFetchSystemTimeZonesReply(const QJsonObject& message, const Q
     m_settingsWarning.clear();
 }
 
+void Engine::handleFetchLoggingCategoriesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_loggingCategoriesPending = false;
+    if (!transportError.isEmpty()) {
+        m_settingsWarning = "Settings warning: failed to load logging categories: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_settingsWarning = "Settings warning: logging categories request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_settingsWarning = "Settings warning: logging categories request returned an error.";
+        return;
+    }
+
+    const api::DebugGetLoggingCategoriesResponse response = api::DebugGetLoggingCategoriesResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_loggingCategories.clear();
+    m_loggingCategories.reserve(response.loggingCategories.size());
+    for (const api::LoggingCategory& category : response.loggingCategories) {
+        m_loggingCategories.push_back(category);
+    }
+    sortLoggingCategories(m_loggingCategories);
+    m_loggingCategoriesLoaded = true;
+    m_loggingCategoryStatus = "Loaded " + std::to_string(m_loggingCategories.size()) + " logging categories.";
+    m_settingsWarning.clear();
+    clampSettingsDetailsSelection();
+}
+
 void Engine::handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError)
 {
     m_systemActionRequestPending = false;
@@ -4134,6 +4312,50 @@ void Engine::handleUpdatePackagesReply(const QJsonObject& message, const QString
     m_systemPackagesLoaded = false;
     ensureSystemUpdateStatusLoaded();
     ensureSystemPackagesLoaded();
+}
+
+void Engine::handleSetLoggingCategoryLevelReply(const QJsonObject& message, const QString& transportError, const QString& categoryName, api::LoggingLevel level)
+{
+    m_systemActionRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_loggingCategoryStatus = "Logging category update failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_loggingCategoryStatus = "Setting the logging category level was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_loggingCategoryStatus = "Setting the logging category level returned an error.";
+        return;
+    }
+
+    const api::DebugSetLoggingCategoryLevelResponse response = api::DebugSetLoggingCategoryLevelResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.debugError != api::DebugError::DebugErrorNoError) {
+        m_loggingCategoryStatus = "Setting the logging category level failed: " + api::toString(response.debugError).toStdString();
+        return;
+    }
+
+    for (api::LoggingCategory& category : m_loggingCategories) {
+        if (category.name == categoryName) {
+            category.level = level;
+            break;
+        }
+    }
+    sortLoggingCategories(m_loggingCategories);
+    m_loggingCategoryStatus = "Logging category " + categoryName.toStdString() + " set to " + loggingLevelLabel(level) + ".";
+    m_settingsWarning.clear();
+    clampSettingsDetailsSelection();
 }
 
 void Engine::handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action)
@@ -4688,7 +4910,7 @@ ftxui::Element Engine::renderConfigureDetails() const
 
 ftxui::Element Engine::renderSettingsMenu() const
 {
-    constexpr std::array<const char*, 6> menuItems = {"Server info", "Timezone", "Update", "Shutdown", "Restart", "Reboot"};
+    constexpr std::array<const char*, 7> menuItems = {"Server info", "Timezone", "Update", "Logging categories", "Shutdown", "Restart", "Reboot"};
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
@@ -4819,6 +5041,36 @@ ftxui::Element Engine::renderSettingsDetails() const
         }
         pushLine(ftxui::separator());
         pushLine(ftxui::text(m_systemUpdateStatusPending ? "Loading update status..." : "Enter checks updates or installs all available updates.") | ftxui::dim);
+    } else if (m_settingsView == SettingsView::LoggingCategories) {
+        const std::vector<api::LoggingCategory> filteredCategories = filteredLoggingCategories();
+        const std::string statusText = m_loggingCategoryStatus.empty() ? std::string("Status: ") + (m_loggingCategoriesPending ? "loading..." : "ready")
+                                                                       : "Status: " + m_loggingCategoryStatus;
+        pushLine(ftxui::text(statusText));
+        pushLine(ftxui::separator());
+        auto search = ftxui::text("Filter: " + (m_loggingCategorySearch.empty() ? std::string("<type to filter>") : m_loggingCategorySearch));
+        if (m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
+            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 32);
+        }
+        pushLine(std::move(search));
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Logging categories") | ftxui::bold);
+        if (!m_loggingCategoriesLoaded) {
+            pushLine(ftxui::text("Loading logging categories..."));
+        } else if (filteredCategories.empty()) {
+            pushLine(ftxui::text("No logging categories match the current filter."));
+        } else {
+            for (const api::LoggingCategory& category : filteredCategories) {
+                const std::string label = " " + category.name.toStdString() + " [" + loggingLevelLabel(category.level) + "] ";
+                const ftxui::Color levelColor = loggingLevelColor(category.level);
+                pushSelectableLine(ftxui::hbox({
+                                       ftxui::text(" ") | ftxui::bgcolor(levelColor),
+                                       ftxui::text(label) | ftxui::color(levelColor),
+                                   }),
+                                   36);
+            }
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Type to filter. Left/Right or Space changes the selected level.") | ftxui::dim);
     } else {
         pushLine(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
         pushLine(ftxui::separator());
@@ -4859,6 +5111,8 @@ int Engine::settingsDetailsLineCount() const
         return m_systemTimeZonesLoaded ? 9 + std::max(1, static_cast<int>(filteredSystemTimeZones().size())) : 10;
     case SettingsView::Update:
         return m_systemPackagesLoaded ? 11 + static_cast<int>(m_systemPackages.size()) : 11;
+    case SettingsView::LoggingCategories:
+        return m_loggingCategoriesLoaded ? 7 + std::max(1, static_cast<int>(filteredLoggingCategories().size())) : 8;
     case SettingsView::Shutdown:
     case SettingsView::Restart:
     case SettingsView::Reboot:
@@ -4889,6 +5143,28 @@ void Engine::clampSettingsDetailsSelection()
         }
         if (m_settingsDetailsLineIndex < firstResultLineIndex) {
             m_settingsDetailsLineIndex = timezoneSearchLineIndex;
+            return;
+        }
+        if (m_settingsDetailsLineIndex > lastResultLineIndex) {
+            m_settingsDetailsLineIndex = lastResultLineIndex;
+            return;
+        }
+    }
+
+    if (m_settingsView == SettingsView::LoggingCategories) {
+        const int filteredCount = m_loggingCategoriesLoaded ? static_cast<int>(filteredLoggingCategories().size()) : 0;
+        const int firstResultLineIndex = loggingCategoryListStartLineIndex;
+        if (filteredCount <= 0) {
+            m_settingsDetailsLineIndex = loggingCategorySearchLineIndex;
+            return;
+        }
+
+        const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
+        if (m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
+            return;
+        }
+        if (m_settingsDetailsLineIndex < firstResultLineIndex) {
+            m_settingsDetailsLineIndex = loggingCategorySearchLineIndex;
             return;
         }
         if (m_settingsDetailsLineIndex > lastResultLineIndex) {
@@ -5367,6 +5643,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 ensureSystemTimeZonesLoaded();
             } else if (m_settingsView == SettingsView::Update) {
                 ensureSystemPackagesLoaded();
+            } else if (m_settingsView == SettingsView::LoggingCategories) {
+                ensureLoggingCategoriesLoaded();
             }
             break;
         case MainMenuEntry::Logout:
@@ -5857,6 +6135,68 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::LoggingCategories) {
+        auto selectedLoggingCategory = [&]() -> std::optional<api::LoggingCategory> {
+            if (!m_loggingCategoriesLoaded) {
+                return std::nullopt;
+            }
+            const std::vector<api::LoggingCategory> filteredCategories = filteredLoggingCategories();
+            const int categoryIndex = m_settingsDetailsLineIndex - loggingCategoryListStartLineIndex;
+            if (categoryIndex < 0 || categoryIndex >= static_cast<int>(filteredCategories.size())) {
+                return std::nullopt;
+            }
+            return filteredCategories.at(categoryIndex);
+        };
+
+        if (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown) {
+            const int filteredCount = m_loggingCategoriesLoaded ? static_cast<int>(filteredLoggingCategories().size()) : 0;
+            m_settingsDetailsLineIndex = nextFilterListDetailsLineIndex(m_settingsDetailsLineIndex,
+                                                                        event == ftxui::Event::ArrowDown ? 1 : -1,
+                                                                        loggingCategorySearchLineIndex,
+                                                                        loggingCategoryListStartLineIndex,
+                                                                        filteredCount);
+            return true;
+        }
+
+        if (m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
+            if (event == ftxui::Event::Backspace && !m_loggingCategorySearch.empty()) {
+                m_loggingCategorySearch.pop_back();
+                clampSettingsDetailsSelection();
+                return true;
+            }
+            if (event.is_character()) {
+                m_loggingCategorySearch += event.character();
+                clampSettingsDetailsSelection();
+                return true;
+            }
+        }
+
+        if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+            if (m_systemActionRequestPending) {
+                return true;
+            }
+            const std::optional<api::LoggingCategory> category = selectedLoggingCategory();
+            if (!category.has_value()) {
+                if (event == ftxui::Event::Character(" ")) {
+                    return true;
+                }
+            } else {
+                const int delta = event == ftxui::Event::ArrowLeft ? -1 : 1;
+                const api::LoggingLevel nextLevel = cycleLoggingLevel(category->level, delta);
+                api::DebugSetLoggingCategoryLevelParams request;
+                request.name = category->name;
+                request.level = nextLevel;
+                m_systemActionRequestPending = true;
+                m_loggingCategoryStatus = "Setting logging category " + category->name.toStdString() + " to " + loggingLevelLabel(nextLevel) + "...";
+                observeReply(m_client.sendRequest(api::DebugSetLoggingCategoryLevelMethod::methodName(), request.toJson()),
+                             [this, categoryName = category->name, nextLevel](const QJsonObject& message, const QString& transportError) {
+                                 handleSetLoggingCategoryLevelReply(message, transportError, categoryName, nextLevel);
+                             });
+                return true;
+            }
+        }
+    }
+
     if (event == ftxui::Event::ArrowLeft) {
         if (m_focusArea == FocusArea::ThingDetails) {
             m_focusArea = FocusArea::ThingList;
@@ -5974,6 +6314,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemTimeZonesLoaded();
                 } else if (m_settingsView == SettingsView::Update) {
                     ensureSystemPackagesLoaded();
+                } else if (m_settingsView == SettingsView::LoggingCategories) {
+                    ensureLoggingCategoriesLoaded();
                 }
                 return true;
             }
@@ -6076,6 +6418,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemTimeZonesLoaded();
                 } else if (m_settingsView == SettingsView::Update) {
                     ensureSystemPackagesLoaded();
+                } else if (m_settingsView == SettingsView::LoggingCategories) {
+                    ensureLoggingCategoriesLoaded();
                 }
                 return true;
             }
@@ -6227,6 +6571,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             }
             return true;
         }
+        case SettingsView::LoggingCategories:
+            return true;
         case SettingsView::Shutdown:
             openPowerActionConfirmDialog(PowerAction::Shutdown);
             return true;

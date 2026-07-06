@@ -811,9 +811,9 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("Type in search fields to filter thing classes.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Settings")},
-        {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Shutdown, Restart, or Reboot.")},
+        {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Logging categories, Shutdown, Restart, or Reboot.")},
         {HelpRowKind::Text, QStringLiteral("Right: open the settings details panel.")},
-        {HelpRowKind::Text, QStringLiteral("Enter: apply the selected time zone, start an update, or open a power confirmation. Left or Esc returns to the settings menu.")},
+        {HelpRowKind::Text, QStringLiteral("Enter applies time zones, starts updates, or opens power confirmation. Logging levels use Left/Right or Space.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("API browser")},
         {HelpRowKind::Text, QStringLiteral("Type to filter methods, notifications, types, and enums.")},
@@ -935,7 +935,7 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
                                         % static_cast<int>(m_thingManager.things().size());
     };
     auto moveSettingsMenu = [this, delta]() {
-        const int count = 6;
+        const int count = 7;
         int next = static_cast<int>(m_settingsView) + delta;
         if (next < 0) {
             next = count - 1;
@@ -951,6 +951,8 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
             ensureSystemTimeZonesLoaded();
         } else if (m_settingsView == SettingsView::Update) {
             ensureSystemPackagesLoaded();
+        } else if (m_settingsView == SettingsView::LoggingCategories) {
+            ensureLoggingCategoriesLoaded();
         }
     };
     auto moveSettingsDetails = [this, delta]() {

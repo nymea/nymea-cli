@@ -3,6 +3,7 @@
 #pragma once
 
 #include "connectionsettings.h"
+#include "generated/loggingcategory.h"
 #include "generated/package.h"
 #include "generated/paramtype.h"
 #include "generated/systemgetcapabilitiesresponse.h"
@@ -66,6 +67,7 @@ private:
         ServerInfo,
         Timezone,
         Update,
+        LoggingCategories,
         Shutdown,
         Restart,
         Reboot,
@@ -159,7 +161,9 @@ private:
     void ensureSystemUpdateStatusLoaded();
     void ensureSystemPackagesLoaded();
     void ensureSystemTimeZonesLoaded();
+    void ensureLoggingCategoriesLoaded();
     QStringList filteredSystemTimeZones() const;
+    std::vector<api::LoggingCategory> filteredLoggingCategories() const;
     bool openSelectedActionDialog();
     void closeActionDialog();
     std::vector<const api::Thing*> filteredThings() const;
@@ -216,9 +220,11 @@ private:
     void handleFetchSystemUpdateStatusReply(const QJsonObject& message, const QString& transportError);
     void handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchLoggingCategoriesReply(const QJsonObject& message, const QString& transportError);
     void handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError);
     void handleSetTimeZoneReply(const QJsonObject& message, const QString& transportError);
     void handleUpdatePackagesReply(const QJsonObject& message, const QString& transportError);
+    void handleSetLoggingCategoryLevelReply(const QJsonObject& message, const QString& transportError, const QString& categoryName, api::LoggingLevel level);
     void handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action);
     void handleActionExecutionReply(const QJsonObject& message, const QString& transportError);
     void handleNotification(const QJsonObject& message);
@@ -397,6 +403,11 @@ private:
     bool m_systemTimeZonesPending = false;
     QStringList m_systemTimeZones;
     std::string m_systemTimeZoneSearch;
+    bool m_loggingCategoriesLoaded = false;
+    bool m_loggingCategoriesPending = false;
+    std::vector<api::LoggingCategory> m_loggingCategories;
+    std::string m_loggingCategorySearch;
+    std::string m_loggingCategoryStatus;
     mutable ftxui::Box m_mainMenuBox;
     mutable ftxui::Box m_thingListBox;
     mutable ftxui::Box m_thingDetailsBox;
