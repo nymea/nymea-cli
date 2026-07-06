@@ -38,6 +38,21 @@
 #include "generated/jsonrpcrequestpushbuttonauthresponse.h"
 #include "generated/jsonrpcsetnotificationstatusparams.h"
 #include "generated/jsonrpcsetnotificationstatusresponse.h"
+#include "generated/modbusrtuaddmodbusrtumasterparams.h"
+#include "generated/modbusrtuaddmodbusrtumasterresponse.h"
+#include "generated/modbusrtugetmodbusrtumastersparams.h"
+#include "generated/modbusrtugetmodbusrtumastersresponse.h"
+#include "generated/modbusrtugetserialportsparams.h"
+#include "generated/modbusrtugetserialportsresponse.h"
+#include "generated/modbusrtumodbusrtumasteraddednotificationparams.h"
+#include "generated/modbusrtumodbusrtumasterchangednotificationparams.h"
+#include "generated/modbusrtumodbusrtumasterremovednotificationparams.h"
+#include "generated/modbusrtureconfiguremodbusrtumasterparams.h"
+#include "generated/modbusrtureconfiguremodbusrtumasterresponse.h"
+#include "generated/modbusrturemovemodbusrtumasterparams.h"
+#include "generated/modbusrturemovemodbusrtumasterresponse.h"
+#include "generated/modbusrtuserialportaddednotificationparams.h"
+#include "generated/modbusrtuserialportremovednotificationparams.h"
 #include "generated/package.h"
 #include "generated/param.h"
 #include "generated/state.h"
@@ -746,10 +761,12 @@ std::string settingsViewLabel(int view)
     case 3:
         return "Logging categories";
     case 4:
-        return "Shutdown";
+        return "Modbus RTU";
     case 5:
-        return "Restart";
+        return "Shutdown";
     case 6:
+        return "Restart";
+    case 7:
         return "Reboot";
     }
 
@@ -1312,10 +1329,12 @@ std::string settingsViewLabel(int view)
     case 3:
         return "Logging categories";
     case 4:
-        return "Shutdown";
+        return "Modbus RTU";
     case 5:
-        return "Restart";
+        return "Shutdown";
     case 6:
+        return "Restart";
+    case 7:
         return "Reboot";
     }
 
@@ -1340,6 +1359,7 @@ constexpr int timezoneSearchLineIndex = 4;
 constexpr int timezoneListStartLineIndex = 7;
 constexpr int loggingCategorySearchLineIndex = 2;
 constexpr int loggingCategoryListStartLineIndex = 5;
+constexpr int modbusRtuMasterListStartLineIndex = 4;
 
 int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCount)
 {
@@ -1453,6 +1473,149 @@ void sortLoggingCategories(std::vector<api::LoggingCategory>& categories)
     std::sort(categories.begin(), categories.end(), [](const api::LoggingCategory& left, const api::LoggingCategory& right) {
         return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
     });
+}
+
+std::string serialPortLabel(const api::SerialPort& serialPort)
+{
+    std::string label = serialPort.systemLocation.toStdString();
+    std::vector<std::string> details;
+    if (!serialPort.description.isEmpty()) {
+        details.push_back(serialPort.description.toStdString());
+    }
+    if (!serialPort.manufacturer.isEmpty()) {
+        details.push_back(serialPort.manufacturer.toStdString());
+    }
+    if (!serialPort.serialNumber.isEmpty()) {
+        details.push_back(serialPort.serialNumber.toStdString());
+    }
+    if (!details.empty()) {
+        label += " (" + joinCommaSeparated(details) + ")";
+    }
+    return label;
+}
+
+std::string dataBitsLabel(api::SerialPortDataBits dataBits)
+{
+    switch (dataBits) {
+    case api::SerialPortDataBits::SerialPortDataBitsData5:
+        return "5";
+    case api::SerialPortDataBits::SerialPortDataBitsData6:
+        return "6";
+    case api::SerialPortDataBits::SerialPortDataBitsData7:
+        return "7";
+    case api::SerialPortDataBits::SerialPortDataBitsData8:
+        return "8";
+    case api::SerialPortDataBits::SerialPortDataBitsUnknownDataBits:
+        return "unknown";
+    }
+    return "unknown";
+}
+
+std::string parityLabel(api::SerialPortParity parity)
+{
+    switch (parity) {
+    case api::SerialPortParity::SerialPortParityNoParity:
+        return "none";
+    case api::SerialPortParity::SerialPortParityEvenParity:
+        return "even";
+    case api::SerialPortParity::SerialPortParityOddParity:
+        return "odd";
+    case api::SerialPortParity::SerialPortParitySpaceParity:
+        return "space";
+    case api::SerialPortParity::SerialPortParityMarkParity:
+        return "mark";
+    case api::SerialPortParity::SerialPortParityUnknownParity:
+        return "unknown";
+    }
+    return "unknown";
+}
+
+std::string stopBitsLabel(api::SerialPortStopBits stopBits)
+{
+    switch (stopBits) {
+    case api::SerialPortStopBits::SerialPortStopBitsOneStop:
+        return "1";
+    case api::SerialPortStopBits::SerialPortStopBitsOneAndHalfStop:
+        return "1.5";
+    case api::SerialPortStopBits::SerialPortStopBitsTwoStop:
+        return "2";
+    case api::SerialPortStopBits::SerialPortStopBitsUnknownStopBits:
+        return "unknown";
+    }
+    return "unknown";
+}
+
+const std::array<api::SerialPortDataBits, 4>& dataBitsOptions()
+{
+    static const std::array<api::SerialPortDataBits, 4> options = {
+        api::SerialPortDataBits::SerialPortDataBitsData5,
+        api::SerialPortDataBits::SerialPortDataBitsData6,
+        api::SerialPortDataBits::SerialPortDataBitsData7,
+        api::SerialPortDataBits::SerialPortDataBitsData8,
+    };
+    return options;
+}
+
+const std::array<quint64, 14>& baudrateOptions()
+{
+    static const std::array<quint64, 14> options = {
+        1200,
+        2400,
+        4800,
+        9600,
+        19200,
+        38400,
+        57600,
+        115200,
+        230400,
+        460800,
+        500000,
+        576000,
+        921600,
+        1000000,
+    };
+    return options;
+}
+
+const std::array<api::SerialPortParity, 5>& parityOptions()
+{
+    static const std::array<api::SerialPortParity, 5> options = {
+        api::SerialPortParity::SerialPortParityNoParity,
+        api::SerialPortParity::SerialPortParityEvenParity,
+        api::SerialPortParity::SerialPortParityOddParity,
+        api::SerialPortParity::SerialPortParitySpaceParity,
+        api::SerialPortParity::SerialPortParityMarkParity,
+    };
+    return options;
+}
+
+const std::array<api::SerialPortStopBits, 3>& stopBitsOptions()
+{
+    static const std::array<api::SerialPortStopBits, 3> options = {
+        api::SerialPortStopBits::SerialPortStopBitsOneStop,
+        api::SerialPortStopBits::SerialPortStopBitsOneAndHalfStop,
+        api::SerialPortStopBits::SerialPortStopBitsTwoStop,
+    };
+    return options;
+}
+
+template<typename T, size_t Size>
+int optionIndex(const std::array<T, Size>& options, T value, int fallback)
+{
+    for (int index = 0; index < static_cast<int>(options.size()); ++index) {
+        if (options.at(index) == value) {
+            return index;
+        }
+    }
+    return fallback;
+}
+
+int cycledIndex(int currentIndex, int count, int delta)
+{
+    if (count <= 0) {
+        return 0;
+    }
+    return (currentIndex + count + delta) % count;
 }
 
 } // namespace
@@ -3066,6 +3229,72 @@ void Engine::handleNotification(const QJsonObject& message)
         return;
     }
 
+    if (notificationName == api::ModbusRtuModbusRtuMasterAddedNotification::notificationName()) {
+        const api::ModbusRtuModbusRtuMasterAddedNotificationParams notification = api::ModbusRtuModbusRtuMasterAddedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
+            return master.modbusUuid == notification.modbusRtuMaster.modbusUuid;
+        });
+        if (existing == m_modbusRtuMasters.end()) {
+            m_modbusRtuMasters.push_back(notification.modbusRtuMaster);
+        } else {
+            *existing = notification.modbusRtuMaster;
+        }
+        m_modbusRtuMastersLoaded = true;
+        clampModbusRtuSelection();
+        m_modbusRtuStatus = "Live update: Modbus RTU master added.";
+        return;
+    }
+
+    if (notificationName == api::ModbusRtuModbusRtuMasterChangedNotification::notificationName()) {
+        const api::ModbusRtuModbusRtuMasterChangedNotificationParams notification = api::ModbusRtuModbusRtuMasterChangedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
+            return master.modbusUuid == notification.modbusRtuMaster.modbusUuid;
+        });
+        if (existing == m_modbusRtuMasters.end()) {
+            m_modbusRtuMasters.push_back(notification.modbusRtuMaster);
+        } else {
+            *existing = notification.modbusRtuMaster;
+        }
+        m_modbusRtuMastersLoaded = true;
+        clampModbusRtuSelection();
+        m_modbusRtuStatus = "Live update: Modbus RTU master changed.";
+        return;
+    }
+
+    if (notificationName == api::ModbusRtuModbusRtuMasterRemovedNotification::notificationName()) {
+        const api::ModbusRtuModbusRtuMasterRemovedNotificationParams notification = api::ModbusRtuModbusRtuMasterRemovedNotificationParams::fromJson(params);
+        m_modbusRtuMasters.erase(std::remove_if(m_modbusRtuMasters.begin(),
+                                                m_modbusRtuMasters.end(),
+                                                [&](const api::ModbusRtuMaster& master) { return master.modbusUuid == notification.modbusUuid; }),
+                                 m_modbusRtuMasters.end());
+        clampModbusRtuSelection();
+        m_modbusRtuStatus = "Live update: Modbus RTU master removed.";
+        return;
+    }
+
+    if (notificationName == api::ModbusRtuSerialPortAddedNotification::notificationName()) {
+        const api::ModbusRtuSerialPortAddedNotificationParams notification = api::ModbusRtuSerialPortAddedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_modbusRtuSerialPorts.begin(), m_modbusRtuSerialPorts.end(), [&](const api::SerialPort& serialPort) {
+            return serialPort.systemLocation == notification.serialPort.systemLocation;
+        });
+        if (existing == m_modbusRtuSerialPorts.end()) {
+            m_modbusRtuSerialPorts.push_back(notification.serialPort);
+        } else {
+            *existing = notification.serialPort;
+        }
+        m_modbusRtuSerialPortsLoaded = true;
+        return;
+    }
+
+    if (notificationName == api::ModbusRtuSerialPortRemovedNotification::notificationName()) {
+        const api::ModbusRtuSerialPortRemovedNotificationParams notification = api::ModbusRtuSerialPortRemovedNotificationParams::fromJson(params);
+        m_modbusRtuSerialPorts.erase(std::remove_if(m_modbusRtuSerialPorts.begin(),
+                                                    m_modbusRtuSerialPorts.end(),
+                                                    [&](const api::SerialPort& serialPort) { return serialPort.systemLocation == notification.serialPort.systemLocation; }),
+                                     m_modbusRtuSerialPorts.end());
+        return;
+    }
+
     if (notificationName == api::IntegrationsStateChangedNotification::notificationName()) {
         const api::IntegrationsStateChangedNotificationParams notification = api::IntegrationsStateChangedNotificationParams::fromJson(params);
         if (m_thingManager
@@ -3692,7 +3921,7 @@ void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QS
     if (!m_notificationsEnabled) {
         m_thingManager.setStatus("Server did not confirm Integrations notifications.");
     } else {
-        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations and Debug.");
+        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations, Debug, and Modbus RTU.");
     }
 
     if (fetchThingsAfterReply) {
@@ -3726,7 +3955,7 @@ void Engine::enableNotifications(bool fetchThingsAfterReply)
 
     api::JSONRPCSetNotificationStatusParams request;
     request.enabled = true;
-    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug")};
+    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug"), QStringLiteral("ModbusRtu")};
 
     observeReply(m_client.sendRequest(api::JSONRPCSetNotificationStatusMethod::methodName(), request.toJson()),
                  [this, fetchThingsAfterReply](const QJsonObject& message, const QString& transportError) {
@@ -3964,6 +4193,25 @@ void Engine::ensureLoggingCategoriesLoaded()
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchLoggingCategoriesReply(message, transportError); });
 }
 
+void Engine::ensureModbusRtuLoaded()
+{
+    if (!m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    if (!m_modbusRtuMastersLoaded && !m_modbusRtuMastersPending) {
+        m_modbusRtuMastersPending = true;
+        observeReply(m_client.sendRequest(api::ModbusRtuGetModbusRtuMastersMethod::methodName(), QJsonObject{}),
+                     [this](const QJsonObject& message, const QString& transportError) { handleFetchModbusRtuMastersReply(message, transportError); });
+    }
+
+    if (!m_modbusRtuSerialPortsLoaded && !m_modbusRtuSerialPortsPending) {
+        m_modbusRtuSerialPortsPending = true;
+        observeReply(m_client.sendRequest(api::ModbusRtuGetSerialPortsMethod::methodName(), QJsonObject{}),
+                     [this](const QJsonObject& message, const QString& transportError) { handleFetchModbusRtuSerialPortsReply(message, transportError); });
+    }
+}
+
 QStringList Engine::filteredSystemTimeZones() const
 {
     if (m_systemTimeZoneSearch.empty()) {
@@ -3994,6 +4242,173 @@ std::vector<api::LoggingCategory> Engine::filteredLoggingCategories() const
         }
     }
     return filtered;
+}
+
+const api::ModbusRtuMaster* Engine::selectedModbusRtuMaster() const
+{
+    const int index = m_settingsDetailsLineIndex - modbusRtuMasterListStartLineIndex;
+    if (index < 0 || index >= static_cast<int>(m_modbusRtuMasters.size())) {
+        return nullptr;
+    }
+    return &m_modbusRtuMasters.at(index);
+}
+
+void Engine::clampModbusRtuSelection()
+{
+    if (m_modbusRtuMasters.empty()) {
+        m_settingsDetailsLineIndex = modbusRtuMasterListStartLineIndex;
+        return;
+    }
+
+    const int firstLineIndex = modbusRtuMasterListStartLineIndex;
+    const int lastLineIndex = firstLineIndex + static_cast<int>(m_modbusRtuMasters.size()) - 1;
+    if (m_settingsDetailsLineIndex < firstLineIndex) {
+        m_settingsDetailsLineIndex = firstLineIndex;
+    } else if (m_settingsDetailsLineIndex > lastLineIndex) {
+        m_settingsDetailsLineIndex = lastLineIndex;
+    }
+}
+
+void Engine::openAddModbusRtuDialog()
+{
+    m_previousFocusArea = m_focusArea;
+    m_focusArea = FocusArea::ModbusRtuDialog;
+    m_modbusRtuDialogMode = ModbusRtuDialogMode::Add;
+    m_modbusRtuDialogFieldIndex = 0;
+    m_modbusRtuRequestPending = false;
+    m_modbusRtuDialogUuid = QUuid();
+    m_modbusRtuDialogSerialPort = m_modbusRtuSerialPorts.empty() ? std::string() : m_modbusRtuSerialPorts.front().systemLocation.toStdString();
+    m_modbusRtuDialogTimeout = "1000";
+    m_modbusRtuDialogRetries = "3";
+    m_modbusRtuDialogBaudrateIndex = optionIndex(baudrateOptions(), static_cast<quint64>(9600), 3);
+    m_modbusRtuDialogDataBitsIndex = optionIndex(dataBitsOptions(), api::SerialPortDataBits::SerialPortDataBitsData8, 3);
+    m_modbusRtuDialogParityIndex = optionIndex(parityOptions(), api::SerialPortParity::SerialPortParityNoParity, 0);
+    m_modbusRtuDialogStopBitsIndex = optionIndex(stopBitsOptions(), api::SerialPortStopBits::SerialPortStopBitsOneStop, 0);
+    m_modbusRtuStatus = "Add Modbus RTU master.";
+}
+
+void Engine::openEditModbusRtuDialog()
+{
+    const api::ModbusRtuMaster* master = selectedModbusRtuMaster();
+    if (master == nullptr) {
+        m_modbusRtuStatus = "No Modbus RTU master selected.";
+        return;
+    }
+
+    m_previousFocusArea = m_focusArea;
+    m_focusArea = FocusArea::ModbusRtuDialog;
+    m_modbusRtuDialogMode = ModbusRtuDialogMode::Edit;
+    m_modbusRtuDialogFieldIndex = 0;
+    m_modbusRtuRequestPending = false;
+    m_modbusRtuDialogUuid = master->modbusUuid;
+    m_modbusRtuDialogSerialPort = master->serialPort.toStdString();
+    m_modbusRtuDialogTimeout = QString::number(master->timeout).toStdString();
+    m_modbusRtuDialogRetries = QString::number(master->numberOfRetries).toStdString();
+    m_modbusRtuDialogBaudrateIndex = optionIndex(baudrateOptions(), master->baudrate, 3);
+    m_modbusRtuDialogDataBitsIndex = optionIndex(dataBitsOptions(), master->dataBits, 3);
+    m_modbusRtuDialogParityIndex = optionIndex(parityOptions(), master->parity, 0);
+    m_modbusRtuDialogStopBitsIndex = optionIndex(stopBitsOptions(), master->stopBits, 0);
+    m_modbusRtuStatus = "Edit Modbus RTU master " + master->modbusUuid.toString(QUuid::WithoutBraces).toStdString() + ".";
+}
+
+void Engine::openRemoveModbusRtuDialog()
+{
+    const api::ModbusRtuMaster* master = selectedModbusRtuMaster();
+    if (master == nullptr) {
+        m_modbusRtuStatus = "No Modbus RTU master selected.";
+        return;
+    }
+
+    m_previousFocusArea = m_focusArea;
+    m_focusArea = FocusArea::ModbusRtuDialog;
+    m_modbusRtuDialogMode = ModbusRtuDialogMode::RemoveConfirm;
+    m_modbusRtuRequestPending = false;
+    m_modbusRtuDialogUuid = master->modbusUuid;
+    m_modbusRtuDialogSerialPort = master->serialPort.toStdString();
+    m_modbusRtuStatus = "Confirm removing Modbus RTU master.";
+}
+
+void Engine::closeModbusRtuDialog()
+{
+    m_modbusRtuDialogMode = ModbusRtuDialogMode::None;
+    m_modbusRtuRequestPending = false;
+    m_modbusRtuDialogFieldIndex = 0;
+    m_focusArea = m_previousFocusArea == FocusArea::ModbusRtuDialog ? FocusArea::SettingsDetails : m_previousFocusArea;
+}
+
+bool Engine::submitModbusRtuDialog()
+{
+    if (m_modbusRtuRequestPending || m_modbusRtuDialogMode == ModbusRtuDialogMode::None) {
+        return true;
+    }
+
+    if (m_modbusRtuDialogMode == ModbusRtuDialogMode::RemoveConfirm) {
+        api::ModbusRtuRemoveModbusRtuMasterParams request;
+        request.modbusUuid = m_modbusRtuDialogUuid;
+        m_modbusRtuRequestPending = true;
+        m_modbusRtuStatus = "Removing Modbus RTU master...";
+        observeReply(m_client.sendRequest(api::ModbusRtuRemoveModbusRtuMasterMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) { handleRemoveModbusRtuReply(message, transportError); });
+        return true;
+    }
+
+    auto parseUint = [](const std::string& raw, const char* label, quint64 minimum, quint64& value, std::string& errorMessage) {
+        bool ok = false;
+        const quint64 parsed = QString::fromStdString(raw).trimmed().toULongLong(&ok);
+        if (!ok || parsed < minimum) {
+            errorMessage = std::string(label) + " must be an integer >= " + std::to_string(minimum) + ".";
+            return false;
+        }
+        value = parsed;
+        return true;
+    };
+
+    const QString serialPort = QString::fromStdString(m_modbusRtuDialogSerialPort).trimmed();
+    if (serialPort.isEmpty()) {
+        m_modbusRtuStatus = "Serial port must not be empty.";
+        return true;
+    }
+
+    quint64 timeout = 0;
+    quint64 retries = 0;
+    std::string validationError;
+    if (!parseUint(m_modbusRtuDialogTimeout, "Timeout", 10, timeout, validationError) || !parseUint(m_modbusRtuDialogRetries, "Retries", 0, retries, validationError)) {
+        m_modbusRtuStatus = validationError;
+        return true;
+    }
+
+    const quint64 baudrate = baudrateOptions().at(m_modbusRtuDialogBaudrateIndex);
+
+    if (m_modbusRtuDialogMode == ModbusRtuDialogMode::Add) {
+        api::ModbusRtuAddModbusRtuMasterParams request;
+        request.serialPort = serialPort;
+        request.baudrate = baudrate;
+        request.timeout = timeout;
+        request.numberOfRetries = retries;
+        request.dataBits = dataBitsOptions().at(m_modbusRtuDialogDataBitsIndex);
+        request.parity = parityOptions().at(m_modbusRtuDialogParityIndex);
+        request.stopBits = stopBitsOptions().at(m_modbusRtuDialogStopBitsIndex);
+        m_modbusRtuRequestPending = true;
+        m_modbusRtuStatus = "Adding Modbus RTU master...";
+        observeReply(m_client.sendRequest(api::ModbusRtuAddModbusRtuMasterMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) { handleAddModbusRtuReply(message, transportError); });
+        return true;
+    }
+
+    api::ModbusRtuReconfigureModbusRtuMasterParams request;
+    request.modbusUuid = m_modbusRtuDialogUuid;
+    request.serialPort = serialPort;
+    request.baudrate = baudrate;
+    request.timeout = timeout;
+    request.numberOfRetries = retries;
+    request.dataBits = dataBitsOptions().at(m_modbusRtuDialogDataBitsIndex);
+    request.parity = parityOptions().at(m_modbusRtuDialogParityIndex);
+    request.stopBits = stopBitsOptions().at(m_modbusRtuDialogStopBitsIndex);
+    m_modbusRtuRequestPending = true;
+    m_modbusRtuStatus = "Updating Modbus RTU master...";
+    observeReply(m_client.sendRequest(api::ModbusRtuReconfigureModbusRtuMasterMethod::methodName(), request.toJson()),
+                 [this](const QJsonObject& message, const QString& transportError) { handleReconfigureModbusRtuReply(message, transportError); });
+    return true;
 }
 
 void Engine::handleFetchSystemCapabilitiesReply(const QJsonObject& message, const QString& transportError)
@@ -4196,6 +4611,83 @@ void Engine::handleFetchLoggingCategoriesReply(const QJsonObject& message, const
     clampSettingsDetailsSelection();
 }
 
+void Engine::handleFetchModbusRtuMastersReply(const QJsonObject& message, const QString& transportError)
+{
+    m_modbusRtuMastersPending = false;
+    if (!transportError.isEmpty()) {
+        m_modbusRtuStatus = "Failed to load Modbus RTU masters: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_modbusRtuStatus = "Modbus RTU master request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_modbusRtuStatus = "Modbus RTU master request returned an error.";
+        return;
+    }
+
+    const api::ModbusRtuGetModbusRtuMastersResponse response = api::ModbusRtuGetModbusRtuMastersResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.modbusError != api::ModbusRtuError::ModbusRtuErrorNoError) {
+        m_modbusRtuStatus = "Modbus RTU master request failed: " + api::toString(response.modbusError).toStdString();
+        return;
+    }
+
+    m_modbusRtuMasters.clear();
+    if (response.modbusRtuMasters.has_value()) {
+        for (const api::ModbusRtuMaster& master : *response.modbusRtuMasters) {
+            m_modbusRtuMasters.push_back(master);
+        }
+    }
+    m_modbusRtuMastersLoaded = true;
+    m_modbusRtuStatus = "Loaded " + std::to_string(m_modbusRtuMasters.size()) + " Modbus RTU masters.";
+    clampModbusRtuSelection();
+}
+
+void Engine::handleFetchModbusRtuSerialPortsReply(const QJsonObject& message, const QString& transportError)
+{
+    m_modbusRtuSerialPortsPending = false;
+    if (!transportError.isEmpty()) {
+        m_modbusRtuStatus = "Failed to load serial ports: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_modbusRtuStatus = "Serial port request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_modbusRtuStatus = "Serial port request returned an error.";
+        return;
+    }
+
+    const api::ModbusRtuGetSerialPortsResponse response = api::ModbusRtuGetSerialPortsResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_modbusRtuSerialPorts.clear();
+    for (const api::SerialPort& serialPort : response.serialPorts) {
+        m_modbusRtuSerialPorts.push_back(serialPort);
+    }
+    m_modbusRtuSerialPortsLoaded = true;
+}
+
 void Engine::handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError)
 {
     m_systemActionRequestPending = false;
@@ -4356,6 +4848,120 @@ void Engine::handleSetLoggingCategoryLevelReply(const QJsonObject& message, cons
     m_loggingCategoryStatus = "Logging category " + categoryName.toStdString() + " set to " + loggingLevelLabel(level) + ".";
     m_settingsWarning.clear();
     clampSettingsDetailsSelection();
+}
+
+void Engine::handleAddModbusRtuReply(const QJsonObject& message, const QString& transportError)
+{
+    m_modbusRtuRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_modbusRtuStatus = "Adding Modbus RTU master failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_modbusRtuStatus = "Adding Modbus RTU master was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_modbusRtuStatus = "Adding Modbus RTU master returned an error.";
+        return;
+    }
+
+    const api::ModbusRtuAddModbusRtuMasterResponse response = api::ModbusRtuAddModbusRtuMasterResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.modbusError != api::ModbusRtuError::ModbusRtuErrorNoError) {
+        m_modbusRtuStatus = "Adding Modbus RTU master failed: " + api::toString(response.modbusError).toStdString();
+        return;
+    }
+
+    m_modbusRtuStatus = "Added Modbus RTU master.";
+    closeModbusRtuDialog();
+    m_modbusRtuMastersLoaded = false;
+    ensureModbusRtuLoaded();
+}
+
+void Engine::handleReconfigureModbusRtuReply(const QJsonObject& message, const QString& transportError)
+{
+    m_modbusRtuRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_modbusRtuStatus = "Updating Modbus RTU master failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_modbusRtuStatus = "Updating Modbus RTU master was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_modbusRtuStatus = "Updating Modbus RTU master returned an error.";
+        return;
+    }
+
+    const api::ModbusRtuReconfigureModbusRtuMasterResponse response = api::ModbusRtuReconfigureModbusRtuMasterResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.modbusError != api::ModbusRtuError::ModbusRtuErrorNoError) {
+        m_modbusRtuStatus = "Updating Modbus RTU master failed: " + api::toString(response.modbusError).toStdString();
+        return;
+    }
+
+    m_modbusRtuStatus = "Updated Modbus RTU master.";
+    closeModbusRtuDialog();
+    m_modbusRtuMastersLoaded = false;
+    ensureModbusRtuLoaded();
+}
+
+void Engine::handleRemoveModbusRtuReply(const QJsonObject& message, const QString& transportError)
+{
+    m_modbusRtuRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_modbusRtuStatus = "Removing Modbus RTU master failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_modbusRtuStatus = "Removing Modbus RTU master was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_modbusRtuStatus = "Removing Modbus RTU master returned an error.";
+        return;
+    }
+
+    const api::ModbusRtuRemoveModbusRtuMasterResponse response = api::ModbusRtuRemoveModbusRtuMasterResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    if (response.modbusError != api::ModbusRtuError::ModbusRtuErrorNoError) {
+        m_modbusRtuStatus = "Removing Modbus RTU master failed: " + api::toString(response.modbusError).toStdString();
+        return;
+    }
+
+    m_modbusRtuStatus = "Removed Modbus RTU master.";
+    closeModbusRtuDialog();
+    m_modbusRtuMastersLoaded = false;
+    ensureModbusRtuLoaded();
 }
 
 void Engine::handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action)
@@ -4910,7 +5516,7 @@ ftxui::Element Engine::renderConfigureDetails() const
 
 ftxui::Element Engine::renderSettingsMenu() const
 {
-    constexpr std::array<const char*, 7> menuItems = {"Server info", "Timezone", "Update", "Logging categories", "Shutdown", "Restart", "Reboot"};
+    constexpr std::array<const char*, 8> menuItems = {"Server info", "Timezone", "Update", "Logging categories", "Modbus RTU", "Shutdown", "Restart", "Reboot"};
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
@@ -5071,6 +5677,50 @@ ftxui::Element Engine::renderSettingsDetails() const
         }
         pushLine(ftxui::separator());
         pushLine(ftxui::text("Type to filter. Left/Right or Space changes the selected level.") | ftxui::dim);
+    } else if (m_settingsView == SettingsView::ModbusRtu) {
+        const api::ModbusRtuMaster* selectedMaster = selectedModbusRtuMaster();
+        const std::string statusText = m_modbusRtuStatus.empty() ? std::string("Status: ") + ((m_modbusRtuMastersPending || m_modbusRtuSerialPortsPending) ? "loading..." : "ready")
+                                                                 : "Status: " + m_modbusRtuStatus;
+        pushLine(ftxui::text(statusText));
+        pushLine(ftxui::text("Actions: a add, Enter/e edit, d delete, r refresh") | ftxui::dim);
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Configured masters") | ftxui::bold);
+        if (!m_modbusRtuMastersLoaded) {
+            pushLine(ftxui::text("Loading Modbus RTU masters..."));
+        } else if (m_modbusRtuMasters.empty()) {
+            pushLine(ftxui::text("No Modbus RTU masters configured."));
+        } else {
+            for (const api::ModbusRtuMaster& master : m_modbusRtuMasters) {
+                const std::string connected = master.connected ? "connected" : "disconnected";
+                const std::string label = " " + master.serialPort.toStdString() + " | " + QString::number(master.baudrate).toStdString() + " " + dataBitsLabel(master.dataBits)
+                                          + parityLabel(master.parity).substr(0, 1) + stopBitsLabel(master.stopBits) + " | " + connected + " ";
+                pushSelectableLine(ftxui::text(label), 42);
+            }
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Selected master") | ftxui::bold);
+        if (selectedMaster == nullptr) {
+            pushLine(ftxui::text("No master selected."));
+        } else {
+            pushLine(ftxui::text("UUID: " + selectedMaster->modbusUuid.toString(QUuid::WithoutBraces).toStdString()));
+            pushLine(ftxui::text("Serial port: " + selectedMaster->serialPort.toStdString()));
+            pushLine(ftxui::text("State: " + std::string(selectedMaster->connected ? "connected" : "disconnected")));
+            pushLine(ftxui::text("Data: " + QString::number(selectedMaster->baudrate).toStdString() + " baud, " + dataBitsLabel(selectedMaster->dataBits) + " data bits, "
+                                 + parityLabel(selectedMaster->parity) + " parity, " + stopBitsLabel(selectedMaster->stopBits) + " stop bits"));
+            pushLine(ftxui::text("Timeout: " + QString::number(selectedMaster->timeout).toStdString()
+                                 + " ms | Retries: " + QString::number(selectedMaster->numberOfRetries).toStdString()));
+        }
+        pushLine(ftxui::separator());
+        pushLine(ftxui::text("Available serial ports") | ftxui::bold);
+        if (!m_modbusRtuSerialPortsLoaded) {
+            pushLine(ftxui::text("Loading serial ports..."));
+        } else if (m_modbusRtuSerialPorts.empty()) {
+            pushLine(ftxui::text("No serial ports discovered. Add still supports manual paths."));
+        } else {
+            for (const api::SerialPort& serialPort : m_modbusRtuSerialPorts) {
+                pushLine(ftxui::paragraph(serialPortLabel(serialPort)));
+            }
+        }
     } else {
         pushLine(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
         pushLine(ftxui::separator());
@@ -5113,6 +5763,8 @@ int Engine::settingsDetailsLineCount() const
         return m_systemPackagesLoaded ? 11 + static_cast<int>(m_systemPackages.size()) : 11;
     case SettingsView::LoggingCategories:
         return m_loggingCategoriesLoaded ? 7 + std::max(1, static_cast<int>(filteredLoggingCategories().size())) : 8;
+    case SettingsView::ModbusRtu:
+        return modbusRtuMasterListStartLineIndex + std::max(1, static_cast<int>(m_modbusRtuMasters.size()));
     case SettingsView::Shutdown:
     case SettingsView::Restart:
     case SettingsView::Reboot:
@@ -5171,6 +5823,11 @@ void Engine::clampSettingsDetailsSelection()
             m_settingsDetailsLineIndex = lastResultLineIndex;
             return;
         }
+    }
+
+    if (m_settingsView == SettingsView::ModbusRtu) {
+        clampModbusRtuSelection();
+        return;
     }
 
     if (m_settingsDetailsLineIndex < 0) {
@@ -5337,8 +5994,8 @@ ftxui::Element Engine::renderUi()
         keyHintLine
             = "Keys: Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh things, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Settings) {
-        keyHintLine = "Keys: Up/Down select settings sections, Right/Enter open the details panel, Enter applies the selected action or time zone, type to search time zones, Left "
-                      "returns to the menu, ?/h help, q/Esc quit";
+        keyHintLine
+            = "Keys: Up/Down select settings, Right/Enter open details, Enter applies/edits, Modbus RTU a/e/d/r add/edit/delete/refresh, Left returns, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Logout) {
         keyHintLine = "Keys: Enter logs out, Left returns to the menu, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::About) {
@@ -5406,6 +6063,66 @@ ftxui::Element Engine::renderUi()
         sections.push_back(ftxui::separator());
         sections.push_back(
             renderFocusedWindow(ftxui::text(powerActionLabel(static_cast<int>(m_systemAction)) + " confirmation"), ftxui::vbox(std::move(dialogBody)), m_showSystemActionConfirm));
+    }
+
+    if (m_modbusRtuDialogMode != ModbusRtuDialogMode::None) {
+        ftxui::Elements dialogBody;
+        const bool removeConfirm = m_modbusRtuDialogMode == ModbusRtuDialogMode::RemoveConfirm;
+        if (removeConfirm) {
+            dialogBody.push_back(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text("Serial port: " + m_modbusRtuDialogSerialPort));
+            dialogBody.push_back(ftxui::text("UUID: " + m_modbusRtuDialogUuid.toString(QUuid::WithoutBraces).toStdString()));
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text(m_modbusRtuRequestPending ? "Removing..." : "Enter confirms removal, Esc cancels.") | ftxui::dim);
+        } else {
+            auto pushField = [&](int index, const std::string& label, const std::string& value) {
+                const bool selected = m_focusArea == FocusArea::ModbusRtuDialog && m_modbusRtuDialogFieldIndex == index;
+                ftxui::Element marker = ftxui::text(selected ? "> " : "  ");
+                ftxui::Element valueElement = ftxui::text(value) | ftxui::flex;
+                if (selected) {
+                    marker = marker | ftxui::bold | ftxui::color(ftxui::Color::CyanLight);
+                    valueElement = valueElement | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
+                }
+                ftxui::Element row = ftxui::hbox({
+                    std::move(marker),
+                    ftxui::text(label + ": "),
+                    std::move(valueElement),
+                });
+                if (selected) {
+                    row = renderActiveField(std::move(row), true, 52);
+                }
+                dialogBody.push_back(row);
+            };
+
+            const auto& dataBits = dataBitsOptions();
+            const auto& baudrates = baudrateOptions();
+            const auto& parity = parityOptions();
+            const auto& stopBits = stopBitsOptions();
+            pushField(0, "Serial port", m_modbusRtuDialogSerialPort.empty() ? "<type or cycle discovered ports>" : m_modbusRtuDialogSerialPort);
+            pushField(1, "Baudrate", QString::number(baudrates.at(m_modbusRtuDialogBaudrateIndex)).toStdString());
+            pushField(2, "Data bits", dataBitsLabel(dataBits.at(m_modbusRtuDialogDataBitsIndex)));
+            pushField(3, "Parity", parityLabel(parity.at(m_modbusRtuDialogParityIndex)));
+            pushField(4, "Stop bits", stopBitsLabel(stopBits.at(m_modbusRtuDialogStopBitsIndex)));
+            pushField(5, "Timeout ms", m_modbusRtuDialogTimeout);
+            pushField(6, "Retries", m_modbusRtuDialogRetries);
+            dialogBody.push_back(ftxui::separator());
+            if (!m_modbusRtuStatus.empty()) {
+                dialogBody.push_back(ftxui::paragraph(m_modbusRtuStatus));
+            }
+            dialogBody.push_back(ftxui::text(m_modbusRtuRequestPending
+                                                 ? "Sending request..."
+                                                 : "Up/Down moves, Left/Right cycles serial port and selectors, type edits text fields, Enter saves, Esc cancels.")
+                                 | ftxui::dim);
+        }
+
+        const std::string title = m_modbusRtuDialogMode == ModbusRtuDialogMode::Add
+                                      ? "Add Modbus RTU master"
+                                      : (m_modbusRtuDialogMode == ModbusRtuDialogMode::Edit ? "Edit Modbus RTU master" : "Remove Modbus RTU master");
+        sections.push_back(ftxui::separator());
+        sections.push_back(renderFocusedWindow(ftxui::text(title),
+                                               ftxui::vbox(std::move(dialogBody)) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 72),
+                                               m_focusArea == FocusArea::ModbusRtuDialog));
     }
 
     if (m_showActionDialog) {
@@ -5645,6 +6362,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 ensureSystemPackagesLoaded();
             } else if (m_settingsView == SettingsView::LoggingCategories) {
                 ensureLoggingCategoriesLoaded();
+            } else if (m_settingsView == SettingsView::ModbusRtu) {
+                ensureModbusRtuLoaded();
             }
             break;
         case MainMenuEntry::Logout:
@@ -5935,6 +6654,102 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (m_modbusRtuDialogMode != ModbusRtuDialogMode::None) {
+        if (m_modbusRtuRequestPending) {
+            return true;
+        }
+        if (event == ftxui::Event::Escape) {
+            closeModbusRtuDialog();
+            return true;
+        }
+        if (event == ftxui::Event::Return) {
+            return submitModbusRtuDialog();
+        }
+
+        if (m_modbusRtuDialogMode == ModbusRtuDialogMode::RemoveConfirm) {
+            return true;
+        }
+
+        if (event == ftxui::Event::ArrowUp) {
+            m_modbusRtuDialogFieldIndex = cycledIndex(m_modbusRtuDialogFieldIndex, 7, -1);
+            return true;
+        }
+        if (event == ftxui::Event::ArrowDown) {
+            m_modbusRtuDialogFieldIndex = cycledIndex(m_modbusRtuDialogFieldIndex, 7, 1);
+            return true;
+        }
+        if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+            const int delta = event == ftxui::Event::ArrowLeft ? -1 : 1;
+            if (m_modbusRtuDialogFieldIndex == 0 && !m_modbusRtuSerialPorts.empty()) {
+                int currentIndex = 0;
+                for (int index = 0; index < static_cast<int>(m_modbusRtuSerialPorts.size()); ++index) {
+                    if (m_modbusRtuSerialPorts.at(index).systemLocation.toStdString() == m_modbusRtuDialogSerialPort) {
+                        currentIndex = index;
+                        break;
+                    }
+                }
+                currentIndex = cycledIndex(currentIndex, static_cast<int>(m_modbusRtuSerialPorts.size()), delta);
+                m_modbusRtuDialogSerialPort = m_modbusRtuSerialPorts.at(currentIndex).systemLocation.toStdString();
+                return true;
+            }
+            if (m_modbusRtuDialogFieldIndex == 1) {
+                m_modbusRtuDialogBaudrateIndex = cycledIndex(m_modbusRtuDialogBaudrateIndex, static_cast<int>(baudrateOptions().size()), delta);
+                return true;
+            }
+            if (m_modbusRtuDialogFieldIndex == 2) {
+                m_modbusRtuDialogDataBitsIndex = cycledIndex(m_modbusRtuDialogDataBitsIndex, static_cast<int>(dataBitsOptions().size()), delta);
+                return true;
+            }
+            if (m_modbusRtuDialogFieldIndex == 3) {
+                m_modbusRtuDialogParityIndex = cycledIndex(m_modbusRtuDialogParityIndex, static_cast<int>(parityOptions().size()), delta);
+                return true;
+            }
+            if (m_modbusRtuDialogFieldIndex == 4) {
+                m_modbusRtuDialogStopBitsIndex = cycledIndex(m_modbusRtuDialogStopBitsIndex, static_cast<int>(stopBitsOptions().size()), delta);
+                return true;
+            }
+            if (event == ftxui::Event::Character(" ")) {
+                return true;
+            }
+        }
+
+        auto editText = [&](std::string& value, bool numericOnly) {
+            if (event == ftxui::Event::Backspace && !value.empty()) {
+                value.pop_back();
+                return true;
+            }
+            if (event.is_character()) {
+                const std::string character = event.character();
+                if (numericOnly && (character.size() != 1 || character.front() < '0' || character.front() > '9')) {
+                    return true;
+                }
+                value += character;
+                return true;
+            }
+            return false;
+        };
+
+        if (m_modbusRtuDialogFieldIndex == 0) {
+            if (editText(m_modbusRtuDialogSerialPort, false)) {
+                return true;
+            }
+            return true;
+        }
+        if (m_modbusRtuDialogFieldIndex == 5) {
+            if (editText(m_modbusRtuDialogTimeout, true)) {
+                return true;
+            }
+            return true;
+        }
+        if (m_modbusRtuDialogFieldIndex == 6) {
+            if (editText(m_modbusRtuDialogRetries, true)) {
+                return true;
+            }
+            return true;
+        }
+        return true;
+    }
+
     if (m_mainView == MainView::Settings && m_systemActionRequestPending) {
         return true;
     }
@@ -6197,6 +7012,40 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (m_mainView == MainView::Settings && (m_focusArea == FocusArea::SettingsDetails || m_focusArea == FocusArea::SettingsMenu || m_focusArea == FocusArea::MainMenu)
+        && m_settingsView == SettingsView::ModbusRtu) {
+        if (m_focusArea != FocusArea::SettingsDetails && (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown)) {
+            // Let the settings/main menu keep normal navigation until the details pane is focused.
+        } else if (event == ftxui::Event::Character("a")) {
+            openAddModbusRtuDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("e")) {
+            openEditModbusRtuDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("d")) {
+            openRemoveModbusRtuDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("r")) {
+            m_modbusRtuMastersLoaded = false;
+            m_modbusRtuMastersPending = false;
+            m_modbusRtuSerialPortsLoaded = false;
+            m_modbusRtuSerialPortsPending = false;
+            m_modbusRtuStatus = "Refreshing Modbus RTU resources...";
+            ensureModbusRtuLoaded();
+            return true;
+        }
+    }
+
+    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::ModbusRtu) {
+        if (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown) {
+            const int count = std::max(1, static_cast<int>(m_modbusRtuMasters.size()));
+            const int currentIndex = std::max(0, m_settingsDetailsLineIndex - modbusRtuMasterListStartLineIndex);
+            const int nextIndex = cycledIndex(currentIndex, count, event == ftxui::Event::ArrowDown ? 1 : -1);
+            m_settingsDetailsLineIndex = modbusRtuMasterListStartLineIndex + nextIndex;
+            return true;
+        }
+    }
+
     if (event == ftxui::Event::ArrowLeft) {
         if (m_focusArea == FocusArea::ThingDetails) {
             m_focusArea = FocusArea::ThingList;
@@ -6316,6 +7165,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemPackagesLoaded();
                 } else if (m_settingsView == SettingsView::LoggingCategories) {
                     ensureLoggingCategoriesLoaded();
+                } else if (m_settingsView == SettingsView::ModbusRtu) {
+                    ensureModbusRtuLoaded();
                 }
                 return true;
             }
@@ -6420,6 +7271,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemPackagesLoaded();
                 } else if (m_settingsView == SettingsView::LoggingCategories) {
                     ensureLoggingCategoriesLoaded();
+                } else if (m_settingsView == SettingsView::ModbusRtu) {
+                    ensureModbusRtuLoaded();
                 }
                 return true;
             }
@@ -6572,6 +7425,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         case SettingsView::LoggingCategories:
+            return true;
+        case SettingsView::ModbusRtu:
+            openEditModbusRtuDialog();
             return true;
         case SettingsView::Shutdown:
             openPowerActionConfirmDialog(PowerAction::Shutdown);

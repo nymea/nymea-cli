@@ -4,8 +4,10 @@
 
 #include "connectionsettings.h"
 #include "generated/loggingcategory.h"
+#include "generated/modbusrtumaster.h"
 #include "generated/package.h"
 #include "generated/paramtype.h"
+#include "generated/serialport.h"
 #include "generated/systemgetcapabilitiesresponse.h"
 #include "generated/systemgettimeresponse.h"
 #include "generated/systemgetupdatestatusresponse.h"
@@ -68,6 +70,7 @@ private:
         Timezone,
         Update,
         LoggingCategories,
+        ModbusRtu,
         Shutdown,
         Restart,
         Reboot,
@@ -77,6 +80,13 @@ private:
         Shutdown,
         Restart,
         Reboot,
+    };
+
+    enum class ModbusRtuDialogMode {
+        None,
+        Add,
+        Edit,
+        RemoveConfirm,
     };
 
     enum class FocusArea {
@@ -95,6 +105,7 @@ private:
         ApiBrowserReferences,
         SettingsMenu,
         SettingsDetails,
+        ModbusRtuDialog,
         LoginForm,
     };
 
@@ -162,8 +173,16 @@ private:
     void ensureSystemPackagesLoaded();
     void ensureSystemTimeZonesLoaded();
     void ensureLoggingCategoriesLoaded();
+    void ensureModbusRtuLoaded();
     QStringList filteredSystemTimeZones() const;
     std::vector<api::LoggingCategory> filteredLoggingCategories() const;
+    const api::ModbusRtuMaster* selectedModbusRtuMaster() const;
+    void clampModbusRtuSelection();
+    void openAddModbusRtuDialog();
+    void openEditModbusRtuDialog();
+    void openRemoveModbusRtuDialog();
+    void closeModbusRtuDialog();
+    bool submitModbusRtuDialog();
     bool openSelectedActionDialog();
     void closeActionDialog();
     std::vector<const api::Thing*> filteredThings() const;
@@ -221,10 +240,15 @@ private:
     void handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchLoggingCategoriesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchModbusRtuMastersReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchModbusRtuSerialPortsReply(const QJsonObject& message, const QString& transportError);
     void handleCheckForUpdatesReply(const QJsonObject& message, const QString& transportError);
     void handleSetTimeZoneReply(const QJsonObject& message, const QString& transportError);
     void handleUpdatePackagesReply(const QJsonObject& message, const QString& transportError);
     void handleSetLoggingCategoryLevelReply(const QJsonObject& message, const QString& transportError, const QString& categoryName, api::LoggingLevel level);
+    void handleAddModbusRtuReply(const QJsonObject& message, const QString& transportError);
+    void handleReconfigureModbusRtuReply(const QJsonObject& message, const QString& transportError);
+    void handleRemoveModbusRtuReply(const QJsonObject& message, const QString& transportError);
     void handlePowerActionReply(const QJsonObject& message, const QString& transportError, PowerAction action);
     void handleActionExecutionReply(const QJsonObject& message, const QString& transportError);
     void handleNotification(const QJsonObject& message);
@@ -408,6 +432,24 @@ private:
     std::vector<api::LoggingCategory> m_loggingCategories;
     std::string m_loggingCategorySearch;
     std::string m_loggingCategoryStatus;
+    bool m_modbusRtuMastersLoaded = false;
+    bool m_modbusRtuMastersPending = false;
+    std::vector<api::ModbusRtuMaster> m_modbusRtuMasters;
+    bool m_modbusRtuSerialPortsLoaded = false;
+    bool m_modbusRtuSerialPortsPending = false;
+    std::vector<api::SerialPort> m_modbusRtuSerialPorts;
+    std::string m_modbusRtuStatus;
+    ModbusRtuDialogMode m_modbusRtuDialogMode = ModbusRtuDialogMode::None;
+    bool m_modbusRtuRequestPending = false;
+    int m_modbusRtuDialogFieldIndex = 0;
+    QUuid m_modbusRtuDialogUuid;
+    std::string m_modbusRtuDialogSerialPort;
+    std::string m_modbusRtuDialogTimeout;
+    std::string m_modbusRtuDialogRetries;
+    int m_modbusRtuDialogBaudrateIndex = 6;
+    int m_modbusRtuDialogDataBitsIndex = 3;
+    int m_modbusRtuDialogParityIndex = 0;
+    int m_modbusRtuDialogStopBitsIndex = 0;
     mutable ftxui::Box m_mainMenuBox;
     mutable ftxui::Box m_thingListBox;
     mutable ftxui::Box m_thingDetailsBox;
