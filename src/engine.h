@@ -8,11 +8,14 @@
 #include "generated/package.h"
 #include "generated/paramtype.h"
 #include "generated/serialport.h"
+#include "generated/serverconfiguration.h"
 #include "generated/systemgetcapabilitiesresponse.h"
 #include "generated/systemgettimeresponse.h"
 #include "generated/systemgetupdatestatusresponse.h"
 #include "generated/thingclass.h"
 #include "generated/thingdescriptor.h"
+#include "generated/tunnelproxyserverconfiguration.h"
+#include "generated/webserverconfiguration.h"
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
@@ -70,6 +73,7 @@ private:
         Timezone,
         Update,
         LoggingCategories,
+        ServerInterfaces,
         ModbusRtu,
         Shutdown,
         Restart,
@@ -89,6 +93,26 @@ private:
         RemoveConfirm,
     };
 
+    enum class ServerInterfaceType {
+        Tcp,
+        WebSocket,
+        WebServer,
+        TunnelProxy,
+    };
+
+    enum class ServerInterfaceDialogMode {
+        None,
+        Add,
+        Edit,
+        RemoveConfirm,
+    };
+
+    struct ServerInterfaceSelection
+    {
+        ServerInterfaceType type = ServerInterfaceType::Tcp;
+        int index = -1;
+    };
+
     enum class FocusArea {
         MainMenu,
         ThingSearch,
@@ -106,6 +130,7 @@ private:
         SettingsMenu,
         SettingsDetails,
         ModbusRtuDialog,
+        ServerInterfaceDialog,
         LoginForm,
     };
 
@@ -173,6 +198,7 @@ private:
     void ensureSystemPackagesLoaded();
     void ensureSystemTimeZonesLoaded();
     void ensureLoggingCategoriesLoaded();
+    void ensureServerInterfacesLoaded();
     void ensureModbusRtuLoaded();
     void applySystemUpdateStatus(const api::SystemGetUpdateStatusResponse& status);
     bool systemUpdateInteractionBusy() const;
@@ -181,6 +207,16 @@ private:
     QStringList filteredSystemTimeZones() const;
     std::vector<api::LoggingCategory> filteredLoggingCategories() const;
     const api::ModbusRtuMaster* selectedModbusRtuMaster() const;
+    int serverInterfaceCount() const;
+    std::optional<ServerInterfaceSelection> selectedServerInterface() const;
+    void clampServerInterfaceSelection();
+    std::string serverInterfaceTypeLabel(ServerInterfaceType type) const;
+    int serverInterfaceDialogFieldCount() const;
+    void openAddServerInterfaceDialog();
+    void openEditServerInterfaceDialog();
+    void openRemoveServerInterfaceDialog();
+    void closeServerInterfaceDialog();
+    bool submitServerInterfaceDialog();
     void clampModbusRtuSelection();
     void openAddModbusRtuDialog();
     void openEditModbusRtuDialog();
@@ -243,6 +279,7 @@ private:
     void handleFetchSystemUpdateStatusReply(const QJsonObject& message, const QString& transportError);
     void handleFetchSystemPackagesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchSystemTimeZonesReply(const QJsonObject& message, const QString& transportError);
+    void handleFetchServerInterfacesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchLoggingCategoriesReply(const QJsonObject& message, const QString& transportError);
     void handleFetchModbusRtuMastersReply(const QJsonObject& message, const QString& transportError);
     void handleFetchModbusRtuSerialPortsReply(const QJsonObject& message, const QString& transportError);
@@ -250,6 +287,8 @@ private:
     void handleSetTimeZoneReply(const QJsonObject& message, const QString& transportError);
     void handleUpdatePackagesReply(const QJsonObject& message, const QString& transportError);
     void handleSetLoggingCategoryLevelReply(const QJsonObject& message, const QString& transportError, const QString& categoryName, api::LoggingLevel level);
+    void handleSetServerInterfaceReply(const QJsonObject& message, const QString& transportError, ServerInterfaceType type);
+    void handleDeleteServerInterfaceReply(const QJsonObject& message, const QString& transportError, ServerInterfaceType type);
     void handleAddModbusRtuReply(const QJsonObject& message, const QString& transportError);
     void handleReconfigureModbusRtuReply(const QJsonObject& message, const QString& transportError);
     void handleRemoveModbusRtuReply(const QJsonObject& message, const QString& transportError);
@@ -437,6 +476,24 @@ private:
     std::vector<api::LoggingCategory> m_loggingCategories;
     std::string m_loggingCategorySearch;
     std::string m_loggingCategoryStatus;
+    bool m_serverInterfacesLoaded = false;
+    bool m_serverInterfacesPending = false;
+    std::vector<api::ServerConfiguration> m_tcpServerConfigurations;
+    std::vector<api::ServerConfiguration> m_webSocketServerConfigurations;
+    std::vector<api::WebServerConfiguration> m_webServerConfigurations;
+    std::vector<api::TunnelProxyServerConfiguration> m_tunnelProxyServerConfigurations;
+    std::string m_serverInterfaceStatus;
+    ServerInterfaceDialogMode m_serverInterfaceDialogMode = ServerInterfaceDialogMode::None;
+    bool m_serverInterfaceRequestPending = false;
+    ServerInterfaceType m_serverInterfaceDialogType = ServerInterfaceType::Tcp;
+    int m_serverInterfaceDialogFieldIndex = 0;
+    std::string m_serverInterfaceDialogId;
+    std::string m_serverInterfaceDialogAddress;
+    std::string m_serverInterfaceDialogPort;
+    bool m_serverInterfaceDialogSslEnabled = false;
+    bool m_serverInterfaceDialogAuthenticationEnabled = false;
+    std::string m_serverInterfaceDialogPublicFolder;
+    bool m_serverInterfaceDialogIgnoreSslErrors = false;
     bool m_modbusRtuMastersLoaded = false;
     bool m_modbusRtuMastersPending = false;
     std::vector<api::ModbusRtuMaster> m_modbusRtuMasters;

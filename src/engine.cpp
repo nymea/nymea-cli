@@ -5,8 +5,34 @@
 
 #include "generated/actiontype.h"
 #include "generated/apiutils.h"
+#include "generated/configurationdeletetcpserverconfigurationparams.h"
+#include "generated/configurationdeletetcpserverconfigurationresponse.h"
+#include "generated/configurationdeletetunnelproxyserverconfigurationparams.h"
+#include "generated/configurationdeletetunnelproxyserverconfigurationresponse.h"
+#include "generated/configurationdeletewebserverconfigurationparams.h"
+#include "generated/configurationdeletewebserverconfigurationresponse.h"
+#include "generated/configurationdeletewebsocketserverconfigurationparams.h"
+#include "generated/configurationdeletewebsocketserverconfigurationresponse.h"
+#include "generated/configurationgetconfigurationsparams.h"
+#include "generated/configurationgetconfigurationsresponse.h"
+#include "generated/configurationsettcpserverconfigurationparams.h"
+#include "generated/configurationsettcpserverconfigurationresponse.h"
 #include "generated/configurationsettimezoneparams.h"
 #include "generated/configurationsettimezoneresponse.h"
+#include "generated/configurationsettunnelproxyserverconfigurationparams.h"
+#include "generated/configurationsettunnelproxyserverconfigurationresponse.h"
+#include "generated/configurationsetwebserverconfigurationparams.h"
+#include "generated/configurationsetwebserverconfigurationresponse.h"
+#include "generated/configurationsetwebsocketserverconfigurationparams.h"
+#include "generated/configurationsetwebsocketserverconfigurationresponse.h"
+#include "generated/configurationtcpserverconfigurationchangednotificationparams.h"
+#include "generated/configurationtcpserverconfigurationremovednotificationparams.h"
+#include "generated/configurationtunnelproxyserverconfigurationchangednotificationparams.h"
+#include "generated/configurationtunnelproxyserverconfigurationremovednotificationparams.h"
+#include "generated/configurationwebserverconfigurationchangednotificationparams.h"
+#include "generated/configurationwebserverconfigurationremovednotificationparams.h"
+#include "generated/configurationwebsocketserverconfigurationchangednotificationparams.h"
+#include "generated/configurationwebsocketserverconfigurationremovednotificationparams.h"
 #include "generated/debuggetloggingcategoriesparams.h"
 #include "generated/debuggetloggingcategoriesresponse.h"
 #include "generated/debugloggingcategorylevelchangednotificationparams.h"
@@ -761,12 +787,14 @@ std::string settingsViewLabel(int view)
     case 3:
         return "Logging categories";
     case 4:
-        return "Modbus RTU";
+        return "Server interfaces";
     case 5:
-        return "Shutdown";
+        return "Modbus RTU";
     case 6:
-        return "Restart";
+        return "Shutdown";
     case 7:
+        return "Restart";
+    case 8:
         return "Reboot";
     }
 
@@ -1329,12 +1357,14 @@ std::string settingsViewLabel(int view)
     case 3:
         return "Logging categories";
     case 4:
-        return "Modbus RTU";
+        return "Server interfaces";
     case 5:
-        return "Shutdown";
+        return "Modbus RTU";
     case 6:
-        return "Restart";
+        return "Shutdown";
     case 7:
+        return "Restart";
+    case 8:
         return "Reboot";
     }
 
@@ -3261,6 +3291,118 @@ void Engine::handleNotification(const QJsonObject& message)
         return;
     }
 
+    if (notificationName == api::ConfigurationTcpServerConfigurationChangedNotification::notificationName()) {
+        const api::ConfigurationTcpServerConfigurationChangedNotificationParams notification = api::ConfigurationTcpServerConfigurationChangedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_tcpServerConfigurations.begin(), m_tcpServerConfigurations.end(), [&](const api::ServerConfiguration& configuration) {
+            return configuration.id == notification.tcpServerConfiguration.id;
+        });
+        if (existing == m_tcpServerConfigurations.end()) {
+            m_tcpServerConfigurations.push_back(notification.tcpServerConfiguration);
+        } else {
+            *existing = notification.tcpServerConfiguration;
+        }
+        m_serverInterfacesLoaded = true;
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: TCP server configuration changed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationTcpServerConfigurationRemovedNotification::notificationName()) {
+        const api::ConfigurationTcpServerConfigurationRemovedNotificationParams notification = api::ConfigurationTcpServerConfigurationRemovedNotificationParams::fromJson(params);
+        m_tcpServerConfigurations.erase(std::remove_if(m_tcpServerConfigurations.begin(),
+                                                       m_tcpServerConfigurations.end(),
+                                                       [&](const api::ServerConfiguration& configuration) { return configuration.id == notification.id; }),
+                                        m_tcpServerConfigurations.end());
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: TCP server configuration removed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationWebSocketServerConfigurationChangedNotification::notificationName()) {
+        const api::ConfigurationWebSocketServerConfigurationChangedNotificationParams notification
+            = api::ConfigurationWebSocketServerConfigurationChangedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_webSocketServerConfigurations.begin(), m_webSocketServerConfigurations.end(), [&](const api::ServerConfiguration& configuration) {
+            return configuration.id == notification.webSocketServerConfiguration.id;
+        });
+        if (existing == m_webSocketServerConfigurations.end()) {
+            m_webSocketServerConfigurations.push_back(notification.webSocketServerConfiguration);
+        } else {
+            *existing = notification.webSocketServerConfiguration;
+        }
+        m_serverInterfacesLoaded = true;
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: WebSocket server configuration changed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationWebSocketServerConfigurationRemovedNotification::notificationName()) {
+        const api::ConfigurationWebSocketServerConfigurationRemovedNotificationParams notification
+            = api::ConfigurationWebSocketServerConfigurationRemovedNotificationParams::fromJson(params);
+        m_webSocketServerConfigurations.erase(std::remove_if(m_webSocketServerConfigurations.begin(),
+                                                             m_webSocketServerConfigurations.end(),
+                                                             [&](const api::ServerConfiguration& configuration) { return configuration.id == notification.id; }),
+                                              m_webSocketServerConfigurations.end());
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: WebSocket server configuration removed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationWebServerConfigurationChangedNotification::notificationName()) {
+        const api::ConfigurationWebServerConfigurationChangedNotificationParams notification = api::ConfigurationWebServerConfigurationChangedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_webServerConfigurations.begin(), m_webServerConfigurations.end(), [&](const api::WebServerConfiguration& configuration) {
+            return configuration.id == notification.webServerConfiguration.id;
+        });
+        if (existing == m_webServerConfigurations.end()) {
+            m_webServerConfigurations.push_back(notification.webServerConfiguration);
+        } else {
+            *existing = notification.webServerConfiguration;
+        }
+        m_serverInterfacesLoaded = true;
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: WebServer configuration changed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationWebServerConfigurationRemovedNotification::notificationName()) {
+        const api::ConfigurationWebServerConfigurationRemovedNotificationParams notification = api::ConfigurationWebServerConfigurationRemovedNotificationParams::fromJson(params);
+        m_webServerConfigurations.erase(std::remove_if(m_webServerConfigurations.begin(),
+                                                       m_webServerConfigurations.end(),
+                                                       [&](const api::WebServerConfiguration& configuration) { return configuration.id == notification.id; }),
+                                        m_webServerConfigurations.end());
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: WebServer configuration removed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationTunnelProxyServerConfigurationChangedNotification::notificationName()) {
+        const api::ConfigurationTunnelProxyServerConfigurationChangedNotificationParams notification
+            = api::ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::fromJson(params);
+        auto existing = std::find_if(m_tunnelProxyServerConfigurations.begin(),
+                                     m_tunnelProxyServerConfigurations.end(),
+                                     [&](const api::TunnelProxyServerConfiguration& configuration) { return configuration.id == notification.tunnelProxyServerConfiguration.id; });
+        if (existing == m_tunnelProxyServerConfigurations.end()) {
+            m_tunnelProxyServerConfigurations.push_back(notification.tunnelProxyServerConfiguration);
+        } else {
+            *existing = notification.tunnelProxyServerConfiguration;
+        }
+        m_serverInterfacesLoaded = true;
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: Tunnel Proxy server configuration changed.";
+        return;
+    }
+
+    if (notificationName == api::ConfigurationTunnelProxyServerConfigurationRemovedNotification::notificationName()) {
+        const api::ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams notification
+            = api::ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams::fromJson(params);
+        m_tunnelProxyServerConfigurations.erase(std::remove_if(m_tunnelProxyServerConfigurations.begin(),
+                                                               m_tunnelProxyServerConfigurations.end(),
+                                                               [&](const api::TunnelProxyServerConfiguration& configuration) { return configuration.id == notification.id; }),
+                                                m_tunnelProxyServerConfigurations.end());
+        clampServerInterfaceSelection();
+        m_serverInterfaceStatus = "Live update: Tunnel Proxy server configuration removed.";
+        return;
+    }
+
     if (notificationName == api::ModbusRtuModbusRtuMasterAddedNotification::notificationName()) {
         const api::ModbusRtuModbusRtuMasterAddedNotificationParams notification = api::ModbusRtuModbusRtuMasterAddedNotificationParams::fromJson(params);
         auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
@@ -3504,6 +3646,15 @@ bool Engine::connectToServer(bool shouldLoadSavedConnection)
     m_systemTimeZonesPending = false;
     m_systemTimeZones.clear();
     m_systemTimeZoneSearch.clear();
+    m_serverInterfacesLoaded = false;
+    m_serverInterfacesPending = false;
+    m_tcpServerConfigurations.clear();
+    m_webSocketServerConfigurations.clear();
+    m_webServerConfigurations.clear();
+    m_tunnelProxyServerConfigurations.clear();
+    m_serverInterfaceStatus.clear();
+    m_serverInterfaceDialogMode = ServerInterfaceDialogMode::None;
+    m_serverInterfaceRequestPending = false;
     m_apiBrowserLoaded = false;
     m_apiBrowserPending = false;
     m_apiBrowserIntrospection = QJsonObject();
@@ -3954,7 +4105,7 @@ void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QS
     if (!m_notificationsEnabled) {
         m_thingManager.setStatus("Server did not confirm Integrations notifications.");
     } else {
-        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations, Debug, and Modbus RTU.");
+        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations, Debug, Configuration, and Modbus RTU.");
     }
 
     if (fetchThingsAfterReply) {
@@ -3988,7 +4139,7 @@ void Engine::enableNotifications(bool fetchThingsAfterReply)
 
     api::JSONRPCSetNotificationStatusParams request;
     request.enabled = true;
-    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug"), QStringLiteral("ModbusRtu")};
+    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug"), QStringLiteral("Configuration"), QStringLiteral("ModbusRtu")};
 
     observeReply(m_client.sendRequest(api::JSONRPCSetNotificationStatusMethod::methodName(), request.toJson()),
                  [this, fetchThingsAfterReply](const QJsonObject& message, const QString& transportError) {
@@ -4261,6 +4412,17 @@ void Engine::ensureLoggingCategoriesLoaded()
                  [this](const QJsonObject& message, const QString& transportError) { handleFetchLoggingCategoriesReply(message, transportError); });
 }
 
+void Engine::ensureServerInterfacesLoaded()
+{
+    if (m_serverInterfacesLoaded || m_serverInterfacesPending || !m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
+        return;
+    }
+
+    m_serverInterfacesPending = true;
+    observeReply(m_client.sendRequest(api::ConfigurationGetConfigurationsMethod::methodName(), QJsonObject{}),
+                 [this](const QJsonObject& message, const QString& transportError) { handleFetchServerInterfacesReply(message, transportError); });
+}
+
 void Engine::ensureModbusRtuLoaded()
 {
     if (!m_client.isConnected() || (m_isAuthenticationRequired && !m_isAuthenticated)) {
@@ -4310,6 +4472,300 @@ std::vector<api::LoggingCategory> Engine::filteredLoggingCategories() const
         }
     }
     return filtered;
+}
+
+int Engine::serverInterfaceCount() const
+{
+    return static_cast<int>(m_tcpServerConfigurations.size() + m_webSocketServerConfigurations.size() + m_webServerConfigurations.size() + m_tunnelProxyServerConfigurations.size());
+}
+
+std::optional<Engine::ServerInterfaceSelection> Engine::selectedServerInterface() const
+{
+    int index = m_settingsDetailsLineIndex;
+    if (index < 0) {
+        return std::nullopt;
+    }
+
+    if (index < static_cast<int>(m_tcpServerConfigurations.size())) {
+        return ServerInterfaceSelection{ServerInterfaceType::Tcp, index};
+    }
+    index -= static_cast<int>(m_tcpServerConfigurations.size());
+    if (index < static_cast<int>(m_webSocketServerConfigurations.size())) {
+        return ServerInterfaceSelection{ServerInterfaceType::WebSocket, index};
+    }
+    index -= static_cast<int>(m_webSocketServerConfigurations.size());
+    if (index < static_cast<int>(m_webServerConfigurations.size())) {
+        return ServerInterfaceSelection{ServerInterfaceType::WebServer, index};
+    }
+    index -= static_cast<int>(m_webServerConfigurations.size());
+    if (index < static_cast<int>(m_tunnelProxyServerConfigurations.size())) {
+        return ServerInterfaceSelection{ServerInterfaceType::TunnelProxy, index};
+    }
+    return std::nullopt;
+}
+
+void Engine::clampServerInterfaceSelection()
+{
+    const int count = serverInterfaceCount();
+    if (count <= 0) {
+        m_settingsDetailsLineIndex = 0;
+        return;
+    }
+    if (m_settingsDetailsLineIndex < 0) {
+        m_settingsDetailsLineIndex = 0;
+    } else if (m_settingsDetailsLineIndex >= count) {
+        m_settingsDetailsLineIndex = count - 1;
+    }
+}
+
+std::string Engine::serverInterfaceTypeLabel(ServerInterfaceType type) const
+{
+    switch (type) {
+    case ServerInterfaceType::Tcp:
+        return "TCP server";
+    case ServerInterfaceType::WebSocket:
+        return "WebSocket server";
+    case ServerInterfaceType::WebServer:
+        return "WebServer";
+    case ServerInterfaceType::TunnelProxy:
+        return "Tunnel Proxy server";
+    }
+    return "Server interface";
+}
+
+int Engine::serverInterfaceDialogFieldCount() const
+{
+    if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::None || m_serverInterfaceDialogMode == ServerInterfaceDialogMode::RemoveConfirm) {
+        return 0;
+    }
+
+    int count = m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add ? 5 : 4;
+    if (m_serverInterfaceDialogType == ServerInterfaceType::WebServer || m_serverInterfaceDialogType == ServerInterfaceType::TunnelProxy) {
+        ++count;
+    }
+    return count;
+}
+
+void Engine::openAddServerInterfaceDialog()
+{
+    m_previousFocusArea = m_focusArea;
+    m_focusArea = FocusArea::ServerInterfaceDialog;
+    m_serverInterfaceDialogMode = ServerInterfaceDialogMode::Add;
+    m_serverInterfaceRequestPending = false;
+    m_serverInterfaceDialogType = ServerInterfaceType::Tcp;
+    m_serverInterfaceDialogFieldIndex = 0;
+    m_serverInterfaceDialogId = QUuid::createUuid().toString(QUuid::WithoutBraces).toStdString();
+    m_serverInterfaceDialogAddress = "0.0.0.0";
+    m_serverInterfaceDialogPort = "2223";
+    m_serverInterfaceDialogSslEnabled = false;
+    m_serverInterfaceDialogAuthenticationEnabled = false;
+    m_serverInterfaceDialogPublicFolder.clear();
+    m_serverInterfaceDialogIgnoreSslErrors = false;
+    m_serverInterfaceStatus = "Add server interface.";
+}
+
+void Engine::openEditServerInterfaceDialog()
+{
+    const std::optional<ServerInterfaceSelection> selection = selectedServerInterface();
+    if (!selection.has_value()) {
+        m_serverInterfaceStatus = "No server interface selected.";
+        return;
+    }
+
+    m_previousFocusArea = m_focusArea;
+    m_focusArea = FocusArea::ServerInterfaceDialog;
+    m_serverInterfaceDialogMode = ServerInterfaceDialogMode::Edit;
+    m_serverInterfaceRequestPending = false;
+    m_serverInterfaceDialogType = selection->type;
+    m_serverInterfaceDialogFieldIndex = 0;
+    m_serverInterfaceDialogPublicFolder.clear();
+    m_serverInterfaceDialogIgnoreSslErrors = false;
+
+    auto copyCommon = [this](const api::ServerConfiguration& configuration) {
+        m_serverInterfaceDialogId = configuration.id.toStdString();
+        m_serverInterfaceDialogAddress = configuration.address.toStdString();
+        m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
+        m_serverInterfaceDialogSslEnabled = configuration.sslEnabled;
+        m_serverInterfaceDialogAuthenticationEnabled = configuration.authenticationEnabled;
+    };
+
+    switch (selection->type) {
+    case ServerInterfaceType::Tcp:
+        copyCommon(m_tcpServerConfigurations.at(selection->index));
+        break;
+    case ServerInterfaceType::WebSocket:
+        copyCommon(m_webSocketServerConfigurations.at(selection->index));
+        break;
+    case ServerInterfaceType::WebServer: {
+        const api::WebServerConfiguration& configuration = m_webServerConfigurations.at(selection->index);
+        m_serverInterfaceDialogId = configuration.id.toStdString();
+        m_serverInterfaceDialogAddress = configuration.address.toStdString();
+        m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
+        m_serverInterfaceDialogSslEnabled = configuration.sslEnabled;
+        m_serverInterfaceDialogAuthenticationEnabled = configuration.authenticationEnabled;
+        m_serverInterfaceDialogPublicFolder = configuration.publicFolder.toStdString();
+        break;
+    }
+    case ServerInterfaceType::TunnelProxy: {
+        const api::TunnelProxyServerConfiguration& configuration = m_tunnelProxyServerConfigurations.at(selection->index);
+        m_serverInterfaceDialogId = configuration.id.toStdString();
+        m_serverInterfaceDialogAddress = configuration.address.toStdString();
+        m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
+        m_serverInterfaceDialogSslEnabled = configuration.sslEnabled;
+        m_serverInterfaceDialogAuthenticationEnabled = configuration.authenticationEnabled;
+        m_serverInterfaceDialogIgnoreSslErrors = configuration.ignoreSslErrors;
+        break;
+    }
+    }
+    m_serverInterfaceStatus = "Edit " + serverInterfaceTypeLabel(selection->type) + " " + m_serverInterfaceDialogId + ".";
+}
+
+void Engine::openRemoveServerInterfaceDialog()
+{
+    const std::optional<ServerInterfaceSelection> selection = selectedServerInterface();
+    if (!selection.has_value()) {
+        m_serverInterfaceStatus = "No server interface selected.";
+        return;
+    }
+
+    openEditServerInterfaceDialog();
+    m_serverInterfaceDialogMode = ServerInterfaceDialogMode::RemoveConfirm;
+    m_serverInterfaceRequestPending = false;
+    m_serverInterfaceStatus = "Confirm removing " + serverInterfaceTypeLabel(selection->type) + ".";
+}
+
+void Engine::closeServerInterfaceDialog()
+{
+    m_serverInterfaceDialogMode = ServerInterfaceDialogMode::None;
+    m_serverInterfaceRequestPending = false;
+    m_serverInterfaceDialogFieldIndex = 0;
+    m_focusArea = m_previousFocusArea == FocusArea::ServerInterfaceDialog ? FocusArea::SettingsDetails : m_previousFocusArea;
+}
+
+bool Engine::submitServerInterfaceDialog()
+{
+    if (m_serverInterfaceRequestPending || m_serverInterfaceDialogMode == ServerInterfaceDialogMode::None) {
+        return true;
+    }
+
+    if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::RemoveConfirm) {
+        const QString id = QString::fromStdString(m_serverInterfaceDialogId);
+        if (id.trimmed().isEmpty()) {
+            m_serverInterfaceStatus = "Interface id must not be empty.";
+            return true;
+        }
+
+        m_serverInterfaceRequestPending = true;
+        m_serverInterfaceStatus = "Removing " + serverInterfaceTypeLabel(m_serverInterfaceDialogType) + "...";
+        switch (m_serverInterfaceDialogType) {
+        case ServerInterfaceType::Tcp: {
+            api::ConfigurationDeleteTcpServerConfigurationParams request;
+            request.id = id;
+            observeReply(m_client.sendRequest(api::ConfigurationDeleteTcpServerConfigurationMethod::methodName(), request.toJson()),
+                         [this](const QJsonObject& message, const QString& transportError) { handleDeleteServerInterfaceReply(message, transportError, ServerInterfaceType::Tcp); });
+            break;
+        }
+        case ServerInterfaceType::WebSocket: {
+            api::ConfigurationDeleteWebSocketServerConfigurationParams request;
+            request.id = id;
+            observeReply(m_client.sendRequest(api::ConfigurationDeleteWebSocketServerConfigurationMethod::methodName(), request.toJson()),
+                         [this](const QJsonObject& message, const QString& transportError) {
+                             handleDeleteServerInterfaceReply(message, transportError, ServerInterfaceType::WebSocket);
+                         });
+            break;
+        }
+        case ServerInterfaceType::WebServer: {
+            api::ConfigurationDeleteWebServerConfigurationParams request;
+            request.id = id;
+            observeReply(m_client.sendRequest(api::ConfigurationDeleteWebServerConfigurationMethod::methodName(), request.toJson()),
+                         [this](const QJsonObject& message, const QString& transportError) {
+                             handleDeleteServerInterfaceReply(message, transportError, ServerInterfaceType::WebServer);
+                         });
+            break;
+        }
+        case ServerInterfaceType::TunnelProxy: {
+            api::ConfigurationDeleteTunnelProxyServerConfigurationParams request;
+            request.id = id;
+            observeReply(m_client.sendRequest(api::ConfigurationDeleteTunnelProxyServerConfigurationMethod::methodName(), request.toJson()),
+                         [this](const QJsonObject& message, const QString& transportError) {
+                             handleDeleteServerInterfaceReply(message, transportError, ServerInterfaceType::TunnelProxy);
+                         });
+            break;
+        }
+        }
+        return true;
+    }
+
+    const QString id = QString::fromStdString(m_serverInterfaceDialogId).trimmed();
+    const QString address = QString::fromStdString(m_serverInterfaceDialogAddress).trimmed();
+    bool ok = false;
+    const quint64 port = QString::fromStdString(m_serverInterfaceDialogPort).trimmed().toULongLong(&ok);
+    if (id.isEmpty()) {
+        m_serverInterfaceStatus = "Interface id must not be empty.";
+        return true;
+    }
+    if (address.isEmpty()) {
+        m_serverInterfaceStatus = "Address must not be empty.";
+        return true;
+    }
+    if (!ok || port == 0 || port > 65535) {
+        m_serverInterfaceStatus = "Port must be an integer between 1 and 65535.";
+        return true;
+    }
+
+    m_serverInterfaceRequestPending = true;
+    m_serverInterfaceStatus = "Saving " + serverInterfaceTypeLabel(m_serverInterfaceDialogType) + "...";
+    switch (m_serverInterfaceDialogType) {
+    case ServerInterfaceType::Tcp: {
+        api::ConfigurationSetTcpServerConfigurationParams request;
+        request.configuration.id = id;
+        request.configuration.address = address;
+        request.configuration.port = port;
+        request.configuration.sslEnabled = m_serverInterfaceDialogSslEnabled;
+        request.configuration.authenticationEnabled = m_serverInterfaceDialogAuthenticationEnabled;
+        observeReply(m_client.sendRequest(api::ConfigurationSetTcpServerConfigurationMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) { handleSetServerInterfaceReply(message, transportError, ServerInterfaceType::Tcp); });
+        break;
+    }
+    case ServerInterfaceType::WebSocket: {
+        api::ConfigurationSetWebSocketServerConfigurationParams request;
+        request.configuration.id = id;
+        request.configuration.address = address;
+        request.configuration.port = port;
+        request.configuration.sslEnabled = m_serverInterfaceDialogSslEnabled;
+        request.configuration.authenticationEnabled = m_serverInterfaceDialogAuthenticationEnabled;
+        observeReply(m_client.sendRequest(api::ConfigurationSetWebSocketServerConfigurationMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) { handleSetServerInterfaceReply(message, transportError, ServerInterfaceType::WebSocket); });
+        break;
+    }
+    case ServerInterfaceType::WebServer: {
+        api::ConfigurationSetWebServerConfigurationParams request;
+        request.configuration.id = id;
+        request.configuration.address = address;
+        request.configuration.port = port;
+        request.configuration.sslEnabled = m_serverInterfaceDialogSslEnabled;
+        request.configuration.authenticationEnabled = m_serverInterfaceDialogAuthenticationEnabled;
+        request.configuration.publicFolder = QString::fromStdString(m_serverInterfaceDialogPublicFolder).trimmed();
+        observeReply(m_client.sendRequest(api::ConfigurationSetWebServerConfigurationMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) { handleSetServerInterfaceReply(message, transportError, ServerInterfaceType::WebServer); });
+        break;
+    }
+    case ServerInterfaceType::TunnelProxy: {
+        api::ConfigurationSetTunnelProxyServerConfigurationParams request;
+        request.configuration.id = id;
+        request.configuration.address = address;
+        request.configuration.port = port;
+        request.configuration.sslEnabled = m_serverInterfaceDialogSslEnabled;
+        request.configuration.authenticationEnabled = m_serverInterfaceDialogAuthenticationEnabled;
+        request.configuration.ignoreSslErrors = m_serverInterfaceDialogIgnoreSslErrors;
+        observeReply(m_client.sendRequest(api::ConfigurationSetTunnelProxyServerConfigurationMethod::methodName(), request.toJson()),
+                     [this](const QJsonObject& message, const QString& transportError) {
+                         handleSetServerInterfaceReply(message, transportError, ServerInterfaceType::TunnelProxy);
+                     });
+        break;
+    }
+    }
+    return true;
 }
 
 const api::ModbusRtuMaster* Engine::selectedModbusRtuMaster() const
@@ -4641,6 +5097,43 @@ void Engine::handleFetchSystemTimeZonesReply(const QJsonObject& message, const Q
     m_settingsWarning.clear();
 }
 
+void Engine::handleFetchServerInterfacesReply(const QJsonObject& message, const QString& transportError)
+{
+    m_serverInterfacesPending = false;
+    if (!transportError.isEmpty()) {
+        m_serverInterfaceStatus = "Failed to load server interfaces: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_serverInterfaceStatus = "Server interface request was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_serverInterfaceStatus = "Server interface request returned an error.";
+        return;
+    }
+
+    const api::ConfigurationGetConfigurationsResponse response = api::ConfigurationGetConfigurationsResponse::fromJson(message.value(QStringLiteral("params")).toObject());
+    m_tcpServerConfigurations.assign(response.tcpServerConfigurations.begin(), response.tcpServerConfigurations.end());
+    m_webSocketServerConfigurations.assign(response.webSocketServerConfigurations.begin(), response.webSocketServerConfigurations.end());
+    m_webServerConfigurations.assign(response.webServerConfigurations.begin(), response.webServerConfigurations.end());
+    m_tunnelProxyServerConfigurations.assign(response.tunnelProxyServerConfigurations.begin(), response.tunnelProxyServerConfigurations.end());
+    m_serverInterfacesLoaded = true;
+    m_serverInterfaceStatus = "Loaded " + std::to_string(serverInterfaceCount()) + " server interfaces.";
+    m_settingsWarning.clear();
+    clampServerInterfaceSelection();
+}
+
 void Engine::handleFetchLoggingCategoriesReply(const QJsonObject& message, const QString& transportError)
 {
     m_loggingCategoriesPending = false;
@@ -4917,6 +5410,110 @@ void Engine::handleSetLoggingCategoryLevelReply(const QJsonObject& message, cons
     m_loggingCategoryStatus = "Logging category " + categoryName.toStdString() + " set to " + loggingLevelLabel(level) + ".";
     m_settingsWarning.clear();
     clampSettingsDetailsSelection();
+}
+
+void Engine::handleSetServerInterfaceReply(const QJsonObject& message, const QString& transportError, ServerInterfaceType type)
+{
+    m_serverInterfaceRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_serverInterfaceStatus = "Saving " + serverInterfaceTypeLabel(type) + " failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_serverInterfaceStatus = "Saving " + serverInterfaceTypeLabel(type) + " was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_serverInterfaceStatus = "Saving " + serverInterfaceTypeLabel(type) + " returned an error.";
+        return;
+    }
+
+    api::ConfigurationError configurationError = api::ConfigurationError::ConfigurationErrorNoError;
+    switch (type) {
+    case ServerInterfaceType::Tcp:
+        configurationError = api::ConfigurationSetTcpServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::WebSocket:
+        configurationError = api::ConfigurationSetWebSocketServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::WebServer:
+        configurationError = api::ConfigurationSetWebServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::TunnelProxy:
+        configurationError = api::ConfigurationSetTunnelProxyServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    }
+    if (configurationError != api::ConfigurationError::ConfigurationErrorNoError) {
+        m_serverInterfaceStatus = "Saving " + serverInterfaceTypeLabel(type) + " failed: " + api::toString(configurationError).toStdString();
+        return;
+    }
+
+    m_serverInterfaceStatus = "Saved " + serverInterfaceTypeLabel(type) + ".";
+    closeServerInterfaceDialog();
+    m_serverInterfacesLoaded = false;
+    ensureServerInterfacesLoaded();
+}
+
+void Engine::handleDeleteServerInterfaceReply(const QJsonObject& message, const QString& transportError, ServerInterfaceType type)
+{
+    m_serverInterfaceRequestPending = false;
+    if (!transportError.isEmpty()) {
+        m_serverInterfaceStatus = "Removing " + serverInterfaceTypeLabel(type) + " failed: " + transportError.toStdString();
+        return;
+    }
+
+    const QString status = message.value(QStringLiteral("status")).toString();
+    if (status == QStringLiteral("unauthorized")) {
+        clearStoredToken();
+        m_client.clearAuthToken();
+        m_isAuthenticationRequired = true;
+        m_isAuthenticated = false;
+        m_showLoginForm = true;
+        m_loginSelectedInputIndex = 0;
+        m_focusArea = FocusArea::LoginForm;
+        m_authStatus = "Authentication required. Please login.";
+        m_serverInterfaceStatus = "Removing " + serverInterfaceTypeLabel(type) + " was unauthorized.";
+        return;
+    }
+    if (status == QStringLiteral("error")) {
+        m_serverInterfaceStatus = "Removing " + serverInterfaceTypeLabel(type) + " returned an error.";
+        return;
+    }
+
+    api::ConfigurationError configurationError = api::ConfigurationError::ConfigurationErrorNoError;
+    switch (type) {
+    case ServerInterfaceType::Tcp:
+        configurationError = api::ConfigurationDeleteTcpServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::WebSocket:
+        configurationError = api::ConfigurationDeleteWebSocketServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::WebServer:
+        configurationError = api::ConfigurationDeleteWebServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    case ServerInterfaceType::TunnelProxy:
+        configurationError = api::ConfigurationDeleteTunnelProxyServerConfigurationResponse::fromJson(message.value(QStringLiteral("params")).toObject()).configurationError;
+        break;
+    }
+    if (configurationError != api::ConfigurationError::ConfigurationErrorNoError) {
+        m_serverInterfaceStatus = "Removing " + serverInterfaceTypeLabel(type) + " failed: " + api::toString(configurationError).toStdString();
+        return;
+    }
+
+    m_serverInterfaceStatus = "Removed " + serverInterfaceTypeLabel(type) + ".";
+    closeServerInterfaceDialog();
+    m_serverInterfacesLoaded = false;
+    ensureServerInterfacesLoaded();
 }
 
 void Engine::handleAddModbusRtuReply(const QJsonObject& message, const QString& transportError)
@@ -5585,7 +6182,7 @@ ftxui::Element Engine::renderConfigureDetails() const
 
 ftxui::Element Engine::renderSettingsMenu() const
 {
-    constexpr std::array<const char*, 8> menuItems = {"Server info", "Timezone", "Update", "Logging categories", "Modbus RTU", "Shutdown", "Restart", "Reboot"};
+    constexpr std::array<const char*, 9> menuItems = {"Server info", "Timezone", "Update", "Logging categories", "Server interfaces", "Modbus RTU", "Shutdown", "Restart", "Reboot"};
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
@@ -5768,6 +6365,67 @@ ftxui::Element Engine::renderSettingsDetails() const
         }
         pushLine(ftxui::separator());
         pushLine(ftxui::text("Type to filter. Left/Right or Space changes the selected level.") | ftxui::dim);
+    } else if (m_settingsView == SettingsView::ServerInterfaces) {
+        const std::string statusText = m_serverInterfaceStatus.empty() ? std::string("Status: ") + (m_serverInterfacesPending ? "loading..." : "ready")
+                                                                       : "Status: " + m_serverInterfaceStatus;
+        int serverInterfaceRowIndex = 0;
+        auto pushServerInterfaceRow = [&](const std::string& label) {
+            auto row = ftxui::text(label);
+            const bool selected = m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == serverInterfaceRowIndex;
+            if (selected) {
+                row = row | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
+            }
+            lines.push_back(renderActiveField(std::move(row), selected, 56));
+            ++lineIndex;
+            ++serverInterfaceRowIndex;
+        };
+        auto commonLabel = [](const std::string& type, const api::ServerConfiguration& configuration) {
+            return " " + type + " | " + configuration.id.toStdString() + " | " + configuration.address.toStdString() + ":" + QString::number(configuration.port).toStdString()
+                   + " | ssl " + std::string(configuration.sslEnabled ? "on" : "off") + " | auth " + std::string(configuration.authenticationEnabled ? "on" : "off") + " ";
+        };
+
+        pushStaticLine(ftxui::text(statusText));
+        pushStaticLine(ftxui::text("Actions: a add, Enter/e edit, d delete, r refresh") | ftxui::dim);
+        pushStaticLine(ftxui::separator());
+        if (!m_serverInterfacesLoaded) {
+            pushStaticLine(ftxui::text("Loading server interfaces..."));
+        } else if (serverInterfaceCount() == 0) {
+            pushStaticLine(ftxui::text("No server interfaces configured."));
+        } else {
+            pushStaticLine(ftxui::text("TCP server") | ftxui::bold);
+            for (const api::ServerConfiguration& configuration : m_tcpServerConfigurations) {
+                pushServerInterfaceRow(commonLabel("TCP", configuration));
+            }
+            pushStaticLine(ftxui::text("WebSocket server") | ftxui::bold);
+            for (const api::ServerConfiguration& configuration : m_webSocketServerConfigurations) {
+                pushServerInterfaceRow(commonLabel("WebSocket", configuration));
+            }
+            pushStaticLine(ftxui::text("WebServer") | ftxui::bold);
+            for (const api::WebServerConfiguration& configuration : m_webServerConfigurations) {
+                std::string label = " WebServer | " + configuration.id.toStdString() + " | " + configuration.address.toStdString() + ":"
+                                    + QString::number(configuration.port).toStdString() + " | ssl " + std::string(configuration.sslEnabled ? "on" : "off") + " | auth "
+                                    + std::string(configuration.authenticationEnabled ? "on" : "off");
+                if (!configuration.publicFolder.isEmpty()) {
+                    label += " | " + configuration.publicFolder.toStdString();
+                }
+                label += " ";
+                pushServerInterfaceRow(label);
+            }
+            pushStaticLine(ftxui::text("Tunnel Proxy server") | ftxui::bold);
+            for (const api::TunnelProxyServerConfiguration& configuration : m_tunnelProxyServerConfigurations) {
+                std::string label = " Tunnel Proxy | " + configuration.id.toStdString() + " | " + configuration.address.toStdString() + ":"
+                                    + QString::number(configuration.port).toStdString() + " | ssl " + std::string(configuration.sslEnabled ? "on" : "off") + " | auth "
+                                    + std::string(configuration.authenticationEnabled ? "on" : "off") + " | ignore SSL errors "
+                                    + std::string(configuration.ignoreSslErrors ? "on" : "off") + " ";
+                pushServerInterfaceRow(label);
+            }
+        }
+        pushStaticLine(ftxui::separator());
+        if (const std::optional<ServerInterfaceSelection> selection = selectedServerInterface(); selection.has_value()) {
+            pushStaticLine(ftxui::text("Selected: " + serverInterfaceTypeLabel(selection->type)) | ftxui::bold);
+        } else {
+            pushStaticLine(ftxui::text("Selected: none") | ftxui::bold);
+        }
     } else if (m_settingsView == SettingsView::ModbusRtu) {
         const api::ModbusRtuMaster* selectedMaster = selectedModbusRtuMaster();
         const std::string statusText = m_modbusRtuStatus.empty() ? std::string("Status: ") + ((m_modbusRtuMastersPending || m_modbusRtuSerialPortsPending) ? "loading..." : "ready")
@@ -5854,6 +6512,8 @@ int Engine::settingsDetailsLineCount() const
         return updateActionCount();
     case SettingsView::LoggingCategories:
         return m_loggingCategoriesLoaded ? 7 + std::max(1, static_cast<int>(filteredLoggingCategories().size())) : 8;
+    case SettingsView::ServerInterfaces:
+        return std::max(1, serverInterfaceCount());
     case SettingsView::ModbusRtu:
         return modbusRtuMasterListStartLineIndex + std::max(1, static_cast<int>(m_modbusRtuMasters.size()));
     case SettingsView::Shutdown:
@@ -5918,6 +6578,11 @@ void Engine::clampSettingsDetailsSelection()
 
     if (m_settingsView == SettingsView::ModbusRtu) {
         clampModbusRtuSelection();
+        return;
+    }
+
+    if (m_settingsView == SettingsView::ServerInterfaces) {
+        clampServerInterfaceSelection();
         return;
     }
 
@@ -6085,8 +6750,8 @@ ftxui::Element Engine::renderUi()
         keyHintLine
             = "Keys: Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh things, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Settings) {
-        keyHintLine
-            = "Keys: Up/Down select settings, Right/Enter open details, Enter applies/edits, Modbus RTU a/e/d/r add/edit/delete/refresh, Left returns, ?/h help, q/Esc quit";
+        keyHintLine = "Keys: Up/Down select settings, Right/Enter open details, Enter applies/edits, Server interfaces/Modbus RTU a/e/d/r add/edit/delete/refresh, Left returns, "
+                      "?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Logout) {
         keyHintLine = "Keys: Enter logs out, Left returns to the menu, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::About) {
@@ -6154,6 +6819,79 @@ ftxui::Element Engine::renderUi()
         sections.push_back(ftxui::separator());
         sections.push_back(
             renderFocusedWindow(ftxui::text(powerActionLabel(static_cast<int>(m_systemAction)) + " confirmation"), ftxui::vbox(std::move(dialogBody)), m_showSystemActionConfirm));
+    }
+
+    if (m_serverInterfaceDialogMode != ServerInterfaceDialogMode::None) {
+        ftxui::Elements dialogBody;
+        const bool removeConfirm = m_serverInterfaceDialogMode == ServerInterfaceDialogMode::RemoveConfirm;
+        if (removeConfirm) {
+            dialogBody.push_back(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text("Type: " + serverInterfaceTypeLabel(m_serverInterfaceDialogType)));
+            dialogBody.push_back(ftxui::text("ID: " + m_serverInterfaceDialogId));
+            dialogBody.push_back(ftxui::text("Endpoint: " + m_serverInterfaceDialogAddress + ":" + m_serverInterfaceDialogPort));
+            if (m_serverInterfaceDialogType == ServerInterfaceType::Tcp || m_serverInterfaceDialogType == ServerInterfaceType::WebSocket
+                || m_serverInterfaceDialogType == ServerInterfaceType::TunnelProxy) {
+                dialogBody.push_back(ftxui::paragraph("Changing or removing the interface used by this connection may disconnect the CLI.") | ftxui::color(ftxui::Color::Yellow));
+            }
+            dialogBody.push_back(ftxui::separator());
+            dialogBody.push_back(ftxui::text(m_serverInterfaceRequestPending ? "Removing..." : "Enter confirms removal, Esc cancels.") | ftxui::dim);
+        } else {
+            auto pushField = [&](int index, const std::string& label, const std::string& value) {
+                const bool selected = m_focusArea == FocusArea::ServerInterfaceDialog && m_serverInterfaceDialogFieldIndex == index;
+                ftxui::Element marker = ftxui::text(selected ? "> " : "  ");
+                ftxui::Element valueElement = ftxui::text(value) | ftxui::flex;
+                if (selected) {
+                    marker = marker | ftxui::bold | ftxui::color(ftxui::Color::CyanLight);
+                    valueElement = valueElement | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
+                }
+                ftxui::Element row = ftxui::hbox({
+                    std::move(marker),
+                    ftxui::text(label + ": "),
+                    std::move(valueElement),
+                });
+                if (selected) {
+                    row = renderActiveField(std::move(row), true, 56);
+                }
+                dialogBody.push_back(row);
+            };
+            auto boolText = [](bool value) { return std::string("< ") + (value ? "on" : "off") + " >"; };
+
+            dialogBody.push_back(ftxui::text("ID: " + m_serverInterfaceDialogId) | ftxui::dim);
+            int fieldIndex = 0;
+            if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add) {
+                pushField(fieldIndex++, "Type", "< " + serverInterfaceTypeLabel(m_serverInterfaceDialogType) + " >");
+            }
+            pushField(fieldIndex++, "Address", m_serverInterfaceDialogAddress.empty() ? "<empty>" : m_serverInterfaceDialogAddress);
+            pushField(fieldIndex++, "Port", m_serverInterfaceDialogPort.empty() ? "<empty>" : m_serverInterfaceDialogPort);
+            pushField(fieldIndex++, "SSL", boolText(m_serverInterfaceDialogSslEnabled));
+            pushField(fieldIndex++, "Authentication", boolText(m_serverInterfaceDialogAuthenticationEnabled));
+            if (m_serverInterfaceDialogType == ServerInterfaceType::WebServer) {
+                pushField(fieldIndex++, "Public folder", m_serverInterfaceDialogPublicFolder.empty() ? "<empty>" : m_serverInterfaceDialogPublicFolder);
+            } else if (m_serverInterfaceDialogType == ServerInterfaceType::TunnelProxy) {
+                pushField(fieldIndex++, "Ignore SSL errors", boolText(m_serverInterfaceDialogIgnoreSslErrors));
+            }
+            dialogBody.push_back(ftxui::separator());
+            if (m_serverInterfaceDialogType == ServerInterfaceType::Tcp || m_serverInterfaceDialogType == ServerInterfaceType::WebSocket
+                || m_serverInterfaceDialogType == ServerInterfaceType::TunnelProxy) {
+                dialogBody.push_back(ftxui::paragraph("Changing the interface used by this connection may disconnect the CLI.") | ftxui::color(ftxui::Color::Yellow));
+            }
+            if (!m_serverInterfaceStatus.empty()) {
+                dialogBody.push_back(ftxui::paragraph(m_serverInterfaceStatus));
+            }
+            dialogBody.push_back(ftxui::text(m_serverInterfaceRequestPending
+                                                 ? "Sending request..."
+                                                 : "Up/Down moves, Left/Right or Space cycles selectors, type edits text fields, Enter saves, Esc cancels.")
+                                 | ftxui::dim);
+        }
+
+        const std::string title = m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add
+                                      ? "Add server interface"
+                                      : (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Edit ? "Edit server interface" : "Remove server interface");
+        sections.push_back(ftxui::separator());
+        sections.push_back(renderFocusedWindow(ftxui::text(title),
+                                               ftxui::vbox(std::move(dialogBody)) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 76),
+                                               m_focusArea == FocusArea::ServerInterfaceDialog));
     }
 
     if (m_modbusRtuDialogMode != ModbusRtuDialogMode::None) {
@@ -6453,6 +7191,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 ensureSystemPackagesLoaded();
             } else if (m_settingsView == SettingsView::LoggingCategories) {
                 ensureLoggingCategoriesLoaded();
+            } else if (m_settingsView == SettingsView::ServerInterfaces) {
+                ensureServerInterfacesLoaded();
             } else if (m_settingsView == SettingsView::ModbusRtu) {
                 ensureModbusRtuLoaded();
             }
@@ -6741,6 +7481,99 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (event == ftxui::Event::Return) {
             executePowerAction();
             return true;
+        }
+        return true;
+    }
+
+    if (m_serverInterfaceDialogMode != ServerInterfaceDialogMode::None) {
+        if (m_serverInterfaceRequestPending) {
+            return true;
+        }
+        if (event == ftxui::Event::Escape) {
+            closeServerInterfaceDialog();
+            return true;
+        }
+        if (event == ftxui::Event::Return) {
+            return submitServerInterfaceDialog();
+        }
+        if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::RemoveConfirm) {
+            return true;
+        }
+
+        auto defaultPort = [](ServerInterfaceType type) {
+            switch (type) {
+            case ServerInterfaceType::Tcp:
+                return std::string("2223");
+            case ServerInterfaceType::WebSocket:
+                return std::string("4444");
+            case ServerInterfaceType::WebServer:
+                return std::string("80");
+            case ServerInterfaceType::TunnelProxy:
+                return std::string("443");
+            }
+            return std::string("0");
+        };
+        auto editText = [&](std::string& value, bool digitsOnly) {
+            if (event == ftxui::Event::Backspace && !value.empty()) {
+                value.pop_back();
+                return true;
+            }
+            if (event.is_character()) {
+                if (!digitsOnly || std::all_of(event.character().begin(), event.character().end(), [](const char ch) { return ch >= '0' && ch <= '9'; })) {
+                    value += event.character();
+                    return true;
+                }
+            }
+            return false;
+        };
+        auto cycleType = [&](int delta) {
+            const int nextIndex = cycledIndex(static_cast<int>(m_serverInterfaceDialogType), 4, delta);
+            m_serverInterfaceDialogType = static_cast<ServerInterfaceType>(nextIndex);
+            if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add) {
+                m_serverInterfaceDialogPort = defaultPort(m_serverInterfaceDialogType);
+            }
+            m_serverInterfaceDialogFieldIndex = std::min(m_serverInterfaceDialogFieldIndex, std::max(0, serverInterfaceDialogFieldCount() - 1));
+        };
+
+        const int fieldCount = serverInterfaceDialogFieldCount();
+        if (event == ftxui::Event::ArrowUp && fieldCount > 0) {
+            m_serverInterfaceDialogFieldIndex = cycledIndex(m_serverInterfaceDialogFieldIndex, fieldCount, -1);
+            return true;
+        }
+        if (event == ftxui::Event::ArrowDown && fieldCount > 0) {
+            m_serverInterfaceDialogFieldIndex = cycledIndex(m_serverInterfaceDialogFieldIndex, fieldCount, 1);
+            return true;
+        }
+
+        const int offset = m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add ? 1 : 0;
+        if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
+            const int delta = event == ftxui::Event::ArrowLeft ? -1 : 1;
+            if (m_serverInterfaceDialogMode == ServerInterfaceDialogMode::Add && m_serverInterfaceDialogFieldIndex == 0) {
+                cycleType(delta);
+                return true;
+            }
+            if (m_serverInterfaceDialogFieldIndex == offset + 2) {
+                m_serverInterfaceDialogSslEnabled = !m_serverInterfaceDialogSslEnabled;
+                return true;
+            }
+            if (m_serverInterfaceDialogFieldIndex == offset + 3) {
+                m_serverInterfaceDialogAuthenticationEnabled = !m_serverInterfaceDialogAuthenticationEnabled;
+                return true;
+            }
+            if (m_serverInterfaceDialogType == ServerInterfaceType::TunnelProxy && m_serverInterfaceDialogFieldIndex == offset + 4) {
+                m_serverInterfaceDialogIgnoreSslErrors = !m_serverInterfaceDialogIgnoreSslErrors;
+                return true;
+            }
+        }
+
+        if (m_serverInterfaceDialogFieldIndex == offset) {
+            return editText(m_serverInterfaceDialogAddress, false);
+        }
+        if (m_serverInterfaceDialogFieldIndex == offset + 1) {
+            return editText(m_serverInterfaceDialogPort, true);
+        }
+        if (m_serverInterfaceDialogType == ServerInterfaceType::WebServer && m_serverInterfaceDialogFieldIndex == offset + 4) {
+            return editText(m_serverInterfaceDialogPublicFolder, false);
         }
         return true;
     }
@@ -7104,6 +7937,36 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (m_mainView == MainView::Settings && (m_focusArea == FocusArea::SettingsDetails || m_focusArea == FocusArea::SettingsMenu || m_focusArea == FocusArea::MainMenu)
+        && m_settingsView == SettingsView::ServerInterfaces) {
+        if (m_focusArea != FocusArea::SettingsDetails && (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown)) {
+            // Let the settings/main menu keep normal navigation until the details pane is focused.
+        } else if (event == ftxui::Event::Character("a")) {
+            openAddServerInterfaceDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("e")) {
+            openEditServerInterfaceDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("d")) {
+            openRemoveServerInterfaceDialog();
+            return true;
+        } else if (event == ftxui::Event::Character("r")) {
+            m_serverInterfacesLoaded = false;
+            m_serverInterfacesPending = false;
+            m_serverInterfaceStatus = "Refreshing server interfaces...";
+            ensureServerInterfacesLoaded();
+            return true;
+        }
+    }
+
+    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::ServerInterfaces) {
+        if (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown) {
+            const int count = std::max(1, serverInterfaceCount());
+            m_settingsDetailsLineIndex = cycledIndex(std::max(0, m_settingsDetailsLineIndex), count, event == ftxui::Event::ArrowDown ? 1 : -1);
+            return true;
+        }
+    }
+
+    if (m_mainView == MainView::Settings && (m_focusArea == FocusArea::SettingsDetails || m_focusArea == FocusArea::SettingsMenu || m_focusArea == FocusArea::MainMenu)
         && m_settingsView == SettingsView::ModbusRtu) {
         if (m_focusArea != FocusArea::SettingsDetails && (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown)) {
             // Let the settings/main menu keep normal navigation until the details pane is focused.
@@ -7256,6 +8119,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemPackagesLoaded();
                 } else if (m_settingsView == SettingsView::LoggingCategories) {
                     ensureLoggingCategoriesLoaded();
+                } else if (m_settingsView == SettingsView::ServerInterfaces) {
+                    ensureServerInterfacesLoaded();
                 } else if (m_settingsView == SettingsView::ModbusRtu) {
                     ensureModbusRtuLoaded();
                 }
@@ -7362,6 +8227,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                     ensureSystemPackagesLoaded();
                 } else if (m_settingsView == SettingsView::LoggingCategories) {
                     ensureLoggingCategoriesLoaded();
+                } else if (m_settingsView == SettingsView::ServerInterfaces) {
+                    ensureServerInterfacesLoaded();
                 } else if (m_settingsView == SettingsView::ModbusRtu) {
                     ensureModbusRtuLoaded();
                 }
@@ -7515,6 +8382,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         case SettingsView::LoggingCategories:
+            return true;
+        case SettingsView::ServerInterfaces:
+            openEditServerInterfaceDialog();
             return true;
         case SettingsView::ModbusRtu:
             openEditModbusRtuDialog();

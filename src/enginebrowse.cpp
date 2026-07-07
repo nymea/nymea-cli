@@ -811,10 +811,10 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("Type in search fields to filter thing classes.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Settings")},
-        {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Logging categories, Modbus RTU, Shutdown, Restart, or Reboot.")},
+        {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Logging categories, Server interfaces, Modbus RTU, Shutdown, Restart, or Reboot.")},
         {HelpRowKind::Text, QStringLiteral("Right: open the settings details panel.")},
-        {HelpRowKind::Text, QStringLiteral("Enter applies time zones, starts updates, edits Modbus RTU masters, or opens power confirmation.")},
-        {HelpRowKind::Text, QStringLiteral("Logging levels use Left/Right or Space. Modbus RTU uses a/e/d/r for add/edit/delete/refresh.")},
+        {HelpRowKind::Text, QStringLiteral("Enter applies time zones, starts updates, edits server interfaces or Modbus RTU masters, or opens power confirmation.")},
+        {HelpRowKind::Text, QStringLiteral("Logging levels use Left/Right or Space. Server interfaces and Modbus RTU use a/e/d/r for add/edit/delete/refresh.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("API browser")},
         {HelpRowKind::Text, QStringLiteral("Type to filter methods, notifications, types, and enums.")},
@@ -936,7 +936,7 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
                                         % static_cast<int>(m_thingManager.things().size());
     };
     auto moveSettingsMenu = [this, delta]() {
-        const int count = 8;
+        const int count = 9;
         int next = static_cast<int>(m_settingsView) + delta;
         if (next < 0) {
             next = count - 1;
@@ -954,6 +954,8 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
             ensureSystemPackagesLoaded();
         } else if (m_settingsView == SettingsView::LoggingCategories) {
             ensureLoggingCategoriesLoaded();
+        } else if (m_settingsView == SettingsView::ServerInterfaces) {
+            ensureServerInterfacesLoaded();
         } else if (m_settingsView == SettingsView::ModbusRtu) {
             ensureModbusRtuLoaded();
         }
