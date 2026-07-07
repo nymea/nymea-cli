@@ -1385,39 +1385,29 @@ std::string powerActionLabel(int action)
     return "Power action";
 }
 
+template<typename Container, typename Item, typename KeyFn>
+void upsertByKey(Container& container, const Item& item, KeyFn keyFn)
+{
+    auto existing = std::find_if(container.begin(), container.end(), [&](const auto& existingItem) { return keyFn(existingItem) == keyFn(item); });
+    if (existing == container.end()) {
+        container.push_back(item);
+    } else {
+        *existing = item;
+    }
+}
+
+template<typename Container, typename Key, typename KeyFn>
+void eraseByKey(Container& container, const Key& key, KeyFn keyFn)
+{
+    container.erase(std::remove_if(container.begin(), container.end(), [&](const auto& item) { return keyFn(item) == key; }), container.end());
+}
+
 constexpr int timezoneSearchLineIndex = 4;
 constexpr int timezoneListStartLineIndex = 7;
 constexpr int loggingCategorySearchLineIndex = 2;
 constexpr int loggingCategoryListStartLineIndex = 5;
 constexpr int modbusRtuMasterListStartLineIndex = 4;
 constexpr int updateProgressBarWidth = 20;
-
-int nextTimezoneDetailsLineIndex(int currentIndex, int direction, int filteredCount)
-{
-    if (filteredCount <= 0) {
-        return timezoneSearchLineIndex;
-    }
-
-    const int firstResultLineIndex = timezoneListStartLineIndex;
-    const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
-
-    if (currentIndex == timezoneSearchLineIndex) {
-        return direction > 0 ? firstResultLineIndex : lastResultLineIndex;
-    }
-
-    if (currentIndex < firstResultLineIndex) {
-        return direction > 0 ? firstResultLineIndex : timezoneSearchLineIndex;
-    }
-
-    if (currentIndex <= lastResultLineIndex) {
-        if (direction > 0) {
-            return currentIndex == lastResultLineIndex ? timezoneSearchLineIndex : currentIndex + 1;
-        }
-        return currentIndex == firstResultLineIndex ? timezoneSearchLineIndex : currentIndex - 1;
-    }
-
-    return direction > 0 ? timezoneSearchLineIndex : lastResultLineIndex;
-}
 
 int nextFilterListDetailsLineIndex(int currentIndex, int direction, int searchLineIndex, int listStartLineIndex, int filteredCount)
 {
@@ -3293,14 +3283,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ConfigurationTcpServerConfigurationChangedNotification::notificationName()) {
         const api::ConfigurationTcpServerConfigurationChangedNotificationParams notification = api::ConfigurationTcpServerConfigurationChangedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_tcpServerConfigurations.begin(), m_tcpServerConfigurations.end(), [&](const api::ServerConfiguration& configuration) {
-            return configuration.id == notification.tcpServerConfiguration.id;
-        });
-        if (existing == m_tcpServerConfigurations.end()) {
-            m_tcpServerConfigurations.push_back(notification.tcpServerConfiguration);
-        } else {
-            *existing = notification.tcpServerConfiguration;
-        }
+        upsertByKey(m_tcpServerConfigurations, notification.tcpServerConfiguration, [](const api::ServerConfiguration& configuration) { return configuration.id; });
         m_serverInterfacesLoaded = true;
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: TCP server configuration changed.";
@@ -3309,10 +3292,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ConfigurationTcpServerConfigurationRemovedNotification::notificationName()) {
         const api::ConfigurationTcpServerConfigurationRemovedNotificationParams notification = api::ConfigurationTcpServerConfigurationRemovedNotificationParams::fromJson(params);
-        m_tcpServerConfigurations.erase(std::remove_if(m_tcpServerConfigurations.begin(),
-                                                       m_tcpServerConfigurations.end(),
-                                                       [&](const api::ServerConfiguration& configuration) { return configuration.id == notification.id; }),
-                                        m_tcpServerConfigurations.end());
+        eraseByKey(m_tcpServerConfigurations, notification.id, [](const api::ServerConfiguration& configuration) { return configuration.id; });
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: TCP server configuration removed.";
         return;
@@ -3321,14 +3301,7 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::ConfigurationWebSocketServerConfigurationChangedNotification::notificationName()) {
         const api::ConfigurationWebSocketServerConfigurationChangedNotificationParams notification
             = api::ConfigurationWebSocketServerConfigurationChangedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_webSocketServerConfigurations.begin(), m_webSocketServerConfigurations.end(), [&](const api::ServerConfiguration& configuration) {
-            return configuration.id == notification.webSocketServerConfiguration.id;
-        });
-        if (existing == m_webSocketServerConfigurations.end()) {
-            m_webSocketServerConfigurations.push_back(notification.webSocketServerConfiguration);
-        } else {
-            *existing = notification.webSocketServerConfiguration;
-        }
+        upsertByKey(m_webSocketServerConfigurations, notification.webSocketServerConfiguration, [](const api::ServerConfiguration& configuration) { return configuration.id; });
         m_serverInterfacesLoaded = true;
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: WebSocket server configuration changed.";
@@ -3338,10 +3311,7 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::ConfigurationWebSocketServerConfigurationRemovedNotification::notificationName()) {
         const api::ConfigurationWebSocketServerConfigurationRemovedNotificationParams notification
             = api::ConfigurationWebSocketServerConfigurationRemovedNotificationParams::fromJson(params);
-        m_webSocketServerConfigurations.erase(std::remove_if(m_webSocketServerConfigurations.begin(),
-                                                             m_webSocketServerConfigurations.end(),
-                                                             [&](const api::ServerConfiguration& configuration) { return configuration.id == notification.id; }),
-                                              m_webSocketServerConfigurations.end());
+        eraseByKey(m_webSocketServerConfigurations, notification.id, [](const api::ServerConfiguration& configuration) { return configuration.id; });
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: WebSocket server configuration removed.";
         return;
@@ -3349,14 +3319,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ConfigurationWebServerConfigurationChangedNotification::notificationName()) {
         const api::ConfigurationWebServerConfigurationChangedNotificationParams notification = api::ConfigurationWebServerConfigurationChangedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_webServerConfigurations.begin(), m_webServerConfigurations.end(), [&](const api::WebServerConfiguration& configuration) {
-            return configuration.id == notification.webServerConfiguration.id;
-        });
-        if (existing == m_webServerConfigurations.end()) {
-            m_webServerConfigurations.push_back(notification.webServerConfiguration);
-        } else {
-            *existing = notification.webServerConfiguration;
-        }
+        upsertByKey(m_webServerConfigurations, notification.webServerConfiguration, [](const api::WebServerConfiguration& configuration) { return configuration.id; });
         m_serverInterfacesLoaded = true;
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: WebServer configuration changed.";
@@ -3365,10 +3328,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ConfigurationWebServerConfigurationRemovedNotification::notificationName()) {
         const api::ConfigurationWebServerConfigurationRemovedNotificationParams notification = api::ConfigurationWebServerConfigurationRemovedNotificationParams::fromJson(params);
-        m_webServerConfigurations.erase(std::remove_if(m_webServerConfigurations.begin(),
-                                                       m_webServerConfigurations.end(),
-                                                       [&](const api::WebServerConfiguration& configuration) { return configuration.id == notification.id; }),
-                                        m_webServerConfigurations.end());
+        eraseByKey(m_webServerConfigurations, notification.id, [](const api::WebServerConfiguration& configuration) { return configuration.id; });
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: WebServer configuration removed.";
         return;
@@ -3377,14 +3337,9 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::ConfigurationTunnelProxyServerConfigurationChangedNotification::notificationName()) {
         const api::ConfigurationTunnelProxyServerConfigurationChangedNotificationParams notification
             = api::ConfigurationTunnelProxyServerConfigurationChangedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_tunnelProxyServerConfigurations.begin(),
-                                     m_tunnelProxyServerConfigurations.end(),
-                                     [&](const api::TunnelProxyServerConfiguration& configuration) { return configuration.id == notification.tunnelProxyServerConfiguration.id; });
-        if (existing == m_tunnelProxyServerConfigurations.end()) {
-            m_tunnelProxyServerConfigurations.push_back(notification.tunnelProxyServerConfiguration);
-        } else {
-            *existing = notification.tunnelProxyServerConfiguration;
-        }
+        upsertByKey(m_tunnelProxyServerConfigurations, notification.tunnelProxyServerConfiguration, [](const api::TunnelProxyServerConfiguration& configuration) {
+            return configuration.id;
+        });
         m_serverInterfacesLoaded = true;
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: Tunnel Proxy server configuration changed.";
@@ -3394,10 +3349,7 @@ void Engine::handleNotification(const QJsonObject& message)
     if (notificationName == api::ConfigurationTunnelProxyServerConfigurationRemovedNotification::notificationName()) {
         const api::ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams notification
             = api::ConfigurationTunnelProxyServerConfigurationRemovedNotificationParams::fromJson(params);
-        m_tunnelProxyServerConfigurations.erase(std::remove_if(m_tunnelProxyServerConfigurations.begin(),
-                                                               m_tunnelProxyServerConfigurations.end(),
-                                                               [&](const api::TunnelProxyServerConfiguration& configuration) { return configuration.id == notification.id; }),
-                                                m_tunnelProxyServerConfigurations.end());
+        eraseByKey(m_tunnelProxyServerConfigurations, notification.id, [](const api::TunnelProxyServerConfiguration& configuration) { return configuration.id; });
         clampServerInterfaceSelection();
         m_serverInterfaceStatus = "Live update: Tunnel Proxy server configuration removed.";
         return;
@@ -3405,14 +3357,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ModbusRtuModbusRtuMasterAddedNotification::notificationName()) {
         const api::ModbusRtuModbusRtuMasterAddedNotificationParams notification = api::ModbusRtuModbusRtuMasterAddedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
-            return master.modbusUuid == notification.modbusRtuMaster.modbusUuid;
-        });
-        if (existing == m_modbusRtuMasters.end()) {
-            m_modbusRtuMasters.push_back(notification.modbusRtuMaster);
-        } else {
-            *existing = notification.modbusRtuMaster;
-        }
+        upsertByKey(m_modbusRtuMasters, notification.modbusRtuMaster, [](const api::ModbusRtuMaster& master) { return master.modbusUuid; });
         m_modbusRtuMastersLoaded = true;
         clampModbusRtuSelection();
         m_modbusRtuStatus = "Live update: Modbus RTU master added.";
@@ -3421,14 +3366,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ModbusRtuModbusRtuMasterChangedNotification::notificationName()) {
         const api::ModbusRtuModbusRtuMasterChangedNotificationParams notification = api::ModbusRtuModbusRtuMasterChangedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_modbusRtuMasters.begin(), m_modbusRtuMasters.end(), [&](const api::ModbusRtuMaster& master) {
-            return master.modbusUuid == notification.modbusRtuMaster.modbusUuid;
-        });
-        if (existing == m_modbusRtuMasters.end()) {
-            m_modbusRtuMasters.push_back(notification.modbusRtuMaster);
-        } else {
-            *existing = notification.modbusRtuMaster;
-        }
+        upsertByKey(m_modbusRtuMasters, notification.modbusRtuMaster, [](const api::ModbusRtuMaster& master) { return master.modbusUuid; });
         m_modbusRtuMastersLoaded = true;
         clampModbusRtuSelection();
         m_modbusRtuStatus = "Live update: Modbus RTU master changed.";
@@ -3437,10 +3375,7 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ModbusRtuModbusRtuMasterRemovedNotification::notificationName()) {
         const api::ModbusRtuModbusRtuMasterRemovedNotificationParams notification = api::ModbusRtuModbusRtuMasterRemovedNotificationParams::fromJson(params);
-        m_modbusRtuMasters.erase(std::remove_if(m_modbusRtuMasters.begin(),
-                                                m_modbusRtuMasters.end(),
-                                                [&](const api::ModbusRtuMaster& master) { return master.modbusUuid == notification.modbusUuid; }),
-                                 m_modbusRtuMasters.end());
+        eraseByKey(m_modbusRtuMasters, notification.modbusUuid, [](const api::ModbusRtuMaster& master) { return master.modbusUuid; });
         clampModbusRtuSelection();
         m_modbusRtuStatus = "Live update: Modbus RTU master removed.";
         return;
@@ -3448,24 +3383,14 @@ void Engine::handleNotification(const QJsonObject& message)
 
     if (notificationName == api::ModbusRtuSerialPortAddedNotification::notificationName()) {
         const api::ModbusRtuSerialPortAddedNotificationParams notification = api::ModbusRtuSerialPortAddedNotificationParams::fromJson(params);
-        auto existing = std::find_if(m_modbusRtuSerialPorts.begin(), m_modbusRtuSerialPorts.end(), [&](const api::SerialPort& serialPort) {
-            return serialPort.systemLocation == notification.serialPort.systemLocation;
-        });
-        if (existing == m_modbusRtuSerialPorts.end()) {
-            m_modbusRtuSerialPorts.push_back(notification.serialPort);
-        } else {
-            *existing = notification.serialPort;
-        }
+        upsertByKey(m_modbusRtuSerialPorts, notification.serialPort, [](const api::SerialPort& serialPort) { return serialPort.systemLocation; });
         m_modbusRtuSerialPortsLoaded = true;
         return;
     }
 
     if (notificationName == api::ModbusRtuSerialPortRemovedNotification::notificationName()) {
         const api::ModbusRtuSerialPortRemovedNotificationParams notification = api::ModbusRtuSerialPortRemovedNotificationParams::fromJson(params);
-        m_modbusRtuSerialPorts.erase(std::remove_if(m_modbusRtuSerialPorts.begin(),
-                                                    m_modbusRtuSerialPorts.end(),
-                                                    [&](const api::SerialPort& serialPort) { return serialPort.systemLocation == notification.serialPort.systemLocation; }),
-                                     m_modbusRtuSerialPorts.end());
+        eraseByKey(m_modbusRtuSerialPorts, notification.serialPort.systemLocation, [](const api::SerialPort& serialPort) { return serialPort.systemLocation; });
         return;
     }
 
@@ -4581,7 +4506,7 @@ void Engine::openEditServerInterfaceDialog()
     m_serverInterfaceDialogPublicFolder.clear();
     m_serverInterfaceDialogIgnoreSslErrors = false;
 
-    auto copyCommon = [this](const api::ServerConfiguration& configuration) {
+    auto copyCommon = [this](const auto& configuration) {
         m_serverInterfaceDialogId = configuration.id.toStdString();
         m_serverInterfaceDialogAddress = configuration.address.toStdString();
         m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
@@ -4598,21 +4523,13 @@ void Engine::openEditServerInterfaceDialog()
         break;
     case ServerInterfaceType::WebServer: {
         const api::WebServerConfiguration& configuration = m_webServerConfigurations.at(selection->index);
-        m_serverInterfaceDialogId = configuration.id.toStdString();
-        m_serverInterfaceDialogAddress = configuration.address.toStdString();
-        m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
-        m_serverInterfaceDialogSslEnabled = configuration.sslEnabled;
-        m_serverInterfaceDialogAuthenticationEnabled = configuration.authenticationEnabled;
+        copyCommon(configuration);
         m_serverInterfaceDialogPublicFolder = configuration.publicFolder.toStdString();
         break;
     }
     case ServerInterfaceType::TunnelProxy: {
         const api::TunnelProxyServerConfiguration& configuration = m_tunnelProxyServerConfigurations.at(selection->index);
-        m_serverInterfaceDialogId = configuration.id.toStdString();
-        m_serverInterfaceDialogAddress = configuration.address.toStdString();
-        m_serverInterfaceDialogPort = QString::number(configuration.port).toStdString();
-        m_serverInterfaceDialogSslEnabled = configuration.sslEnabled;
-        m_serverInterfaceDialogAuthenticationEnabled = configuration.authenticationEnabled;
+        copyCommon(configuration);
         m_serverInterfaceDialogIgnoreSslErrors = configuration.ignoreSslErrors;
         break;
     }
@@ -6646,6 +6563,25 @@ ftxui::Element Engine::renderThings() const
            | ftxui::flex;
 }
 
+ftxui::Element Engine::renderDialogFieldRow(bool selected, const std::string& label, const std::string& value, int minimumWidth) const
+{
+    ftxui::Element marker = ftxui::text(selected ? "> " : "  ");
+    ftxui::Element valueElement = ftxui::text(value) | ftxui::flex;
+    if (selected) {
+        marker = marker | ftxui::bold | ftxui::color(ftxui::Color::CyanLight);
+        valueElement = valueElement | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
+    }
+    ftxui::Element row = ftxui::hbox({
+        std::move(marker),
+        ftxui::text(label + ": "),
+        std::move(valueElement),
+    });
+    if (selected) {
+        row = renderActiveField(std::move(row), true, minimumWidth);
+    }
+    return row;
+}
+
 ftxui::Element Engine::renderUi()
 {
     drainUiTasks();
@@ -6839,21 +6775,7 @@ ftxui::Element Engine::renderUi()
         } else {
             auto pushField = [&](int index, const std::string& label, const std::string& value) {
                 const bool selected = m_focusArea == FocusArea::ServerInterfaceDialog && m_serverInterfaceDialogFieldIndex == index;
-                ftxui::Element marker = ftxui::text(selected ? "> " : "  ");
-                ftxui::Element valueElement = ftxui::text(value) | ftxui::flex;
-                if (selected) {
-                    marker = marker | ftxui::bold | ftxui::color(ftxui::Color::CyanLight);
-                    valueElement = valueElement | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
-                }
-                ftxui::Element row = ftxui::hbox({
-                    std::move(marker),
-                    ftxui::text(label + ": "),
-                    std::move(valueElement),
-                });
-                if (selected) {
-                    row = renderActiveField(std::move(row), true, 56);
-                }
-                dialogBody.push_back(row);
+                dialogBody.push_back(renderDialogFieldRow(selected, label, value, 56));
             };
             auto boolText = [](bool value) { return std::string("< ") + (value ? "on" : "off") + " >"; };
 
@@ -6907,21 +6829,7 @@ ftxui::Element Engine::renderUi()
         } else {
             auto pushField = [&](int index, const std::string& label, const std::string& value) {
                 const bool selected = m_focusArea == FocusArea::ModbusRtuDialog && m_modbusRtuDialogFieldIndex == index;
-                ftxui::Element marker = ftxui::text(selected ? "> " : "  ");
-                ftxui::Element valueElement = ftxui::text(value) | ftxui::flex;
-                if (selected) {
-                    marker = marker | ftxui::bold | ftxui::color(ftxui::Color::CyanLight);
-                    valueElement = valueElement | ftxui::bold | ftxui::inverted | ftxui::color(ftxui::Color::CyanLight);
-                }
-                ftxui::Element row = ftxui::hbox({
-                    std::move(marker),
-                    ftxui::text(label + ": "),
-                    std::move(valueElement),
-                });
-                if (selected) {
-                    row = renderActiveField(std::move(row), true, 52);
-                }
-                dialogBody.push_back(row);
+                dialogBody.push_back(renderDialogFieldRow(selected, label, value, 52));
             };
 
             const auto& dataBits = dataBitsOptions();
@@ -7156,6 +7064,21 @@ ftxui::Element Engine::renderUi()
     }
 
     return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
+}
+
+bool Engine::editDialogTextField(std::string& value, const ftxui::Event& event, bool digitsOnly)
+{
+    if (event == ftxui::Event::Backspace && !value.empty()) {
+        value.pop_back();
+        return true;
+    }
+    if (event.is_character()) {
+        if (!digitsOnly || std::all_of(event.character().begin(), event.character().end(), [](const char ch) { return ch >= '0' && ch <= '9'; })) {
+            value += event.character();
+            return true;
+        }
+    }
+    return false;
 }
 
 bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen)
@@ -7513,19 +7436,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             }
             return std::string("0");
         };
-        auto editText = [&](std::string& value, bool digitsOnly) {
-            if (event == ftxui::Event::Backspace && !value.empty()) {
-                value.pop_back();
-                return true;
-            }
-            if (event.is_character()) {
-                if (!digitsOnly || std::all_of(event.character().begin(), event.character().end(), [](const char ch) { return ch >= '0' && ch <= '9'; })) {
-                    value += event.character();
-                    return true;
-                }
-            }
-            return false;
-        };
         auto cycleType = [&](int delta) {
             const int nextIndex = cycledIndex(static_cast<int>(m_serverInterfaceDialogType), 4, delta);
             m_serverInterfaceDialogType = static_cast<ServerInterfaceType>(nextIndex);
@@ -7567,13 +7477,13 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
 
         if (m_serverInterfaceDialogFieldIndex == offset) {
-            return editText(m_serverInterfaceDialogAddress, false);
+            return editDialogTextField(m_serverInterfaceDialogAddress, event, false);
         }
         if (m_serverInterfaceDialogFieldIndex == offset + 1) {
-            return editText(m_serverInterfaceDialogPort, true);
+            return editDialogTextField(m_serverInterfaceDialogPort, event, true);
         }
         if (m_serverInterfaceDialogType == ServerInterfaceType::WebServer && m_serverInterfaceDialogFieldIndex == offset + 4) {
-            return editText(m_serverInterfaceDialogPublicFolder, false);
+            return editDialogTextField(m_serverInterfaceDialogPublicFolder, event, false);
         }
         return true;
     }
@@ -7637,38 +7547,16 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             }
         }
 
-        auto editText = [&](std::string& value, bool numericOnly) {
-            if (event == ftxui::Event::Backspace && !value.empty()) {
-                value.pop_back();
-                return true;
-            }
-            if (event.is_character()) {
-                const std::string character = event.character();
-                if (numericOnly && (character.size() != 1 || character.front() < '0' || character.front() > '9')) {
-                    return true;
-                }
-                value += character;
-                return true;
-            }
-            return false;
-        };
-
         if (m_modbusRtuDialogFieldIndex == 0) {
-            if (editText(m_modbusRtuDialogSerialPort, false)) {
-                return true;
-            }
+            editDialogTextField(m_modbusRtuDialogSerialPort, event, false);
             return true;
         }
         if (m_modbusRtuDialogFieldIndex == 5) {
-            if (editText(m_modbusRtuDialogTimeout, true)) {
-                return true;
-            }
+            editDialogTextField(m_modbusRtuDialogTimeout, event, true);
             return true;
         }
         if (m_modbusRtuDialogFieldIndex == 6) {
-            if (editText(m_modbusRtuDialogRetries, true)) {
-                return true;
-            }
+            editDialogTextField(m_modbusRtuDialogRetries, event, true);
             return true;
         }
         return true;
@@ -8085,7 +7973,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::Timezone
         && (event == ftxui::Event::ArrowUp || event == ftxui::Event::ArrowDown)) {
         const int filteredCount = m_systemTimeZonesLoaded ? static_cast<int>(filteredSystemTimeZones().size()) : 0;
-        m_settingsDetailsLineIndex = nextTimezoneDetailsLineIndex(m_settingsDetailsLineIndex, event == ftxui::Event::ArrowDown ? 1 : -1, filteredCount);
+        m_settingsDetailsLineIndex = nextFilterListDetailsLineIndex(m_settingsDetailsLineIndex,
+                                                                    event == ftxui::Event::ArrowDown ? 1 : -1,
+                                                                    timezoneSearchLineIndex,
+                                                                    timezoneListStartLineIndex,
+                                                                    filteredCount);
         return true;
     }
 

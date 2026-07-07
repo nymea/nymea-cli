@@ -319,6 +319,7 @@ private:
     void openPowerActionConfirmDialog(PowerAction action);
     void closePowerActionConfirmDialog();
     void executePowerAction();
+    bool editDialogTextField(std::string& value, const ftxui::Event& event, bool digitsOnly);
 
     ftxui::Element renderMainMenu() const;
     ftxui::Element renderThingList() const;
@@ -333,6 +334,7 @@ private:
     ftxui::Element renderApiBrowser() const;
     ftxui::Element renderHelp() const;
     ftxui::Element renderThings() const;
+    ftxui::Element renderDialogFieldRow(bool selected, const std::string& label, const std::string& value, int minimumWidth) const;
     ftxui::Element renderUi();
     bool handleMouseWheel(const ftxui::Event& event);
     bool handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& screen);
