@@ -804,6 +804,15 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Heading, QStringLiteral("Things view")},
         {HelpRowKind::Text, QStringLiteral("Left / Right: switch between search, list, and details.")},
         {HelpRowKind::Text, QStringLiteral("Enter on an action: open the action execution dialog.")},
+        {HelpRowKind::Text, QStringLiteral("l on a temperature, humidity, or boolean state: open the state history chart.")},
+        {HelpRowKind::Text, QStringLiteral("l on an action: open the action log list.")},
+        {HelpRowKind::Separator, {}},
+        {HelpRowKind::Heading, QStringLiteral("Log view (state chart / action log)")},
+        {HelpRowKind::Text, QStringLiteral("h / d / w / m / y: switch to hour, day, week, month, or year range.")},
+        {HelpRowKind::Text, QStringLiteral("Left / Right: move the time window by a quarter of the visible range.")},
+        {HelpRowKind::Text, QStringLiteral("Up / Down: scroll the action log list.")},
+        {HelpRowKind::Text, QStringLiteral("x: enable or disable logging for the shown state or action.")},
+        {HelpRowKind::Text, QStringLiteral("Esc or q: close the log view and return to the thing details.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Configure things")},
         {HelpRowKind::Text, QStringLiteral("Up / Down: move between menu entries or list rows.")},
@@ -854,6 +863,10 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
 {
     if (!event.is_mouse()) {
         return false;
+    }
+
+    if (m_logView.visible) {
+        return true;
     }
 
     ftxui::Event mouseEvent = event;

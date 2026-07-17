@@ -19,6 +19,7 @@
 #include "nymeajsonrpcclient.h"
 #include "thingmanager.h"
 
+#include <QDateTime>
 #include <QJsonObject>
 #include <QString>
 #include <QStringList>
@@ -48,6 +49,14 @@ struct EngineOptions
     std::string username;
     std::string password;
     std::string appVersion;
+};
+
+enum class LogViewRange {
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year,
 };
 
 class Engine
@@ -119,6 +128,7 @@ private:
         ThingList,
         ThingDetails,
         ActionDialog,
+        LogView,
         ConfigureMenu,
         ConfigureThingClassSearch,
         ConfigureThingClassList,
@@ -166,6 +176,30 @@ private:
         Default,
         Alphabetical,
         Grouped,
+    };
+
+    struct LogViewModel
+    {
+        bool visible = false;
+        bool isAction = false;
+        QUuid thingId;
+        QUuid typeId;
+        QString typeName;
+        std::string thingLabel;
+        std::string typeLabel;
+        std::string unitLabel;
+        bool isBool = false;
+        LogViewRange range = LogViewRange::Day;
+        QDateTime windowEnd;
+        std::vector<std::pair<qint64, double>> samples;
+        std::vector<std::pair<qint64, std::string>> listEntries;
+        int listSelectionIndex = 0;
+        bool fetchPending = false;
+        quint64 fetchGeneration = 0;
+        std::chrono::steady_clock::time_point fetchStartedAt{};
+        bool setLoggingPending = false;
+        std::chrono::steady_clock::time_point setLoggingStartedAt{};
+        std::string status;
     };
 
     enum class ThingCategory {
@@ -225,6 +259,16 @@ private:
     bool submitModbusRtuDialog();
     bool openSelectedActionDialog();
     void closeActionDialog();
+    const api::StateType* selectedChartableStateType() const;
+    bool openSelectedLogView();
+    void closeLogView();
+    void setLogViewRange(LogViewRange range);
+    void stepLogViewWindow(int direction);
+    void fetchLogViewData();
+    void handleLogViewReply(quint64 generation, const QJsonObject& message, const QString& transportError);
+    bool logViewLoggingEnabled() const;
+    void toggleLogViewLogging();
+    void handleSetLoggingReply(const QUuid& thingId, const QUuid& typeId, bool enabled, const QJsonObject& message, const QString& transportError);
     std::vector<const api::Thing*> filteredThings() const;
     const api::Thing* selectedThing() const;
     QUuid selectedThingId() const;
@@ -324,6 +368,7 @@ private:
     ftxui::Element renderMainMenu() const;
     ftxui::Element renderThingList() const;
     ftxui::Element renderThingDetails() const;
+    ftxui::Element renderLogView() const;
     ftxui::Element renderConfigureMenu() const;
     ftxui::Element renderConfigureDetails() const;
     ftxui::Element renderSettingsMenu() const;
@@ -391,6 +436,7 @@ private:
     QUuid m_preferredThingSelectionId;
     int m_selectedThingDetailIndex = 0;
     bool m_showThingDetailInspector = false;
+    LogViewModel m_logView;
     bool m_showActionDialog = false;
     std::string m_actionDialogStatus;
     std::string m_actionDialogActionName;
