@@ -10,12 +10,14 @@
 
 namespace nymea::api {
 
-class ConfigurationLanguageChangedNotificationParams {
+class ConfigurationUploadAndRestoreBackupParams {
 public:
-    // wire: 'language' (field)
-    QString language{};
+    // wire: 'fileName' (field)
+    QString fileName{};
+    // wire: 'size' (field)
+    qint64 size{};
 
-    static ConfigurationLanguageChangedNotificationParams fromJson(const QJsonObject &object);
+    static ConfigurationUploadAndRestoreBackupParams fromJson(const QJsonObject &object);
     QJsonObject toJson() const;
 };
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "connectionsettings.h"
+#include "generated/logentry.h"
 #include "generated/loggingcategory.h"
 #include "generated/modbusrtumaster.h"
 #include "generated/package.h"
@@ -132,6 +133,7 @@ private:
         ConfigureMenu,
         ConfigureThingClassSearch,
         ConfigureThingClassList,
+        ConfigureThingSelectionSearch,
         ConfigureThingSelection,
         ConfigureDialog,
         ApiBrowserSearch,
@@ -182,6 +184,8 @@ private:
     {
         bool visible = false;
         bool isAction = false;
+        bool chartable = false;
+        bool followLatest = false;
         QUuid thingId;
         QUuid typeId;
         QString typeName;
@@ -266,6 +270,7 @@ private:
     void stepLogViewWindow(int direction);
     void fetchLogViewData();
     void handleLogViewReply(quint64 generation, const QJsonObject& message, const QString& transportError);
+    void appendLiveLogEntry(const api::LogEntry& entry);
     bool logViewLoggingEnabled() const;
     void toggleLogViewLogging();
     void handleSetLoggingReply(const QUuid& thingId, const QUuid& typeId, bool enabled, const QJsonObject& message, const QString& transportError);
@@ -279,6 +284,7 @@ private:
     void cycleThingCategoryFilter();
     std::vector<api::ThingClass> filteredConfigThingClasses() const;
     const api::ThingClass* selectedConfigThingClass() const;
+    std::vector<const api::Thing*> filteredConfigureThings() const;
     const api::Thing* selectedConfigureThing() const;
     void closeConfigureDialog();
     void openHelpView();
@@ -469,6 +475,7 @@ private:
     int m_helpLineIndex = 0;
     PowerAction m_systemAction = PowerAction::Shutdown;
     std::string m_configureThingSearch;
+    std::string m_configureThingSelectionSearch;
     int m_selectedConfigureThingClassIndex = 0;
     int m_selectedConfigureThingIndex = 0;
     bool m_fetchAllThingClassesPending = false;

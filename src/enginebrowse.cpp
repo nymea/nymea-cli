@@ -58,9 +58,10 @@ void Engine::clampConfigureThingClassSelection()
 
 void Engine::clampConfigureThingSelection()
 {
-    if (m_thingManager.things().empty()) {
+    const int count = static_cast<int>(filteredConfigureThings().size());
+    if (count == 0) {
         m_selectedConfigureThingIndex = 0;
-        if (m_focusArea == FocusArea::ConfigureThingSelection) {
+        if (m_thingManager.things().empty() && m_focusArea == FocusArea::ConfigureThingSelection) {
             m_focusArea = FocusArea::ConfigureMenu;
         }
         return;
@@ -68,8 +69,8 @@ void Engine::clampConfigureThingSelection()
 
     if (m_selectedConfigureThingIndex < 0) {
         m_selectedConfigureThingIndex = 0;
-    } else if (m_selectedConfigureThingIndex >= static_cast<int>(m_thingManager.things().size())) {
-        m_selectedConfigureThingIndex = static_cast<int>(m_thingManager.things().size()) - 1;
+    } else if (m_selectedConfigureThingIndex >= count) {
+        m_selectedConfigureThingIndex = count - 1;
     }
 }
 
@@ -386,9 +387,34 @@ const api::ThingClass* Engine::selectedConfigThingClass() const
     return m_thingManager.thingClassById(thingClasses.at(m_selectedConfigureThingClassIndex).id);
 }
 
+std::vector<const api::Thing*> Engine::filteredConfigureThings() const
+{
+    const QString search = QString::fromStdString(m_configureThingSelectionSearch).trimmed();
+    std::vector<const api::Thing*> things;
+    things.reserve(m_thingManager.things().size());
+    for (const api::Thing& thing : m_thingManager.things()) {
+        if (!search.isEmpty()) {
+            const api::ThingClass* thingClass = m_thingManager.thingClassForThing(thing);
+            const bool matchesThing = thing.name.has_value() && caseInsensitiveContains(*thing.name, search);
+            const bool matchesClass = thingClass != nullptr
+                                      && (caseInsensitiveContains(thingClass->displayName, search) || caseInsensitiveContains(thingClass->name, search)
+                                          || caseInsensitiveContains(thingClass->interfaces.join(QStringLiteral(" ")), search));
+            if (!matchesThing && !matchesClass) {
+                continue;
+            }
+        }
+        things.push_back(&thing);
+    }
+    return things;
+}
+
 const api::Thing* Engine::selectedConfigureThing() const
 {
-    return m_thingManager.thingAt(m_selectedConfigureThingIndex);
+    const std::vector<const api::Thing*> things = filteredConfigureThings();
+    if (m_selectedConfigureThingIndex < 0 || m_selectedConfigureThingIndex >= static_cast<int>(things.size())) {
+        return nullptr;
+    }
+    return things.at(m_selectedConfigureThingIndex);
 }
 
 void Engine::ensureApiBrowserLoaded()
@@ -942,11 +968,11 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
             m_selectedConfigureThingClassIndex = (m_selectedConfigureThingClassIndex + static_cast<int>(thingClasses.size()) + delta) % static_cast<int>(thingClasses.size());
             return;
         }
-        if (m_thingManager.things().empty()) {
+        const std::vector<const api::Thing*> things = filteredConfigureThings();
+        if (things.empty()) {
             return;
         }
-        m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + static_cast<int>(m_thingManager.things().size()) + delta)
-                                        % static_cast<int>(m_thingManager.things().size());
+        m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + static_cast<int>(things.size()) + delta) % static_cast<int>(things.size());
     };
     auto moveSettingsMenu = [this, delta]() {
         const int count = 9;

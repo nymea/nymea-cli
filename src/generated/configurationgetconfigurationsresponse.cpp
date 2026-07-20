@@ -10,8 +10,14 @@ namespace nymea::api {
 
 ConfigurationGetConfigurationsResponse ConfigurationGetConfigurationsResponse::fromJson(const QJsonObject &object) {
     ConfigurationGetConfigurationsResponse value;
+    if (object.contains(QStringLiteral("backupConfigurations"))) {
+        value.backupConfigurations = ConfigurationGetConfigurationsResponseBackupConfigurations::fromJson((object.value(QStringLiteral("backupConfigurations"))).toObject());
+    }
     if (object.contains(QStringLiteral("basicConfiguration"))) {
         value.basicConfiguration = ConfigurationGetConfigurationsResponseBasicConfiguration::fromJson((object.value(QStringLiteral("basicConfiguration"))).toObject());
+    }
+    if (object.contains(QStringLiteral("mqttServerConfigurations"))) {
+        value.mqttServerConfigurations = ([&]() { QList<ServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("mqttServerConfigurations"))).toArray()) { list.append(ServerConfiguration::fromJson((item).toObject())); } return list; }());
     }
     if (object.contains(QStringLiteral("tcpServerConfigurations"))) {
         value.tcpServerConfigurations = ([&]() { QList<ServerConfiguration> list; for (const QJsonValue &item : (object.value(QStringLiteral("tcpServerConfigurations"))).toArray()) { list.append(ServerConfiguration::fromJson((item).toObject())); } return list; }());
@@ -30,7 +36,9 @@ ConfigurationGetConfigurationsResponse ConfigurationGetConfigurationsResponse::f
 
 QJsonObject ConfigurationGetConfigurationsResponse::toJson() const {
     QJsonObject object;
+    object.insert(QStringLiteral("backupConfigurations"), QJsonValue((backupConfigurations).toJson()));
     object.insert(QStringLiteral("basicConfiguration"), QJsonValue((basicConfiguration).toJson()));
+    object.insert(QStringLiteral("mqttServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : mqttServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("tcpServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tcpServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("tunnelProxyServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : tunnelProxyServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));
     object.insert(QStringLiteral("webServerConfigurations"), ([&]() { QJsonArray array; for (const auto &item : webServerConfigurations) { array.append(QJsonValue((item).toJson())); } return QJsonValue(array); }()));

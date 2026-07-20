@@ -7,6 +7,7 @@
 #pragma once
 
 #include "apiutils.h"
+#include "configurationgetconfigurationsresponsebackupconfigurations.h"
 #include "configurationgetconfigurationsresponsebasicconfiguration.h"
 #include "serverconfiguration.h"
 #include "tunnelproxyserverconfiguration.h"
@@ -16,8 +17,12 @@ namespace nymea::api {
 
 class ConfigurationGetConfigurationsResponse {
 public:
+    // wire: 'backupConfigurations' (field)
+    ConfigurationGetConfigurationsResponseBackupConfigurations backupConfigurations{};
     // wire: 'basicConfiguration' (field)
     ConfigurationGetConfigurationsResponseBasicConfiguration basicConfiguration{};
+    // wire: 'mqttServerConfigurations' (field)
+    QList<ServerConfiguration> mqttServerConfigurations{};
     // wire: 'tcpServerConfigurations' (field)
     QList<ServerConfiguration> tcpServerConfigurations{};
     // wire: 'tunnelProxyServerConfigurations' (field)

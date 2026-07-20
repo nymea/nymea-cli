@@ -86,6 +86,7 @@
 #include "generated/logentry.h"
 #include "generated/logginggetlogentriesparams.h"
 #include "generated/logginggetlogentriesresponse.h"
+#include "generated/logginglogentryaddednotificationparams.h"
 #include "generated/package.h"
 #include "generated/param.h"
 #include "generated/state.h"
@@ -249,6 +250,21 @@ std::optional<double> chartLogEntryValue(const QJsonValue& value)
         }
     }
     return std::nullopt;
+}
+
+std::string formatStateLogEntryValue(const QJsonValue& value, const std::string& unitLabel, bool isBool)
+{
+    if (isBool) {
+        const std::optional<double> numeric = chartLogEntryValue(value);
+        if (numeric.has_value()) {
+            return *numeric >= 0.5 ? "true" : "false";
+        }
+    }
+    std::string text = jsonValueToString(value);
+    if (!unitLabel.empty() && !text.empty()) {
+        text += " " + unitLabel;
+    }
+    return text;
 }
 
 #if 0
@@ -2434,7 +2450,13 @@ void Engine::startAddThingFlow(api::CreateMethod createMethod)
         }
         m_configureParamSelectionIndex = 0;
         m_configureRangeEditIndex.reset();
-        m_configureDialogStatus = m_configureParamTypes.empty() ? "Press Enter to start discovery." : "Edit discovery params and press Enter to search.";
+        if (m_configureParamTypes.empty()) {
+            // No discovery params to edit: start the discovery immediately.
+            m_configureDialogStatus = "Discovering things...";
+            submitConfigureDialog();
+            return;
+        }
+        m_configureDialogStatus = "Edit discovery params and press Enter to search.";
         return;
     }
 
@@ -2794,11 +2816,18 @@ bool Engine::openSelectedLogView()
 
     const ThingDetailEntry& selectedEntry = detailEntries.at(m_selectedThingDetailIndex);
     if (selectedEntry.type == ThingDetailEntry::Type::State) {
-        const api::StateType* stateType = selectedChartableStateType();
+        const api::State& state = thing->states.at(selectedEntry.index);
+        const api::StateType* stateType = m_thingManager.stateTypeForThing(*thing, state);
         if (stateType == nullptr) {
             return false;
         }
+        // Only states with logging enabled can be opened (older servers that do not report the set are assumed available).
+        const bool logged = !thing->loggedStateTypeIds.has_value() || thing->loggedStateTypeIds->contains(stateType->id);
+        if (!logged) {
+            return false;
+        }
         m_logView.isAction = false;
+        m_logView.chartable = selectedChartableStateType() != nullptr;
         m_logView.typeId = stateType->id;
         m_logView.typeName = stateType->name;
         m_logView.typeLabel = firstNonEmpty({stateType->displayName.toStdString(), stateType->name.toStdString(), "State"});
@@ -2810,6 +2839,7 @@ bool Engine::openSelectedLogView()
             return false;
         }
         m_logView.isAction = true;
+        m_logView.chartable = false;
         m_logView.typeId = actionType->id;
         m_logView.typeName = actionType->name;
         m_logView.typeLabel = firstNonEmpty({actionType->displayName.toStdString(), actionType->name.toStdString(), "Action"});
@@ -2820,6 +2850,7 @@ bool Engine::openSelectedLogView()
     }
 
     m_showThingDetailInspector = false;
+    m_logView.followLatest = false;
     m_logView.visible = true;
     m_logView.thingId = thing->id;
     m_logView.thingLabel = thingLabel(thing);
@@ -2878,7 +2909,8 @@ void Engine::fetchLogViewData()
     params.sources = QList<QString>{sourcePrefix + m_logView.thingId.toString() + QStringLiteral("-") + m_logView.typeName};
     params.startTime = static_cast<quint64>(windowStart.toMSecsSinceEpoch());
     params.endTime = static_cast<quint64>(m_logView.windowEnd.toMSecsSinceEpoch());
-    if (m_logView.isAction) {
+    if (m_logView.isAction || !m_logView.chartable) {
+        // Actions and non-chartable states: fetch the most recent raw entries for the list.
         params.sampleRate = api::SampleRate::SampleRateAny;
         params.sortOrder = api::SortOrder::DescendingOrder;
         params.limit = 500;
@@ -2933,32 +2965,74 @@ void Engine::handleLogViewReply(quint64 generation, const QJsonObject& message, 
     m_logView.samples.clear();
     m_logView.listEntries.clear();
     m_logView.listSelectionIndex = 0;
-    if (m_logView.isAction) {
-        if (response.logEntries.has_value()) {
-            m_logView.listEntries.reserve(response.logEntries->size());
-            for (const api::LogEntry& entry : *response.logEntries) {
-                m_logView.listEntries.emplace_back(static_cast<qint64>(entry.timestamp), formatActionLogEntryValues(entry.values));
-            }
-        }
-        if (m_logView.listEntries.empty()) {
-            m_logView.status = "No log data in this range.";
-        }
-        return;
-    }
 
     if (response.logEntries.has_value()) {
+        m_logView.listEntries.reserve(response.logEntries->size());
         m_logView.samples.reserve(response.logEntries->size());
         for (const api::LogEntry& entry : *response.logEntries) {
-            const std::optional<double> value = chartLogEntryValue(entry.values.value(m_logView.typeName));
-            if (value.has_value()) {
-                m_logView.samples.emplace_back(static_cast<qint64>(entry.timestamp), *value);
+            const qint64 timestamp = static_cast<qint64>(entry.timestamp);
+            if (m_logView.isAction) {
+                m_logView.listEntries.emplace_back(timestamp, formatActionLogEntryValues(entry.values));
+            } else {
+                const QJsonValue value = entry.values.value(m_logView.typeName);
+                m_logView.listEntries.emplace_back(timestamp, formatStateLogEntryValue(value, m_logView.unitLabel, m_logView.isBool));
+                if (m_logView.chartable) {
+                    const std::optional<double> numeric = chartLogEntryValue(value);
+                    if (numeric.has_value()) {
+                        m_logView.samples.emplace_back(timestamp, *numeric);
+                    }
+                }
             }
         }
     }
+
+    // Present the list oldest-first so the newest entry is at the bottom (follow/jump-to-bottom target).
+    std::stable_sort(m_logView.listEntries.begin(), m_logView.listEntries.end(),
+                     [](const auto& left, const auto& right) { return left.first < right.first; });
     std::sort(m_logView.samples.begin(), m_logView.samples.end());
-    if (m_logView.samples.empty()) {
+
+    const bool hasData = m_logView.chartable ? !m_logView.samples.empty() : !m_logView.listEntries.empty();
+    if (!hasData) {
         m_logView.status = "No log data in this range.";
     }
+    if (!m_logView.listEntries.empty()) {
+        m_logView.listSelectionIndex = static_cast<int>(m_logView.listEntries.size()) - 1;
+    }
+}
+
+void Engine::appendLiveLogEntry(const api::LogEntry& entry)
+{
+    constexpr size_t maxEntries = 2000;
+    const qint64 timestamp = static_cast<qint64>(entry.timestamp);
+    if (m_logView.isAction) {
+        m_logView.listEntries.emplace_back(timestamp, formatActionLogEntryValues(entry.values));
+    } else {
+        const QJsonValue value = entry.values.value(m_logView.typeName);
+        m_logView.listEntries.emplace_back(timestamp, formatStateLogEntryValue(value, m_logView.unitLabel, m_logView.isBool));
+        if (m_logView.chartable) {
+            const std::optional<double> numeric = chartLogEntryValue(value);
+            if (numeric.has_value()) {
+                m_logView.samples.emplace_back(timestamp, *numeric);
+            }
+        }
+    }
+
+    if (m_logView.listEntries.size() > maxEntries) {
+        const size_t drop = m_logView.listEntries.size() - maxEntries;
+        m_logView.listEntries.erase(m_logView.listEntries.begin(), m_logView.listEntries.begin() + drop);
+        m_logView.listSelectionIndex = std::max(0, m_logView.listSelectionIndex - static_cast<int>(drop));
+    }
+    if (m_logView.samples.size() > maxEntries) {
+        m_logView.samples.erase(m_logView.samples.begin(), m_logView.samples.begin() + (m_logView.samples.size() - maxEntries));
+    }
+
+    if (m_logView.followLatest) {
+        m_logView.windowEnd = QDateTime::currentDateTime();
+        m_logView.listSelectionIndex = static_cast<int>(m_logView.listEntries.size()) - 1;
+    } else if (m_logView.listSelectionIndex >= static_cast<int>(m_logView.listEntries.size())) {
+        m_logView.listSelectionIndex = std::max(0, static_cast<int>(m_logView.listEntries.size()) - 1);
+    }
+    m_logView.status.clear();
 }
 
 bool Engine::logViewLoggingEnabled() const
@@ -3675,6 +3749,19 @@ void Engine::handleNotification(const QJsonObject& message)
         return;
     }
 
+    if (notificationName == api::LoggingLogEntryAddedNotification::notificationName()) {
+        if (m_logView.visible) {
+            const api::LoggingLogEntryAddedNotificationParams notification = api::LoggingLogEntryAddedNotificationParams::fromJson(params);
+            const api::LogEntry& entry = notification.logEntry;
+            const QString source = (m_logView.isAction ? QStringLiteral("action-") : QStringLiteral("state-")) + m_logView.thingId.toString() + QStringLiteral("-")
+                                   + m_logView.typeName;
+            if (entry.source == source) {
+                appendLiveLogEntry(entry);
+            }
+        }
+        return;
+    }
+
     if (notificationName == api::DebugLoggingCategoryLevelChangedNotification::notificationName()) {
         const api::DebugLoggingCategoryLevelChangedNotificationParams notification = api::DebugLoggingCategoryLevelChangedNotificationParams::fromJson(params);
         for (api::LoggingCategory& category : m_loggingCategories) {
@@ -3946,7 +4033,6 @@ void Engine::handleClientStateChanged(bool connected, bool encrypted, const QStr
         m_pendingActionInvocation.clear();
     } else {
         m_connectionStatus = std::string(m_client.isEncrypted() ? "SSL connected to " : "TCP connected to ") + endpoint();
-        m_thingManager.setStatus(m_connectionStatus);
         updateCertificateWarning();
     }
 }
@@ -4455,7 +4541,7 @@ void Engine::handleEnableNotificationsReply(const QJsonObject& message, const QS
     if (!m_notificationsEnabled) {
         m_thingManager.setStatus("Server did not confirm Integrations notifications.");
     } else {
-        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations, Debug, Configuration, and Modbus RTU.");
+        m_thingManager.setStatus(m_thingManager.status() + " Live updates enabled for Integrations, Debug, Configuration, Modbus RTU, and Logging.");
     }
 
     if (fetchThingsAfterReply) {
@@ -4489,7 +4575,8 @@ void Engine::enableNotifications(bool fetchThingsAfterReply)
 
     api::JSONRPCSetNotificationStatusParams request;
     request.enabled = true;
-    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug"), QStringLiteral("Configuration"), QStringLiteral("ModbusRtu")};
+    request.namespaces = QStringList{QStringLiteral("Integrations"), QStringLiteral("Debug"), QStringLiteral("Configuration"), QStringLiteral("ModbusRtu"),
+                                     QStringLiteral("Logging")};
 
     observeReply(m_client.sendRequest(api::JSONRPCSetNotificationStatusMethod::methodName(), request.toJson()),
                  [this, fetchThingsAfterReply](const QJsonObject& message, const QString& transportError) {
@@ -6137,7 +6224,6 @@ ftxui::Element Engine::renderMainMenu() const
 ftxui::Element Engine::renderThingList() const
 {
     ftxui::Elements lines;
-    lines.push_back(ftxui::text(m_thingManager.status()));
     auto search = ftxui::text("Search: " + (m_thingSearch.empty() ? std::string("<type to filter>") : m_thingSearch));
     if (m_focusArea == FocusArea::ThingSearch) {
         search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
@@ -6264,7 +6350,12 @@ ftxui::Element Engine::renderThingDetails() const
             const bool isSelected = selectedEntry != nullptr && selectedEntry->type == ThingDetailEntry::Type::State && selectedEntry->index == index;
             const std::optional<api::BasicType> basicType = stateType != nullptr ? std::optional<api::BasicType>(stateType->type) : std::nullopt;
             const std::optional<api::Unit> unit = stateType != nullptr ? stateType->unit : std::nullopt;
-            browserRows.push_back(renderTwoColumnRow(label, renderValueCell(state.value, basicType, unit), isSelected, m_focusArea == FocusArea::ThingDetails));
+            const bool logged = stateType != nullptr && thing->loggedStateTypeIds.has_value() && thing->loggedStateTypeIds->contains(stateType->id);
+            ftxui::Element indicator = logged ? (ftxui::text(" L ") | ftxui::color(ftxui::Color::Black) | ftxui::bgcolor(ftxui::Color::Green)) : ftxui::text("   ");
+            browserRows.push_back(ftxui::hbox({
+                std::move(indicator),
+                renderTwoColumnRow(label, renderValueCell(state.value, basicType, unit), isSelected, m_focusArea == FocusArea::ThingDetails) | ftxui::xflex,
+            }));
         }
     }
 
@@ -6418,6 +6509,9 @@ ftxui::Element Engine::renderLogView() const
     } else {
         infoRow.push_back(ftxui::text("off") | ftxui::color(ftxui::Color::Yellow));
     }
+    infoRow.push_back(ftxui::text("  Follow: "));
+    infoRow.push_back(ftxui::text(m_logView.followLatest ? "on" : "off")
+                      | ftxui::color(m_logView.followLatest ? ftxui::Color::Green : ftxui::Color::GrayDark));
     infoRow.push_back(ftxui::filler());
     if (m_logView.fetchPending) {
         infoRow.push_back(ftxui::text(busyIndicator(m_logView.fetchStartedAt) + " Fetching...  ") | ftxui::color(ftxui::Color::CyanLight));
@@ -6425,9 +6519,28 @@ ftxui::Element Engine::renderLogView() const
     infoRow.push_back(ftxui::text(windowStart.toString(QStringLiteral("yyyy-MM-dd hh:mm")).toStdString() + " -> "
                                   + m_logView.windowEnd.toString(QStringLiteral("yyyy-MM-dd hh:mm")).toStdString()));
 
+    auto buildLogList = [this]() {
+        ftxui::Elements rows;
+        rows.reserve(m_logView.listEntries.size());
+        for (int index = 0; index < static_cast<int>(m_logView.listEntries.size()); ++index) {
+            const auto& entry = m_logView.listEntries.at(index);
+            const std::string timestamp = QDateTime::fromMSecsSinceEpoch(entry.first).toString(QStringLiteral("yyyy-MM-dd hh:mm:ss")).toStdString();
+            ftxui::Element row = ftxui::hbox({
+                ftxui::text(timestamp) | ftxui::color(ftxui::Color::CyanLight),
+                ftxui::text("  "),
+                ftxui::paragraph(entry.second) | ftxui::flex,
+            });
+            if (index == m_logView.listSelectionIndex) {
+                row = row | ftxui::inverted | ftxui::focus;
+            }
+            rows.push_back(std::move(row));
+        }
+        return ftxui::vbox(std::move(rows)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex;
+    };
+
     ftxui::Element body;
     bool statusShownAsPlaceholder = false;
-    const bool hasData = m_logView.isAction ? !m_logView.listEntries.empty() : !m_logView.samples.empty();
+    const bool hasData = m_logView.chartable ? !m_logView.samples.empty() : !m_logView.listEntries.empty();
     if (!hasData) {
         std::string placeholder;
         if (m_logView.fetchPending) {
@@ -6444,23 +6557,9 @@ ftxui::Element Engine::renderLogView() const
                    ftxui::filler(),
                })
                | ftxui::flex;
-    } else if (m_logView.isAction) {
-        ftxui::Elements rows;
-        rows.reserve(m_logView.listEntries.size());
-        for (int index = 0; index < static_cast<int>(m_logView.listEntries.size()); ++index) {
-            const auto& entry = m_logView.listEntries.at(index);
-            const std::string timestamp = QDateTime::fromMSecsSinceEpoch(entry.first).toString(QStringLiteral("yyyy-MM-dd hh:mm:ss")).toStdString();
-            ftxui::Element row = ftxui::hbox({
-                ftxui::text(timestamp) | ftxui::color(ftxui::Color::CyanLight),
-                ftxui::text("  "),
-                ftxui::paragraph(entry.second) | ftxui::flex,
-            });
-            if (index == m_logView.listSelectionIndex) {
-                row = row | ftxui::inverted | ftxui::focus;
-            }
-            rows.push_back(std::move(row));
-        }
-        body = ftxui::vbox(std::move(rows)) | ftxui::vscroll_indicator | ftxui::frame | ftxui::flex;
+    } else if (!m_logView.chartable) {
+        // Actions and non-chartable states: browsable list only.
+        body = buildLogList();
     } else {
         double minValue = m_logView.samples.front().second;
         double maxValue = minValue;
@@ -6524,13 +6623,20 @@ ftxui::Element Engine::renderLogView() const
             ftxui::filler(),
             ftxui::text(formatChartTimestamp(endMs, m_logView.range)),
         });
-        body = ftxui::vbox({
-                   ftxui::hbox({
-                       yAxis,
-                       ftxui::separator(),
-                       ftxui::graph(std::move(graphFunction)) | ftxui::flex | ftxui::color(ftxui::Color::CyanLight),
-                   }) | ftxui::flex,
-                   xAxis,
+        ftxui::Element graphBody = ftxui::vbox({
+                                       ftxui::hbox({
+                                           yAxis,
+                                           ftxui::separator(),
+                                           ftxui::graph(std::move(graphFunction)) | ftxui::flex | ftxui::color(ftxui::Color::CyanLight),
+                                       }) | ftxui::flex,
+                                       xAxis,
+                                   })
+                                   | ftxui::flex;
+        // Show the log-entry list to the right of the graph.
+        body = ftxui::hbox({
+                   std::move(graphBody) | ftxui::flex,
+                   ftxui::separator(),
+                   buildLogList() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 48),
                })
                | ftxui::flex;
     }
@@ -6542,10 +6648,7 @@ ftxui::Element Engine::renderLogView() const
     if (!m_logView.status.empty() && !statusShownAsPlaceholder) {
         content.push_back(ftxui::text(m_logView.status) | ftxui::color(ftxui::Color::Yellow));
     }
-    std::string keyHints = "Keys: h/d/w/m/y switch range (hour/day/week/month/year), Left/Right move 1/4 window, x toggle logging, Esc/q close";
-    if (m_logView.isAction) {
-        keyHints = "Keys: Up/Down scroll, h/d/w/m/y switch range (hour/day/week/month/year), Left/Right move 1/4 window, x toggle logging, Esc/q close";
-    }
+    const std::string keyHints = "Keys: Up/Down scroll, f follow latest, h/d/w/m/y range, Left/Right move 1/4 window, x toggle logging, Esc/q close";
     content.push_back(ftxui::text(keyHints) | ftxui::dim);
 
     const std::string title = (m_logView.isAction ? "Action log: " : "State history: ") + m_logView.thingLabel + " / " + m_logView.typeLabel;
@@ -6639,12 +6742,21 @@ ftxui::Element Engine::renderConfigureDetails() const
     }
 
     ftxui::Elements content;
+    auto search = ftxui::text("Search: " + (m_configureThingSelectionSearch.empty() ? std::string("<type to filter>") : m_configureThingSelectionSearch));
+    if (m_focusArea == FocusArea::ConfigureThingSelectionSearch) {
+        search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
+    }
+    content.push_back(search);
+    content.push_back(ftxui::separator());
+
+    const std::vector<const api::Thing*> things = filteredConfigureThings();
     if (m_thingManager.things().empty()) {
         content.push_back(ftxui::text("No configured things available."));
+    } else if (things.empty()) {
+        content.push_back(ftxui::text("No things match the current filter."));
     } else {
-        for (int index = 0; index < static_cast<int>(m_thingManager.things().size()); ++index) {
-            const api::Thing& thing = m_thingManager.things().at(index);
-            auto row = ftxui::text(" " + thingLabel(&thing) + " ");
+        for (int index = 0; index < static_cast<int>(things.size()); ++index) {
+            auto row = ftxui::text(" " + thingLabel(things.at(index)) + " ");
             if (index == m_selectedConfigureThingIndex) {
                 row = row | ftxui::bold | ftxui::inverted;
             }
@@ -6676,7 +6788,8 @@ ftxui::Element Engine::renderConfigureDetails() const
     const char* title = m_configureThingsView == ConfigureThingsView::RemoveThing
                             ? "Remove thing"
                             : (m_configureThingsView == ConfigureThingsView::ReconfigureThing ? "Reconfigure thing" : "Rename thing");
-    return renderFocusedWindow(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::ConfigureThingSelection)
+    return renderFocusedWindow(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame,
+                               m_focusArea == FocusArea::ConfigureThingSelectionSearch || m_focusArea == FocusArea::ConfigureThingSelection)
            | ftxui::reflect(m_configureDetailsBox);
 }
 
@@ -6971,14 +7084,13 @@ ftxui::Element Engine::renderSettingsDetails() const
             }
         }
     } else {
-        pushLine(ftxui::text("Warning") | ftxui::bold | ftxui::color(ftxui::Color::RedLight));
-        pushLine(ftxui::separator());
         const std::string action = powerActionLabel(static_cast<int>(m_systemAction));
-        pushLine(ftxui::paragraph("This will request a " + action + " on the server."));
-        pushLine(ftxui::paragraph("Enter opens the confirmation dialog, and Left or Esc returns to the settings menu."));
+        pushLine(ftxui::text(action) | ftxui::bold | ftxui::center | ftxui::border | ftxui::color(ftxui::Color::RedLight));
+        pushStaticLine(ftxui::paragraph("This will request a " + action + " on the server."));
+        pushStaticLine(ftxui::paragraph("Enter opens the confirmation dialog, and Left or Esc returns to the settings menu."));
         if (!m_systemActionStatus.empty()) {
-            pushLine(ftxui::separator());
-            pushLine(ftxui::text(m_systemActionStatus));
+            pushStaticLine(ftxui::separator());
+            pushStaticLine(ftxui::text(m_systemActionStatus));
         }
     }
 
@@ -7019,7 +7131,7 @@ int Engine::settingsDetailsLineCount() const
     case SettingsView::Shutdown:
     case SettingsView::Restart:
     case SettingsView::Reboot:
-        return 0;
+        return 1;
     }
     return 0;
 }
@@ -7792,6 +7904,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
         if (event == ftxui::Event::ArrowLeft) {
+            m_logView.followLatest = false;
             stepLogViewWindow(-1);
             return true;
         }
@@ -7803,8 +7916,20 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             toggleLogViewLogging();
             return true;
         }
-        if (m_logView.isAction && !m_logView.listEntries.empty()) {
+        if (event == ftxui::Event::Character("f")) {
+            m_logView.followLatest = !m_logView.followLatest;
+            if (m_logView.followLatest) {
+                m_logView.windowEnd = QDateTime::currentDateTime();
+                if (!m_logView.listEntries.empty()) {
+                    m_logView.listSelectionIndex = static_cast<int>(m_logView.listEntries.size()) - 1;
+                }
+                fetchLogViewData();
+            }
+            return true;
+        }
+        if (!m_logView.listEntries.empty()) {
             if (event == ftxui::Event::ArrowUp) {
+                m_logView.followLatest = false;
                 m_logView.listSelectionIndex = std::max(0, m_logView.listSelectionIndex - 1);
                 return true;
             }
@@ -8545,7 +8670,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             m_focusArea = FocusArea::ConfigureThingClassSearch;
             return true;
         }
-        if (m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingSelection || m_focusArea == FocusArea::ConfigureMenu) {
+        if (m_focusArea == FocusArea::ConfigureThingSelection) {
+            m_focusArea = FocusArea::ConfigureThingSelectionSearch;
+            return true;
+        }
+        if (m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingSelectionSearch || m_focusArea == FocusArea::ConfigureMenu) {
             syncMainMenuSelectionToCurrentView();
             m_focusArea = FocusArea::MainMenu;
             return true;
@@ -8581,9 +8710,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 fetchAllThingClasses();
             }
             if (m_focusArea == FocusArea::ConfigureMenu) {
-                m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassSearch : FocusArea::ConfigureThingSelection;
+                m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassSearch : FocusArea::ConfigureThingSelectionSearch;
             } else if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
                 m_focusArea = FocusArea::ConfigureThingClassList;
+            } else if (m_focusArea == FocusArea::ConfigureThingSelectionSearch) {
+                m_focusArea = FocusArea::ConfigureThingSelection;
             } else {
                 m_focusArea = FocusArea::ConfigureMenu;
             }
@@ -8634,8 +8765,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
         if (m_mainView == MainView::Settings) {
             if (m_focusArea == FocusArea::SettingsMenu) {
-                if (m_settingsView == SettingsView::Reboot) {
-                    m_settingsView = SettingsView::ServerInfo;
+                if (m_settingsView == SettingsView::ServerInfo) {
+                    m_settingsView = SettingsView::Reboot;
                 } else {
                     m_settingsView = static_cast<SettingsView>(static_cast<int>(m_settingsView) - 1);
                 }
@@ -8683,9 +8814,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::ConfigureThingSelection && !m_thingManager.things().empty()) {
-            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + static_cast<int>(m_thingManager.things().size()) - 1)
-                                            % static_cast<int>(m_thingManager.things().size());
+        if (m_focusArea == FocusArea::ConfigureThingSelection && !filteredConfigureThings().empty()) {
+            const int count = static_cast<int>(filteredConfigureThings().size());
+            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + count - 1) % count;
             return true;
         }
 
@@ -8791,8 +8922,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             return true;
         }
 
-        if (m_focusArea == FocusArea::ConfigureThingSelection && !m_thingManager.things().empty()) {
-            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + 1) % static_cast<int>(m_thingManager.things().size());
+        if (m_focusArea == FocusArea::ConfigureThingSelection && !filteredConfigureThings().empty()) {
+            const int count = static_cast<int>(filteredConfigureThings().size());
+            m_selectedConfigureThingIndex = (m_selectedConfigureThingIndex + 1) % count;
             return true;
         }
 
@@ -9013,6 +9145,21 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
+    if (m_focusArea == FocusArea::ConfigureThingSelectionSearch && m_mainView == MainView::ConfigureThings) {
+        if (event == ftxui::Event::Backspace && !m_configureThingSelectionSearch.empty()) {
+            m_configureThingSelectionSearch.pop_back();
+            m_selectedConfigureThingIndex = 0;
+            clampConfigureThingSelection();
+            return true;
+        }
+        if (event.is_character()) {
+            m_configureThingSelectionSearch += event.character();
+            m_selectedConfigureThingIndex = 0;
+            clampConfigureThingSelection();
+            return true;
+        }
+    }
+
     if (event == ftxui::Event::Character("s") && m_mainView == MainView::Things) {
         cycleThingSortMode();
         return true;
@@ -9032,7 +9179,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::Character("h") || event == ftxui::Event::Character("?")) {
-        if (m_focusArea != FocusArea::ThingSearch && m_focusArea != FocusArea::ConfigureThingClassSearch && m_focusArea != FocusArea::ApiBrowserSearch) {
+        if (m_focusArea != FocusArea::ThingSearch && m_focusArea != FocusArea::ConfigureThingClassSearch && m_focusArea != FocusArea::ConfigureThingSelectionSearch
+            && m_focusArea != FocusArea::ApiBrowserSearch) {
             openHelpView();
             return true;
         }
