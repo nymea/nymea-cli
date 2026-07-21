@@ -1,3 +1,15 @@
+nymea-cli (1.16.0) resolute; urgency=medium
+
+  [ Simon Stürz ]
+  * Settings: Add server logging categories
+  * Settings: Add modbus RTU configuration
+  * Settings: Improve system and package update views
+  * Settings: Add server interface configuration settings
+  * Logging: Add graphs an logs
+  * Restructure the source code and improve maintainability
+
+ -- jenkins <developer@nymea.io>  Tue, 21 Jul 2026 16:29:06 +0200
+
 nymea-cli (1.15.2) resolute; urgency=medium
 
 
