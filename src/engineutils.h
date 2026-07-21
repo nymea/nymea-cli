@@ -98,6 +98,7 @@ bool handleParamValueEditEvent(const ftxui::Event& event, const api::ParamType& 
 std::string rangeInputSummary(const api::ParamType& paramType);
 std::string cycleSelectableValue(const api::ParamType& paramType, const std::string& rawValue, int delta);
 std::string normalizedActionSubmissionValue(const api::ParamType& paramType, const std::string& rawValue);
+std::optional<NumericRangeInputSpec> numericRangeInputSpec(const api::ParamType& paramType);
 std::optional<double> currentNumericRangeValueFromRaw(const api::ParamType& paramType, const NumericRangeInputSpec& spec, const std::string& rawValue);
 ftxui::Element renderActionDialogValueCell(const api::ParamType& paramType, const std::string& rawValue);
 

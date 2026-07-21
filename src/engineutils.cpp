@@ -37,6 +37,7 @@
 #include <string_view>
 #include <utility>
 
+#include <ftxui/component/event.hpp>
 #include <ftxui/dom/node.hpp>
 
 namespace nymea {

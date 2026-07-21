@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "engine.h"
+#include "engineapibrowser.h"
 #include "engineutils.h"
 
 #include "generated/actiontype.h"
@@ -442,23 +443,6 @@ void Engine::ensureApiBrowserLoaded()
 
 namespace {
 
-enum class ApiBrowserKind {
-    Method,
-    Notification,
-    Type,
-    Enum,
-};
-
-struct ApiBrowserItem
-{
-    QString section;
-    QString name;
-    ApiBrowserKind kind = ApiBrowserKind::Type;
-    QJsonValue value;
-    QString searchText;
-    std::vector<std::pair<QString, QString>> references;
-};
-
 QString apiBrowserKindLabel(ApiBrowserKind kind)
 {
     switch (kind) {
@@ -545,6 +529,8 @@ QString apiBrowserPrettyJson(const QJsonValue& value)
     return QString::fromStdString(prettyJsonValueToString(value));
 }
 
+} // namespace
+
 std::vector<ApiBrowserItem> buildApiBrowserItems(const QJsonObject& introspection)
 {
     std::vector<ApiBrowserItem> items;
@@ -630,8 +616,6 @@ QString apiBrowserItemDisplayLabel(const ApiBrowserItem& item)
 {
     return apiBrowserKindLabel(item.kind) + QStringLiteral(": ") + item.name;
 }
-
-} // namespace
 
 void Engine::handleApiBrowserIntrospectionReply(const QJsonObject& message, const QString& transportError)
 {

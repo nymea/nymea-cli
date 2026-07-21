@@ -49,10 +49,13 @@ set(NYMEA_API_OUTPUT "${CMAKE_SOURCE_DIR}/src/generated/nymeaapigenerated.h")
 set(NYMEA_API_SOURCE "${CMAKE_SOURCE_DIR}/src/generated/nymeaapigenerated.cpp")
 
 if (Python3_Interpreter_FOUND)
-    add_custom_target(generate-nymea-api
+    # Regenerate only when the API definition or the generator itself changes,
+    # so ordinary builds don't rewrite the generated sources (and force a full rebuild).
+    add_custom_command(
+        OUTPUT "${NYMEA_API_OUTPUT}" "${NYMEA_API_SOURCE}"
         COMMAND "${Python3_EXECUTABLE}" "${NYMEA_API_GENERATOR}" --api-json "${NYMEA_API_JSON}" --output "${NYMEA_API_OUTPUT}"
+        DEPENDS "${NYMEA_API_JSON}" "${NYMEA_API_GENERATOR}"
         WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-        BYPRODUCTS "${NYMEA_API_OUTPUT}" "${NYMEA_API_SOURCE}"
         COMMENT "Generating nymea Qt/C++ API model from ${NYMEA_API_JSON}"
         VERBATIM
     )
@@ -64,6 +67,21 @@ add_executable(nymea-cli
     src/connectionsettings.h
     src/engine.cpp
     src/engine.h
+    src/engineinternal.h
+    src/engineutils.cpp
+    src/engineutils.h
+    src/enginebrowse.cpp
+    src/engineapibrowser.h
+    src/enginehelpers.h
+    src/engine_connection.cpp
+    src/engine_notifications.cpp
+    src/engine_things.cpp
+    src/engine_configure.cpp
+    src/engine_logview.cpp
+    src/engine_settings.cpp
+    src/engine_serverinterfaces.cpp
+    src/engine_modbus.cpp
+    src/engine_events.cpp
     src/nymeajsonrpcclient.cpp
     src/nymeajsonrpcclient.h
     src/thingmanager.cpp
@@ -71,10 +89,6 @@ add_executable(nymea-cli
     src/generated/nymeaapigenerated.cpp
     src/generated/nymeaapigenerated.h
 )
-
-if (TARGET generate-nymea-api)
-    add_dependencies(nymea-cli generate-nymea-api)
-endif()
 
 target_include_directories(nymea-cli
     PRIVATE
