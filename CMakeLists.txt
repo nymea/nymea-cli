@@ -10,6 +10,19 @@ set(FTXUI_GIT_TAG "v6.1.9")
 option(NYMEA_USE_SYSTEM_FTXUI "Prefer a system-installed FTXUI package over FetchContent." ON)
 option(NYMEA_ALLOW_FETCHCONTENT_FTXUI "Allow downloading FTXUI with FetchContent when no system package is available." ON)
 
+set(NYMEA_CLI_DEBIAN_CHANGELOG "${CMAKE_SOURCE_DIR}/debian/changelog")
+if (NOT EXISTS "${NYMEA_CLI_DEBIAN_CHANGELOG}")
+    message(FATAL_ERROR "Debian changelog not found: ${NYMEA_CLI_DEBIAN_CHANGELOG}")
+endif()
+
+file(STRINGS "${NYMEA_CLI_DEBIAN_CHANGELOG}" NYMEA_CLI_DEBIAN_CHANGELOG_HEADER LIMIT_COUNT 1)
+if (NOT NYMEA_CLI_DEBIAN_CHANGELOG_HEADER MATCHES "^[^(]+\\(([^)]+)\\)")
+    message(FATAL_ERROR "Could not parse Debian version from: ${NYMEA_CLI_DEBIAN_CHANGELOG_HEADER}")
+endif()
+
+set(NYMEA_CLI_APP_VERSION "${CMAKE_MATCH_1}")
+message(STATUS "nymea-cli app version: ${NYMEA_CLI_APP_VERSION}")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
 find_package(Python3 COMPONENTS Interpreter)
@@ -107,7 +120,7 @@ target_link_libraries(nymea-cli
 
 target_compile_definitions(nymea-cli
     PRIVATE
-        APP_VERSION="${PROJECT_VERSION}"
+        APP_VERSION="${NYMEA_CLI_APP_VERSION}"
         APP_LICENSE_SPDX="GPL-3.0-or-later"
         FTXUI_VERSION="${NYMEA_FTXUI_VERSION}"
 )
