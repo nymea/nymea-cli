@@ -76,8 +76,8 @@ The current UI is menu-driven and keyboard-only.
 
 Main structure:
 
-- left: main menu
-- right: current view
+- top: tab bar below the header
+- below: current view
 - `Things` view contains:
   - thing list
   - thing overview
@@ -88,7 +88,10 @@ Main structure:
 Interaction rules:
 
 - `Up` / `Down` navigate the focused list
-- `Left` / `Right` switch focus between panels
+- `Left` / `Right` switch focus between panels; on the tab bar they switch tabs
+- `Left` from the leftmost panel focuses the tab bar; `Down` / `Enter` enters the view
+- `Tab` / `Shift+Tab` switch tabs from anywhere outside dialogs
+- filtered lists have no separate search focus stop: `/` edits the list filter, `Enter` / `Up` / `Down` finish, `Esc` clears
 - `Space` opens metadata inspector for the selected param, state, or action
 - `Enter` on an action opens the execution dialog
 - action dialog:

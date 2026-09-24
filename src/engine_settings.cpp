@@ -660,11 +660,7 @@ ftxui::Element Engine::renderSettingsDetails() const
         pushLine(ftxui::text("Automatic time: " + (m_systemTimeLoaded ? std::string(m_systemTime.automaticTime ? "enabled" : "disabled") : std::string("n/a"))));
         pushLine(ftxui::text("Automatic time available: " + (m_systemTimeLoaded ? std::string(m_systemTime.automaticTimeAvailable ? "yes" : "no") : std::string("n/a"))));
         pushLine(ftxui::separator());
-        auto search = ftxui::text("Search: " + (m_systemTimeZoneSearch.empty() ? std::string("<type to filter>") : m_systemTimeZoneSearch));
-        if (m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
-            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 32);
-        }
-        pushLine(std::move(search));
+        pushLine(renderFilterRow(m_systemTimeZoneSearch, m_focusArea == FocusArea::SettingsDetails, 32));
         pushLine(ftxui::separator());
         pushLine(ftxui::text("Available time zones") | ftxui::bold);
         if (!m_systemTimeZonesLoaded) {
@@ -759,11 +755,7 @@ ftxui::Element Engine::renderSettingsDetails() const
                                                                        : "Status: " + m_loggingCategoryStatus;
         pushLine(ftxui::text(statusText));
         pushLine(ftxui::separator());
-        auto search = ftxui::text("Filter: " + (m_loggingCategorySearch.empty() ? std::string("<type to filter>") : m_loggingCategorySearch));
-        if (m_focusArea == FocusArea::SettingsDetails && m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
-            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 32);
-        }
-        pushLine(std::move(search));
+        pushLine(renderFilterRow(m_loggingCategorySearch, m_focusArea == FocusArea::SettingsDetails, 32));
         pushLine(ftxui::separator());
         pushLine(ftxui::text("Logging categories") | ftxui::bold);
         if (!m_loggingCategoriesLoaded) {
@@ -782,7 +774,7 @@ ftxui::Element Engine::renderSettingsDetails() const
             }
         }
         pushLine(ftxui::separator());
-        pushLine(ftxui::text("Type to filter. Left/Right or Space changes the selected level.") | ftxui::dim);
+        pushLine(ftxui::text("/ filters, Esc clears the filter. Left/Right or Space changes the selected level.") | ftxui::dim);
     } else if (m_settingsView == SettingsView::ServerInterfaces) {
         const std::string statusText = m_serverInterfaceStatus.empty() ? std::string("Status: ") + (m_serverInterfacesPending ? "loading..." : "ready")
                                                                        : "Status: " + m_serverInterfaceStatus;
@@ -889,11 +881,14 @@ ftxui::Element Engine::renderSettingsDetails() const
             }
         }
     } else {
-        const std::string action = powerActionLabel(static_cast<int>(m_systemAction));
+        const PowerAction viewAction = m_settingsView == SettingsView::Reboot    ? PowerAction::Reboot
+                                       : m_settingsView == SettingsView::Restart ? PowerAction::Restart
+                                                                                 : PowerAction::Shutdown;
+        const std::string action = powerActionLabel(static_cast<int>(viewAction));
         pushLine(ftxui::text(action) | ftxui::bold | ftxui::center | ftxui::border | ftxui::color(ftxui::Color::RedLight));
         pushStaticLine(ftxui::paragraph("This will request a " + action + " on the server."));
         pushStaticLine(ftxui::paragraph("Enter opens the confirmation dialog, and Left or Esc returns to the settings menu."));
-        if (!m_systemActionStatus.empty()) {
+        if (!m_systemActionStatus.empty() && m_systemAction == viewAction) {
             pushStaticLine(ftxui::separator());
             pushStaticLine(ftxui::text(m_systemActionStatus));
         }
@@ -913,7 +908,7 @@ ftxui::Element Engine::renderLogout() const
     lines.push_back(ftxui::paragraph("Logout revokes the current token on the server, clears the saved token locally, and reconnects to the same server."));
     lines.push_back(ftxui::separator());
     lines.push_back(ftxui::text("Only execution option: Logout") | ftxui::bold);
-    lines.push_back(ftxui::text("Press Enter to logout, or Left to return to the menu.") | ftxui::dim);
+    lines.push_back(ftxui::text("Press Enter to logout, or Tab/Shift+Tab to switch tabs.") | ftxui::dim);
 
     return renderFocusedWindow(ftxui::text("Logout"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame, m_mainView == MainView::Logout) | ftxui::flex;
 }
@@ -951,46 +946,14 @@ void Engine::clampSettingsDetailsSelection()
 
     if (m_settingsView == SettingsView::Timezone) {
         const int filteredCount = m_systemTimeZonesLoaded ? static_cast<int>(filteredSystemTimeZones().size()) : 0;
-        const int firstResultLineIndex = timezoneListStartLineIndex;
-        if (filteredCount <= 0) {
-            m_settingsDetailsLineIndex = timezoneSearchLineIndex;
-            return;
-        }
-
-        const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
-        if (m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
-            return;
-        }
-        if (m_settingsDetailsLineIndex < firstResultLineIndex) {
-            m_settingsDetailsLineIndex = timezoneSearchLineIndex;
-            return;
-        }
-        if (m_settingsDetailsLineIndex > lastResultLineIndex) {
-            m_settingsDetailsLineIndex = lastResultLineIndex;
-            return;
-        }
+        m_settingsDetailsLineIndex = std::clamp(m_settingsDetailsLineIndex, timezoneListStartLineIndex, timezoneListStartLineIndex + std::max(0, filteredCount - 1));
+        return;
     }
 
     if (m_settingsView == SettingsView::LoggingCategories) {
         const int filteredCount = m_loggingCategoriesLoaded ? static_cast<int>(filteredLoggingCategories().size()) : 0;
-        const int firstResultLineIndex = loggingCategoryListStartLineIndex;
-        if (filteredCount <= 0) {
-            m_settingsDetailsLineIndex = loggingCategorySearchLineIndex;
-            return;
-        }
-
-        const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
-        if (m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
-            return;
-        }
-        if (m_settingsDetailsLineIndex < firstResultLineIndex) {
-            m_settingsDetailsLineIndex = loggingCategorySearchLineIndex;
-            return;
-        }
-        if (m_settingsDetailsLineIndex > lastResultLineIndex) {
-            m_settingsDetailsLineIndex = lastResultLineIndex;
-            return;
-        }
+        m_settingsDetailsLineIndex = std::clamp(m_settingsDetailsLineIndex, loggingCategoryListStartLineIndex, loggingCategoryListStartLineIndex + std::max(0, filteredCount - 1));
+        return;
     }
 
     if (m_settingsView == SettingsView::ModbusRtu) {

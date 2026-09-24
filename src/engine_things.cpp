@@ -286,12 +286,8 @@ void Engine::fetchAllThingClasses()
 ftxui::Element Engine::renderThingList() const
 {
     ftxui::Elements lines;
-    auto search = ftxui::text("Search: " + (m_thingSearch.empty() ? std::string("<type to filter>") : m_thingSearch));
-    if (m_focusArea == FocusArea::ThingSearch) {
-        search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
-    }
-    lines.push_back(search);
-    lines.push_back(ftxui::text("Sort: " + thingSortModeLabel() + "  Filter: " + thingCategoryLabel(m_thingCategoryFilter)));
+    lines.push_back(renderFilterRow(m_thingSearch, m_focusArea == FocusArea::ThingList, 28));
+    lines.push_back(ftxui::text("Sort: " + thingSortModeLabel() + "  Category: " + thingCategoryLabel(m_thingCategoryFilter)));
     lines.push_back(ftxui::separator());
 
     const std::vector<const api::Thing*> things = filteredThings();
@@ -323,9 +319,7 @@ ftxui::Element Engine::renderThingList() const
         }
     }
 
-    return renderFocusedWindow(ftxui::text("Things"),
-                               ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame,
-                               m_focusArea == FocusArea::ThingSearch || m_focusArea == FocusArea::ThingList)
+    return renderFocusedWindow(ftxui::text("Things"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::ThingList)
            | ftxui::reflect(m_thingListBox);
 }
 

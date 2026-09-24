@@ -31,6 +31,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/screen/box.hpp>
 
+#include <array>
 #include <chrono>
 #include <functional>
 #include <mutex>
@@ -125,18 +126,14 @@ private:
 
     enum class FocusArea {
         MainMenu,
-        ThingSearch,
         ThingList,
         ThingDetails,
         ActionDialog,
         LogView,
         ConfigureMenu,
-        ConfigureThingClassSearch,
         ConfigureThingClassList,
-        ConfigureThingSelectionSearch,
         ConfigureThingSelection,
         ConfigureDialog,
-        ApiBrowserSearch,
         ApiBrowserList,
         ApiBrowserReferences,
         SettingsMenu,
@@ -154,6 +151,8 @@ private:
         Logout,
         About,
     };
+    static constexpr std::array<MainMenuEntry, 6> s_mainMenuEntries
+        = {MainMenuEntry::Things, MainMenuEntry::ConfigureThings, MainMenuEntry::ApiBrowser, MainMenuEntry::Settings, MainMenuEntry::Logout, MainMenuEntry::About};
 
     enum class ConfigureThingsView {
         AddThing,
@@ -371,7 +370,13 @@ private:
     void executePowerAction();
     bool editDialogTextField(std::string& value, const ftxui::Event& event, bool digitsOnly);
 
+    static MainMenuEntry nextMainMenuEntry(MainMenuEntry entry, int delta);
     ftxui::Element renderMainMenu() const;
+    const std::string* focusedFilterText() const;
+    std::string* focusedFilterText();
+    bool isFilterEditing() const;
+    void applyFilterChange(const QUuid& previousThingId);
+    ftxui::Element renderFilterRow(const std::string& text, bool listFocused, int minimumWidth) const;
     ftxui::Element renderThingList() const;
     ftxui::Element renderThingDetails() const;
     ftxui::Element renderLogView() const;
@@ -437,6 +442,7 @@ private:
     QJsonObject m_apiBrowserIntrospection;
     int m_selectedThingIndex = 0;
     std::string m_thingSearch;
+    bool m_filterEditing = false;
     ThingSortMode m_thingSortMode = ThingSortMode::Alphabetical;
     ThingCategory m_thingCategoryFilter = ThingCategory::All;
     QUuid m_preferredThingSelectionId;

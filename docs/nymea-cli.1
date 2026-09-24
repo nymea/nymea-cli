@@ -74,10 +74,10 @@ Show command line help and exit.
 Show the program version and exit.
 .SH INTERFACE
 .SS Main Views
-The main menu provides access to the things browser, thing configuration
+The tab bar below the header provides access to the things browser, thing configuration
 flows, the API browser, settings, logout, and an about screen.
 .PP
-The things view contains a search field, a filtered thing list, and a
+The things view contains a filterable thing list and a
 details pane with overview, parameters, states, and actions. The
 configuration view is used for setup, rename, and remove flows. The API
 browser exposes methods, notifications, types, enums, and references from
@@ -104,7 +104,14 @@ Refresh things from the server.
 Move the selection in the focused list.
 .TP
 .B Left / Right
-Switch panels or move between subviews.
+Switch panels or move between subviews. On the tab bar, switch tabs.
+.TP
+.B Tab / Shift+Tab
+Switch to the next or previous tab.
+.TP
+.B /
+Edit the filter of the focused list. Enter, Up or Down finishes editing,
+Esc clears the filter. Esc on a filtered list also clears the filter.
 .TP
 .B Enter
 Activate the selected item.
@@ -120,7 +127,7 @@ Cycle the thing sort mode.
 Cycle the thing category filter.
 .TP
 .B Left / Right
-Switch between search, thing list, and details.
+Switch between thing list and details.
 .TP
 .B Space
 Open or close the inspector for the selected parameter, state, or action.
@@ -135,8 +142,8 @@ Move between menu entries or list rows.
 .B Enter
 Open the selected setup, rename, or remove flow.
 .TP
-.B Typing
-Filter available thing classes in search fields.
+.B /
+Filter available thing classes or things.
 .SS Settings
 .TP
 .B Up / Down
@@ -146,21 +153,18 @@ Select server info, time zone, update, shutdown, restart, or reboot.
 Open the details pane or apply the selected action, depending on the
 current row.
 .TP
-.B Typing
-Filter time zones in the time zone view.
+.B /
+Filter time zones or logging categories.
 .SS API Browser
 .TP
-.B Typing
+.B /
 Filter methods, notifications, types, and enums.
-.TP
-.B Backspace
-Remove the last filter character.
 .TP
 .B Left
 Go back in API browser history.
 .TP
 .B Right
-Move between search, list, and references panes.
+Move between list and references panes.
 .TP
 .B Enter
 Follow the selected referenced type.

@@ -862,11 +862,7 @@ ftxui::Element Engine::renderConfigureDetails() const
     if (m_configureThingsView == ConfigureThingsView::AddThing) {
         ftxui::Elements content;
 
-        auto search = ftxui::text("Search: " + (m_configureThingSearch.empty() ? std::string("<type to filter>") : m_configureThingSearch));
-        if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
-            search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
-        }
-        content.push_back(search);
+        content.push_back(renderFilterRow(m_configureThingSearch, m_focusArea == FocusArea::ConfigureThingClassList, 28));
         content.push_back(ftxui::separator());
 
         if (m_fetchAllThingClassesPending && !m_haveAllThingClasses) {
@@ -914,15 +910,11 @@ ftxui::Element Engine::renderConfigureDetails() const
         content.push_back(ftxui::text("Enter opens the setup flow.") | ftxui::dim);
         return renderFocusedWindow(ftxui::text("Add thing"),
                                    ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame,
-                                   m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingClassList);
+                                   m_focusArea == FocusArea::ConfigureThingClassList);
     }
 
     ftxui::Elements content;
-    auto search = ftxui::text("Search: " + (m_configureThingSelectionSearch.empty() ? std::string("<type to filter>") : m_configureThingSelectionSearch));
-    if (m_focusArea == FocusArea::ConfigureThingSelectionSearch) {
-        search = renderActiveField(std::move(search) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
-    }
-    content.push_back(search);
+    content.push_back(renderFilterRow(m_configureThingSelectionSearch, m_focusArea == FocusArea::ConfigureThingSelection, 28));
     content.push_back(ftxui::separator());
 
     const std::vector<const api::Thing*> things = filteredConfigureThings();
@@ -964,8 +956,7 @@ ftxui::Element Engine::renderConfigureDetails() const
     const char* title = m_configureThingsView == ConfigureThingsView::RemoveThing
                             ? "Remove thing"
                             : (m_configureThingsView == ConfigureThingsView::ReconfigureThing ? "Reconfigure thing" : "Rename thing");
-    return renderFocusedWindow(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame,
-                               m_focusArea == FocusArea::ConfigureThingSelectionSearch || m_focusArea == FocusArea::ConfigureThingSelection)
+    return renderFocusedWindow(ftxui::text(title), ftxui::vbox(std::move(content)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::ConfigureThingSelection)
            | ftxui::reflect(m_configureDetailsBox);
 }
 

@@ -207,38 +207,19 @@ void eraseByKey(Container& container, const Key& key, KeyFn keyFn)
     container.erase(std::remove_if(container.begin(), container.end(), [&](const auto& item) { return keyFn(item) == key; }), container.end());
 }
 
-constexpr int timezoneSearchLineIndex = 4;
 constexpr int timezoneListStartLineIndex = 7;
-constexpr int loggingCategorySearchLineIndex = 2;
 constexpr int loggingCategoryListStartLineIndex = 5;
 constexpr int modbusRtuMasterListStartLineIndex = 4;
 constexpr int updateProgressBarWidth = 20;
 
-inline int nextFilterListDetailsLineIndex(int currentIndex, int direction, int searchLineIndex, int listStartLineIndex, int filteredCount)
+inline int nextFilterListDetailsLineIndex(int currentIndex, int direction, int listStartLineIndex, int filteredCount)
 {
     if (filteredCount <= 0) {
-        return searchLineIndex;
+        return listStartLineIndex;
     }
 
-    const int firstResultLineIndex = listStartLineIndex;
-    const int lastResultLineIndex = firstResultLineIndex + filteredCount - 1;
-
-    if (currentIndex == searchLineIndex) {
-        return direction > 0 ? firstResultLineIndex : lastResultLineIndex;
-    }
-
-    if (currentIndex < firstResultLineIndex) {
-        return direction > 0 ? firstResultLineIndex : searchLineIndex;
-    }
-
-    if (currentIndex <= lastResultLineIndex) {
-        if (direction > 0) {
-            return currentIndex == lastResultLineIndex ? searchLineIndex : currentIndex + 1;
-        }
-        return currentIndex == firstResultLineIndex ? searchLineIndex : currentIndex - 1;
-    }
-
-    return direction > 0 ? searchLineIndex : lastResultLineIndex;
+    const int currentResult = std::clamp(currentIndex - listStartLineIndex, 0, filteredCount - 1);
+    return listStartLineIndex + (currentResult + direction + filteredCount) % filteredCount;
 }
 
 inline std::string progressBar(qint64 progress)
