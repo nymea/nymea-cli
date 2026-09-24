@@ -369,14 +369,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
-    if (event == ftxui::Event::Escape && m_focusArea == FocusArea::ThingSearch && !m_thingSearch.empty()) {
-        const QUuid selectedId = selectedThingId();
-        m_thingSearch.clear();
-        clampThingSelection(selectedId);
-        resetThingDetailSelection();
-        return true;
-    }
-
     if (m_showLogoutConfirm) {
         if (m_logoutRequestPending) {
             return true;
@@ -594,6 +586,44 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (std::string* filterText = m_showLoginForm ? nullptr : focusedFilterText(); filterText == nullptr) {
+        m_filterEditing = false;
+    } else if (m_filterEditing) {
+        const QUuid previousThingId = selectedThingId();
+        if (event == ftxui::Event::Backspace) {
+            if (!filterText->empty()) {
+                filterText->pop_back();
+                applyFilterChange(previousThingId);
+            }
+            return true;
+        }
+        if (event == ftxui::Event::Escape) {
+            filterText->clear();
+            applyFilterChange(previousThingId);
+            m_filterEditing = false;
+            return true;
+        }
+        if (event == ftxui::Event::Return || event == ftxui::Event::ArrowDown || event == ftxui::Event::ArrowUp) {
+            m_filterEditing = false;
+            return true;
+        }
+        if (event.is_character()) {
+            *filterText += event.character();
+            applyFilterChange(previousThingId);
+            return true;
+        }
+        // Any other key ends editing and is handled normally.
+        m_filterEditing = false;
+    } else if (event == ftxui::Event::Character("/")) {
+        m_filterEditing = true;
+        return true;
+    } else if (event == ftxui::Event::Escape && !filterText->empty()) {
+        const QUuid previousThingId = selectedThingId();
+        filterText->clear();
+        applyFilterChange(previousThingId);
+        return true;
+    }
+
     if (event == ftxui::Event::Character("q") || event == ftxui::Event::Escape) {
         m_client.disconnectFromHost();
         screen.ExitLoopClosure()();
@@ -649,13 +679,13 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         if (event == ftxui::Event::ArrowDown || event == ftxui::Event::Return) {
             switch (m_mainView) {
             case MainView::Things:
-                m_focusArea = FocusArea::ThingSearch;
+                m_focusArea = FocusArea::ThingList;
                 break;
             case MainView::ConfigureThings:
                 m_focusArea = FocusArea::ConfigureMenu;
                 break;
             case MainView::ApiBrowser:
-                m_focusArea = FocusArea::ApiBrowserSearch;
+                m_focusArea = FocusArea::ApiBrowserList;
                 break;
             case MainView::Settings:
                 m_focusArea = FocusArea::SettingsMenu;
@@ -712,10 +742,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         };
 
         if (event == ftxui::Event::Return) {
-            if (m_focusArea == FocusArea::ApiBrowserSearch) {
-                m_focusArea = FocusArea::ApiBrowserList;
-                return true;
-            }
             if (m_focusArea == FocusArea::ApiBrowserReferences) {
                 return followSelectedReference();
             }
@@ -723,16 +749,12 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
 
         if (event == ftxui::Event::ArrowRight) {
-            if (m_focusArea == FocusArea::ApiBrowserSearch) {
-                m_focusArea = FocusArea::ApiBrowserList;
-                return true;
-            }
             if (m_focusArea == FocusArea::ApiBrowserList) {
                 m_focusArea = FocusArea::ApiBrowserReferences;
                 return true;
             }
             if (m_focusArea == FocusArea::ApiBrowserReferences) {
-                m_focusArea = FocusArea::ApiBrowserSearch;
+                m_focusArea = FocusArea::ApiBrowserList;
                 return true;
             }
         }
@@ -748,10 +770,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 return true;
             }
             if (m_focusArea == FocusArea::ApiBrowserList) {
-                m_focusArea = FocusArea::ApiBrowserSearch;
-                return true;
-            }
-            if (m_focusArea == FocusArea::ApiBrowserSearch) {
                 syncMainMenuSelectionToCurrentView();
                 m_focusArea = FocusArea::MainMenu;
                 return true;
@@ -794,17 +812,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 return true;
             }
         }
-
-        if (m_focusArea == FocusArea::ApiBrowserSearch) {
-            if (event == ftxui::Event::Backspace && !m_apiBrowserSearch.empty()) {
-                m_apiBrowserSearch.pop_back();
-                return true;
-            }
-            if (event.is_character()) {
-                m_apiBrowserSearch += event.character();
-                return true;
-            }
-        }
     }
 
     if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::LoggingCategories) {
@@ -824,23 +831,9 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             const int filteredCount = m_loggingCategoriesLoaded ? static_cast<int>(filteredLoggingCategories().size()) : 0;
             m_settingsDetailsLineIndex = nextFilterListDetailsLineIndex(m_settingsDetailsLineIndex,
                                                                         event == ftxui::Event::ArrowDown ? 1 : -1,
-                                                                        loggingCategorySearchLineIndex,
                                                                         loggingCategoryListStartLineIndex,
                                                                         filteredCount);
             return true;
-        }
-
-        if (m_settingsDetailsLineIndex == loggingCategorySearchLineIndex) {
-            if (event == ftxui::Event::Backspace && !m_loggingCategorySearch.empty()) {
-                m_loggingCategorySearch.pop_back();
-                clampSettingsDetailsSelection();
-                return true;
-            }
-            if (event.is_character()) {
-                m_loggingCategorySearch += event.character();
-                clampSettingsDetailsSelection();
-                return true;
-            }
         }
 
         if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight || event == ftxui::Event::Character(" ")) {
@@ -939,24 +932,11 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             m_showThingDetailInspector = false;
             return true;
         }
-        if (m_focusArea == FocusArea::ThingList) {
-            m_focusArea = FocusArea::ThingSearch;
+        if (m_focusArea == FocusArea::ConfigureThingClassList || m_focusArea == FocusArea::ConfigureThingSelection) {
+            m_focusArea = FocusArea::ConfigureMenu;
             return true;
         }
-        if (m_focusArea == FocusArea::ThingSearch) {
-            syncMainMenuSelectionToCurrentView();
-            m_focusArea = FocusArea::MainMenu;
-            return true;
-        }
-        if (m_focusArea == FocusArea::ConfigureThingClassList) {
-            m_focusArea = FocusArea::ConfigureThingClassSearch;
-            return true;
-        }
-        if (m_focusArea == FocusArea::ConfigureThingSelection) {
-            m_focusArea = FocusArea::ConfigureThingSelectionSearch;
-            return true;
-        }
-        if (m_focusArea == FocusArea::ConfigureThingClassSearch || m_focusArea == FocusArea::ConfigureThingSelectionSearch || m_focusArea == FocusArea::ConfigureMenu) {
+        if (m_focusArea == FocusArea::ThingList || m_focusArea == FocusArea::ConfigureMenu) {
             syncMainMenuSelectionToCurrentView();
             m_focusArea = FocusArea::MainMenu;
             return true;
@@ -977,9 +957,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
     if (event == ftxui::Event::ArrowRight) {
         if (m_mainView == MainView::Things) {
-            if (m_focusArea == FocusArea::ThingSearch) {
-                m_focusArea = FocusArea::ThingList;
-            } else if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
+            if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
                 selectInitialThingDetailSection();
                 m_focusArea = FocusArea::ThingDetails;
             } else {
@@ -990,22 +968,12 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 fetchAllThingClasses();
             }
             if (m_focusArea == FocusArea::ConfigureMenu) {
-                m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassSearch : FocusArea::ConfigureThingSelectionSearch;
-            } else if (m_focusArea == FocusArea::ConfigureThingClassSearch) {
-                m_focusArea = FocusArea::ConfigureThingClassList;
-            } else if (m_focusArea == FocusArea::ConfigureThingSelectionSearch) {
-                m_focusArea = FocusArea::ConfigureThingSelection;
+                m_focusArea = m_configureThingsView == ConfigureThingsView::AddThing ? FocusArea::ConfigureThingClassList : FocusArea::ConfigureThingSelection;
             } else {
                 m_focusArea = FocusArea::ConfigureMenu;
             }
         } else if (m_mainView == MainView::ApiBrowser) {
-            if (m_focusArea == FocusArea::ApiBrowserSearch) {
-                m_focusArea = FocusArea::ApiBrowserList;
-            } else if (m_focusArea == FocusArea::ApiBrowserList) {
-                m_focusArea = FocusArea::ApiBrowserReferences;
-            } else {
-                m_focusArea = FocusArea::ApiBrowserSearch;
-            }
+            m_focusArea = m_focusArea == FocusArea::ApiBrowserList ? FocusArea::ApiBrowserReferences : FocusArea::ApiBrowserList;
         } else if (m_mainView == MainView::Settings) {
             if (m_focusArea == FocusArea::SettingsMenu) {
                 m_focusArea = FocusArea::SettingsDetails;
@@ -1022,7 +990,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         const int filteredCount = m_systemTimeZonesLoaded ? static_cast<int>(filteredSystemTimeZones().size()) : 0;
         m_settingsDetailsLineIndex = nextFilterListDetailsLineIndex(m_settingsDetailsLineIndex,
                                                                     event == ftxui::Event::ArrowDown ? 1 : -1,
-                                                                    timezoneSearchLineIndex,
                                                                     timezoneListStartLineIndex,
                                                                     filteredCount);
         return true;
@@ -1320,66 +1287,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         }
     }
 
-    if (m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsDetails && m_settingsView == SettingsView::Timezone) {
-        if (m_settingsDetailsLineIndex == timezoneSearchLineIndex) {
-            if (event == ftxui::Event::Backspace && !m_systemTimeZoneSearch.empty()) {
-                m_systemTimeZoneSearch.pop_back();
-                clampSettingsDetailsSelection();
-                return true;
-            }
-            if (event.is_character()) {
-                m_systemTimeZoneSearch += event.character();
-                clampSettingsDetailsSelection();
-                return true;
-            }
-        }
-    }
-
-    if (m_focusArea == FocusArea::ThingSearch && m_mainView == MainView::Things) {
-        if (event == ftxui::Event::Backspace && !m_thingSearch.empty()) {
-            const QUuid selectedId = selectedThingId();
-            m_thingSearch.pop_back();
-            clampThingSelection(selectedId);
-            resetThingDetailSelection();
-            return true;
-        }
-        if (event.is_character()) {
-            const QUuid selectedId = selectedThingId();
-            m_thingSearch += event.character();
-            clampThingSelection(selectedId);
-            resetThingDetailSelection();
-            return true;
-        }
-    }
-
-    if (m_focusArea == FocusArea::ConfigureThingClassSearch && m_mainView == MainView::ConfigureThings && m_configureThingsView == ConfigureThingsView::AddThing) {
-        if (event == ftxui::Event::Backspace && !m_configureThingSearch.empty()) {
-            m_configureThingSearch.pop_back();
-            clampConfigureThingClassSelection();
-            return true;
-        }
-        if (event.is_character()) {
-            m_configureThingSearch += event.character();
-            clampConfigureThingClassSelection();
-            return true;
-        }
-    }
-
-    if (m_focusArea == FocusArea::ConfigureThingSelectionSearch && m_mainView == MainView::ConfigureThings) {
-        if (event == ftxui::Event::Backspace && !m_configureThingSelectionSearch.empty()) {
-            m_configureThingSelectionSearch.pop_back();
-            m_selectedConfigureThingIndex = 0;
-            clampConfigureThingSelection();
-            return true;
-        }
-        if (event.is_character()) {
-            m_configureThingSelectionSearch += event.character();
-            m_selectedConfigureThingIndex = 0;
-            clampConfigureThingSelection();
-            return true;
-        }
-    }
-
     if (event == ftxui::Event::Character("s") && m_mainView == MainView::Things) {
         cycleThingSortMode();
         return true;
@@ -1399,11 +1306,8 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
     }
 
     if (event == ftxui::Event::Character("h") || event == ftxui::Event::Character("?")) {
-        if (m_focusArea != FocusArea::ThingSearch && m_focusArea != FocusArea::ConfigureThingClassSearch && m_focusArea != FocusArea::ConfigureThingSelectionSearch
-            && m_focusArea != FocusArea::ApiBrowserSearch) {
-            openHelpView();
-            return true;
-        }
+        openHelpView();
+        return true;
     }
 
     if (event == ftxui::Event::Character("t")) {

@@ -44,9 +44,6 @@ void Engine::clampConfigureThingClassSelection()
     const std::vector<api::ThingClass> thingClasses = filteredConfigThingClasses();
     if (thingClasses.empty()) {
         m_selectedConfigureThingClassIndex = 0;
-        if (m_focusArea == FocusArea::ConfigureThingClassList) {
-            m_focusArea = FocusArea::ConfigureThingClassSearch;
-        }
         return;
     }
 
@@ -800,6 +797,8 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("Up / Down: move the selection in the focused list.")},
         {HelpRowKind::Text, QStringLiteral("Left / Right: switch panels or move between subviews.")},
         {HelpRowKind::Text, QStringLiteral("Tab / Shift+Tab: switch to the next or previous tab.")},
+        {HelpRowKind::Text, QStringLiteral("/: edit the filter of the focused list; Enter or Up / Down finishes, Esc clears.")},
+        {HelpRowKind::Text, QStringLiteral("Esc on a filtered list clears the filter.")},
         {HelpRowKind::Text, QStringLiteral("Enter: activate the selected item.")},
         {HelpRowKind::Text, QStringLiteral("Space: toggle the thing inspector.")},
         {HelpRowKind::Text, QStringLiteral("c: reconnect to the current server.")},
@@ -810,10 +809,10 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Heading, QStringLiteral("Tabs")},
         {HelpRowKind::Text, QStringLiteral("Left from the leftmost panel focuses the tab bar.")},
         {HelpRowKind::Text, QStringLiteral("Left / Right on the tab bar switches the selected tab.")},
-        {HelpRowKind::Text, QStringLiteral("Down or Enter enters the selected tab; in API browser it enters the filter field.")},
+        {HelpRowKind::Text, QStringLiteral("Down or Enter enters the selected tab.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Things view")},
-        {HelpRowKind::Text, QStringLiteral("Left / Right: switch between search, list, and details.")},
+        {HelpRowKind::Text, QStringLiteral("Left / Right: switch between list and details.")},
         {HelpRowKind::Text, QStringLiteral("Enter on an action: open the action execution dialog.")},
         {HelpRowKind::Text, QStringLiteral("l on a temperature, humidity, or boolean state: open the state history chart.")},
         {HelpRowKind::Text, QStringLiteral("l on an action: open the action log list.")},
@@ -828,7 +827,7 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Heading, QStringLiteral("Configure things")},
         {HelpRowKind::Text, QStringLiteral("Up / Down: move between menu entries or list rows.")},
         {HelpRowKind::Text, QStringLiteral("Enter: open the selected setup / rename / remove flow.")},
-        {HelpRowKind::Text, QStringLiteral("Type in search fields to filter thing classes.")},
+        {HelpRowKind::Text, QStringLiteral("/ filters thing classes or things.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Settings")},
         {HelpRowKind::Text, QStringLiteral("Up / Down: select Server info, Timezone, Update, Logging categories, Server interfaces, Modbus RTU, Shutdown, Restart, or Reboot.")},
@@ -837,10 +836,9 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("Logging levels use Left/Right or Space. Server interfaces and Modbus RTU use a/e/d/r for add/edit/delete/refresh.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("API browser")},
-        {HelpRowKind::Text, QStringLiteral("Type to filter methods, notifications, types, and enums.")},
-        {HelpRowKind::Text, QStringLiteral("Backspace removes the last filter character.")},
+        {HelpRowKind::Text, QStringLiteral("/ filters methods, notifications, types, and enums.")},
         {HelpRowKind::Text, QStringLiteral("Left: go back in API browser history.")},
-        {HelpRowKind::Text, QStringLiteral("Right: move between search, list, and references panes.")},
+        {HelpRowKind::Text, QStringLiteral("Right: move between list and references panes.")},
         {HelpRowKind::Text, QStringLiteral("Enter on a reference: follow that referenced type.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Dialogs")},
@@ -1159,11 +1157,7 @@ ftxui::Element Engine::renderApiBrowser() const
     const bool selectionVisible = selectedIndex >= 0;
 
     ftxui::Elements leftPaneLines;
-    auto searchRow = ftxui::text("Filter: " + (m_apiBrowserSearch.empty() ? std::string("<type to filter>") : m_apiBrowserSearch));
-    if (m_focusArea == FocusArea::ApiBrowserSearch) {
-        searchRow = renderActiveField(std::move(searchRow) | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, 28);
-    }
-    leftPaneLines.push_back(searchRow);
+    leftPaneLines.push_back(renderFilterRow(m_apiBrowserSearch, m_focusArea == FocusArea::ApiBrowserList, 28));
     leftPaneLines.push_back(ftxui::text(m_apiBrowserStatus));
     leftPaneLines.push_back(ftxui::separator());
 
@@ -1196,7 +1190,7 @@ ftxui::Element Engine::renderApiBrowser() const
 
     ftxui::Element leftPane = renderFocusedWindow(ftxui::text("API browser"),
                                                   ftxui::vbox(std::move(leftPaneLines)) | ftxui::vscroll_indicator | ftxui::frame,
-                                                  m_focusArea == FocusArea::ApiBrowserSearch || m_focusArea == FocusArea::ApiBrowserList)
+                                                  m_focusArea == FocusArea::ApiBrowserList)
                               | ftxui::reflect(m_apiBrowserListBox) | ftxui::flex;
 
     ftxui::Element detailsPanel;

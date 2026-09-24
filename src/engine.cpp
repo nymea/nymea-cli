@@ -2,6 +2,10 @@
 
 #include "engineinternal.h"
 
+#include <ftxui/screen/terminal.hpp>
+
+#include <utility>
+
 namespace nymea {
 
 
@@ -148,35 +152,115 @@ Engine::MainMenuEntry Engine::nextMainMenuEntry(MainMenuEntry entry, int delta)
     return s_mainMenuEntries.at(((index + delta) % count + count) % count);
 }
 
+const std::string* Engine::focusedFilterText() const
+{
+    switch (m_focusArea) {
+    case FocusArea::ThingList:
+        return &m_thingSearch;
+    case FocusArea::ConfigureThingClassList:
+        return &m_configureThingSearch;
+    case FocusArea::ConfigureThingSelection:
+        return &m_configureThingSelectionSearch;
+    case FocusArea::ApiBrowserList:
+        return &m_apiBrowserSearch;
+    case FocusArea::SettingsDetails:
+        if (m_settingsView == SettingsView::Timezone) {
+            return &m_systemTimeZoneSearch;
+        }
+        if (m_settingsView == SettingsView::LoggingCategories) {
+            return &m_loggingCategorySearch;
+        }
+        return nullptr;
+    default:
+        return nullptr;
+    }
+}
+
+std::string* Engine::focusedFilterText()
+{
+    return const_cast<std::string*>(std::as_const(*this).focusedFilterText());
+}
+
+bool Engine::isFilterEditing() const
+{
+    return m_filterEditing && focusedFilterText() != nullptr;
+}
+
+void Engine::applyFilterChange(const QUuid& previousThingId)
+{
+    switch (m_focusArea) {
+    case FocusArea::ThingList:
+        clampThingSelection(previousThingId);
+        resetThingDetailSelection();
+        break;
+    case FocusArea::ConfigureThingClassList:
+        clampConfigureThingClassSelection();
+        break;
+    case FocusArea::ConfigureThingSelection:
+        m_selectedConfigureThingIndex = 0;
+        clampConfigureThingSelection();
+        break;
+    case FocusArea::ApiBrowserList:
+        clampApiBrowserSelection();
+        clampApiBrowserReferenceSelection();
+        break;
+    case FocusArea::SettingsDetails:
+        clampSettingsDetailsSelection();
+        break;
+    default:
+        break;
+    }
+}
+
+ftxui::Element Engine::renderFilterRow(const std::string& text, bool listFocused, int minimumWidth) const
+{
+    if (listFocused && isFilterEditing()) {
+        return renderActiveField(ftxui::text("Filter: " + text + "_") | ftxui::inverted | ftxui::bold | ftxui::color(ftxui::Color::CyanLight), true, minimumWidth);
+    }
+    if (text.empty()) {
+        return ftxui::text("Filter: / to search") | ftxui::dim;
+    }
+    return ftxui::text("Filter: " + text);
+}
+
 ftxui::Element Engine::renderMainMenu() const
 {
     constexpr std::array<const char*, 6> menuItems = {"Things", "Configure things", "API browser", "Settings", "Logout", "About"};
     const bool apiBrowserEnabled = m_client.isConnected() && (!m_isAuthenticationRequired || m_isAuthenticated);
     const bool logoutEnabled = m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty();
 
+    int tabWidth = 0;
+    for (const char* item : menuItems) {
+        tabWidth = std::max(tabWidth, static_cast<int>(std::string(item).size()) + 2);
+    }
+    // Separators between tabs plus the outer border take the remaining columns.
+    const int requiredWidth = tabWidth * static_cast<int>(menuItems.size()) + static_cast<int>(menuItems.size()) + 1;
+    const bool focused = m_focusArea == FocusArea::MainMenu;
+    const bool equalTabs = ftxui::Terminal::Size().dimx >= requiredWidth;
+
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
         const MainMenuEntry menuEntry = s_mainMenuEntries.at(index);
         const bool enabled = (menuEntry != MainMenuEntry::ApiBrowser || apiBrowserEnabled) && (menuEntry != MainMenuEntry::Logout || logoutEnabled);
         const bool selected = m_selectedMainMenuEntry == menuEntry;
-        auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
+        const int minimumWidth = equalTabs ? tabWidth : static_cast<int>(std::string(menuItems.at(index)).size()) + 2;
+        auto entry = ftxui::text(menuItems.at(index)) | ftxui::center | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, minimumWidth) | ftxui::xflex_grow;
         if (!enabled) {
             entry = entry | ftxui::dim;
         }
         if (selected && enabled) {
-            entry = entry | ftxui::bold | ftxui::inverted;
-            if (m_focusArea == FocusArea::MainMenu) {
-                entry = entry | ftxui::color(ftxui::Color::CyanLight);
-            }
+            entry = focused ? entry | ftxui::bold | ftxui::color(ftxui::Color::White) | ftxui::bgcolor(ftxui::Color::SteelBlue) : entry | ftxui::bold | ftxui::inverted;
         }
         if (index > 0) {
-            entries.push_back(ftxui::separator());
+            entries.push_back(focused ? ftxui::separator() | ftxui::color(ftxui::Color::SteelBlue) : ftxui::separator());
         }
         entries.push_back(entry);
     }
-    entries.push_back(ftxui::filler());
 
-    return ftxui::hbox(std::move(entries)) | ftxui::reflect(m_mainMenuBox);
+    return ftxui::vbox({
+        ftxui::hbox(std::move(entries)) | ftxui::reflect(m_mainMenuBox),
+        focused ? ftxui::separator() | ftxui::color(ftxui::Color::SteelBlue) : ftxui::separator(),
+    });
 }
 
 ftxui::Element Engine::renderAbout() const
@@ -281,11 +365,11 @@ ftxui::Element Engine::renderUi()
     if (m_showLoginForm) {
         ftxui::Elements sections;
         sections.push_back(ftxui::hbox({
-                               ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
-                               ftxui::filler(),
-                               ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
-                           })
-                           | ftxui::border);
+            ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
+            ftxui::filler(),
+            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion + " "),
+        }));
+        sections.push_back(ftxui::separator());
         sections.push_back(ftxui::filler());
         ftxui::Elements loginBody;
         if (m_pushButtonAuthAvailable) {
@@ -337,12 +421,13 @@ ftxui::Element Engine::renderUi()
     }
 
     sections.push_back(ftxui::hbox({
-                           ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
-                           ftxui::filler(),
-                           ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
-                       })
-                       | ftxui::border);
-    if (!m_logView.visible && m_mainView != MainView::Help) {
+        ftxui::text(" nymea-cli (" + m_options.appVersion + ")"),
+        ftxui::filler(),
+        ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion + " "),
+    }));
+    const bool showTabs = !m_logView.visible && m_mainView != MainView::Help;
+    sections.push_back(showTabs && m_focusArea == FocusArea::MainMenu ? ftxui::separator() | ftxui::color(ftxui::Color::SteelBlue) : ftxui::separator());
+    if (showTabs) {
         sections.push_back(renderMainMenu());
     } else {
         m_mainMenuBox = {};
@@ -358,10 +443,10 @@ ftxui::Element Engine::renderUi()
         sections.push_back(renderHelp() | ftxui::flex);
         return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
     }
-    std::string keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left/Right switch panels, s sort, f filter, Space inspector, l logs, c reconnect, "
+    std::string keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left/Right switch panels, / filter, s sort, f category, Space inspector, l logs, c reconnect, "
                               "t refresh things, ?/h help, Enter opens actions/setup, q/Esc quit";
     if (m_mainView == MainView::ApiBrowser) {
-        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh "
+        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, / filter, c reconnect, t refresh "
                       "things, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Settings) {
         keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down select settings, Right/Enter open details, Enter applies/edits, "
@@ -371,8 +456,6 @@ ftxui::Element Engine::renderUi()
     } else if (m_mainView == MainView::About) {
         keyHintLine = "Keys: Tab/Shift+Tab switch tabs, ?/h help, q/Esc quit";
     }
-    sections.push_back(ftxui::text(keyHintLine) | ftxui::dim);
-    sections.push_back(ftxui::separator());
 
     ftxui::Element rightPanel;
     if (m_mainView == MainView::Things) {
@@ -736,6 +819,9 @@ ftxui::Element Engine::renderUi()
                                                }) | ftxui::size(ftxui::WIDTH, ftxui::GREATER_THAN, 80),
                                                m_showConfigureDialog && m_focusArea == FocusArea::ConfigureDialog));
     }
+
+    sections.push_back(ftxui::separator());
+    sections.push_back(ftxui::text(keyHintLine) | ftxui::dim);
 
     return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
 }

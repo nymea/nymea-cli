@@ -372,9 +372,10 @@ private:
 
     static MainMenuEntry nextMainMenuEntry(MainMenuEntry entry, int delta);
     ftxui::Element renderMainMenu() const;
+    const std::string* focusedFilterText() const;
     std::string* focusedFilterText();
     bool isFilterEditing() const;
-    void applyFilterChange();
+    void applyFilterChange(const QUuid& previousThingId);
     ftxui::Element renderFilterRow(const std::string& text, bool listFocused, int minimumWidth) const;
     ftxui::Element renderThingList() const;
     ftxui::Element renderThingDetails() const;
