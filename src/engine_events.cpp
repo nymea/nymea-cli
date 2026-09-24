@@ -625,6 +625,50 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
         return true;
     }
 
+    if (event == ftxui::Event::Tab || event == ftxui::Event::TabReverse) {
+        syncMainMenuSelectionToCurrentView();
+        applyMainMenuSelection(nextMainMenuEntry(m_selectedMainMenuEntry, event == ftxui::Event::Tab ? 1 : -1));
+        m_focusArea = FocusArea::MainMenu;
+        return true;
+    }
+
+    if (m_focusArea == FocusArea::MainMenu) {
+        if (event == ftxui::Event::ArrowLeft || event == ftxui::Event::ArrowRight) {
+            applyMainMenuSelection(nextMainMenuEntry(m_selectedMainMenuEntry, event == ftxui::Event::ArrowRight ? 1 : -1));
+            return true;
+        }
+        if (event == ftxui::Event::ArrowUp) {
+            return true;
+        }
+        if (event == ftxui::Event::Return && m_selectedMainMenuEntry == MainMenuEntry::Logout) {
+            if (m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty()) {
+                logout();
+            }
+            return true;
+        }
+        if (event == ftxui::Event::ArrowDown || event == ftxui::Event::Return) {
+            switch (m_mainView) {
+            case MainView::Things:
+                m_focusArea = FocusArea::ThingSearch;
+                break;
+            case MainView::ConfigureThings:
+                m_focusArea = FocusArea::ConfigureMenu;
+                break;
+            case MainView::ApiBrowser:
+                m_focusArea = FocusArea::ApiBrowserSearch;
+                break;
+            case MainView::Settings:
+                m_focusArea = FocusArea::SettingsMenu;
+                break;
+            case MainView::Logout:
+            case MainView::About:
+            case MainView::Help:
+                break;
+            }
+            return true;
+        }
+    }
+
     if (m_mainView == MainView::ApiBrowser) {
         const std::vector<ApiBrowserItem> items = buildApiBrowserItems(m_apiBrowserIntrospection);
         const std::vector<ApiBrowserItem> filteredItems = filterApiBrowserItems(items, QString::fromStdString(m_apiBrowserSearch));
@@ -933,9 +977,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
 
     if (event == ftxui::Event::ArrowRight) {
         if (m_mainView == MainView::Things) {
-            if (m_focusArea == FocusArea::MainMenu) {
-                m_focusArea = FocusArea::ThingSearch;
-            } else if (m_focusArea == FocusArea::ThingSearch) {
+            if (m_focusArea == FocusArea::ThingSearch) {
                 m_focusArea = FocusArea::ThingList;
             } else if (m_focusArea == FocusArea::ThingList && thingDetailEntryCount() > 0) {
                 selectInitialThingDetailSection();
@@ -957,9 +999,7 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
                 m_focusArea = FocusArea::ConfigureMenu;
             }
         } else if (m_mainView == MainView::ApiBrowser) {
-            if (m_focusArea == FocusArea::MainMenu) {
-                m_focusArea = FocusArea::ApiBrowserSearch;
-            } else if (m_focusArea == FocusArea::ApiBrowserSearch) {
+            if (m_focusArea == FocusArea::ApiBrowserSearch) {
                 m_focusArea = FocusArea::ApiBrowserList;
             } else if (m_focusArea == FocusArea::ApiBrowserList) {
                 m_focusArea = FocusArea::ApiBrowserReferences;
@@ -1070,30 +1110,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             }
             return true;
         }
-
-        if (m_focusArea == FocusArea::MainMenu) {
-            switch (m_selectedMainMenuEntry) {
-            case MainMenuEntry::Things:
-                applyMainMenuSelection(MainMenuEntry::About);
-                break;
-            case MainMenuEntry::ConfigureThings:
-                applyMainMenuSelection(MainMenuEntry::Things);
-                break;
-            case MainMenuEntry::ApiBrowser:
-                applyMainMenuSelection(MainMenuEntry::ConfigureThings);
-                break;
-            case MainMenuEntry::Settings:
-                applyMainMenuSelection(MainMenuEntry::ApiBrowser);
-                break;
-            case MainMenuEntry::Logout:
-                applyMainMenuSelection(MainMenuEntry::Settings);
-                break;
-            case MainMenuEntry::About:
-                applyMainMenuSelection(MainMenuEntry::Logout);
-                break;
-            }
-            return true;
-        }
     }
 
     if (event == ftxui::Event::ArrowDown) {
@@ -1177,40 +1193,6 @@ bool Engine::handleEvent(const ftxui::Event& event, ftxui::ScreenInteractive& sc
             }
             return true;
         }
-
-        if (m_focusArea == FocusArea::MainMenu) {
-            switch (m_selectedMainMenuEntry) {
-            case MainMenuEntry::Things:
-                applyMainMenuSelection(MainMenuEntry::ConfigureThings);
-                break;
-            case MainMenuEntry::ConfigureThings:
-                applyMainMenuSelection(MainMenuEntry::ApiBrowser);
-                break;
-            case MainMenuEntry::ApiBrowser:
-                applyMainMenuSelection(MainMenuEntry::Settings);
-                break;
-            case MainMenuEntry::Settings:
-                applyMainMenuSelection(MainMenuEntry::Logout);
-                break;
-            case MainMenuEntry::Logout:
-                applyMainMenuSelection(MainMenuEntry::About);
-                break;
-            case MainMenuEntry::About:
-                applyMainMenuSelection(MainMenuEntry::Things);
-                break;
-            }
-            return true;
-        }
-    }
-
-    if (m_focusArea == FocusArea::MainMenu && event == ftxui::Event::Return) {
-        if (m_selectedMainMenuEntry == MainMenuEntry::Logout) {
-            if (m_client.isConnected() && m_isAuthenticated && !m_client.authToken().isEmpty()) {
-                logout();
-            }
-            return true;
-        }
-        return true;
     }
 
     if (event == ftxui::Event::Return && m_mainView == MainView::Settings && m_focusArea == FocusArea::SettingsMenu) {

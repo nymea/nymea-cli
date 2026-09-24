@@ -799,6 +799,7 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Heading, QStringLiteral("Global")},
         {HelpRowKind::Text, QStringLiteral("Up / Down: move the selection in the focused list.")},
         {HelpRowKind::Text, QStringLiteral("Left / Right: switch panels or move between subviews.")},
+        {HelpRowKind::Text, QStringLiteral("Tab / Shift+Tab: switch to the next or previous tab.")},
         {HelpRowKind::Text, QStringLiteral("Enter: activate the selected item.")},
         {HelpRowKind::Text, QStringLiteral("Space: toggle the thing inspector.")},
         {HelpRowKind::Text, QStringLiteral("c: reconnect to the current server.")},
@@ -806,10 +807,10 @@ std::vector<HelpRow> buildHelpRows()
         {HelpRowKind::Text, QStringLiteral("s: cycle thing sort mode.")},
         {HelpRowKind::Text, QStringLiteral("f: cycle thing category filter.")},
         {HelpRowKind::Separator, {}},
-        {HelpRowKind::Heading, QStringLiteral("Main menu")},
-        {HelpRowKind::Text, QStringLiteral("Up / Down keeps focus on the main menu and updates the selected section.")},
-        {HelpRowKind::Text, QStringLiteral("Right enters the selected section; in API browser it enters the filter field.")},
-        {HelpRowKind::Text, QStringLiteral("About is a separate main-menu entry at the end.")},
+        {HelpRowKind::Heading, QStringLiteral("Tabs")},
+        {HelpRowKind::Text, QStringLiteral("Left from the leftmost panel focuses the tab bar.")},
+        {HelpRowKind::Text, QStringLiteral("Left / Right on the tab bar switches the selected tab.")},
+        {HelpRowKind::Text, QStringLiteral("Down or Enter enters the selected tab; in API browser it enters the filter field.")},
         {HelpRowKind::Separator, {}},
         {HelpRowKind::Heading, QStringLiteral("Things view")},
         {HelpRowKind::Text, QStringLiteral("Left / Right: switch between search, list, and details.")},
@@ -888,28 +889,7 @@ bool Engine::handleMouseWheel(const ftxui::Event& event)
     const int delta = button == ftxui::Mouse::WheelUp ? -1 : 1;
     const auto inside = [&](const ftxui::Box& box) { return box.x_min <= box.x_max && box.y_min <= box.y_max && box.Contain(mouseEvent.mouse().x, mouseEvent.mouse().y); };
 
-    auto moveMainMenu = [this, delta]() {
-        switch (m_selectedMainMenuEntry) {
-        case MainMenuEntry::Things:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::About : MainMenuEntry::ConfigureThings;
-            break;
-        case MainMenuEntry::ConfigureThings:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Things : MainMenuEntry::ApiBrowser;
-            break;
-        case MainMenuEntry::ApiBrowser:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::ConfigureThings : MainMenuEntry::Settings;
-            break;
-        case MainMenuEntry::Settings:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::ApiBrowser : MainMenuEntry::Logout;
-            break;
-        case MainMenuEntry::Logout:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Settings : MainMenuEntry::About;
-            break;
-        case MainMenuEntry::About:
-            m_selectedMainMenuEntry = delta < 0 ? MainMenuEntry::Things : MainMenuEntry::Logout;
-            break;
-        }
-    };
+    auto moveMainMenu = [this, delta]() { m_selectedMainMenuEntry = nextMainMenuEntry(m_selectedMainMenuEntry, delta); };
     auto moveThingList = [this, delta]() {
         const std::vector<const api::Thing*> things = filteredThings();
         if (things.empty()) {

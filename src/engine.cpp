@@ -141,6 +141,13 @@ void Engine::runHandshakeAndLoadThings()
     sendHello();
 }
 
+Engine::MainMenuEntry Engine::nextMainMenuEntry(MainMenuEntry entry, int delta)
+{
+    const int count = static_cast<int>(s_mainMenuEntries.size());
+    const int index = static_cast<int>(std::find(s_mainMenuEntries.begin(), s_mainMenuEntries.end(), entry) - s_mainMenuEntries.begin());
+    return s_mainMenuEntries.at(((index + delta) % count + count) % count);
+}
+
 ftxui::Element Engine::renderMainMenu() const
 {
     constexpr std::array<const char*, 6> menuItems = {"Things", "Configure things", "API browser", "Settings", "Logout", "About"};
@@ -149,27 +156,27 @@ ftxui::Element Engine::renderMainMenu() const
 
     ftxui::Elements entries;
     for (int index = 0; index < static_cast<int>(menuItems.size()); ++index) {
-        const bool selected = (m_selectedMainMenuEntry == MainMenuEntry::Things && index == 0) || (m_selectedMainMenuEntry == MainMenuEntry::ConfigureThings && index == 1)
-                              || (m_selectedMainMenuEntry == MainMenuEntry::ApiBrowser && index == 2) || (m_selectedMainMenuEntry == MainMenuEntry::Settings && index == 3)
-                              || (m_selectedMainMenuEntry == MainMenuEntry::Logout && index == 4) || (m_selectedMainMenuEntry == MainMenuEntry::About && index == 5);
+        const MainMenuEntry menuEntry = s_mainMenuEntries.at(index);
+        const bool enabled = (menuEntry != MainMenuEntry::ApiBrowser || apiBrowserEnabled) && (menuEntry != MainMenuEntry::Logout || logoutEnabled);
+        const bool selected = m_selectedMainMenuEntry == menuEntry;
         auto entry = ftxui::text(std::string(" ") + menuItems.at(index) + " ");
-        if ((index == 2 && !apiBrowserEnabled) || (index == 4 && !logoutEnabled)) {
+        if (!enabled) {
             entry = entry | ftxui::dim;
         }
-        if (selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
+        if (selected && enabled) {
             entry = entry | ftxui::bold | ftxui::inverted;
+            if (m_focusArea == FocusArea::MainMenu) {
+                entry = entry | ftxui::color(ftxui::Color::CyanLight);
+            }
         }
-        if (m_focusArea == FocusArea::MainMenu && selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
-            entry = entry | ftxui::color(ftxui::Color::CyanLight);
-        }
-        if (selected && ((index == 2 && apiBrowserEnabled) || (index == 4 && logoutEnabled) || (index != 2 && index != 4))) {
-            entry = entry | ftxui::focus;
+        if (index > 0) {
+            entries.push_back(ftxui::separator());
         }
         entries.push_back(entry);
     }
+    entries.push_back(ftxui::filler());
 
-    return renderFocusedWindow(ftxui::text("Menu"), ftxui::vbox(std::move(entries)) | ftxui::vscroll_indicator | ftxui::frame, m_focusArea == FocusArea::MainMenu)
-           | ftxui::reflect(m_mainMenuBox);
+    return ftxui::hbox(std::move(entries)) | ftxui::reflect(m_mainMenuBox);
 }
 
 ftxui::Element Engine::renderAbout() const
@@ -182,7 +189,7 @@ ftxui::Element Engine::renderAbout() const
     lines.push_back(ftxui::text("Server version: " + m_serverVersion));
     lines.push_back(ftxui::text("Server API version: " + m_serverApiVersion));
     lines.push_back(ftxui::text("Purpose: terminal client for nymead"));
-    lines.push_back(ftxui::text("Navigation: Up/Down move, Left/Right switch panels"));
+    lines.push_back(ftxui::text("Navigation: Tab/Shift+Tab switch tabs, Up/Down move, Left/Right switch panels"));
     lines.push_back(ftxui::separator());
     lines.push_back(ftxui::text("Open source components"));
     lines.push_back(ftxui::text("Qt Core + Network version: " + std::string(qVersion())));
@@ -335,6 +342,11 @@ ftxui::Element Engine::renderUi()
                            ftxui::text(endpoint() + " " + m_serverName.toStdString() + " | " + m_serverVersion + " | API " + m_serverApiVersion),
                        })
                        | ftxui::border);
+    if (!m_logView.visible && m_mainView != MainView::Help) {
+        sections.push_back(renderMainMenu());
+    } else {
+        m_mainMenuBox = {};
+    }
     if (!m_settingsWarning.empty()) {
         sections.push_back(ftxui::text(m_settingsWarning) | ftxui::color(ftxui::Color::Yellow));
     }
@@ -346,19 +358,18 @@ ftxui::Element Engine::renderUi()
         sections.push_back(renderHelp() | ftxui::flex);
         return ftxui::vbox(std::move(sections)) | ftxui::border | ftxui::flex;
     }
-    std::string keyHintLine
-        = "Keys: Up/Down navigate, Left/Right switch panels, s sort, f filter, Space inspector, l logs, c reconnect, t refresh things, ?/h help, Enter opens actions/setup, "
-          "q/Esc quit";
+    std::string keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left/Right switch panels, s sort, f filter, Space inspector, l logs, c reconnect, "
+                              "t refresh things, ?/h help, Enter opens actions/setup, q/Esc quit";
     if (m_mainView == MainView::ApiBrowser) {
-        keyHintLine
-            = "Keys: Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh things, ?/h help, q/Esc quit";
+        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down navigate, Left back, Right switch browser panes, Enter follows a reference, type to filter, c reconnect, t refresh "
+                      "things, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Settings) {
-        keyHintLine = "Keys: Up/Down select settings, Right/Enter open details, Enter applies/edits, Server interfaces/Modbus RTU a/e/d/r add/edit/delete/refresh, Left returns, "
-                      "?/h help, q/Esc quit";
+        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Up/Down select settings, Right/Enter open details, Enter applies/edits, "
+                      "Server interfaces/Modbus RTU a/e/d/r add/edit/delete/refresh, Left returns, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::Logout) {
-        keyHintLine = "Keys: Enter logs out, Left returns to the menu, ?/h help, q/Esc quit";
+        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, Enter logs out, ?/h help, q/Esc quit";
     } else if (m_mainView == MainView::About) {
-        keyHintLine = "Keys: Left/Right switch panels, ?/h help, q/Esc quit";
+        keyHintLine = "Keys: Tab/Shift+Tab switch tabs, ?/h help, q/Esc quit";
     }
     sections.push_back(ftxui::text(keyHintLine) | ftxui::dim);
     sections.push_back(ftxui::separator());
@@ -386,11 +397,7 @@ ftxui::Element Engine::renderUi()
                      | ftxui::flex;
     }
 
-    sections.push_back(ftxui::hbox({
-                           renderMainMenu() | ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 24),
-                           rightPanel | ftxui::flex,
-                       })
-                       | ftxui::flex);
+    sections.push_back(rightPanel | ftxui::flex);
 
     if (m_showLogoutConfirm) {
         ftxui::Elements dialogBody;

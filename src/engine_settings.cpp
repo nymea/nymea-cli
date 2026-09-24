@@ -913,7 +913,7 @@ ftxui::Element Engine::renderLogout() const
     lines.push_back(ftxui::paragraph("Logout revokes the current token on the server, clears the saved token locally, and reconnects to the same server."));
     lines.push_back(ftxui::separator());
     lines.push_back(ftxui::text("Only execution option: Logout") | ftxui::bold);
-    lines.push_back(ftxui::text("Press Enter to logout, or Left to return to the menu.") | ftxui::dim);
+    lines.push_back(ftxui::text("Press Enter to logout, or Tab/Shift+Tab to switch tabs.") | ftxui::dim);
 
     return renderFocusedWindow(ftxui::text("Logout"), ftxui::vbox(std::move(lines)) | ftxui::vscroll_indicator | ftxui::frame, m_mainView == MainView::Logout) | ftxui::flex;
 }
