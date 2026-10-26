@@ -1,3 +1,10 @@
+nymea-cli (1.17.0) resolute; urgency=medium
+
+  [ Simon Stürz ]
+  * Rework main navigation
+
+ -- jenkins <developer@nymea.io>  Mon, 26 Oct 2026 17:11:58 +0100
+
 nymea-cli (1.16.2) resolute; urgency=medium
 
   [ Simon Stürz ]
